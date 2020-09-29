@@ -13,12 +13,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/SurtiLainez-dev/electron-auto-update-example"
+    "url": "https://github.com/SurtiLainez-dev/tilk"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=DEV electron .",
     "build": "nuxt build && electron-builder build --win --publish never",
-    "deploy": "electron-builder build --win --publish always"
+    "deploy": "nuxt build && electron-builder build --win --publish always --config ./electron-builder.yml"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.0",
