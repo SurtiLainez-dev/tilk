@@ -1,15 +1,16 @@
 /*
 **  Nuxt
 */
-const http = require('http')
-const { Nuxt, Builder } = require('nuxt')
-let config = require('./nuxt.config.js')
+const http = require('http');
+const { Nuxt, Builder } = require('nuxt');
+let config = require('./nuxt.config.js');
 const db = require('./db');
-config.rootDir = __dirname // for electron-builder
+config.rootDir = __dirname;// for electron-builder
+const log = require('electron-log');
 // Init Nuxt.js
-const nuxt = new Nuxt(config)
-const builder = new Builder(nuxt)
-const server = http.createServer(nuxt.render)
+const nuxt = new Nuxt(config);
+const builder = new Builder(nuxt);
+const server = http.createServer(nuxt.render);
 // Build only in dev mode
 if (config.dev) {
 	builder.build().catch(err => {
@@ -26,15 +27,17 @@ console.log(`Nuxt working on ${_NUXT_URL_}`)
 ** Electron
 */
 let win = null // Current window
-const electron = require('electron')
-const path = require('path')
-const app = electron.app
+const electron = require('electron');
+const path = require('path');
+const app = electron.app;
 const newWin = () => {
 	win = new electron.BrowserWindow({
 		icon: path.join(__dirname, 'static/icon.png')
-	})
-	win.maximize()
-	win.on('closed', () => win = null)
+	});
+	win.maximize();
+
+	win.on('closed', () => win = null);
+
 	if (config.dev) {
 		// Install vue dev tool and open chrome dev tools
 		const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer')
@@ -50,11 +53,26 @@ const newWin = () => {
 		}
 		pollServer()
 	} else { return win.loadURL(_NUXT_URL_) }
-}
-db.crear_db_inicios()
-db.crear_db_usuarios()
-db.crear_db_conexiones()
-db.crear_db_articulos()
-app.on('ready', newWin)
-app.on('window-all-closed', () => app.quit())
-app.on('activate', () => win === null && newWin())
+
+};
+db.crear_db_inicios();
+db.crear_db_usuarios();
+db.crear_db_conexiones();
+db.crear_db_articulos();
+
+// autoUpdater.on('update-available', () => {
+// 	win.webContents.send('update_available');
+// });
+
+// autoUpdater.on('update-downloaded', () => {
+// 	win.webContents.send('update_downloaded');
+// });
+//
+// ipcMain.on('restart_app', () => {
+// 	win.quitAndInstall();
+// });
+
+
+app.on('ready', newWin);
+app.on('window-all-closed', () => app.quit());
+app.on('activate', () => win === null && newWin());

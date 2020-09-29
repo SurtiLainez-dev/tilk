@@ -9,7 +9,7 @@ module.exports = {
 		link: [
 			{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
 		],
-		title: 'adn',
+		title: 'TILK',
 	}, // Headers of the page
 	build: {
 		extend (config, { isDev, isClient }) {
@@ -31,9 +31,6 @@ module.exports = {
 		]
 	},
 	loading: { color: '#23F702'},
-	// plugins:[
-	// 	'@/plugins/vuetify'
-	// ],
 	dev: process.env.NODE_ENV === 'DEV',
 	css: [
 		'@/assets/css/global.css'
@@ -42,7 +39,6 @@ module.exports = {
 		'@/plugins/icons'
 	],
 	modules: [
-		// Doc: https://axios.nuxtjs.org/usage
 		'@nuxtjs/axios',
 		'@nuxtjs/vuetify',
 		'bootstrap-vue/nuxt',

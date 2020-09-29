@@ -161,6 +161,10 @@ export default {
       this.actualizacion = true;
     });
 
+    ipcRenderer.on('busrcar-actualizacion', () => {
+      console.log("ya vino")
+    });
+
   },
   methods:{
     cambioServidor(){

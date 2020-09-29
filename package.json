@@ -17,8 +17,8 @@
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=DEV electron .",
-    "build": "nuxt build && electron-builder build --mac --win --publish never",
-    "deploy": "electron-builder build --mac --win --publish always"
+    "build": "nuxt build && electron-builder build --win --publish never",
+    "deploy": "electron-builder build --win --publish always"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.0",

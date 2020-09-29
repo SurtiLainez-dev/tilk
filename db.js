@@ -47,6 +47,12 @@ app.on('ready', ()=>{
     winPdf.loadURL(url);
   })
 
+  ipcMain.on('busrcar-actualizacion', (v, arg) => {
+      autoUpdater.checkForUpdatesAndNotify();
+      console.log("si vino")
+      log.info('busco actualizacion')
+  })
+
 })
 
 //creacion de base de datos
