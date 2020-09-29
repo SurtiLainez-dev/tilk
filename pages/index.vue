@@ -116,7 +116,7 @@
       <v-snackbar v-model="updater" :timeout="120000">
         La actualización ya se descargo completamente. Por favor reinicie la aplicación para instalar la nueva versión.
         <template v-slot:action="{ attrs }">
-          <v-btn color="pink" text v-bind="attrs" @click="actualizacion = false">
+          <v-btn color="pink" text v-bind="attrs" @click="updater = false">
             Cerrar
           </v-btn>
           <v-btn color="pink" text v-bind="attrs" @click="reiniciarApp">
@@ -169,18 +169,14 @@ export default {
       this.$axios.defaults.baseURL = data.conexion
     });
 
-    ipcRenderer.on('update_available', () => {
-      console.log("escucho")
-      this.actualizacion = true;
-    });
-
     ipcRenderer.send('busrcar-actualizacion', () => {
 
     });
 
-    ipcRenderer.on('update-available', (e, data) => {
+    ipcRenderer.on('update_available', () => {
       this.actualizacion = true;
     });
+
     ipcRenderer.on('update_downloaded', (e, data) => {
       this.updater = true;
     });

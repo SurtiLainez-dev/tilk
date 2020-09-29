@@ -49,7 +49,6 @@ app.on('ready', ()=>{
 
   ipcMain.on('busrcar-actualizacion', (v, arg) => {
       autoUpdater.checkForUpdatesAndNotify();
-      console.log("si vino")
       log.info('busco actualizacion')
   })
 
@@ -144,16 +143,19 @@ module.exports.recuperar_conexion = () => {
 
 
 autoUpdater.on('update-available', () => {
+    log.info('actualizando')
     const win = BrowserWindow.getFocusedWindow()
     win.webContents.send('update_available');
 });
 
 autoUpdater.on('update-downloaded', () => {
+    log.info('se termino de descargar')
     const win = BrowserWindow.getFocusedWindow()
     win.webContents.send('update_downloaded');
 });
 
 ipcMain.on('restart_app', () => {
+    log.info('se va actualizar')
     autoUpdater.quitAndInstall();
 });
 
