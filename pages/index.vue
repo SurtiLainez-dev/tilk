@@ -169,7 +169,7 @@ export default {
       this.$axios.defaults.baseURL = data.conexion
     });
 
-    ipcRenderer.send('busrcar-actualizacion', () => {
+    ipcRenderer.send('buscar-actualizacion', () => {
 
     });
 

@@ -47,12 +47,29 @@ app.on('ready', ()=>{
     winPdf.loadURL(url);
   })
 
-  ipcMain.on('busrcar-actualizacion', (v, arg) => {
-      autoUpdater.checkForUpdatesAndNotify();
+  ipcMain.on('buscar-actualizacion', (v, arg) => {
+      let i  = autoUpdater.checkForUpdatesAndNotify();
       log.info('busco actualizacion')
+      log.info('esto es :'+i)
   })
 
-})
+  ipcMain.on('restart_app', () => {
+    log.info('se va actualizar')
+    autoUpdater.quitAndInstall();
+  });
+});
+
+autoUpdater.on('update-available', () => {
+    log.info('actualizando')
+    const win = BrowserWindow.getFocusedWindow()
+    win.webContents.send('update_available');
+});
+
+autoUpdater.on('update-downloaded', () => {
+    log.info('se termino de descargar')
+    const win = BrowserWindow.getFocusedWindow()
+    win.webContents.send('update_downloaded');
+});
 
 //creacion de base de datos
 module.exports.crear_db_usuarios = function () {
@@ -142,20 +159,5 @@ module.exports.recuperar_conexion = () => {
 }
 
 
-autoUpdater.on('update-available', () => {
-    log.info('actualizando')
-    const win = BrowserWindow.getFocusedWindow()
-    win.webContents.send('update_available');
-});
 
-autoUpdater.on('update-downloaded', () => {
-    log.info('se termino de descargar')
-    const win = BrowserWindow.getFocusedWindow()
-    win.webContents.send('update_downloaded');
-});
-
-ipcMain.on('restart_app', () => {
-    log.info('se va actualizar')
-    autoUpdater.quitAndInstall();
-});
 
