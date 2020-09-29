@@ -1,0 +1,47 @@
+{
+  "name": "tilk",
+  "version": "1.0.0",
+  "description": "Sístema de Negocios - Surtidora Laínez",
+  "author": "SurtiLainez-dev",
+  "private": false,
+  "main": "main.js",
+  "build": {
+    "appId": "",
+    "directories": {
+      "buildResources": "static"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SurtiLainez-dev/electron-auto-update-example"
+  },
+  "scripts": {
+    "dev": "cross-env NODE_ENV=DEV electron .",
+    "build": "nuxt build && electron-builder build --mac --win --publish never",
+    "deploy": "electron-builder build --mac --win --publish always"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.0",
+    "@nuxtjs/axios": "^5.9.5",
+    "bootstrap-vue": "^2.15.0",
+    "electron-db": "^1.0.0",
+    "electron-log": "^4.2.4",
+    "electron-pdf-window": "1.0.10",
+    "electron-updater": "^4.3.4",
+    "nuxt": "^2.14.0",
+    "sweetalert2": "^9.15.3",
+    "vue-toast-notification": "^0.5.4",
+    "vuetify": "2.3.2"
+  },
+  "devDependencies": {
+    "@nuxtjs/vuetify": "^1.11.2",
+    "cross-env": "^5.1.4",
+    "deepmerge": "^4.2.2",
+    "electron": "2.0.0-beta.7",
+    "electron-builder": "^20.8.1",
+    "electron-devtools-installer": "^2.2.3",
+    "fibers": "^5.0.0",
+    "sass": "^1.26.11",
+    "sass-loader": "^10.0.2"
+  }
+}
