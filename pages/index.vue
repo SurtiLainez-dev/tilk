@@ -112,6 +112,18 @@
           </v-btn>
         </template>
       </v-snackbar>
+
+      <v-snackbar v-model="updater" :timeout="120000">
+        La actualización ya se descargo completamente. Por favor reinicie la aplicación para instalar la nueva versión.
+        <template v-slot:action="{ attrs }">
+          <v-btn color="pink" text v-bind="attrs" @click="actualizacion = false">
+            Cerrar
+          </v-btn>
+          <v-btn color="pink" text v-bind="attrs" @click="reiniciarApp">
+            Actualizar
+          </v-btn>
+        </template>
+      </v-snackbar>
     </div>
 </template>
 
@@ -132,7 +144,8 @@ export default {
       email: '',
       dialogoServidor: false,
       server: this.$axios.defaults.baseURL,
-      actualizacion: false
+      actualizacion: false,
+      updater: true
     }
   },
   created() {
@@ -161,12 +174,24 @@ export default {
       this.actualizacion = true;
     });
 
-    ipcRenderer.on('busrcar-actualizacion', () => {
-      console.log("ya vino")
+    ipcRenderer.send('busrcar-actualizacion', () => {
+
+    });
+
+    ipcRenderer.on('update-available', (e, data) => {
+      this.actualizacion = true;
+    });
+    ipcRenderer.on('update_downloaded', (e, data) => {
+      this.updater = true;
     });
 
   },
   methods:{
+    reiniciarApp(){
+      ipcRenderer.send('restart_app', () => {
+
+      });
+    },
     cambioServidor(){
       this.dialogoServidor = false;
       ipcRenderer.send('add_conexion', (this.server));

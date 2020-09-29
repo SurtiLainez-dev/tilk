@@ -60,19 +60,6 @@ db.crear_db_usuarios();
 db.crear_db_conexiones();
 db.crear_db_articulos();
 
-// autoUpdater.on('update-available', () => {
-// 	win.webContents.send('update_available');
-// });
-
-// autoUpdater.on('update-downloaded', () => {
-// 	win.webContents.send('update_downloaded');
-// });
-//
-// ipcMain.on('restart_app', () => {
-// 	win.quitAndInstall();
-// });
-
-
 app.on('ready', newWin);
 app.on('window-all-closed', () => app.quit());
 app.on('activate', () => win === null && newWin());

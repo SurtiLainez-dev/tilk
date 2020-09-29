@@ -142,3 +142,18 @@ module.exports.recuperar_conexion = () => {
     })
 }
 
+
+autoUpdater.on('update-available', () => {
+    const win = BrowserWindow.getFocusedWindow()
+    win.webContents.send('update_available');
+});
+
+autoUpdater.on('update-downloaded', () => {
+    const win = BrowserWindow.getFocusedWindow()
+    win.webContents.send('update_downloaded');
+});
+
+ipcMain.on('restart_app', () => {
+    autoUpdater.quitAndInstall();
+});
+
