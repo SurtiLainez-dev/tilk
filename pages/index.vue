@@ -145,7 +145,7 @@ export default {
       dialogoServidor: false,
       server: this.$axios.defaults.baseURL,
       actualizacion: false,
-      updater: true
+      updater: false
     }
   },
   created() {
