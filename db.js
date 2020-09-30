@@ -57,18 +57,19 @@ app.on('ready', ()=>{
     log.info('se va actualizar')
     autoUpdater.quitAndInstall();
   });
-});
 
-autoUpdater.on('update-available', () => {
+  autoUpdater.on('update-available', () => {
     log.info('actualizando')
     const win = BrowserWindow.getFocusedWindow()
     win.webContents.send('update_available');
-});
+  });
 
-autoUpdater.on('update-downloaded', () => {
+  autoUpdater.on('update-downloaded', () => {
     log.info('se termino de descargar')
     const win = BrowserWindow.getFocusedWindow()
     win.webContents.send('update_downloaded');
+  });
+
 });
 
 //creacion de base de datos
