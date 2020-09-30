@@ -48,7 +48,7 @@ app.on('ready', ()=>{
   })
 
   ipcMain.on('buscar-actualizacion', (v, arg) => {
-      let i  = autoUpdater.checkForUpdatesAndNotify();
+      autoUpdater.checkForUpdatesAndNotify();
       log.info('busco actualizacion');
       log.info(i)
   })
@@ -58,6 +58,10 @@ app.on('ready', ()=>{
     autoUpdater.quitAndInstall();
   });
 
+
+  autoUpdater.on('update-not-available', () => {
+      log.info('No hay actualizaciones')
+  })
   autoUpdater.on('update-available', () => {
     log.info('actualizando')
     const win = BrowserWindow.getFocusedWindow()
