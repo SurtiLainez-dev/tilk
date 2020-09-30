@@ -174,10 +174,12 @@ export default {
     });
 
     ipcRenderer.on('update_available', () => {
+      ipcRenderer.removeAllListeners('update_available');
       this.actualizacion = true;
     });
 
     ipcRenderer.on('update_downloaded', (e, data) => {
+      ipcRenderer.removeAllListeners('update_downloaded');
       this.updater = true;
     });
 
