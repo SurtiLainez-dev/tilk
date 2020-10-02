@@ -59,7 +59,9 @@ db.crear_db_inicios();
 db.crear_db_usuarios();
 db.crear_db_conexiones();
 db.crear_db_articulos();
-
+electron.ipcMain.on('app_version', (event) => {
+	event.sender.send('app_version', { version: app.getVersion() });
+});
 app.on('ready', newWin);
 app.on('window-all-closed', () => app.quit());
 app.on('activate', () => win === null && newWin());

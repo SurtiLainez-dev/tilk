@@ -124,6 +124,9 @@
           </v-btn>
         </template>
       </v-snackbar>
+      <div style="bottom: 0px">
+        {{version}}
+      </div>
     </div>
 </template>
 
@@ -145,7 +148,8 @@ export default {
       dialogoServidor: false,
       server: this.$axios.defaults.baseURL,
       actualizacion: false,
-      updater: false
+      updater: false,
+      version: ''
     }
   },
   created() {
@@ -170,15 +174,22 @@ export default {
     });
 
     ipcRenderer.send('buscar-actualizacion', () => {
-
+      console.log("buscando actualizacion")
     });
 
     ipcRenderer.on('update_available', () => {
+      console.log("")
       this.actualizacion = true;
     });
 
     ipcRenderer.on('update_downloaded', (e, data) => {
       this.updater = true;
+    });
+
+    ipcRenderer.send('app_version');
+    ipcRenderer.on('app_version', (event, arg) => {
+      console.log('Version ' + arg.version)
+      this.version = arg.version;
     });
 
   },

@@ -50,7 +50,6 @@ app.on('ready', ()=>{
   ipcMain.on('buscar-actualizacion', (v, arg) => {
       autoUpdater.checkForUpdatesAndNotify();
       log.info('busco actualizacion');
-      log.info(i)
   })
 
   ipcMain.on('restart_app', () => {
