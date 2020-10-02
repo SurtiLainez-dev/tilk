@@ -60,7 +60,6 @@ const newWin = () => {
 		autoUpdater.checkForUpdatesAndNotify();
 		log.info('busco actualizacion');
 		win.show();
-		const db = require('./db');
 	});
 
 };
@@ -91,3 +90,9 @@ electron.ipcMain.on('app_version', (event) => {
 app.on('ready', newWin);
 app.on('window-all-closed', () => app.quit());
 app.on('activate', () => win === null && newWin());
+
+const db = require('./db');
+db.crear_db_inicios();
+db.crear_db_usuarios();
+db.crear_db_conexiones();
+db.crear_db_articulos();

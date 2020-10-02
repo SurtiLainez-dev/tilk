@@ -4,36 +4,34 @@ const PDFWindow = require('electron-pdf-window')
 
 // const location = path.join(__dirname, '')
 
-// app.on('ready', ()=>{
-// });
-ipcMain.on('traer-usuarios', (v,arg) => {
-    this.crear_db_inicios();
-    this.crear_db_usuarios();
-    this.crear_db_conexiones();
-    this.crear_db_articulos();
+app.on('ready', ()=>{
+  ipcMain.on('traer-usuarios', (v,arg) => {
     this.all_usuarios();
     this.recuperar_conexion();
-});
+  });
 
-ipcMain.on('open-nav', (v, arg) => {
+  ipcMain.on('open-nav', (v, arg) => {
     let url = 'https://ign-surti.nyc3.digitaloceanspaces.com/Contabilidad/Planillas-Generadas/Planilla-SL-A1-00000-0?X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=P43MQVMWSHE6CPPXLVN2%2F20200720%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20200720T023841Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Signature=ba18615cbc7c2fa39f4f309683a1ce6e8ce3fd2e82138ab209132a9a31803a77https://ign-surti.nyc3.digitaloceanspaces.com/Contabilidad/Planillas-Generadas/Planilla-SL-A1-00000-0?X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=P43MQVMWSHE6CPPXLVN2%2F20200720%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20200720T023841Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Signature=ba18615cbc7c2fa39f4f309683a1ce6e8ce3fd2e82138ab209132a9a31803a77'
 
     let winPdf = new PDFWindow({
-        width: 1400,
-        height: 950
+      width: 1400,
+      height: 950
     });
     winPdf.loadURL(arg)
-});
+  });
 
-ipcMain.on('pdf-prueba', (v, arg) => {
+  ipcMain.on('pdf-prueba', (v, arg) => {
     let url = 'http://127.0.0.1:8000/'+arg;
     let winPdf = new PDFWindow({
-        width: 1400,
-        height: 950
+      width: 1400,
+      height: 950
     });
     console.log(url);
     winPdf.loadURL(url);
-})
+  })
+
+});
+
 //creacion de base de datos
 module.exports.crear_db_usuarios = function () {
     db.createTable('usuarios', (succ, msg) => {
