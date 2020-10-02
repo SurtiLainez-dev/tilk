@@ -28,13 +28,16 @@ console.log(`Nuxt working on ${_NUXT_URL_}`)
 */
 let win = null // Current window
 const electron = require('electron');
+const {BrowserWindow} = require('electron');
 const path = require('path');
 const app = electron.app;
+const { autoUpdater } = require('electron-updater');
 const newWin = () => {
-	win = new electron.BrowserWindow({
+	win = new BrowserWindow({
+		fullscreen: true,
+		show: false,
 		icon: path.join(__dirname, 'static/icon.png')
 	});
-	win.maximize();
 
 	win.on('closed', () => win = null);
 
@@ -54,7 +57,34 @@ const newWin = () => {
 		pollServer()
 	} else { return win.loadURL(_NUXT_URL_) }
 
+	win.once('ready-to-show', () => {
+		autoUpdater.checkForUpdatesAndNotify();
+		log.info('busco actualizacion');
+		win.show();
+	});
+
 };
+
+electron.ipcMain.on('restart_app', () => {
+	log.info('se va actualizar')
+	autoUpdater.quitAndInstall();
+});
+
+
+autoUpdater.on('update-not-available', () => {
+	log.info('No hay actualizaciones')
+})
+autoUpdater.on('update-available', () => {
+	log.info('actualizando')
+	const win = BrowserWindow.getFocusedWindow()
+	win.webContents.send('update_available');
+});
+
+autoUpdater.on('update-downloaded', () => {
+	log.info('se termino de descargar')
+	const win = BrowserWindow.getFocusedWindow()
+	win.webContents.send('update_downloaded');
+});
 db.crear_db_inicios();
 db.crear_db_usuarios();
 db.crear_db_conexiones();

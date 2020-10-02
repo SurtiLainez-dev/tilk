@@ -47,32 +47,6 @@ app.on('ready', ()=>{
     winPdf.loadURL(url);
   })
 
-  ipcMain.on('buscar-actualizacion', (v, arg) => {
-      autoUpdater.checkForUpdatesAndNotify();
-      log.info('busco actualizacion');
-  })
-
-  ipcMain.on('restart_app', () => {
-    log.info('se va actualizar')
-    autoUpdater.quitAndInstall();
-  });
-
-
-  autoUpdater.on('update-not-available', () => {
-      log.info('No hay actualizaciones')
-  })
-  autoUpdater.on('update-available', () => {
-    log.info('actualizando')
-    const win = BrowserWindow.getFocusedWindow()
-    win.webContents.send('update_available');
-  });
-
-  autoUpdater.on('update-downloaded', () => {
-    log.info('se termino de descargar')
-    const win = BrowserWindow.getFocusedWindow()
-    win.webContents.send('update_downloaded');
-  });
-
 });
 
 //creacion de base de datos
