@@ -12,21 +12,6 @@ app.on('ready', ()=>{
     this.crear_db_articulos();
     this.all_usuarios();
     this.recuperar_conexion();
-    var i =autoUpdater.checkForUpdatesAndNotify();
-    log.info(i)
-    log.info("incia")
-    autoUpdater.on('update-available', () => {
-      let win = BrowserWindow.getFocusedWindow();
-      log.info('esta buscando actualizaciones - data available');
-      log.warn('Some problem appears - data available');
-      win.webContents.send('update_available');
-    });
-    autoUpdater.on('update-downloaded', () => {
-      let win = BrowserWindow.getFocusedWindow();
-      log.info('esta buscando actualizaciones - update downloaded');
-      log.warn('Some problem appears - update downloaded');
-      win.webContents.send('update_downloaded');
-    });
   });
 
   ipcMain.on('open-nav', (v, arg) => {

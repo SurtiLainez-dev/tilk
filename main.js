@@ -78,12 +78,12 @@ autoUpdater.on('update-available', () => {
 	const win = BrowserWindow.getFocusedWindow()
 	win.webContents.send('update_available');
 });
-
 autoUpdater.on('update-downloaded', () => {
 	log.info('se termino de descargar')
 	const win = BrowserWindow.getFocusedWindow()
 	win.webContents.send('update_downloaded');
 });
+
 const db = require('./db');
 electron.ipcMain.on('app_version', (event) => {
 	event.sender.send('app_version', { version: app.getVersion() });
