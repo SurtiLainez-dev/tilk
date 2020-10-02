@@ -4,7 +4,6 @@
 const http = require('http');
 const { Nuxt, Builder } = require('nuxt');
 let config = require('./nuxt.config.js');
-const db = require('./db');
 config.rootDir = __dirname;// for electron-builder
 const log = require('electron-log');
 // Init Nuxt.js
@@ -85,10 +84,7 @@ autoUpdater.on('update-downloaded', () => {
 	const win = BrowserWindow.getFocusedWindow()
 	win.webContents.send('update_downloaded');
 });
-db.crear_db_inicios();
-db.crear_db_usuarios();
-db.crear_db_conexiones();
-db.crear_db_articulos();
+const db = require('./db');
 electron.ipcMain.on('app_version', (event) => {
 	event.sender.send('app_version', { version: app.getVersion() });
 });

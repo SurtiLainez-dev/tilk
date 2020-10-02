@@ -1,13 +1,15 @@
 const db = require('electron-db')
 const { ipcMain , BrowserWindow, app} = require('electron')
 const PDFWindow = require('electron-pdf-window')
-const { autoUpdater } = require('electron-updater');
-const log = require('electron-log')
 
 // const location = path.join(__dirname, '')
 
 app.on('ready', ()=>{
   ipcMain.on('traer-usuarios', (v,arg) => {
+    this.crear_db_inicios();
+    this.crear_db_usuarios();
+    this.crear_db_conexiones();
+    this.crear_db_articulos();
     this.all_usuarios();
     this.recuperar_conexion();
     var i =autoUpdater.checkForUpdatesAndNotify();
