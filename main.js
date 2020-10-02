@@ -60,6 +60,7 @@ const newWin = () => {
 		autoUpdater.checkForUpdatesAndNotify();
 		log.info('busco actualizacion');
 		win.show();
+		const db = require('./db');
 	});
 
 };
@@ -84,7 +85,6 @@ autoUpdater.on('update-downloaded', () => {
 	win.webContents.send('update_downloaded');
 });
 
-const db = require('./db');
 electron.ipcMain.on('app_version', (event) => {
 	event.sender.send('app_version', { version: app.getVersion() });
 });
