@@ -35,11 +35,18 @@ const newWin = () => {
 	win = new BrowserWindow({
 		fullscreen: true,
 		show: false,
+		paintWhenInitiallyHidden: false,
 		icon: path.join(__dirname, 'static/icon.png')
 	});
 
 	win.on('closed', () => win = null);
-
+	win.once('ready-to-show', () => {
+		autoUpdater.checkForUpdatesAndNotify();
+		log.info('busco actualizacion');
+		win.show();
+		let w = BrowserWindow.getFocusedWindow();
+		w.webContents.send('inicio', true);
+	});
 	if (config.dev) {
 		// Install vue dev tool and open chrome dev tools
 		const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer')
@@ -56,11 +63,6 @@ const newWin = () => {
 		pollServer()
 	} else { return win.loadURL(_NUXT_URL_) }
 
-	win.once('ready-to-show', () => {
-		autoUpdater.checkForUpdatesAndNotify();
-		log.info('busco actualizacion');
-		win.show();
-	});
 
 };
 

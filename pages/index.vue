@@ -1,10 +1,16 @@
 <template>
-  <div v-if="proceso">
+  <div>
+    <v-row no-gutters>
+      <v-col class="d-flex justify-end">
+        <v-btn fab x-small color="red" text class="ma-0"><v-icon>fa fa-times</v-icon></v-btn>
+      </v-col>
+    </v-row>
+    <div v-if="proceso">
       cargando.............
-  </div>
+    </div>
     <div v-else class="containerP" >
       <div v-if="primeraVez" class="d-flex justify-center" width="80%">
-          <inicio/>
+        <inicio/>
       </div>
       <div v-else>
         <v-card class="mx-auto pt-2 pl-2 pr-2" width="500px">
@@ -128,6 +134,7 @@
         {{version}}
       </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -153,18 +160,16 @@ export default {
     }
   },
   created() {
-    if (process.client){
-      ipcRenderer.send('traer-usuarios', 'w')
-      ipcRenderer.on('usuarios', (e, data)=>{
-        this.usuarios = data
-        if (data <= 0){
-            this.primeraVez = true
-        }else if (data.length > 0){
-            this.primeraVez = false
-        }
-      })
-      this.proceso = false;
-    }
+    ipcRenderer.send('traer-usuarios', 'w')
+    ipcRenderer.on('usuarios', (e, data)=>{
+      this.usuarios = data
+      if (data <= 0){
+        this.primeraVez = true
+      }else if (data.length > 0){
+        this.primeraVez = false
+      }
+    })
+    this.proceso = false;
 
     ipcRenderer.on('recuperar-conexion', (e, data) => {
       console.log(data)
