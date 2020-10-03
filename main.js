@@ -63,6 +63,25 @@ const newWin = () => {
 	} else { return win.loadURL(_NUXT_URL_) }
 
 };
+
+electron.ipcMain.on('restart_app', () => {
+	log.info('se va actualizar')
+	autoUpdater.quitAndInstall();
+});
+
+electron.ipcMain.on('app_version', (event) => {
+	event.sender.send('app_version', { version: app.getVersion() });
+});
+app.on('ready', newWin);
+app.on('window-all-closed', () => app.quit());
+app.on('activate', () => win === null && newWin());
+
+const db = require('./db');
+db.crear_db_inicios();
+db.crear_db_usuarios();
+db.crear_db_conexiones();
+db.crear_db_articulos();
+
 autoUpdater.on('checking-for-update', ()=>{
 	console.log("check")
 	log.info("check")
@@ -84,21 +103,3 @@ autoUpdater.on('checking-for-update', ()=>{
 	console.log("check")
 	log.info("check")
 })
-
-electron.ipcMain.on('restart_app', () => {
-	log.info('se va actualizar')
-	autoUpdater.quitAndInstall();
-});
-
-electron.ipcMain.on('app_version', (event) => {
-	event.sender.send('app_version', { version: app.getVersion() });
-});
-app.on('ready', newWin);
-app.on('window-all-closed', () => app.quit());
-app.on('activate', () => win === null && newWin());
-
-const db = require('./db');
-db.crear_db_inicios();
-db.crear_db_usuarios();
-db.crear_db_conexiones();
-db.crear_db_articulos();
