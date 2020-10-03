@@ -34,7 +34,6 @@ const { autoUpdater } = require('electron-updater');
 const newWin = () => {
 	win = new BrowserWindow({
 		fullscreen: true,
-		show: false,
 		icon: path.join(__dirname, 'static/icon.png')
 	});
 
@@ -59,7 +58,6 @@ const newWin = () => {
 	win.once('ready-to-show', () => {
 		autoUpdater.checkForUpdatesAndNotify();
 		log.info('busco actualizacion');
-		win.show();
 	});
 
 };
