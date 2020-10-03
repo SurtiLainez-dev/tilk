@@ -41,8 +41,6 @@ const newWin = () => {
 
 	win.on('closed', () => win = null);
 	win.once('ready-to-show', () => {
-		log.info(JSON.stringify(autoUpdater.checkForUpdatesAndNotify()));
-		log.info('busco actualizacion');
 		win.show();
 	});
 
@@ -73,6 +71,7 @@ electron.ipcMain.on('app_version', (event) => {
 	event.sender.send('app_version', { version: app.getVersion() });
 });
 app.on('ready', newWin);
+autoUpdater.checkForUpdatesAndNotify()
 app.on('window-all-closed', () => app.quit());
 app.on('activate', () => win === null && newWin());
 
@@ -82,24 +81,24 @@ db.crear_db_usuarios();
 db.crear_db_conexiones();
 db.crear_db_articulos();
 
-// autoUpdater.on('checking-for-update', ()=>{
-// 	console.log("check")
-// 	log.info("check")
-// })
-// autoUpdater.on('update-not-available', () => {
-// 	log.info('No hay actualizaciones')
-// })
-// autoUpdater.on('update-available', () => {
-// 	log.info('actualizando')
-// 	const win = BrowserWindow.getFocusedWindow()
-// 	win.webContents.send('update_available');
-// });
-// autoUpdater.on('update-downloaded', () => {
-// 	log.info('se termino de descargar')
-// 	const win = BrowserWindow.getFocusedWindow()
-// 	win.webContents.send('update_downloaded');
-// });
-// autoUpdater.on('checking-for-update', ()=>{
-// 	console.log("check")
-// 	log.info("check")
-// })
+autoUpdater.on('checking-for-update', ()=>{
+	console.log("check")
+	log.info("check")
+})
+autoUpdater.on('update-not-available', () => {
+	log.info('No hay actualizaciones')
+})
+autoUpdater.on('update-available', () => {
+	log.info('actualizando')
+	const win = BrowserWindow.getFocusedWindow()
+	win.webContents.send('update_available');
+});
+autoUpdater.on('update-downloaded', () => {
+	log.info('se termino de descargar')
+	const win = BrowserWindow.getFocusedWindow()
+	win.webContents.send('update_downloaded');
+});
+autoUpdater.on('checking-for-update', ()=>{
+	console.log("check")
+	log.info("check")
+})
