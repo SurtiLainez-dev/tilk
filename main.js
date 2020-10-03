@@ -41,11 +41,8 @@ const newWin = () => {
 
 	win.on('closed', () => win = null);
 	win.once('ready-to-show', () => {
+		autoUpdater.checkForUpdatesAndNotify();
 		log.info('busco actualizacion');
-		autoUpdater.on('checking-for-update', ()=>{
-			console.log("check")
-			log.info("check")
-		})
 		win.show();
 	});
 
@@ -66,6 +63,10 @@ const newWin = () => {
 	} else { return win.loadURL(_NUXT_URL_) }
 
 };
+autoUpdater.on('checking-for-update', ()=>{
+	console.log("check")
+	log.info("check")
+})
 autoUpdater.on('update-not-available', () => {
 	log.info('No hay actualizaciones')
 })
@@ -79,7 +80,10 @@ autoUpdater.on('update-downloaded', () => {
 	const win = BrowserWindow.getFocusedWindow()
 	win.webContents.send('update_downloaded');
 });
-
+autoUpdater.on('checking-for-update', ()=>{
+	console.log("check")
+	log.info("check")
+})
 
 electron.ipcMain.on('restart_app', () => {
 	log.info('se va actualizar')

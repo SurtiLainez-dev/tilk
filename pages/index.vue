@@ -179,10 +179,6 @@ export default {
       this.server = data.conexion
     });
 
-    ipcRenderer.send('buscar-actualizacion', () => {
-      console.log("buscando actualizacion")
-    });
-
     ipcRenderer.on('update_available', () => {
       console.log("")
       this.actualizacion = true;
@@ -193,6 +189,7 @@ export default {
     });
 
     ipcRenderer.send('app_version');
+
     ipcRenderer.on('app_version', (event, arg) => {
       console.log('Version ' + arg.version)
       this.version = arg.version;
