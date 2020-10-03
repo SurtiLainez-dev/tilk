@@ -3,6 +3,7 @@ const { ipcMain , BrowserWindow, app} = require('electron')
 const PDFWindow = require('electron-pdf-window')
 const WINDOW = BrowserWindow.getFocusedWindow()
 // const location = path.join(__dirname, '')
+const log = require('electron-log');
 
 app.on('ready', ()=>{
     ipcMain.on('traer-usuarios', (v,arg) => {
@@ -64,8 +65,12 @@ module.exports.crear_usuario = (correo)=>{
 }
 module.exports.all_usuarios = () => {
     db.getAll('usuarios', (succ, data) => {
-        const win = BrowserWindow.getFocusedWindow()
-        win.webContents.send('usuarios', data)
+        try {
+            const win = BrowserWindow.getFocusedWindow()
+            win.webContents.send('usuarios', data)
+        }catch (e) {
+            log.error(e)
+        }
     })
 }
 module.exports.crear_conexion = (conexion) => {
@@ -94,10 +99,14 @@ module.exports.actualizar_conexion = (id, conexion) => {
 };
 module.exports.recuperar_conexion = () => {
     db.getRows('conexion', {add:1}, (succ, data) => {
-        const win = BrowserWindow.getFocusedWindow()
-        win.webContents.send('recuperar-conexion', data[0])
-        console.log("entro")
-        console.log(data[0])
+        try {
+            const win = BrowserWindow.getFocusedWindow()
+            win.webContents.send('recuperar-conexion', data[0])
+            console.log("entro")
+            console.log(data[0])
+        }catch (e) {
+            log.error(e)
+        }
     })
 }
 
