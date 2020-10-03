@@ -47,6 +47,7 @@ const newWin = () => {
 		let w = BrowserWindow.getFocusedWindow();
 		w.webContents.send('inicio', true);
 	});
+
 	if (config.dev) {
 		// Install vue dev tool and open chrome dev tools
 		const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer')
@@ -63,27 +64,25 @@ const newWin = () => {
 		pollServer()
 	} else { return win.loadURL(_NUXT_URL_) }
 
+	autoUpdater.on('update-not-available', () => {
+		log.info('No hay actualizaciones')
+	})
+	autoUpdater.on('update-available', () => {
+		log.info('actualizando')
+		const win = BrowserWindow.getFocusedWindow()
+		win.webContents.send('update_available');
+	});
+	autoUpdater.on('update-downloaded', () => {
+		log.info('se termino de descargar')
+		const win = BrowserWindow.getFocusedWindow()
+		win.webContents.send('update_downloaded');
+	});
 
 };
 
 electron.ipcMain.on('restart_app', () => {
 	log.info('se va actualizar')
 	autoUpdater.quitAndInstall();
-});
-
-
-autoUpdater.on('update-not-available', () => {
-	log.info('No hay actualizaciones')
-})
-autoUpdater.on('update-available', () => {
-	log.info('actualizando')
-	const win = BrowserWindow.getFocusedWindow()
-	win.webContents.send('update_available');
-});
-autoUpdater.on('update-downloaded', () => {
-	log.info('se termino de descargar')
-	const win = BrowserWindow.getFocusedWindow()
-	win.webContents.send('update_downloaded');
 });
 
 electron.ipcMain.on('app_version', (event) => {
