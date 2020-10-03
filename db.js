@@ -8,6 +8,7 @@ app.on('ready', ()=>{
   ipcMain.on('traer-usuarios', (v,arg) => {
     this.all_usuarios();
     this.recuperar_conexion();
+
   });
 
   ipcMain.on('open-nav', (v, arg) => {

@@ -153,21 +153,18 @@ export default {
     }
   },
   created() {
-    if (process.client){
-      this.proceso = false;
-      ipcRenderer.send('traer-usuarios', 'w')
-      ipcRenderer.on('usuarios', (e, data)=>{
-        this.usuarios = data
-        if (data <= 0){
-            this.primeraVez = true
-        }else if (data.length > 0){
-            this.primeraVez = false
-        }
-      })
-    }
-
+    this.proceso = false;
+    ipcRenderer.send('traer-usuarios', 'w');
+    ipcRenderer.on('usuarios', (e, data)=> {
+      this.usuarios = data;
+      if (data <= 0) {
+        this.primeraVez = true;
+      } else if (data.length > 0) {
+        this.primeraVez = false;
+      }
+    });
     ipcRenderer.on('recuperar-conexion', (e, data) => {
-      console.log(data)
+      console.log(data);
       localStorage.setItem('guardarConexion', data.conexion);
       this.$store.commit('guardarConexion', localStorage.getItem('guardarConexion'))
       this.$axios.defaults.baseURL = data.conexion

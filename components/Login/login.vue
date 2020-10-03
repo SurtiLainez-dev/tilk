@@ -124,7 +124,7 @@
                 // this.erroresServidor.push(error.response.data)
               }
             })
-          }
+          },
         }
     }
 </script>
