@@ -31,6 +31,7 @@ const {BrowserWindow} = require('electron');
 const path = require('path');
 const app = electron.app;
 const { autoUpdater } = require('electron-updater');
+require('update-electron-app')()
 const newWin = () => {
 	win = new BrowserWindow({
 		fullscreen: true,
@@ -41,7 +42,7 @@ const newWin = () => {
 
 	win.on('closed', () => win = null);
 	win.once('ready-to-show', () => {
-		autoUpdater.checkForUpdatesAndNotify();
+		// autoUpdater.checkForUpdatesAndNotify();
 		log.info('busco actualizacion');
 		win.show();
 	});
@@ -82,24 +83,24 @@ db.crear_db_usuarios();
 db.crear_db_conexiones();
 db.crear_db_articulos();
 
-autoUpdater.on('checking-for-update', ()=>{
-	console.log("check")
-	log.info("check")
-})
-autoUpdater.on('update-not-available', () => {
-	log.info('No hay actualizaciones')
-})
-autoUpdater.on('update-available', () => {
-	log.info('actualizando')
-	const win = BrowserWindow.getFocusedWindow()
-	win.webContents.send('update_available');
-});
-autoUpdater.on('update-downloaded', () => {
-	log.info('se termino de descargar')
-	const win = BrowserWindow.getFocusedWindow()
-	win.webContents.send('update_downloaded');
-});
-autoUpdater.on('checking-for-update', ()=>{
-	console.log("check")
-	log.info("check")
-})
+// autoUpdater.on('checking-for-update', ()=>{
+// 	console.log("check")
+// 	log.info("check")
+// })
+// autoUpdater.on('update-not-available', () => {
+// 	log.info('No hay actualizaciones')
+// })
+// autoUpdater.on('update-available', () => {
+// 	log.info('actualizando')
+// 	const win = BrowserWindow.getFocusedWindow()
+// 	win.webContents.send('update_available');
+// });
+// autoUpdater.on('update-downloaded', () => {
+// 	log.info('se termino de descargar')
+// 	const win = BrowserWindow.getFocusedWindow()
+// 	win.webContents.send('update_downloaded');
+// });
+// autoUpdater.on('checking-for-update', ()=>{
+// 	console.log("check")
+// 	log.info("check")
+// })

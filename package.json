@@ -1,6 +1,6 @@
 {
   "name": "TILK",
-  "version": "1.0.35",
+  "version": "1.0.36",
   "description": "Sístema de Negocios - Surtidora Laínez",
   "author": "SurtiLainez-dev",
   "private": false,
@@ -30,6 +30,7 @@
     "electron-updater": "^4.3.4",
     "nuxt": "^2.14.0",
     "sweetalert2": "^9.15.3",
+    "update-electron-app": "^2.0.1",
     "vue-toast-notification": "^0.5.4",
     "vuetify": "2.3.2"
   },
