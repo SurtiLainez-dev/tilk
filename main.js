@@ -42,6 +42,10 @@ const newWin = () => {
 	win.on('closed', () => win = null);
 	win.once('ready-to-show', () => {
 		log.info('busco actualizacion');
+		autoUpdater.on('checking-for-update', ()=>{
+			console.log("check")
+			log.info("check")
+		})
 		win.show();
 	});
 
@@ -62,10 +66,6 @@ const newWin = () => {
 	} else { return win.loadURL(_NUXT_URL_) }
 
 };
-autoUpdater.on('checking-for-update', ()=>{
-	console.log("check")
-	log.info("check")
-})
 autoUpdater.on('update-not-available', () => {
 	log.info('No hay actualizaciones')
 })
