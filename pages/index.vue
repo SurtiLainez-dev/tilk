@@ -152,7 +152,7 @@ export default {
       version: ''
     }
   },
-  created() {
+  mounted() {
     this.proceso = false;
     ipcRenderer.send('traer-usuarios', 'w');
     ipcRenderer.on('usuarios', (e, data)=> {
