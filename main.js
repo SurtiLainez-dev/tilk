@@ -80,6 +80,7 @@ try{
 		win.webContents.send('update_downloaded');
 	}), 20000)
 }catch (e) {
+	log.error(e)
 	log.error('error al buscar app')
 }
 app.on('window-all-closed', () => app.quit());
