@@ -71,7 +71,12 @@ electron.ipcMain.on('app_version', (event) => {
 	event.sender.send('app_version', { version: app.getVersion() });
 });
 app.on('ready', newWin);
-autoUpdater.checkForUpdatesAndNotify()
+try{
+	autoUpdater.checkForUpdatesAndNotify()
+	log.info('se busco exitosamente')
+}catch (e) {
+	log.error('error al buscar app')
+}
 app.on('window-all-closed', () => app.quit());
 app.on('activate', () => win === null && newWin());
 
@@ -84,6 +89,10 @@ db.crear_db_articulos();
 autoUpdater.on('checking-for-update', ()=>{
 	console.log("check")
 	log.info("check")
+})
+autoUpdater.on('error', (err)=>{
+	log.error('error');
+	log.error(err)
 })
 autoUpdater.on('update-not-available', () => {
 	log.info('No hay actualizaciones')
