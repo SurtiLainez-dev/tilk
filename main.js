@@ -27,11 +27,10 @@ console.log(`Nuxt working on ${_NUXT_URL_}`)
 */
 let win = null // Current window
 const electron = require('electron');
-const {BrowserWindow} = require('electron');
+const {BrowserWindow, autoUpdater} = require('electron');
 const path = require('path');
 const app = electron.app;
-const { autoUpdater } = require('electron-updater');
-require('update-electron-app')()
+// const { autoUpdater } = require('electron-updater');
 const newWin = () => {
 	win = new BrowserWindow({
 		fullscreen: true,
@@ -42,7 +41,8 @@ const newWin = () => {
 
 	win.on('closed', () => win = null);
 	win.once('ready-to-show', () => {
-		// autoUpdater.checkForUpdatesAndNotify();
+
+		log.info(JSON.stringify(autoUpdater.checkForUpdatesAndNotify()))
 		log.info('busco actualizacion');
 		win.show();
 	});
