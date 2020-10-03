@@ -74,6 +74,11 @@ app.on('ready', newWin);
 try{
 	autoUpdater.checkForUpdatesAndNotify()
 	log.info('se busco exitosamente')
+	setTimeout(autoUpdater.on('update-downloaded', () => {
+		log.info('se termino de descargar')
+		const win = BrowserWindow.getFocusedWindow()
+		win.webContents.send('update_downloaded');
+	}), 20000)
 }catch (e) {
 	log.error('error al buscar app')
 }
@@ -85,6 +90,7 @@ db.crear_db_inicios();
 db.crear_db_usuarios();
 db.crear_db_conexiones();
 db.crear_db_articulos();
+
 
 autoUpdater.on('checking-for-update', ()=>{
 	console.log("check")
@@ -101,11 +107,6 @@ autoUpdater.on('update-available', () => {
 	log.info('actualizando')
 	const win = BrowserWindow.getFocusedWindow()
 	win.webContents.send('update_available');
-});
-autoUpdater.on('update-downloaded', () => {
-	log.info('se termino de descargar')
-	const win = BrowserWindow.getFocusedWindow()
-	win.webContents.send('update_downloaded');
 });
 autoUpdater.on('checking-for-update', ()=>{
 	console.log("check")
