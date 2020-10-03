@@ -74,11 +74,7 @@ app.on('ready', newWin);
 try{
 	autoUpdater.checkForUpdatesAndNotify()
 	log.info('se busco exitosamente')
-	setTimeout(autoUpdater.on('update-downloaded', () => {
-		log.info('se termino de descargar')
-		const win = BrowserWindow.getFocusedWindow()
-		win.webContents.send('update_downloaded');
-	}), 20000)
+	setTimeout(buscar, 20000)
 }catch (e) {
 	log.error(e)
 	log.error('error al buscar app')
@@ -92,6 +88,14 @@ db.crear_db_usuarios();
 db.crear_db_conexiones();
 db.crear_db_articulos();
 
+function buscar(){
+	log.info('entando en buscar')
+	autoUpdater.on('update-downloaded', () => {
+		log.info('se termino de descargar')
+		const win = BrowserWindow.getFocusedWindow()
+		win.webContents.send('update_downloaded');
+	})
+}
 
 autoUpdater.on('checking-for-update', ()=>{
 	console.log("check")
