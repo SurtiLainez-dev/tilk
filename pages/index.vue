@@ -130,9 +130,6 @@
           </v-btn>
         </template>
       </v-snackbar>
-      <div style="bottom: 0px">
-        {{version}}
-      </div>
     </div>
   </div>
 </template>

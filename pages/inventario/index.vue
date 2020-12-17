@@ -16,7 +16,7 @@
         </v-col>
         <v-col md="3" class="d-flex justify-end align-center">
           <v-btn v-if="segundaPeticion || primeraPeticion == 1" small color="indigo" class="ma-2"
-                 @click="consultarInventario" outlined dark>Consultar Inventario</v-btn>
+                 @click="$store.commit('inventario/cargarInventario')" outlined dark>Consultar Inventario</v-btn>
         </v-col>
       </v-row>
       <v-divider></v-divider>
@@ -68,23 +68,13 @@
           {text:'Sub-familia',value:'fam'},
           {text:'Acciones',value:'articulo'},
         ],
-        primer:[
-          {text:'Traer Todo el Inventario',value:1},
-          {text:'Traer por Proveedor',value:2},
-          {text:'Traer por Marca',value:3},
-          {text:'Traer por Familia',value:4},
-        ],
         show: false,
-        Inventario:[],
         tooltipInventario:[
           {titulo:'Traer todo el inventario', val:1},
           {titulo:'Proveedor', val:2},
           {titulo:'Marca', val:3},
           {titulo:'Familia', val:4},
         ],
-        primeraPeticion: 1,
-        segundaPeticion: null,
-        isPeticon: false,
         Proveedores: null,
         Marcas: [],
         buscador: '',
@@ -102,25 +92,37 @@
       this.cargarProveedor();
       this.cargarFamilias();
     },
+    computed:{
+      isPeticon(){
+        return this.$store.state.inventario.load;
+      },
+      Inventario(){
+        return this.$store.state.inventario.data;
+      },
+      primer(){
+        return this.$store.state.inventario.tipo_peticion;
+      },
+      segundaPeticion:{
+        get:function () {
+          return this.$store.state.inventario.segunda_peticion
+        },
+        set: function (val) {
+          return this.$store.commit('inventario/cambiarValorSegundaPeticion', val);
+        }
+      },
+      primeraPeticion:{
+        get:function () {
+          return this.$store.state.inventario.valor_peticion;
+        },
+        set: function (val) {
+          return this.$store.commit('inventario/cambiarValorPeticion', val);
+        }
+      }
+    },
     methods:{
       verInfo(data){
         this.data = data;
         this.$store.commit('cambiarVistaPRecioArticulo', 2)
-      },
-      consultarInventario(){
-        this.isPeticon = true
-        let val
-        if(this.primeraPeticion == 1){
-          val = 1
-        }else{
-          val = this.segundaPeticion
-        }
-        this.$axios.get('consultar_articulo/'+this.primeraPeticion+'/'+val).then((res)=>{
-          if (res.status === 200){
-            this.Inventario = res.data.inventario
-            this.isPeticon = false
-          }
-        })
       },
       cargarProveedor(){
         this.$axios.get('proveedores',{
@@ -162,7 +164,7 @@
     async fetch(){
       this.$store.commit('cambiarVistaPRecioArticulo', 1);
       this.primeraPeticion = 1;
-      this.consultarInventario()
+      this.$store.commit('inventario/cargarInventario');
     }
   }
 </script>

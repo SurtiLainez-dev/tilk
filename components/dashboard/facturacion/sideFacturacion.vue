@@ -21,10 +21,10 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Ventas</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/inventario/ordenes-compra/nueva')">
+      <v-list-item class="itemOpciones" @click="go('/solicitudes_redito/')">
         Solicitudes de Crédito
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/inventario/ordenes-compra/')">
+      <v-list-item class="itemOpciones" @click="go('/solicitudes_redito/')">
         Solicitudes de Crédito Pendientes
       </v-list-item>
     </v-list-group>

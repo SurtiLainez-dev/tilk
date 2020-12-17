@@ -197,13 +197,13 @@
 
       <v-dialog v-model="dialogo2" width="100%">
         <v-card class="pl-5 pr-5">
-          <tramitar_transferencia :articulos_data="articulos"
-                                  :sucursal_data="Traslado.sucursal.id"
-                                  :tipo="2"
-                                  :cuerpos_data="cuerpo_data"
-                                  :traslado_id="TrasladoId"
-                                  :motivo_data="Traslado.motivo_traslado.id"
-                                  :destino_data="Traslado.destino.id"/>
+<!--          <tramitar_transferencia :articulos_data="articulos"-->
+<!--                                  :sucursal_data="Traslado.sucursal.id"-->
+<!--                                  :tipo="2"-->
+<!--                                  :cuerpos_data="cuerpo_data"-->
+<!--                                  :traslado_id="TrasladoId"-->
+<!--                                  :motivo_data="Traslado.motivo_traslado.id"-->
+<!--                                  :destino_data="Traslado.destino.id"/>-->
           <v-card-actions class="d-flex justify-end">
             <v-btn dark v-if="vista < 3" color="orange" small @click="$store.commit('valorDialogo2', false)">Cancelar</v-btn>
             <v-btn dark v-if="vista === 4" color="orange" small @click="$router.replace({path:'/inventario/traslados/remisiones'})">Cerrar</v-btn>

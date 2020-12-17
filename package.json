@@ -1,6 +1,6 @@
 {
   "name": "TILK",
-  "version": "1.0.46",
+  "version": "2.0",
   "description": "Sístema de Negocios - Surtidora Laínez",
   "author": "SurtiLainez-dev",
   "private": false,
@@ -43,6 +43,7 @@
     "electron-devtools-installer": "^2.2.3",
     "fibers": "^5.0.0",
     "sass": "^1.26.11",
-    "sass-loader": "^10.0.2"
+    "sass-loader": "^10.0.2",
+    "vue": "^2.6.11"
   }
 }

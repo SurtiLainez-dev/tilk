@@ -85,9 +85,9 @@
           this.selected.forEach( (i) => {
             total = parseFloat(total) + parseFloat(i.total_a_pagar)
           });
-          return total;
+          return total.toFixed(2);
         }else{
-          return total;
+          return total.toFixed(2);
         }
       }
     },
@@ -113,7 +113,8 @@
           })
         });
         let datos = JSON.stringify(this.Enviar);
-        let url = this.$axios.defaults.baseURL+'/crear_lista_pago/'+datos+'/'+this.total;
+        let url = this.$axios.defaults.baseURL+'crear_lista_pago/'+datos+'/'+this.total;
+        console.log(url)
         ipcRenderer.send('open-nav', url);
       }
     }

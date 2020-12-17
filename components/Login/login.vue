@@ -65,6 +65,7 @@
             return this.$axios({
               method: 'post',
               url: '/login',
+              timeout: 15000,
               data: qs.stringify({
                 email: this.Email,
                 password: this.Login.password,
@@ -100,6 +101,7 @@
                 localStorage.setItem('permisosUser', permisos);
                 //guardando las variables globales en estados de vue
                 this.$store.commit("guardarToken", localStorage.getItem('token'));
+                this.$store.commit("solicitud_credito/guardarToken", localStorage.getItem('token'));
                 this.$store.commit("guardarUsuario", localStorage.getItem('usuario'));
                 this.$store.commit("guardarTipoUsuario", localStorage.getItem('tipoUsuario'));
                 this.$store.commit("guardarSucursal", localStorage.getItem('sucursal'));
@@ -109,19 +111,26 @@
                 this.$store.commit("guardarMiniToken", localStorage.getItem('miniToken'));
                 this.$store.commit("asignarIdSucursal", localStorage.getItem('sucursal_id'));
                 ipcRenderer.send('crear-usuario', this.Email)
-
+                this.$axios.setToken(this.$store.state.token, 'Bearer')
                 this.$router.replace({path:'/inicio/'})
               }
             }).catch((error)=>{
               this.isError = true
-              if (error.response.status === 401){
-                this.error = error.response.data
-                console.log(error.response)
-                // this.erroresServidor.push(error.response.data)
-              }if (error.response.status === 422){
-                console.log(error.response)
-                this.error = error.response.data
-                // this.erroresServidor.push(error.response.data)
+              try{
+                if (error.response.status === 500){
+                  this.error = 'Hubo un error en el servidor. [error status:500]'
+                }
+                if (error.response.status === 401){
+                  this.error = error.response.data
+                  console.log(error.response)
+                  // this.erroresServidor.push(error.response.data)
+                }if (error.response.status === 422){
+                  console.log(error.response)
+                  this.error = error.response.data
+                  // this.erroresServidor.push(error.response.data)
+                }
+              }catch (e) {
+                this.error = 'Tiempo de espera agotado, el servidor tardo mucho en responder.'
               }
             })
           },

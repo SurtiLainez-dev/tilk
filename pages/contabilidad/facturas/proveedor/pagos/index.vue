@@ -12,7 +12,8 @@
              :per-page="perPage"
              :fields="field"
              class="rowsTable" hover
-             responsive :items="Pagos"
+             responsive
+             :items="Pagos"
              @filtered="onFiltered"
              :busy="loading"
              striped bordered>
@@ -78,11 +79,11 @@
     },
     data(){
       return{
+        search: '',
         loading: true,
         currentPage: 1,
         totalRows: 1,
-        perPage: 25,
-        search: '',
+        perPage: 20,
         field:[
           {key:'pagos_factura.factura_proveedor.proveedor.nombre', label:'Proveedor'},
           'pagos_factura.factura_proveedor.num_factura',

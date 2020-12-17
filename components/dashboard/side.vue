@@ -62,6 +62,7 @@
               <v-container style="color: #FFF">
                 <strong>Inicio</strong>
               </v-container>
+              <side-seguimientos/>
             </v-col>
             <v-col cols="9" v-if="select === 2">
                 <v-list>
@@ -102,6 +103,7 @@
 </template>
 
 <script>
+  import sideSeguimientos from "./inicio/sideSeguimientos";
   import admin from "./admin/admin";
   import sideSucursal from "./admin/sideSucursal";
   import sideColaboradores from "./colaboradores/sideColaboradores";
@@ -124,6 +126,7 @@
       articulosConta,
       sideFacturacion,
       notasCredito,
+      sideSeguimientos
     },
     name: "side",
     data(){
@@ -151,6 +154,10 @@
             'url':'/inicio/', 'id':6, 'modulo': 0},
           {'color': 'brown darken-3',  'titulo':'Facturación',   'icono':'fa fa-share-alt',
             'url':'/inicio/', 'id':7, 'modulo': 0},
+          {'color': 'purple',  'titulo':'Ventas y Contratos',  'icono':'fa fa-file-invoice',
+            'url':'/inicio/', 'id':8, 'modulo': 0},
+          {'color': 'blue-grey',  'titulo':'Clientes',                 'icono':'fa fa-users',
+            'url':'/inicio/', 'id':9, 'modulo': 0},
         ]
     }
     },

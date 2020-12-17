@@ -33,16 +33,16 @@ const app = electron.app;
 const { autoUpdater } = require('electron-updater');
 const newWin = () => {
 	win = new BrowserWindow({
-		fullscreen: true,
-		show: false,
+		// fullscreen: true,
+		// show: false,
 		paintWhenInitiallyHidden: false,
 		icon: path.join(__dirname, 'static/icon.png')
 	});
-
+	win.maximize();
 	win.on('closed', () => win = null);
-	win.once('ready-to-show', () => {
-		win.show();
-	});
+	// win.once('ready-to-show', () => {
+	// 	win.show();
+	// });
 
 	if (config.dev) {
 		// Install vue dev tool and open chrome dev tools
@@ -71,14 +71,14 @@ electron.ipcMain.on('app_version', (event) => {
 	event.sender.send('app_version', { version: app.getVersion() });
 });
 app.on('ready', newWin);
-try{
-	autoUpdater.checkForUpdatesAndNotify()
-	log.info('se busco exitosamente')
-	setTimeout(buscar, 20000)
-}catch (e) {
-	log.error(e)
-	log.error('error al buscar app')
-}
+// try{
+// 	autoUpdater.checkForUpdatesAndNotify()
+// 	log.info('se busco exitosamente')
+// 	setTimeout(buscar, 20000)
+// }catch (e) {
+// 	log.error(e)
+// 	log.error('error al buscar app')
+// }
 app.on('window-all-closed', () => app.quit());
 app.on('activate', () => win === null && newWin());
 
@@ -87,15 +87,6 @@ db.crear_db_inicios();
 db.crear_db_usuarios();
 db.crear_db_conexiones();
 db.crear_db_articulos();
-
-function buscar(){
-	log.info('entando en buscar')
-	autoUpdater.on('update-downloaded', () => {
-		log.info('se termino de descargar')
-		const win = BrowserWindow.getFocusedWindow()
-		win.webContents.send('update_downloaded');
-	})
-}
 
 autoUpdater.on('checking-for-update', ()=>{
 	console.log("check")

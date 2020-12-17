@@ -266,7 +266,6 @@
 
 <script>
   import {ipcRenderer} from "electron";
-  import VueToast from 'vue-toast-notification'
   import Vue from 'vue'
   import Swal from "sweetalert2";
   export default {
@@ -364,6 +363,9 @@
       }
     },
     methods:{
+      cambiarEstadoFile(item){
+          item.estado = 1;
+      },
       verDocumento(dir){
         this.$store.commit('activarOverlay', true);
         this.$axios.post('leer_documento/',{

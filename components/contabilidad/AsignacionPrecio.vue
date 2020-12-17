@@ -412,7 +412,7 @@
           "intereses": 0,
           "despues": despues
         });
-        let intereses = 0
+        let intereses = 0;
         for (let i = 0; i < T; i++){
           antes = despues;
           intereses = (antes * TASA_MENSUAL).toFixed(2);

@@ -3,6 +3,7 @@
       <v-card-title>Remisiones por Aceptar</v-card-title>
       <v-data-table :headers="header"
                     :loading="load"
+                    dense
                     @click:row="abrirDialogoVerificacion"
                     class="rowsTable"
                     loading-text="Cargando datos ..."
@@ -222,9 +223,6 @@
         fecha_recibido: ''
       }
     },
-    created() {
-      this.ver_remisiones()
-    },
     computed:{
       sucursal(){
         return this.$store.state.sucursal
@@ -311,6 +309,14 @@
           })
         })
       }
+    },
+    async fetch (){
+      this.Transferencias = (await this.$axios.get('view_traslados/'+this.sucursal,{
+        headers: {
+          'Authorization': 'Bearer ' + this.$store.state.token
+        }
+      })).data.remisiones;
+      this.load = false
     }
   }
 </script>

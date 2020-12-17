@@ -2,6 +2,7 @@ export default function RedirectLogin({redirect, store, route, $axios}) {
     if (localStorage.getItem('token')){
         if (!store.state.token){
             store.commit("guardarToken", localStorage.getItem('token'));
+            store.commit("solicitud_credito/guardarToken", localStorage.getItem('token'));
             store.commit("guardarUsuario", localStorage.getItem('usuario'));
             store.commit("guardarTipoUsuario", localStorage.getItem('tipoUsuario'));
             store.commit("guardarSucursal", localStorage.getItem('sucursal'));
@@ -13,6 +14,7 @@ export default function RedirectLogin({redirect, store, route, $axios}) {
             store.commit("asignarIdSucursal", localStorage.getItem('sucursal_id'))
             console.log(localStorage.getItem('guardarConexion'))
             $axios.defaults.baseURL = localStorage.getItem('guardarConexion')
+            $axios.setToken(store.state.token, 'Bearer')
         }else{
             console.log("el token no se puso")
         }
