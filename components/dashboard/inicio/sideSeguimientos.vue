@@ -27,6 +27,9 @@
             <v-list-item class="itemOpciones" @click="go('/inicio/otras_gestiones/solicitudes_credito')">
                 Solicitudes de crédito
             </v-list-item>
+            <v-list-item class="itemOpciones" @click="go('/inicio/otras_gestiones/ventas')">
+              Ver ventas
+            </v-list-item>
         </v-list-group>
     </div>
 </template>

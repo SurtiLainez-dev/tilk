@@ -18,7 +18,7 @@
         </v-row>
         <v-row no-gutters>
             <v-col>
-                <v-text-field class="ma-1" dense label="Total del crédito" suffix="lps"
+                <v-text-field class="ma-1" dense label="Total de la solicitud" suffix="lps"
                               v-model="totalCredito" disabled></v-text-field>
             </v-col>
             <v-col>

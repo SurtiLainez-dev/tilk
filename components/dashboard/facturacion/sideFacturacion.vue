@@ -27,6 +27,9 @@
       <v-list-item class="itemOpciones" @click="go('/solicitudes_redito/')">
         Solicitudes de Crédito Pendientes
       </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/ventas/pendientes')">
+        Ventas Pendientes
+      </v-list-item>
     </v-list-group>
   </div>
 </template>

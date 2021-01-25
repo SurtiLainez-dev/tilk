@@ -38,6 +38,12 @@ export default {
       refe: null,
     }
   },
+  created() {
+    this.$store.commit('direcciones/cargar_COLONIAS');
+    this.$store.commit('direcciones/cargar_DISTRITOS');
+    this.$store.commit('direcciones/cargar_MUNICIPIOS');
+    this.$store.commit('direcciones/cargar_DEPARTAMENTOS');
+  },
   computed:{
     titulo(){
       return this.$store.state.titulo

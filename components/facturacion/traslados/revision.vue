@@ -408,6 +408,7 @@
     created() {
       this.pageHistory = this.page;
       let sucursal_origen = this.traslado.sucursalOrigen;
+      console.log(this.traslado.articulos)
       this.traslado.articulos.forEach( (i)=>{
         if (i.compuesto === 0 && i.remision === 0)
           i.revisado = true;

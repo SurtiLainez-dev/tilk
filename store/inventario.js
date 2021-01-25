@@ -15,7 +15,7 @@ export const mutations = {
     cargarInventario(state){
         state.load = true;
         let val;
-        if(state.valor_peticion == 1)
+        if(state.valor_peticion === 1)
             val = 1;
         else
             val = state.segunda_peticion;

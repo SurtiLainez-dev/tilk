@@ -106,6 +106,7 @@ module.exports.recuperar_conexion = () => {
 //creacion de base de datos
 module.exports.crear_db_usuarios = function () {
     db.createTable('usuarios', (succ, msg) => {
+        console.log("Se creo exitasamente la bd de usuarios")
     })
 }
 module.exports.crear_db_conexiones = function () {

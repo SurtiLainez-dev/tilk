@@ -186,7 +186,7 @@
           <hr>
           <v-card-actions class="d-flex align-center justify-center">
             <v-btn class="ma-2" color="success" dark small @click="$store.commit('valorDialogo2', true)">Aceptar Transferencia</v-btn>
-            <v-btn class="ma-2" color="red" dark small >Declinar Transferencia</v-btn>
+            <v-btn class="ma-2" color="red" dark small @click="declinarTraslado">Declinar Transferencia</v-btn>
           </v-card-actions>
           <hr>
           <v-card-actions class="d-flex justify-end">
@@ -197,15 +197,15 @@
 
       <v-dialog v-model="dialogo2" width="100%">
         <v-card class="pl-5 pr-5">
-<!--          <tramitar_transferencia :articulos_data="articulos"-->
-<!--                                  :sucursal_data="Traslado.sucursal.id"-->
-<!--                                  :tipo="2"-->
-<!--                                  :cuerpos_data="cuerpo_data"-->
-<!--                                  :traslado_id="TrasladoId"-->
-<!--                                  :motivo_data="Traslado.motivo_traslado.id"-->
-<!--                                  :destino_data="Traslado.destino.id"/>-->
+          <tramitar_transferencia :articulos_data="articulos"
+                                  :sucursal_data="Traslado.sucursal.id"
+                                  :tipo="2"
+                                  :cuerpos_data="cuerpo_data"
+                                  :traslado_id="TrasladoId"
+                                  :motivo_data="Traslado.motivo_traslado.id"
+                                  :destino_data="Traslado.destino.id"/>
           <v-card-actions class="d-flex justify-end">
-            <v-btn dark v-if="vista < 3" color="orange" small @click="$store.commit('valorDialogo2', false)">Cancelar</v-btn>
+            <v-btn dark v-if="vista < 3" color="orange" small @click="$store.commit('valorDialogo2', false);">Cancelar</v-btn>
             <v-btn dark v-if="vista === 4" color="orange" small @click="$router.replace({path:'/inventario/traslados/remisiones'})">Cerrar</v-btn>
           </v-card-actions>
         </v-card>
@@ -222,6 +222,7 @@
 </template>
 
 <script>
+import Vue from "vue";
   import nuevo from "./nuevo";
   import {ipcRenderer} from "electron";
   export default {
@@ -347,6 +348,20 @@
               "nombre": i.nombres+' '+i.apellidos
             })
           })
+        })
+      },
+      declinarTraslado(){
+        this.dialogo = false;
+        this.$store.commit('activarOverlay', true);
+        this.$axios.put('declinar_traslado/'+this.Traslado.id)
+        .then((res)=>{
+          Vue.$toast.open({
+            message: 'Se ha rechazado la transferencia exitosamente.',
+            type: 'success',
+            position: 'bottom-left',
+            duration: 4000
+          });
+          this.$store.commit('activarOverlay', false);
         })
       },
       verDocumento(){

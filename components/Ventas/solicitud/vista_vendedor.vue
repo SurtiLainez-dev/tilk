@@ -235,6 +235,8 @@
                 this.String_Estado = 'Rechazado';
             else if (this.Soli.estado === 4)
                 this.String_Estado = 'Aceptada';
+            else if (this.Soli.estado === 5)
+                this.String_Estado = 'Aceptada/Venta'
 
             this.Venta = this.Soli.estado === 4;
             console.log(this.Venta)
@@ -261,7 +263,7 @@
                 dataAval= {}
             });
             this.vista = 1;
-            if (this.Soli.estado === 3 || this.Soli.estado === 4 || this.Soli.estado === 1)
+            if (this.Soli.estado === 3 || this.Soli.estado === 4 || this.Soli.estado === 1 || this.Soli.estado === 5)
                 this.EstadoVista = true;
             else
                 this.EstadoVista = false;

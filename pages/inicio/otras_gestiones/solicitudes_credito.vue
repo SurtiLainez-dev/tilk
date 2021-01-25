@@ -31,6 +31,7 @@
                 <v-chip v-else-if="item.estado === 2" x-small dark color="indigo">Falta documentación</v-chip>
                 <v-chip v-else-if="item.estado === 3" x-small dark color="red">Rechazado</v-chip>
                 <v-chip v-else-if="item.estado === 4" x-small dark color="success">Aprobado</v-chip>
+                <v-chip v-else-if="item.estado === 5" x-small dark color="green">Aprobado y Revisado</v-chip>
             </template>
         </v-data-table>
 
@@ -110,6 +111,7 @@
             SeleccionarSolicitud(item){
                 this.$store.commit('solicitud_credito/datoSolicitud', item);
                 this.dialogo = true;
+                console.log(this.$store.state.solicitud_credito.Solicitud)
             }
         }
     }

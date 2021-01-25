@@ -160,6 +160,7 @@ export default {
     ipcRenderer.send('traer-usuarios', 'w')
     ipcRenderer.on('usuarios', (e, data)=>{
       this.usuarios = data
+      console.log(data)
       if (data <= 0){
         this.primeraVez = true
       }else if (data.length > 0){

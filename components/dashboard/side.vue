@@ -98,6 +98,11 @@
               <side-facturacion/>
             </v-list>
           </v-col>
+          <v-col cols="9" v-if="select === 8">
+            <v-list>
+              <side-cuentas/>
+            </v-list>
+          </v-col>
         </v-row>
     </v-navigation-drawer>
 </template>
@@ -114,6 +119,7 @@
   import articulosConta from "./contabilidad/articulosConta";
   import sideFacturacion from "./facturacion/sideFacturacion";
   import notasCredito from "./contabilidad/notasCredito";
+  import sideCuentas from "./cuentas/sideCuentas";
   export default {
     components:{
       admin,
@@ -126,7 +132,8 @@
       articulosConta,
       sideFacturacion,
       notasCredito,
-      sideSeguimientos
+      sideSeguimientos,
+      sideCuentas
     },
     name: "side",
     data(){
@@ -154,7 +161,7 @@
             'url':'/inicio/', 'id':6, 'modulo': 0},
           {'color': 'brown darken-3',  'titulo':'Facturación',   'icono':'fa fa-share-alt',
             'url':'/inicio/', 'id':7, 'modulo': 0},
-          {'color': 'purple',  'titulo':'Ventas y Contratos',  'icono':'fa fa-file-invoice',
+          {'color': 'purple',  'titulo':'Cuentas',  'icono':'fa fa-file-invoice',
             'url':'/inicio/', 'id':8, 'modulo': 0},
           {'color': 'blue-grey',  'titulo':'Clientes',                 'icono':'fa fa-users',
             'url':'/inicio/', 'id':9, 'modulo': 0},

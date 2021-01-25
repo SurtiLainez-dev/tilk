@@ -33,8 +33,10 @@
               <p>Para soporte técnico puede comunicarse al siguiente correo: </p>
               <p><strong>williams_santos@grupolainez.com</strong></p>
             </v-container>
-            <v-divider></v-divider>
-            <v-btn class="mt-3" color="primary" @click="e1 = 2">Continuar</v-btn>
+
+            <v-card-actions class="d-flex justify-end">
+              <v-btn class="mt-3" color="primary" @click="e1 = 2">Continuar</v-btn>
+            </v-card-actions>
           </v-stepper-content>
           <v-stepper-content step="2">
             <v-container class="contenedores">

@@ -1,5 +1,12 @@
 <template>
     <div>
+      <div class="d-flex justify-end" >
+        <v-btn dark small class="ma-2"
+               @click="$router.replace({path:'/inventario/traslados/remisiones'})"
+               color="orange">No Enviar</v-btn>
+        <v-btn v-if="selected.length > 0" class="ma-2"
+               @click="envioCorreo" dark small color="success">Enviar Remisión</v-btn>
+      </div>
       <v-row class="d-flex justify-end">
         <v-col cols="7">
           <strong>Envio de guía de remisión por correo</strong>
@@ -21,14 +28,6 @@
         <div v-for="item in selected">
           {{item.colaborador.nombres}} {{item.colaborador.apellidos}} - {{item.email}}
         </div>
-      </div>
-      <br>
-      <div class="d-flex justify-end" >
-        <v-btn dark small class="ma-2"
-               @click="$router.replace({path:'/inventario/traslados/remisiones'})"
-               color="orange">No Enviar</v-btn>
-        <v-btn v-if="selected.length > 0" class="ma-2"
-               @click="envioCorreo" dark small color="success">Enviar Remisión</v-btn>
       </div>
     </div>
 </template>
