@@ -59,7 +59,7 @@ export default {
         { title: 'Cliente',           val:2},
         { title: 'Artículo',          val:3 },
         { title: 'Agregar Pagos',     val:4 },
-        { title: 'Pagos Agregados',   val:5 },
+        { title: 'Documentos x Cobrar',   val:5 },
         { title: 'Pagos a la Cuenta', val:6 },
         { title: 'Estado de Cuenta',  val:7 },
       ],

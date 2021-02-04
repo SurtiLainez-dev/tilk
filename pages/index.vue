@@ -1,10 +1,5 @@
 <template>
   <div>
-    <v-row no-gutters>
-      <v-col class="d-flex justify-end">
-        <v-btn fab x-small color="red" text class="ma-0"><v-icon>fa fa-times</v-icon></v-btn>
-      </v-col>
-    </v-row>
     <div v-if="proceso">
       cargando.............
     </div>

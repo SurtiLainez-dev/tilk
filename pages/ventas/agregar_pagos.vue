@@ -31,21 +31,28 @@
     </template>
     <template v-slot:item.id="{item}">
       <div class="d-flex justify-center">
-        <v-btn color="success" fab width="25" dark height="25">
+        <v-btn color="success" fab width="25" dark height="25" @click="abrirDialogo(item)">
           <v-icon x-small>fa fa-plus</v-icon>
         </v-btn>
       </div>
     </template>
   </v-data-table>
 
-  <v-dialog v-model="DIALOGO" width="40%">
-    <v-card ></v-card>
+  <v-dialog v-model="DIALOGO" width="30%">
+    <v-card>
+      <v-card-title class="grey lighten-3">Agregar Pago por Cobrar a la Cuenta</v-card-title>
+      <div class="pa-5"><formulario_pago_nuevo :accion="2"/></div>
+    </v-card>
   </v-dialog>
 </v-card>
 </template>
 
 <script>
+import formulario_pago_nuevo from "../../components/Ventas/cuentas/formulario_pago_nuevo";
 export default {
+  components:{
+    formulario_pago_nuevo
+  },
   name: "agregar_pagos",
   data(){
     return{
@@ -81,7 +88,7 @@ export default {
   },
   methods:{
     abrirDialogo(data){
-      this.$store.commit('cuentas\agregar_CUENTA', data);
+      this.$store.commit('cuentas/agregar_CUENTA', data);
       this.DIALOGO = true;
     }
   },

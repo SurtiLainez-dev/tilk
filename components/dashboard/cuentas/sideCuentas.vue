@@ -19,7 +19,10 @@
         Todas las Cuentas
       </v-list-item>
       <v-list-item class="itemOpciones" @click="go('/ventas/agregar_pagos')">
-        Agregar pagos a cuentas
+        Agregar Pagos a Cuentas
+      </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/ventas/nueva_venta_manual')">
+        Agregar Venta Manual
       </v-list-item>
     </v-list-group>
 

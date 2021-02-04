@@ -243,8 +243,7 @@
           }).catch((error)=>{
             Swal.fire(
               'Fallo en el Cambio de Estado',
-              'El estado el usuario no se puedo cambiar, intenta nuevamente, si el error persiste ' +
-              'ponte en contecto con soporte técnico.',
+              error.response.data.eror,
               'error'
             )
             this.estado = this.User.estado

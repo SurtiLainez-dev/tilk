@@ -110,7 +110,7 @@ export default {
       });
     },
     goCuenta(data){
-      if(data.estado === 1 && data.is_aceptado === 1){
+      if(data.estado === 1 || data.estado === 2 && data.is_aceptado === 1){
         this.$store.commit('cuentas/agregar_CUENTA', data);
         this.vista = 2;
       }else{

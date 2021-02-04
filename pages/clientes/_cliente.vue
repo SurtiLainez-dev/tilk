@@ -124,7 +124,7 @@ export default {
         { title: 'Documentos', icon: 'fa fa-file-pdf', val:5 },
         { title: 'Cuentas Asociadas', icon: 'fa fa-th-list', val:6 },
         { title: 'Notas de Crédito', icon: 'fa fa-file', val:7 },
-        { title: 'Agregar Pagos a Cuentas', icon: 'fa fa-money-check-alt', val:8 },
+        { title: 'Agregar Doc. x Cobrar', icon: 'fa fa-money-check-alt', val:8 },
         { title: 'Notas', icon: 'fa fa-sticky-note', val:9 },
         { title: 'Pagos Realizados', icon: 'fa fa-file-invoice-dollar', val:10 },
         { title: 'Solicitudes de Crédito', icon: 'fa fa-file', val:11 }

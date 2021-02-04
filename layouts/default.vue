@@ -1,14 +1,27 @@
 <template>
   <v-app>
     <side/>
-    <v-app-bar color="grey darken-3" height="40px" app dark>
-      <!-- -->
-      <strong>{{titulo}}</strong>
+    <v-app-bar height="35" app>
+      <v-tabs height="35" v-model="tab" align-with-title hide-slider>
+        <v-tab v-for="item in Pes" :key="item.key" class="blue-grey lighten-5">
+          <small>{{ item.titulo }}</small>
+          <div class="pl-5">
+            <v-btn width="15px" height="15px" @click="$store.commit('quitar_pestania')"
+                   fab color="indigo" dark v-if="item.key > 0"> <small>x</small>
+            </v-btn>
+          </div>
+        </v-tab>
+      </v-tabs>
     </v-app-bar>
+
     <v-main app>
-      <div height="100%" class="pt-2 pr-2 pl-2">
-        <nuxt/>
-      </div>
+      <v-tabs-items v-model="tab" >
+        <v-tab-item v-for="i in Pes" :key="i.key" >
+          <nuxt v-if="i.key === 0"/>
+          <caja v-if="i.key === 1"/>
+        </v-tab-item>
+      </v-tabs-items>
+
       <v-overlay :value="over">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
       </v-overlay>
@@ -24,6 +37,7 @@ const restartButton = document.getElementById('restart-button');
 import side from "../components/dashboard/side";
 import NuxtLoading from "../.nuxt/components/nuxt-loading";
 import Cuerpo from "../components/Pestanas/Cuerpo";
+import caja from "../components/caja/index"
 export default {
   watch: {
     over (val) {
@@ -31,11 +45,13 @@ export default {
       }, 500)
     },
   },
-  components:{NuxtLoading, side, Cuerpo},
+  components:{NuxtLoading, side, Cuerpo, caja},
   data(){
     return{
-      tab: 1,
       refe: null,
+      Hora: 0,
+      Minuto: 0,
+      Segundo: 0,
     }
   },
   created() {
@@ -43,15 +59,58 @@ export default {
     this.$store.commit('direcciones/cargar_DISTRITOS');
     this.$store.commit('direcciones/cargar_MUNICIPIOS');
     this.$store.commit('direcciones/cargar_DEPARTAMENTOS');
+    this.calcularFecha()
   },
   computed:{
+    tab:{
+      get: function (){
+        return this.$store.state.tab;
+      },
+      set: function (val){
+        this.$store.commit('cambiarTab', val)
+      }
+    },
     titulo(){
       return this.$store.state.titulo
     },
     over(){
       return this.$store.state.over
+    },
+    Pes(){
+      return this.$store.state.pestana
     }
   },
+  methods:{
+    calcularFecha(){
+      let fecha =new Date();
+      let diaS = fecha.getDay();
+      let mes   = fecha.getMonth()
+      let dia   = fecha.getDate();
+      let fechaS = this.conocerDia(diaS)+', '+dia+' de '+this.concerMes(mes)+' de '+fecha.getFullYear();
+      let fechaN = dia+'/'+mes+'/'+fecha.getFullYear();
+      this.$store.commit('fecha/agregar_DIA_STRING', fechaS);
+      this.$store.commit('fecha/agregar_DIA_PLECA', fechaN);
+    },
+    conocerDia(dia){
+      let day = '';
+      let dias = ['Lunes','Martes','Miercoles','Jueves','Viernes','Sábado','Domingo']
+      for (let i = 0; i < dias.length; i++){
+        if ((parseInt(i) + parseInt(1)) === dia)
+          day = dias[i]
+      }
+      return day
+    },
+    concerMes(mes){
+      let meses = ['Enero','Febrero','Marzo','Abril','Mayo', 'Junio',
+        'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+      let month = '';
+      for (let i = 0; i < meses.length; i++){
+        if (i === mes)
+          month = meses[i]
+      }
+      return month;
+    }
+  }
 }
 </script>
 

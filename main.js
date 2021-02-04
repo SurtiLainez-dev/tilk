@@ -31,6 +31,7 @@ const {BrowserWindow} = require('electron');
 const path = require('path');
 const app = electron.app;
 const { autoUpdater } = require('electron-updater');
+require('update-electron-app')
 const newWin = () => {
 	win = new BrowserWindow({
 		// fullscreen: true,

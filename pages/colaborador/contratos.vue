@@ -38,6 +38,16 @@
           <v-icon v-if="item.estado ===1" color="success">fa fa-check-circle</v-icon>
           <v-icon v-else color="red">fa fa-times</v-icon>
         </template>
+        <template v-slot:item.observacion="{item}">
+          <v-tooltip top>
+            <template v-slot:activator="{on, attrs}">
+              <span v-on="on" v-bind="attrs" v-if="item.observacion">{{item.observacion.substr(0,20)}} ...</span>
+              <span v-on="on" v-bind="attrs" v-else>No hay</span>
+            </template>
+            <span v-if="item.observacion">{{item.observacion}}</span>
+            <span v-else>No hay observaciones</span>
+          </v-tooltip>
+        </template>
       </v-data-table>
     </v-card>
 

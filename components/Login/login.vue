@@ -83,6 +83,7 @@
                 localStorage.setItem('token', res.data.success.token);
                 localStorage.setItem('miniToken', res.data.user.mini_token);
                 localStorage.setItem('usuario', res.data.user.usuario);
+                localStorage.setItem('usuario_id', res.data.user.id);
                 localStorage.setItem('tipoUsuario', res.data.user.tipo_usuario_id);
                 localStorage.setItem('sucursal', res.data.user.colaborador.sucursal.id);
                 localStorage.setItem('estadoUsuario', res.data.user.estado);
@@ -110,6 +111,7 @@
                 this.$store.commit("guardarColaborador", localStorage.getItem('colaborador'));
                 this.$store.commit("guardarMiniToken", localStorage.getItem('miniToken'));
                 this.$store.commit("asignarIdSucursal", localStorage.getItem('sucursal_id'));
+                this.$store.commit("guardarUsuarioId", localStorage.getItem('usuario_id'));
                 ipcRenderer.send('crear-usuario', this.Email)
                 this.$axios.setToken(this.$store.state.token, 'Bearer')
                 this.$router.replace({path:'/inicio/'})

@@ -16,7 +16,7 @@
         <v-row>
             <v-col class="subMenu rounded-lg" cols="3">
                 <v-row v-for="item in opciones">
-                  <v-col v-if="item.id === 1" class="d-flex justify-center" @click="go(item.url)">
+                  <v-col v-if="item.id === 1" class="d-flex justify-center" @click="go(item.url, item.id, item.accion)">
                       <v-tooltip right>
                           <template v-slot:activator="{ on, attrs }">
                               <v-btn @click="select = item.id" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
@@ -29,7 +29,7 @@
                   <v-col v-else-if="item.id === 2 && tipoUser == 1" class="d-flex justify-center">
                     <v-tooltip right>
                       <template v-slot:activator="{ on, attrs }">
-                        <v-btn @click="select = item.id" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
+                        <v-btn @click="go(item.url, item.id, item.accion)" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
                           <v-icon>{{item.icono}}</v-icon>
                         </v-btn>
                       </template>
@@ -39,7 +39,8 @@
                   <v-col v-else-if="item.id === 3 && tipoUser == 2 || tipoUser == 1" class="d-flex justify-center">
                     <v-tooltip right>
                       <template v-slot:activator="{ on, attrs }">
-                        <v-btn @click="select = item.id" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
+                        <v-btn @click="go(item.url, item.id, item.accion)" v-on="on" v-bind="attrs"
+                               :color="item.color" fab x-small dark>
                           <v-icon>{{item.icono}}</v-icon>
                         </v-btn>
                       </template>
@@ -58,6 +59,7 @@
                   </v-col>
                 </v-row>
             </v-col>
+
             <v-col cols="9" v-if="select === 1">
               <v-container style="color: #FFF">
                 <strong>Inicio</strong>
@@ -70,37 +72,42 @@
                   <side-sucursal/>
                 </v-list>
             </v-col>
-          <v-col cols="9" v-if="select === 3">
+            <v-col cols="9" v-if="select === 3">
             <v-list>
               <side-colaboradores/>
               <side-planilla/>
             </v-list>
           </v-col>
-          <v-col cols="9" v-if="select === 4">
+            <v-col cols="9" v-if="select === 4">
             <v-list>
               <side-conta/>
               <articulos-conta/>
               <notas-credito/>
             </v-list>
           </v-col>
-          <v-col cols="9" v-if="select === 5">
+            <v-col cols="9" v-if="select === 5">
             <v-list>
               <side-inventario/>
             </v-list>
           </v-col>
-          <v-col cols="9" v-if="select === 6">
+            <v-col cols="9" v-if="select === 6">
             <v-list>
               <side-proveedores/>
             </v-list>
           </v-col>
-          <v-col cols="9" v-if="select === 7">
+            <v-col cols="9" v-if="select === 7">
             <v-list>
               <side-facturacion/>
             </v-list>
           </v-col>
-          <v-col cols="9" v-if="select === 8">
+            <v-col cols="9" v-if="select === 8">
             <v-list>
               <side-cuentas/>
+            </v-list>
+          </v-col>
+            <v-col cols="9" v-if="select === 9">
+            <v-list>
+              <side-caja/>
             </v-list>
           </v-col>
         </v-row>
@@ -120,6 +127,7 @@
   import sideFacturacion from "./facturacion/sideFacturacion";
   import notasCredito from "./contabilidad/notasCredito";
   import sideCuentas from "./cuentas/sideCuentas";
+  import sideCaja from "./sideCaja";
   export default {
     components:{
       admin,
@@ -133,7 +141,8 @@
       sideFacturacion,
       notasCredito,
       sideSeguimientos,
-      sideCuentas
+      sideCuentas,
+      sideCaja
     },
     name: "side",
     data(){
@@ -148,29 +157,31 @@
         right: null,
         opciones:[
           {'color': 'teal darken-3',   'titulo':'Inicio',        'icono':'fa fa-tachometer-alt',
-            'url':'/inicio/', 'id':1, 'modulo': 0},
+            'url':'/inicio/', 'id':1, 'modulo': 0, 'accion': true},
           {'color': 'primary',         'titulo':'Administrador', 'icono':'fa fa-users-cog',
-            'url':'/admin/user/', 'id':2, 'modulo': 0},
+            'url':'/admin/user/', 'id':2, 'modulo': 0, 'accion': false},
           {'color': 'red darken-2',    'titulo':'Colaboradores', 'icono':'fa fa-users',
-            'url':'/inicio/','id':3, 'modulo': 0},
+            'url':'/inicio/','id':3, 'modulo': 0, 'accion': false},
           {'color': 'teal darken-2',   'titulo':'Contabilidad',  'icono':'fa fa-calculator',
-            'url':'/inicio/', 'id':4, 'modulo': 0},
+            'url':'/inicio/', 'id':4, 'modulo': 0, 'accion': false},
           {'color': 'orange darken-4', 'titulo':'Inventario',    'icono':'fa fa-boxes',
-            'url':'/inicio/', 'id':5, 'modulo': 0},
+            'url':'/inicio/', 'id':5, 'modulo': 0, 'accion': false},
           {'color': 'pink darken-3',   'titulo':'Proveedores',   'icono':'fa fa-user-friends',
-            'url':'/inicio/', 'id':6, 'modulo': 0},
+            'url':'/inicio/', 'id':6, 'modulo': 0, 'accion': false},
           {'color': 'brown darken-3',  'titulo':'Facturación',   'icono':'fa fa-share-alt',
-            'url':'/inicio/', 'id':7, 'modulo': 0},
+            'url':'/inicio/', 'id':7, 'modulo': 0, 'accion': false},
           {'color': 'purple',  'titulo':'Cuentas',  'icono':'fa fa-file-invoice',
-            'url':'/inicio/', 'id':8, 'modulo': 0},
-          {'color': 'blue-grey',  'titulo':'Clientes',                 'icono':'fa fa-users',
-            'url':'/inicio/', 'id':9, 'modulo': 0},
+            'url':'/inicio/', 'id':8, 'modulo': 0, 'accion': false},
+          {'color':'pink darken-4', 'titulo':'Caja', 'icono':'fa fa-cash-register',
+            'url': '/caja/', 'id': 9, 'modulo': 0, 'accion': true}
         ]
     }
     },
     methods:{
-      go(url){
-        this.$router.push(url)
+      go(url, id, accion){
+        this.select = id;
+        if (accion)
+          this.$router.push(url)
       },
     },
     computed:{

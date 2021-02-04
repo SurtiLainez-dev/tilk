@@ -12,6 +12,7 @@ export default function RedirectLogin({redirect, store, route, $axios}) {
             store.commit("guardarMiniToken", localStorage.getItem('miniToken'));
             store.commit("guardarConexion", localStorage.getItem('guardarConexion'))
             store.commit("asignarIdSucursal", localStorage.getItem('sucursal_id'))
+            store.commit("guardarUsuarioId", localStorage.getItem('usuario_id'));
             console.log(localStorage.getItem('guardarConexion'))
             $axios.defaults.baseURL = localStorage.getItem('guardarConexion')
             $axios.setToken(store.state.token, 'Bearer')

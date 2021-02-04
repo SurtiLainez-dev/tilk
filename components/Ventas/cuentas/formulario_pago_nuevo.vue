@@ -26,6 +26,7 @@
   </v-form>
   <v-divider></v-divider>
   <v-card-actions class="d-flex justify-end">
+    <v-btn color="orange" @click="DIALOGO = false" small tile dark v-if="accion === 2">Cerrar</v-btn>
     <v-btn color="success" @click="validarForm" small tile dark>Agregar Pago</v-btn>
   </v-card-actions>
 </v-card>
@@ -90,8 +91,13 @@ export default {
       }
     }
   },
+  created() {
+    console.log(this.CUENTA)
+  },
   methods:{
     enviarDatos(){
+      if (this.accion === 2)
+        this.DIALOGO = false;
       this.$store.commit('activarOverlay', true);
       this.$axios.post('cuenta/agregar_pagos_extras',{
         venta_id:    this.CUENTA.id,
@@ -108,12 +114,13 @@ export default {
         if (this.accion === 1) {
           this.$store.commit('cuentas/cargar_PAGOS_AGREGADOS', this.CUENTA.venta_id)
           this.VISTA = 5;
+          setTimeout(()=>{
+            this.$store.commit('activarOverlay', false);
+          }, 4000);
         }else{
           this.DIALOGO = false;
-        }
-        setTimeout(()=>{
           this.$store.commit('activarOverlay', false);
-        }, 4000);
+        }
 
       }).catch((error)=>{
         this.$store.commit('activarOverlay', false);

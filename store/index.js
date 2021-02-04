@@ -2,9 +2,16 @@
 export const strict = false;
 
 export const state = () =>({
+  pestana:[
+    {
+      titulo: 'titulo',
+      key: 0
+    },
+  ],
   token: null,
   conexion: null,
   usuario: null,
+  usuario_id: null,
   titulo: 'inicio',
   tipoUsuario: null,
   sucursal:null,
@@ -32,10 +39,22 @@ export const state = () =>({
   Seguimiento: [],
   Seguimientos: [],
   loadSeguimiento: false,
-
+  tab: 1
 });
 
 export const mutations = {
+  cambiarTab(state, val){
+    state.tab = val;
+  },
+  quitar_pestania(state){
+    state.pestana.splice(1, 1);
+  },
+  anadirCaja(state){
+      state.pestana.push({
+        titulo: 'Caja',
+        key:    1
+      })
+  },
   asignarDatosSeguimiento(state, data){
     state.Seguimiento = data
   },
@@ -64,7 +83,7 @@ export const mutations = {
     state.over = overlay
   },
   guardarTitulo(state, titulo){
-    state.titulo = titulo
+    state.pestana[0].titulo = titulo
   },
   guardarMiniToken(state, token){
       state.miniToken = token
@@ -89,6 +108,9 @@ export const mutations = {
   },
   guardarTipoUsuario(state, tipo){
     state.tipoUsuario = tipo
+  },
+  guardarUsuarioId(state, user){
+    state.usuario_id = user;
   },
   guardarSucursal(state, sucursal){
     state.sucursal = sucursal
