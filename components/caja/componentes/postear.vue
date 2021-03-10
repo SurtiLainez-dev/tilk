@@ -3,6 +3,10 @@
   <v-toolbar flat>
     <v-btn fab tile color="orange" dark v-if="vista === 2" @click="goBack" x-small><v-icon>fa fa-arrow-left</v-icon></v-btn>
     <v-spacer v-if="vista === 2"></v-spacer>
+    <div class="d-flex align-center">
+      <v-btn fab tile @click="$store.commit('caja/cargar_CUENTAS')"
+             color="indigo" text x-small><v-icon>fa fa-sync</v-icon></v-btn>
+    </div>
     <h6>{{titulo}}</h6>
     <v-spacer v-if="vista === 1"></v-spacer>
     <v-text-field v-if="vista === 1" dense v-model="search" label="Buscar"></v-text-field>
@@ -50,7 +54,10 @@ export default {
     },
     LOAD(){
       return this.$store.state.caja.LOAD_CUENTAS;
-    }
+    },
+  },
+  created() {
+    this.$store.commit('caja/cargar_CUENTAS')
   },
   methods:{
     addCuenta(data){

@@ -36,7 +36,7 @@
                 </v-stepper-content>
 
                 <v-stepper-content step="4">
-                    <revision/>
+                    <revision v-if="vistaSolicitud === 4"/>
                 </v-stepper-content>
             </v-stepper-items>
         </v-stepper>

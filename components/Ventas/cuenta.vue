@@ -2,7 +2,7 @@
 <v-card flat>
   <v-row>
     <v-col cols="2">
-      <v-card height="325" width="256" class="mx-auto">
+      <v-card height="366" width="256" class="mx-auto">
         <v-navigation-drawer permanent>
           <v-list dense nav>
             <v-list-item v-for="item in items" :key="item.title" link @click="cambiarDatosMenu(item)">
@@ -25,10 +25,12 @@
         <v-divider></v-divider>
         <datos_cuenta           v-if="VISTA === 1"/>
         <cliente_cuenta         v-else-if="VISTA === 2"/>
-        <articulo_cuenta        v-else-if="VISTA === 3"/>
+        <articulo_cuenta        v-else-if="VISTA === 3 && CUENTA.tipo_venta === 2"/>
+        <articulos_contado      v-else-if="VISTA === 3 && CUENTA.tipo_venta === 1"/>
         <pago_nuevo             v-else-if="VISTA === 4"/>
         <pagos_agregados_cuenta v-else-if="VISTA === 5"/>
         <pagos_cuenta           v-else-if="VISTA === 6"/>
+        <orden_entrega          v-else-if="VISTA === 8"/>
       </v-card>
     </v-col>
   </v-row>
@@ -42,13 +44,17 @@ import articulo_cuenta from "./cuentas/articulo_cuenta";
 import pagos_cuenta from "./cuentas/pagos_cuenta";
 import pago_nuevo from "./cuentas/pago_nuevo";
 import pagos_agregados_cuenta from "./cuentas/pagos_agregados_cuenta";
+import articulos_contado from "./cuentas/articulos_contado";
+import orden_entrega from "./cuentas/orden_entrega";
 export default {
   components:{
     datos_cuenta,
     cliente_cuenta,
     articulo_cuenta,
     pagos_cuenta, pago_nuevo,
-    pagos_agregados_cuenta
+    pagos_agregados_cuenta,
+    articulos_contado,
+    orden_entrega
   },
   name: "cuenta",
   data(){
@@ -62,11 +68,15 @@ export default {
         { title: 'Documentos x Cobrar',   val:5 },
         { title: 'Pagos a la Cuenta', val:6 },
         { title: 'Estado de Cuenta',  val:7 },
+        { title: 'Orden de Entrega',  val:8 },
       ],
       vistaMenu: 1
     }
   },
   computed:{
+    CUENTA(){
+      return this.$store.state.cuentas.CUENTA;
+    },
     VISTA:{
       get: function (){
         return this.$store.state.cuentas.VISTA;

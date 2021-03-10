@@ -8,7 +8,8 @@ export const state = () => ({
     CUENTAS: [],
     CUENTA: [],
     TITULO: '',
-    LOAD_CUENTAS: true
+    LOAD_CUENTAS: true,
+    FACTURA: []
 })
 
 export const mutations = {
@@ -42,5 +43,5 @@ export const mutations = {
     },
     cambiar_TITULO(state, titulo){
         state.TITULO = titulo
-    }
+    },
 }

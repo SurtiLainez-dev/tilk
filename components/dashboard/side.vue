@@ -36,7 +36,7 @@
                       <span>{{item.titulo}}</span>
                     </v-tooltip>
                   </v-col>
-                  <v-col v-else-if="item.id === 3 && tipoUser == 2 || tipoUser == 1" class="d-flex justify-center">
+                  <v-col v-else-if="item.id === 3 && tipoUser == 2 || tipoUser == 1 || PERMISOS.includes(1)" class="d-flex justify-center">
                     <v-tooltip right>
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn @click="go(item.url, item.id, item.accion)" v-on="on" v-bind="attrs"
@@ -83,6 +83,7 @@
               <side-conta/>
               <articulos-conta/>
               <notas-credito/>
+              <mobiliario/>
             </v-list>
           </v-col>
             <v-col cols="9" v-if="select === 5">
@@ -128,6 +129,7 @@
   import notasCredito from "./contabilidad/notasCredito";
   import sideCuentas from "./cuentas/sideCuentas";
   import sideCaja from "./sideCaja";
+  import mobiliario from "./contabilidad/mobiliario";
   export default {
     components:{
       admin,
@@ -142,7 +144,8 @@
       notasCredito,
       sideSeguimientos,
       sideCuentas,
-      sideCaja
+      sideCaja,
+      mobiliario
     },
     name: "side",
     data(){
@@ -184,10 +187,21 @@
           this.$router.push(url)
       },
     },
+    mounted() {
+      console.log(this.PERMISOS.includes(0))
+    },
     computed:{
       tipoUser: function () {
         return this.$store.state.tipoUsuario
       },
+      PERMISOS(){
+        let permisos = this.$store.state.permisosUser.split(',');
+        let per = [];
+        permisos.forEach((item)=>{
+          per.push(parseInt(item))
+        })
+        return per;
+      }
     }
   }
 </script>

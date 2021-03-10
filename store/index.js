@@ -1,4 +1,4 @@
-
+import Vue from 'vue';
 export const strict = false;
 
 export const state = () =>({
@@ -43,6 +43,16 @@ export const state = () =>({
 });
 
 export const mutations = {
+  notificacion(state,data){
+    console.log(data)
+    console.log(data.color)
+    Vue.$toast.open({
+      message: data.texto,
+      type:   data.color,
+      position: 'bottom-left',
+      duration: 5000
+    })
+  },
   cambiarTab(state, val){
     state.tab = val;
   },

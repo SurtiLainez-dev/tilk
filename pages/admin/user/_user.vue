@@ -128,14 +128,14 @@
             </v-row>
             <v-card :disabled="isPermisos">
               <v-data-table  :dense="true" @click:row="anadirPermisos"
-                             :items-per-page="5" class="rowsTable" :search="search"
+                             :items-per-page="15" class="rowsTable" :search="search"
                              :items="modulos" :headers="headerPermisos" fixed-heade>
                 <template v-slot:item.user_id="{item}">
                   {{User.usuario}}
                 </template>
                 <template v-slot:item.estado="{item}" >
                   <div class="d-flex justify-center">
-                    <v-checkbox v-model="item.estado"></v-checkbox>
+                    <v-checkbox v-model="item.estado" @click="item.estado = !item.estado"></v-checkbox>
                   </div>
                 </template>
               </v-data-table>

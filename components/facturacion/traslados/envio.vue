@@ -19,7 +19,9 @@
                     :search="search" class="rowsTable" show-select
                     :loading="load" loading-text="Cargando correos... espere un momento">
         <template v-slot:item.colaborador.nombres="{item}">
-          {{item.colaborador.nombres}} {{item.colaborador.apellidos}}
+          <span v-if="item.colaborador">
+            {{item.colaborador.nombres}} {{item.colaborador.apellidos}}
+          </span>
         </template>
       </v-data-table>
       <v-divider></v-divider>

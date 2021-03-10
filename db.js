@@ -1,5 +1,5 @@
 const db = require('electron-db')
-const { ipcMain , BrowserWindow, app} = require('electron')
+const { ipcMain , BrowserWindow, app, shell} = require('electron')
 const PDFWindow = require('electron-pdf-window')
 const WINDOW = BrowserWindow.getFocusedWindow()
 // const location = path.join(__dirname, '')
@@ -20,6 +20,10 @@ app.on('ready', ()=>{
         });
         winPdf.loadURL(arg)
     });
+
+    ipcMain.on('pint_navegador', (v, arg) =>{
+        shell.openExternal(arg);
+    })
 
     ipcMain.on('pdf-prueba', (v, arg) => {
         let url = 'http://127.0.0.1:8000/'+arg;

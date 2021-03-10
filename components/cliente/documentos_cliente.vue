@@ -58,8 +58,10 @@ export default {
     }
   },
   created() {
-    this.Archivos = JSON.parse(this.CLIENTE.archivos);
-    this.longArchivos = this.Archivos.length;
+    if (this.CLIENTE.archivos){
+      this.Archivos = JSON.parse(this.CLIENTE.archivos);
+      this.longArchivos = this.Archivos.length;
+    }
     this.limpiarArchivos();
   },
   data(){

@@ -306,7 +306,7 @@ import Vue from "vue";
         )
       });
     },
-    name: "traslado",
+    name: "traslado_trans",
     methods:{
       cargarColaboradores(){
         this.$axios.get('colaboradores',{

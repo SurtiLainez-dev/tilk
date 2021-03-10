@@ -26,7 +26,7 @@
                         <v-row no-gutters>
                             <v-col class="d-flex align-center"> <v-card-title>Datos del artículo</v-card-title></v-col>
                             <v-col class="d-flex justify-end align-center ma-2">
-                                <v-btn x-small color="red" class="ma-2" dark>Declinar Solicitud</v-btn>
+                                <v-btn x-small color="red" class="ma-2" dark @click="declinarVenta">Declinar Venta</v-btn>
                                 <v-btn x-small @click="dialogoBusquedaMoto = true"
                                        :disabled="!Is_motocicleta"
                                        color="success" class="text-white ma-2">
@@ -478,6 +478,18 @@
                     this.loadRemision = false;
                   })
             },
+            declinarVenta(){
+              this.$store.commit('activarOverlay', true);
+              this.$axios.post('venta',{
+                tipo:              2,
+                solicitud_credito: this.Soli.id,
+              }).then((res)=>{
+                this.$store.commit('activarOverlay', false);
+                this.notificacion('Se ha declinado la solicitúd de crédito','error');
+                this.dialogo = true;
+                this.vistaVenta = true
+              })
+            },
             crearVenta(){
                 this.AArticulo.remision = this.AArticulo.serie === this.AArticulo.verificar_remision;
 
@@ -499,6 +511,7 @@
                 console.log(this.AArticulo)
                 this.$axios.post('venta',
                     {
+                    tipo:                    1,
                     articulo:                this.Venta.articulo_id,
                     serie_articulo:          this.AArticulo.serie,
                     color_articulo:          this.AArticulo.color,
@@ -528,7 +541,9 @@
                     motocicleta_id:              this.Venta.Moto_id,
                     solicitud_credito:           this.Soli.id,
 
-                    is_remision:                 this.AArticulo.remision
+                    is_remision:                 this.AArticulo.remision,
+                    precio_contado:              this.Soli.precio_contado,
+                    venta_id:                    this.Venta.id
                 }, {
                       timeout: 15000,
                     }).then((res)=>{

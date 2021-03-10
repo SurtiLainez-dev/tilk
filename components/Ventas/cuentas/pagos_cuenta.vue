@@ -43,8 +43,8 @@
     </template>
     <template v-slot:cell(estado)="scope">
       <v-chip color="orange" x-small dark v-if="scope.item.estado === 1">Al día</v-chip>
-      <v-chip color="success" x-small dark v-else-if="scope.item.estado === 2">Cancelado</v-chip>
-      <v-chip color="red" x-small dark v-else-if="scope.item.estado === 3">En Mora</v-chip>
+      <v-chip color="success" x-small dark v-else-if="scope.item.estado === 3">Cancelado</v-chip>
+      <v-chip color="red" x-small dark v-else-if="scope.item.estado === 2">En Mora</v-chip>
     </template>
     <template v-slot:cell(saldo_antes)="scope"><strong>L </strong>{{scope.item.saldo_antes}}</template>
     <template v-slot:cell(saldo_despues)="scope"><strong>L </strong>{{scope.item.saldo_despues}}</template>

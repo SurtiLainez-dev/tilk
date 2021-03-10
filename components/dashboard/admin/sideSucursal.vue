@@ -15,6 +15,21 @@
       </v-list-item>
 
     </v-list-group>
+
+    <v-list-group v-if="PERMISOS.includes(9)">
+      <template v-slot:activator value="true">
+        <v-tooltip top>
+          <template v-slot:activator="{on, attrs}">
+            <v-list-item-title v-on="on" v-bind="attrs">Otras Gestiones</v-list-item-title>
+          </template>
+          <span>Otras Gestiones</span>
+        </v-tooltip>
+      </template>
+      <v-list-item class="itemOpciones" @click="go('/admin/passwords')" v-if="PERMISOS.includes(91)">
+        Contraseñas Administradas
+      </v-list-item>
+
+    </v-list-group>
   </div>
 </template>
 
@@ -24,6 +39,16 @@
       methods:{
         go(url){
           this.$router.push(url)
+        }
+      },
+      computed:{
+        PERMISOS(){
+          let permisos = this.$store.state.permisosUser.split(',');
+          let per = [];
+          permisos.forEach((item)=>{
+            per.push(parseInt(item))
+          })
+          return per;
         }
       }
     }

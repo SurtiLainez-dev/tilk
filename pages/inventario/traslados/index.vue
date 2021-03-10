@@ -50,7 +50,6 @@
   import traslado from "../../../components/facturacion/traslados/traslado";
   export default {
     components:{traslado},
-    name: "index",
     data(){
       return{
         search:'',

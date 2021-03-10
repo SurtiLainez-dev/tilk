@@ -517,7 +517,7 @@
           contado:0,
           min_prima: 0,
           saldo: 0,
-          pagos: 0,
+          pagosT: 0,
           prima: 0,
           saldo_nuevo: 0,
           financiamiento: 0,

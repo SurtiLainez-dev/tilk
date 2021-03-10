@@ -256,7 +256,7 @@
   import Swal from 'sweetalert2'
   export default {
     props:{traslado: Object, tipo: Number, update: Array, traslado_id: Number, cuerpos: Array},
-    name: "revision",
+    name: "revision_transferencia1",
     data(){
       return{
         dialogoVerificar: false,
@@ -344,6 +344,7 @@
         }
       },
       registrarTraslado(){
+        // this.$store.commit('cambiarVista', 3);
         this.$store.commit('valorDialogo', false);
         this.$store.commit('valorDialogo2', false);
         this.$store.commit('activarOverlay', true);

@@ -21,6 +21,9 @@
       <template v-slot:item.saldo_actual="{item}">
         L {{item.saldo_actual}}
       </template>
+      <template v-slot:item.cliente.nombres="{item}">
+        {{item.cliente.nombres}} {{item.cliente.apellidos}}
+      </template>
       <template v-slot:item.estado="{item}">
         <v-chip color="orange" x-small v-if="item.estado === 1" dark>Al día</v-chip>
         <v-chip color="red" x-small v-else-if="item.estado === 2" dark>Mora</v-chip>

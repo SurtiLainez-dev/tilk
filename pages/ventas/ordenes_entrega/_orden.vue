@@ -24,20 +24,6 @@
             </v-list-item-content>
           </v-list-item>
 
-          <v-list-item two-line>
-            <v-list-item-content>
-              <v-list-item-title>Artículo</v-list-item-title>
-              <v-list-item-subtitle>{{Orden.venta.remision_articulo.articulo.nombre_articulo}}</v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-
-          <v-list-item two-line>
-            <v-list-item-content>
-              <v-list-item-title>Serie del Sistema</v-list-item-title>
-              <v-list-item-subtitle>{{Orden.venta.remision_articulo.serie_sistema}}</v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-
 
           <v-list-item two-line>
             <v-list-item-content>
@@ -188,6 +174,7 @@ export default {
     cargarOrden(val){
       if (val === 1)
         this.isPeticion = true
+
       this.$axios.get('ordenes_entrega/venta/'+this.$route.params.orden).then((res)=>{
         this.Orden = res.data.orden;
         if (val === 1){

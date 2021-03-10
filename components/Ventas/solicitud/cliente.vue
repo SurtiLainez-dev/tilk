@@ -410,7 +410,7 @@
             }else if (this.vista === 2){
                 this.height = '100%';
                 this.width  = '100%';
-                // this.cargarDirecciones(this.Cliente.direcciones)
+                this.cargarDirecciones(this.Cliente.direcciones)
             }
             this.cargarDepartamentos();
             this.Solicitud.avales = [];
@@ -576,6 +576,7 @@
                                 this.cantArchivos = 4
                             }
                             if (cl.direcciones){
+                                console.log(JSON.parse(cl.direcciones))
                                 th.direcciones = JSON.parse(cl.direcciones);
                                 this.cargarDirecciones(th.direcciones);
                             }else{
@@ -627,7 +628,7 @@
                     }).catch((error)=>{
                         this.notificacion('Hubo error al cargar los datos. Presiona ENTER nuevamente','error');
                         this.loadIdentidad = false;
-                })
+                    })
             },
             cambiarEstadoFile(item){
                 item.estado = 1;
@@ -671,12 +672,12 @@
                         'Authorization': 'Bearer '+ this.$store.state.token
                     }
                 }).then((res)=>{
-
                     this.Departamentos = res.data.depto
                 })
             },
             cargarDirecciones(direcciones){
                 direcciones.forEach( (i) => {
+                  console.log(i)
                     this.cargarMunicipios(i);
                     this.cargarCiudades(i);
                     this.cargarColonias(i)

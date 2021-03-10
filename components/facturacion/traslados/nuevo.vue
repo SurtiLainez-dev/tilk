@@ -151,7 +151,7 @@
 
         <v-stepper-content step="3">
           <v-card height="400px" width="100%">
-            <strong>Creación de Remisión</strong>
+            <strong>Creación de Guía de Remisión</strong>
             <remision v-if="vista === 3"  :sucursales="Sucursales" :motivos="Motivos.data"/>
           </v-card>
         </v-stepper-content>
@@ -162,6 +162,7 @@
           </v-card>
         </v-stepper-content>
       </v-stepper>
+
       <v-dialog v-model="Motivos.dialogo" width="40%">
         <v-card>
           <v-card-title>Creando Motivo de Traslado</v-card-title>
@@ -234,7 +235,7 @@
   import remision from "../../../components/facturacion/traslados/remision";
   import envio from "../../../components/facturacion/traslados/envio";
   export default {
-    name: "nuevo",
+    name: "nuevo_transfe",
     props:{
       sucursal_data:  Number,
       destino_data:   Number,

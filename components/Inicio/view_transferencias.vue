@@ -208,7 +208,7 @@
             min: v => v.length > 5  || 'Tiene que ser mayor a 5 carácteres'
           }
         },
-        file: '',
+        file: null,
         dialogoFile:false,
         selected: null,
         header:[

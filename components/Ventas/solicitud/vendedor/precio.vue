@@ -26,8 +26,8 @@
                               v-model="Soli.saldo_financiar" disabled></v-text-field>
             </v-col>
             <v-col>
-                <v-select class="ma-1" dense label="Forma de pago" :item-value="'val'" :item-text="'text'"
-                          v-model="formaPago" :items="formaPagos" @change="calcularCuota"></v-select>
+<!--                <v-select class="ma-1" dense label="Forma de pago" :item-value="'val'" :item-text="'text'"-->
+<!--                          v-model="formaPago" :items="formaPagos" @change="calcularCuota"></v-select>-->
             </v-col>
         </v-row>
         <v-row no-gutters>
@@ -148,9 +148,14 @@
         },
         created() {
             this.$store.commit('activarOverlay', false);
-            this.DestallesPRecio.pagos.forEach( (i) => {
+            if (this.DestallesPRecio.pagos){
+              this.DestallesPRecio.pagos.forEach( (i) => {
                 this.totalRows++;
-            });
+              });
+            }else{
+              this.DestallesPRecio.pagos = [];
+            }
+
             let forma = this.Soli.forma_pago.toLowerCase();
             if (forma === 'mensual') {
                 this.formaPago = 3;
@@ -164,9 +169,12 @@
                 this.formaPago = 1;
                 this.pagos = 4;
             }
+
             this.SF = parseFloat(this.Soli.precio_contado) - parseFloat(this.Soli.prima);
             this.totalCredito = parseFloat(this.Soli.prima) + parseFloat(this.Soli.saldo_financiar);
-            this.calcularPagos();
+            if (this.DestallesPRecio.pagos){
+              this.calcularPagos();
+            }
         },
         methods:{
             calcularCuota(){

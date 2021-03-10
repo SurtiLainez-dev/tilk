@@ -2,6 +2,9 @@
 <v-card>
   <v-toolbar flat color="grey lighten-4">
     <h5>Agregando Cuenta</h5>
+    <v-spacer></v-spacer>
+    <v-btn color="indigo" small dark class="ma-2" tile @click="Ciudad.dialogo = true">Ciudad/Caserio/Aldea Nueva</v-btn>
+    <v-btn color="indigo" small dark class="ma-2" tile @click="Colonia.dialogo = true">Colonia Nueva</v-btn>
   </v-toolbar>
 
   <v-form ref="FormNuevaCuentaManual">
@@ -15,16 +18,19 @@
       </v-col>
       <v-col>
         <v-text-field class="ma-1" v-model="data.cliente.nombres"
-                      :disabled="!data.disabled.cliente":rules="[rules.select.req]"
+                      ref="inputDCNombres" @keyup.enter="$refs.inputDCApellidos.focus()"
+                      :disabled="!data.disabled.cliente" :rules="[rules.select.req]"
                       dense outlined label="Nombres del Cliente"></v-text-field>
       </v-col>
       <v-col>
         <v-text-field class="ma-1" v-model="data.cliente.apellidos"
+                      ref="inputDCApellidos" @keyup.enter="$refs.inputDCSexo.focus()"
                       :disabled="!data.disabled.cliente" :rules="[rules.select.req]"
                       dense outlined label="Apellidos del Cliente"></v-text-field>
       </v-col>
       <v-col>
         <v-select class="ma-1" v-model="data.cliente.sexo"
+                  ref="inputDCSexo"
                   :disabled="!data.disabled.cliente" :rules="[rules.select.req]"
                   dense :items="SelectSexos" outlined label="Sexo del Cliente"></v-select>
       </v-col>
@@ -55,14 +61,14 @@
                 </thead>
                 <tbody>
                 <tr v-for="item in data.direcciones">
-                  <td>
+                  <td style="width: 15%">
                     <v-select v-model="item.departamento" :rules="[rules.select.req]"
                               @change="cargarMunicipio(item)" outlined dense
                               :disabled="item.key < logns.direcciones"
                               :items="DEPARTAMENTOS" :item-text="'nombre'" :item-value="'id'">
                     </v-select>
                   </td>
-                  <td>
+                  <td style="width: 15%">
                     <v-autocomplete :items="item.Municipios" v-model="item.municipio"
                                     :disabled="item.key < logns.direcciones"
                                     :rules="[rules.select.req]" dense
@@ -70,7 +76,7 @@
                                     @change="cargarCiudades(item)">
                     </v-autocomplete>
                   </td>
-                  <td>
+                  <td style="width: 20%">
                     <v-autocomplete :items="item.Ciudades" v-model="item.ciudad"
                                     :disabled="item.key < logns.direcciones"
                                     :rules="[rules.select.req]" outlined
@@ -78,7 +84,7 @@
                                     :item-text="'nombres'" :item-value="'id'">
                     </v-autocomplete>
                   </td>
-                  <td>
+                  <td style="width: 20%">
                     <v-autocomplete :items="item.Colonias" :rules="[rules.select.req]"
                                     v-model="item.colonia" outlined
                                     :disabled="item.key < logns.direcciones" dense
@@ -86,7 +92,7 @@
                     </v-autocomplete>
                   </td>
                   <td>
-                    <v-textarea v-model="item.detalle" counter :disabled="item.key < logns.direcciones"
+                    <v-textarea v-model="item.detalle" counter
                                 :rules="[rules.select.req, rules.detalle.min, rules.detalle.max]"
                                 :rows="2" dense outlined>
                     </v-textarea>
@@ -169,27 +175,35 @@
       <v-row no-gutters class="ma-5">
         <v-col>
           <v-text-field dense class="ma-1" label="Total Inicial del Crédito"
+                        @change="calcularCuota" @keyup.enter="$refs.inputPrima.focus()"
                         prefix="L" :rules="[rules.select.req, rules.moneda.num]"
                         outlined v-model="data.cuenta.total_inicial"></v-text-field>
         </v-col>
         <v-col>
           <v-text-field dense class="ma-1" label="Prima" prefix="L"
+                        ref="inputPrima" @keyup.enter="$refs.inputFormaPago.focus()"
                         :rules="[rules.select.req, rules.moneda.num]"
+                        @change="calcularCuota"
                         outlined v-model="data.cuenta.prima"></v-text-field>
         </v-col>
         <v-col>
-          <v-text-field dense class="ma-1" label="Tiempo" persistent-hint
-                        :rules="[rules.select.req, rules.moneda.num]"
-                        hint="Tiempo en meses" outlined v-model="data.cuenta.tiempo">
-          </v-text-field>
+          <v-select dense outlined label="Forma de Pago"
+                    ref="inputFormaPago" @keyup.enter="$refs.inputCuotas.focus()"
+                    v-model="data.cuenta.forma_pago"
+                    class="ma-1" :items="selectFormaPago" :rules="[rules.select.req]">
+          </v-select>
         </v-col>
         <v-col>
-          <v-text-field dense class="ma-1" label="# de Cuotas" v-model="data.cuenta.cuotas"
+          <v-text-field dense class="ma-1" label="# de Cuotas" @change="calcularCuota"
+                        @keyup.enter="$refs.inputEstadoCuenta.focus()"
+                        v-model="data.cuenta.cuotas" ref="inputCuotas"
                         outlined :rules="[rules.select.req, rules.moneda.num]">
           </v-text-field>
         </v-col>
         <v-col>
-          <v-select dense class="ma-1" label="Estado de la Cuenta" :items="selectEstado"
+          <v-select dense class="ma-1" label="Estado de la Cuenta"
+                    @keyup.enter="$refs.inputSaldoCapital.focus()"
+                    :items="selectEstadoCuenta" ref="inputEstadoCuenta"
                     outlined v-model="data.cuenta.estado" :rules="[rules.select.req]">
           </v-select>
         </v-col>
@@ -197,33 +211,41 @@
       <v-row no-gutters class="ma-5">
         <v-col>
           <v-text-field prefix="L" class="ma-1" :rules="[rules.select.req, rules.moneda.num]"
-                        v-model="data.cuenta.saldo_actual"
-                        dense outlined label="Saldo Actual de la cuenta">
+                        @keyup.enter="$refs.inputSaldoMora.focus()"
+                        @change="calcularSaldoCapital"
+                        hint="Es el saldo actual de la cuenta sin mora" persistent-hint
+                        v-model="data.cuenta.saldo_capital" ref="inputSaldoCapital"
+                        dense outlined label="Saldo Capital">
           </v-text-field>
         </v-col>
         <v-col>
-          <v-text-field dense outlined label="Total Abonado" prefix="L"
-                        v-model="data.cuenta.total_abonado"
-                        hint="Abonado a Capital e Intereses(mora no)" persistent-hint
-                        class="ma-1" :rules="[rules.select.req, rules.moneda.num]"></v-text-field>
-        </v-col>
-        <v-col>
           <v-text-field dense outlined label="Saldo en Mora" class="ma-1"
-                        :rules="[rules.moneda.num]"
+                        @change="calcularSaldoCapital"
+                        :rules="[rules.moneda.num]" ref="inputSaldoMora"
+                        @keyup.enter="$refs.inputSaldoActualCuenta.focus()"
                         prefix="L" v-model="data.cuenta.saldo_mora">
           </v-text-field>
         </v-col>
         <v-col>
-          <v-text-field dense outlined label="Cuota" class="ma-1"
-                        v-model="data.cuenta.couta"
-                        prefix="L" :rules="[rules.select.req, rules.moneda.num]">
+          <v-text-field prefix="L" class="ma-1" :rules="[rules.select.req, rules.moneda.num]"
+                        @keyup.enter="$refs.inputTotalAbonado.focus()"
+                        v-model="data.cuenta.saldo_actual" ref="inputSaldoActualCuenta"
+                        dense outlined label="Saldo Actual de la Cuenta">
           </v-text-field>
         </v-col>
         <v-col>
-          <v-select dense outlined label="Forma de Pago"
-                    v-model="data.cuenta.forma_pago"
-                    class="ma-1" :items="selectFormaPago" :rules="[rules.select.req]">
-          </v-select>
+          <v-text-field dense outlined label="Total Abonado" prefix="L"
+                        v-model="data.cuenta.total_abonado" ref="inputTotalAbonado"
+                        @keyup.enter="$refs.inputCuota.focus()"
+                        hint="Abonado a Capital e Intereses(mora no)" persistent-hint
+                        class="ma-1" :rules="[rules.select.req, rules.moneda.num]"></v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field dense outlined label="Cuota" class="ma-1"
+                        v-model="data.cuenta.couta" ref="inputCuota"
+                        @keyup.enter="dialogo.fechaPrima = true"
+                        prefix="L" :rules="[rules.select.req, rules.moneda.num]">
+          </v-text-field>
         </v-col>
       </v-row>
       <v-row no-gutters class="ma-5">
@@ -233,7 +255,8 @@
             <template v-slot:activator="{ on, attrs }">
               <v-text-field v-model="data.cuenta.fecha_prima" label="Fecha de la Prima"
                             :rules="[rules.select.req]" dense class="ma-1"
-                            readonly v-bind="attrs" v-on="on" outlined></v-text-field>
+                            readonly v-bind="attrs" v-on="on" outlined>
+              </v-text-field>
             </template>
             <v-date-picker v-model="data.cuenta.fecha_prima" scrollable>
               <v-spacer></v-spacer>
@@ -280,129 +303,143 @@
         </v-col>
       </v-row>
 
-      <v-divider></v-divider>
-      <v-card-text>Revisión de los Pagos</v-card-text>
-
-
-      <v-row no-gutters>
-        <v-col cols="10">
-          <v-card class="ma-2">
-            <b-table responsive small
-                     class="rowsTable"
-                     :current-page="currentPage"
-                     :per-page="perPage"
-                     :fields="headerPagos"
-                     :items="data.pagos"
-                     hover>
-              <template v-slot:head(fecha_pago)><div class="text-nowrap">Fecha de Pago</div></template>
-              <template v-slot:head(detalle)><div class="text-nowrap">Detalle del Pago</div></template>
-              <template v-slot:head(pago_inicial)><div class="text-nowrap">Pago Inicial</div></template>
-              <template v-slot:head(total_abonado)><div class="text-nowrap">Total Abonado</div></template>
-              <template v-slot:head(saldo_abonado)><div class="text-nowrap">Saldo Abonado</div></template>
-              <template v-slot:head(total_mora)><div class="text-nowrap">Saldo en Mora</div></template>
-              <template v-slot:head(total_pago)><div class="text-nowrap">Total del Pago</div></template>
-              <template v-slot:head(saldo_actual)><div class="text-nowrap">Saldo Actual</div></template>
-              <template v-slot:head(is_mora)><div class="text-nowrap">Estado de la Mora</div></template>
-              <template v-slot:head(estado)><div class="text-nowrap">Estado del Pago</div></template>
-              <template v-slot:head(inicio_mora)><div class="text-nowrap">Inicio de la Mora</div></template>
-              <template v-slot:head(revisado)><div class="text-nowrap">Revisado</div></template>
-              <template v-slot:head(dias_mora)><div class="text-nowrap">Dias en Mora</div></template>
-
-              <template v-slot:cell(fecha_pago)="scope">
-                <v-menu v-model="scope.item.dialogo" :nudge-right="40" offset-y min-width="auto"
-                        :close-on-content-click="false" transition="scale-transition">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-text-field v-model="scope.item.fecha_pago"
-                                  :rules="[rules.select.req]" dense
-                                  readonly v-bind="attrs" v-on="on" outlined>
-                    </v-text-field>
-                  </template>
-                  <v-date-picker
-                      v-model="scope.item.fecha_pago"
-                      @input="scope.item.dialogo = false"></v-date-picker>
-                </v-menu>
-              </template>
-              <template v-slot:cell(detalle)="scope">
-                <div class="text-nowrap">{{scope.item.detalle}}</div>
-              </template>
-              <template v-slot:cell(pago_inicial)="scope">L {{scope.item.pago_inicial}}</template>
-              <template v-slot:cell(total_abonado)="scope">
-                <v-text-field dense prefix="L" outlined @change="sumarTotalPago(scope.item)"
-                              :rules="[rules.select.req, rules.moneda.num]"
-                              v-model="scope.item.total_abonado"></v-text-field>
-              </template>
-              <template v-slot:cell(total_mora)="scope">
-                <v-text-field dense prefix="L" outlined @change="sumarTotalPago(scope.item)"
-                              :rules="[rules.moneda.num]"
-                              v-model="scope.item.total_mora"></v-text-field>
-              </template>
-              <template v-slot:cell(total_pago)="scope">
-                <v-text-field dense prefix="L" outlined
-                              :rules="[rules.select.req, rules.moneda.num]"
-                              disabled v-model="scope.item.total_pago"></v-text-field>
-              </template>
-              <template v-slot:cell(saldo_actual)="scope">
-                <v-text-field dense prefix="L" outlined
-                              :rules="[rules.moneda.num]"
-                              v-model="scope.item.saldo_actual"></v-text-field>
-              </template>
-              <template v-slot:cell(is_mora)="scope">
-                <v-select dense outlined :items="selectEstado" v-model="scope.item.is_mora"></v-select>
-              </template>
-              <template v-slot:cell(estado)="scope">
-                <v-select dense outlined :items="selectPago" v-model="scope.item.estado"></v-select>
-              </template>
-              <template v-slot:cell(inicio_mora)="scope">
-                <v-menu v-model="scope.item.dialogoMora" :nudge-right="40" offset-y min-width="auto"
-                        :close-on-content-click="false" transition="scale-transition">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-text-field v-model="scope.item.inicio_mora"
-                                  :rules="[rules.select.req]" dense
-                                  readonly v-bind="attrs" v-on="on" outlined>
-                    </v-text-field>
-                  </template>
-                  <v-date-picker
-                      v-model="scope.item.inicio_mora"
-                      @input="scope.item.dialogoMora = false"></v-date-picker>
-                </v-menu>
-              </template>
-              <template v-slot:cell(dias_mora)="scope">
-                <v-text-field outlined dense v-model="scope.item.dias_mora"></v-text-field>
-              </template>
-              <template v-slot:cell(revisado)="scope" class="d-flex align-center">
-                <v-checkbox @change="contPagosRevisados(scope.item)" v-model="scope.item.revisado"></v-checkbox>
-              </template>
-            </b-table>
-            <v-row no-gutters>
-              <v-col class="d-flex justify-center">
-                <b-pagination v-model="currentPage"
-                              :total-rows="totalRows"
-                              :per-page="perPage"
-                              align="fill"
-                              size="sm"
-                              class="my-0"
-                ></b-pagination>
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-col>
-        <v-col cols="">
-          <v-card class="ma-2">
-            <v-card-title>Revisión</v-card-title>
-            <v-divider></v-divider>
-            <v-text-field class="ma-1" outlined dense disabled :rules="[rules.revision.revisados]"
-                          label="Pagos Revisados" v-model="revision.user.revisados">
-            </v-text-field>
-            <v-text-field class="ma-1" outlined dense disabled prefix="L" :rules="[rules.revision.saldo_actual]"
-                          label="Saldo Actual" v-model="revision.user.saldo_actual">
-            </v-text-field>
-            <v-text-field class="ma-1" outlined dense disabled :rules="[rules.revision.saldo_mora]"
-                          label="Saldo en Mora" v-model="revision.user.mora">
-            </v-text-field>
-          </v-card>
-        </v-col>
-      </v-row>
     </v-card>
+  </v-form>
+
+  <v-divider></v-divider>
+  <v-card-text>Revisión de los Pagos</v-card-text>
+  <v-form ref="FormValidarConcordanciaDePagos">
+    <v-row no-gutters>
+      <v-col cols="10">
+        <v-card class="ma-2">
+          <b-table responsive small
+                   class="rowsTable"
+                   :current-page="currentPage"
+                   :per-page="perPage"
+                   :fields="headerPagos"
+                   :items="data.pagos"
+                   hover>
+            <template v-slot:head(fecha_pago)><div class="text-nowrap">Fecha de Pago</div></template>
+            <template v-slot:head(detalle)><div class="text-nowrap">Detalle del Pago</div></template>
+            <template v-slot:head(pago_inicial)><div class="text-nowrap">Pago Inicial</div></template>
+            <template v-slot:head(total_abonado)><div class="text-nowrap">Total Abonado</div></template>
+            <template v-slot:head(saldo_abonado)><div class="text-nowrap">Saldo Abonado</div></template>
+            <template v-slot:head(mora)><div class="text-nowrap">Saldo en Mora</div></template>
+            <template v-slot:head(total_pago)><div class="text-nowrap">Total del Pago</div></template>
+            <template v-slot:head(saldo_actual)><div class="text-nowrap">Saldo Actual</div></template>
+            <template v-slot:head(is_mora)><div class="text-nowrap">Estado de la Mora</div></template>
+            <template v-slot:head(estao)><div class="text-nowrap">Estado del Pago</div></template>
+            <template v-slot:head(inicio_mora)><div class="text-nowrap">Inicio de la Mora</div></template>
+            <template v-slot:head(revisado)><div class="text-nowrap">Revisado</div></template>
+            <template v-slot:head(dias_mora)><div class="text-nowrap">Dias en Mora</div></template>
+            <template v-slot:head(saldo_cap)><div class="text-nowrap">Saldo Capital</div></template>
+
+            <template v-slot:cell(fecha_pago)="scope">
+              <v-menu v-model="scope.item.dialogo" :nudge-right="40" offset-y min-width="auto"
+                      :close-on-content-click="false" transition="scale-transition">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="scope.item.fecha_pago"
+                                :rules="[rules.select.req]" dense
+                                persistent-hint
+                                :hint="`${scope.item.fecha_pago.split('-')[2]}/${scope.item.fecha_pago.split('-')[1]}/${scope.item.fecha_pago.split('-')[0]}`"
+                                readonly v-bind="attrs" v-on="on" outlined>
+                  </v-text-field>
+                </template>
+                <v-date-picker
+                    v-model="scope.item.fecha_pago"
+                    @input="scope.item.dialogo = false"></v-date-picker>
+              </v-menu>
+            </template>
+            <template v-slot:cell(detalle)="scope">
+              <div class="text-nowrap">{{scope.item.detalle}}</div>
+            </template>
+            <template v-slot:cell(pago_inicial)="scope">L {{scope.item.pago_inicial}}</template>
+            <template v-slot:cell(total_abonado)="scope">
+              <v-text-field dense prefix="L" outlined @change="sumarTotalPago(scope.item)"
+                            :rules="[rules.moneda.num]"
+                            v-model="scope.item.total_abonado"></v-text-field>
+            </template>
+            <template v-slot:cell(mora)="scope">
+              <v-text-field dense prefix="L" outlined @change="sumarTotalPago(scope.item)"
+                            :rules="[rules.moneda.num]"
+                            v-model="scope.item.mora"></v-text-field>
+            </template>
+            <template v-slot:cell(saldo_cap)="scope">
+              <v-text-field dense prefix="L" outlined
+                            :rules="[rules.moneda.num]"
+                            v-model="scope.item.saldo_cap"></v-text-field>
+            </template>
+            <template v-slot:cell(total_pago)="scope">
+              <v-text-field dense prefix="L" outlined
+                            :rules="[rules.select.req, rules.moneda.num]"
+                            disabled v-model="scope.item.total_pago"></v-text-field>
+            </template>
+            <template v-slot:cell(saldo_actual)="scope">
+              <v-text-field dense prefix="L" outlined
+                            :rules="[rules.moneda.num]"
+                            v-model="scope.item.saldo_actual"></v-text-field>
+            </template>
+            <template v-slot:cell(is_mora)="scope">
+              <v-select dense outlined :items="selectEstado" v-model="scope.item.is_mora"></v-select>
+            </template>
+            <template v-slot:cell(estao)="scope">
+              <v-select dense outlined :items="selectPago" :rules="[rules.select.req]"
+                        v-model="scope.item.estao"></v-select>
+            </template>
+            <template v-slot:cell(inicio_mora)="scope">
+              <v-menu v-model="scope.item.dialogoMora" :nudge-right="40" offset-y min-width="auto"
+                      :close-on-content-click="false" transition="scale-transition">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="scope.item.inicio_mora" dense
+                                :hint="scope.item.inicio_mora ? `${scope.item.fecha_pago.split('-')[2]}/${scope.item.fecha_pago.split('-')[1]}/${scope.item.fecha_pago.split('-')[0]}`:'No hay fecha de inicio de mora'"
+                                persistent-hint
+                                readonly v-bind="attrs" v-on="on" outlined>
+                  </v-text-field>
+                </template>
+                <v-date-picker
+                    v-model="scope.item.inicio_mora" @change="calcularDiasMora(scope.item)"
+                    @input="scope.item.dialogoMora = false"></v-date-picker>
+              </v-menu>
+            </template>
+            <template v-slot:cell(dias_mora)="scope">
+              <v-text-field outlined dense v-model="scope.item.dias_mora" suffix="días"></v-text-field>
+            </template>
+            <template v-slot:cell(revisado)="scope" class="d-flex align-center">
+              <v-checkbox @change="contPagosRevisados(scope.item)"
+                          v-model="scope.item.revisado" :rules="[rules.check.check]">
+              </v-checkbox>
+            </template>
+          </b-table>
+          <v-row no-gutters>
+            <v-col class="d-flex justify-center">
+              <b-pagination v-model="currentPage"
+                            :total-rows="totalRows"
+                            :per-page="perPage"
+                            align="fill"
+                            size="sm"
+                            class="my-0"
+              ></b-pagination>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-col>
+      <v-col cols="">
+        <v-card class="ma-2">
+          <v-card-title>Revisión</v-card-title>
+          <v-divider></v-divider>
+          <v-text-field class="ma-1" outlined dense disabled :rules="[rules.revision.revisados]"
+                        label="Pagos Revisados" v-model="revision.user.revisados">
+          </v-text-field>
+          <v-text-field class="ma-1" outlined dense disabled prefix="L" :rules="[rules.revision.saldo_actual]"
+                        label="Saldo Actual" v-model="revision.user.saldo_actual">
+          </v-text-field>
+          <v-text-field class="ma-1" outlined dense disabled :rules="[rules.revision.saldo_mora]"
+                        label="Saldo en Mora" v-model="revision.user.mora">
+          </v-text-field>
+          <v-btn block color="indigo" dark tile small @click="validarEnvio">Registrar</v-btn>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-form>
 
 
@@ -433,69 +470,111 @@
       </v-card-title>
     </v-card>
   </v-dialog>
+
+  <v-dialog v-model="Ciudad.dialogo" width="30%">
+    <v-card>
+      <v-row class="grey lighten-5" no-gutters>
+        <v-col cols="11">
+          <v-card-title>Nueva ciudad/caserio/aldea </v-card-title>
+        </v-col>
+      </v-row>
+      <v-form ref="FormCiudadNueva"  class="pl-5 pr-5">
+        <v-select label="Seleccione un departamento" :items="DEPARTAMENTOS"
+                  :rules="[Ciudad.rules.r.req]" @change="loadMunicipios"
+                  :item-value="'id'" :item-text="'nombre'"
+                  v-model="Ciudad.departamento">
+        </v-select>
+        <v-autocomplete label="Seleccione un municipio" v-model="Ciudad.municipio"
+                  :item-value="'id'" :item-text="'nombre'"
+                  :rules="[Ciudad.rules.r.req]"
+                  :items="Municipios">
+        </v-autocomplete>
+        <v-text-field v-model="Ciudad.nombre" counter
+                      :rules="[Ciudad.rules.r.req, Ciudad.rules.r.min, Ciudad.rules.r.max]"
+                      label="Nombre de la ciudad/caserio/aldea" ></v-text-field>
+        <v-select label="Tipo" :items="Ciudad.tipo_data"
+                  :rules="[Ciudad.rules.r.req]"
+                  v-model="Ciudad.tipo"></v-select>
+      </v-form>
+      <v-card-actions class="d-flex justify-end">
+        <v-btn color="warning" small @click="Ciudad.dialogo = false" dark>Cerrar</v-btn>
+        <v-btn color="success" small @click="validarFormCiudad" dark>Registrar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="Colonia.dialogo" width="30%">
+    <v-card>
+      <v-row class="grey lighten-5" no-gutters>
+        <v-col cols="11">
+          <v-card-title>Nueva colonia </v-card-title>
+        </v-col>
+      </v-row>
+      <v-form ref="FormColoniaNueva"  class="pl-5 pr-5">
+        <v-select label="Seleccione un departamento" :items="DEPARTAMENTOS"
+                  :rules="[Ciudad.rules.r.req]"
+                  :item-value="'id'" :item-text="'nombre'" v-model="Ciudad.departamento"
+                  @change="loadMunicipios">
+        </v-select>
+        <v-autocomplete label="Seleccione un municipio" v-model="Ciudad.municipio"
+                  :item-value="'id'" :item-text="'nombre'" @change="loadCiudades"
+                  :rules="[Ciudad.rules.r.req]" :items="Municipios">
+        </v-autocomplete>
+        <v-autocomplete label="Seleccione una ciudad/aldea/caserio" v-model="Colonia.ciudad"
+                  :item-value="'id'" :item-text="'nombres'"
+                  :rules="[Ciudad.rules.r.req]"
+                  :items="Ciudades">
+        </v-autocomplete>
+        <v-text-field v-model="Colonia.nombre" counter
+                      :rules="[Ciudad.rules.r.req, Ciudad.rules.r.min, Ciudad.rules.r.max]"
+                      label="Nombre de la colonia" >
+        </v-text-field>
+
+      </v-form>
+      <v-card-actions class="d-flex justify-end">
+        <v-btn color="warning" small @click="Ciudad.dialogo = false" dark>Cerrar</v-btn>
+        <v-btn color="success" small @click="validarFormColonia" dark>Registrar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </v-card>
 </template>
 
 <script>
 import Vue from "vue";
-
+var moment = require('moment');
 export default {
   name: "nueva_venta_manual",
   data(){
     return{
-      currentPage: 1,
-      totalRows: 1,
-      perPage:10,
-      Colaboradores:[],
-      searchArticulo: '',
-      headerArticulo:[
-        {text: 'Nombre del Artículo', value:'nombre_articulo'},
-        {text: 'Módelo', value:'modelo'},
-        {text: 'Código del Proveedor', value:'codigo_proveedor'},
-        {text: 'Familía', value:'sub_familia_articulo.familia_articulo.nombre'},
-        {text: 'Sub-familía', value:'sub_familia_articulo.nombre'},
-        {text: 'Marca', value:'marca.nombre'},
-        {text: 'Proveedor', value:'marca.proveedor.nombre'},
-        {text: 'Seleccionar', value:'id'},
-      ],
-      headerPagos:[
-        'fecha_pago',
-        {key: 'detalle',stickyColumn: true, isRowHeader: true, variant: 'light'},
-        'pago_inicial',
-        'total_abonado',
-        'total_mora',
-        'total_pago',
-        'saldo_actual',
-        'is_mora',
-        'estado',
-        'inicio_mora',
-        'dias_mora',
-        'revisado',
-      ],
-      SelectSexos:[
-        {text: 'Masculino', value: 1},
-        {text: 'Femenino', value: 2},
-      ],
-      selectEstado:[
-        {text:'Sin Mora Actual', value:0},
-        {text:'Cuenta en Mora', value:1},
-      ],
-      selectFormaPago:[
-        {text:'Semanal', value:1},
-        {text:'Quincenal', value:2},
-        {text:'Mensual', value:3},
-      ],
-      selectPago:[
-        {text:'Al día', value:1},
-        {text:'Mora', value:2},
-        {text:'Cancelado', value:3},
-        {text:'Condonado', value:4},
-      ],
-      Sucursales: [],
-      logns:{
-        direcciones:0,
-        telefonos: 0
+      articulos: [],
+      Ciudad:{
+        rules:{
+          r:{
+            req: v => !!v || 'Campo requerido',
+            min:v => (v && v.length >= 3) || 'Tiene que ser mayor a 3 carácteres.',
+            max:v => (v && v.length <= 60) || 'Tiene que ser menor o igual a 60 carácteres.',
+          }
+        },
+        dialogo:   false,
+        departamento: '',
+        municipio:    '',
+        nombre:       '',
+        tipo:         '',
+        tipo_data: [
+          {text:'Caserio', value:'Caserio'},
+          {text:'Ciudad', value:'Ciudad'},
+          {text:'Aldea', value:'Aldea'}
+        ]
       },
+      Ciudades: [],
+      Colaboradores:[],
+      Colonia:{
+        nombre: '',
+        ciudad: '',
+        dialogo: false
+      },
+      currentPage: 1,
       data:{
         disabled: {
           cliente: false,
@@ -509,6 +588,7 @@ export default {
           serie:   ''
         },
         cliente:{
+          id: null,
           nombres: '',
           apellidos: '',
           identidad: '',
@@ -518,6 +598,7 @@ export default {
         direcciones:[],
         telefonos: [],
         cuenta:{
+          saldo_capital: 0,
           total_inicial: 0,
           prima: 5000,
           tiempo: 0,
@@ -535,13 +616,88 @@ export default {
         },
         pagos: []
       },
+      dialogo:{
+        articulos: false,
+        fechaPrima: false,
+        fechaVencimiento: false
+      },
+      headerArticulo:[
+        {text: 'Nombre del Artículo', value:'nombre_articulo'},
+        {text: 'Módelo', value:'modelo'},
+        {text: 'Código del Proveedor', value:'codigo_proveedor'},
+        {text: 'Familía', value:'sub_familia_articulo.familia_articulo.nombre'},
+        {text: 'Sub-familía', value:'sub_familia_articulo.nombre'},
+        {text: 'Marca', value:'marca.nombre'},
+        {text: 'Proveedor', value:'marca.proveedor.nombre'},
+        {text: 'Seleccionar', value:'id'},
+      ],
+      headerPagos:[
+        'fecha_pago',
+        {key: 'detalle',stickyColumn: true, isRowHeader: true, variant: 'light'},
+        'pago_inicial',
+        'total_abonado',
+        'saldo_cap',
+        'mora',
+        'total_pago',
+        'saldo_actual',
+        'is_mora',
+        'estao',
+        'inicio_mora',
+        'dias_mora',
+        'revisado',
+      ],
       load:{
         identidad: false,
         articulos: false,
         sucursales: false,
         colaboradores: false
       },
+      logns:{
+        direcciones:0,
+        telefonos: 0
+      },
+      Municipios: [],
+      perPage:10,
+      searchArticulo: '',
+      selectEstadoCuenta:[
+        {text:'Al día', value:1},
+        {text:'Mora', value:2},
+      ],
+      selectEstado:[
+        {text:'Sin Mora Actual', value:0},
+        {text:'Mora', value:1},
+      ],
+      selectFormaPago:[
+        {text:'Semanal', value:1},
+        {text:'Quincenal', value:2},
+        {text:'Mensual', value:3},
+      ],
+      selectPago:[
+        {text:'Al día', value:1},
+        {text:'Mora', value:2},
+        {text:'Cancelado', value:3},
+        {text:'Condonado', value:4},
+      ],
+      SelectSexos:[
+        {text: 'Masculino', value: 1},
+        {text: 'Femenino', value: 2},
+      ],
+      Sucursales: [],
+      revision:{
+        sis:{
+          revisados: 0,
+          mora:      0
+        },
+        user:{
+          revisados: 0,
+          mora:      0,
+          saldo_actual: 0
+        }
+      },
       rules: {
+        check:{
+          check: value => value === true || value == 1 || 'Falta Revisarlo'
+        },
         revision:{
           revisados: value => this.revision.sis.revisados === value || this.revision.user.revisados +' de '+this.revision.sis.revisados+' revisados',
           saldo_actual: value => this.data.cuenta.saldo_actual == value || 'Saldo actual de la cuenta: L '+this.data.cuenta.saldo_actual+' - Saldo de actual de los pagos: L '+value,
@@ -571,23 +727,7 @@ export default {
           max: v => (v && v.length <= 25) || 'Tiene que ser menor o igual a 25 carácteres.',
         }
       },
-      articulos: [],
-      dialogo:{
-        articulos: false,
-        fechaPrima: false,
-        fechaVencimiento: false
-      },
-      revision:{
-        sis:{
-          revisados: 0,
-          mora:      0
-        },
-        user:{
-          revisados: 0,
-          mora:      0,
-          saldo_actual: 0
-        }
-      }
+      totalRows: 1
     }
   },
   computed:{
@@ -622,8 +762,8 @@ export default {
       detalle: 'Telefono '+(parseInt(this.data.telefonos.length) + parseInt(1)),
       key:     this.data.telefonos.length
     });
-    // this.cargarInventario();
-    // this.cargarSucursales();
+    this.cargarInventario();
+    this.cargarSucursales();
   },
   methods:{
     addArticulo(data){
@@ -634,22 +774,46 @@ export default {
     },
     agregarPago(p_i, t_p, t_a, s_a, f_p, d){
       this.data.pagos.push({
-        pago_inicial:  p_i,//
+        pago_inicial:  p_i,
         total_pago:    t_p,//
         total_abonado: t_a,//
         saldo_actual:  s_a,//
         is_mora:       '',//
         inicio_mora:   '',//
         fecha_pago:    f_p,//
-        estado:        '',
+        estao:        '',
         dias_mora:     0,//
         detalle:       d,//
         revisado:      false,//
-        total_mora:    0,//,
+        mora:          0,//,
         dialogo:       false,
         key:           this.data.pagos.length,
-        dialogoMora:   false
+        dialogoMora:   false,
+        saldo_cap:     0
       })
+    },
+    calcularCuota(){
+      if (this.data.cuenta.total_inicial > 0 && this.data.cuenta.prima > 0 && this.data.cuenta.cuotas > 0)
+        this.data.cuenta.couta = ((this.data.cuenta.total_inicial - this.data.cuenta.prima)/this.data.cuenta.cuotas).toFixed(2)
+
+      // this.calcularFechaVencimiento();
+      this.calcularTotalAbonado();
+    },
+    calcularDiasMora(data){
+      let f = new Date();
+      let fecha1 = moment(f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate());
+      let fecha2 = moment(data.inicio_mora);
+      data.dias_mora = fecha1.diff(fecha2,'days')
+    },
+    calcularFechaVencimiento(){
+      if (this.data.cuenta.fecha_prima){
+        console.log('fecha de la prima: '+this.data.cuenta.fecha_prima)
+        console.log('Cuotas: '+this.data.cuenta.cuotas);
+        let fecha = new Date(this.data.cuenta.fecha_prima+'T00:00:00');
+        fecha.setMonth(fecha.getMonth() + parseInt(this.data.cuenta.cuotas));
+        console.log('Fecha setteada: '+fecha.getFullYear()+'-'+(fecha.getMonth() + 1)+'-'+fecha.getDate())
+        this.data.cuenta.fecha_vencimiento = fecha.getFullYear()+'-'+(fecha.getMonth() + 1)+'-'+fecha.getDate();
+      }
     },
     calcularPagos(){
       if (this.data.cuenta.forma_pago === 1)
@@ -658,6 +822,16 @@ export default {
         return this.data.cuenta.cuotas * 2;
       else if (this.data.cuenta.forma_pago === 3)
         return this.data.cuenta.cuotas
+    },
+    calcularSaldoCapital(){
+      if (this.data.cuenta.saldo_capital > 0 && this.data.cuenta.saldo_mora > 0)
+        this.data.cuenta.saldo_actual = (parseFloat(this.data.cuenta.saldo_capital) + parseFloat(this.data.cuenta.saldo_mora)).toFixed(2)
+
+      this.calcularTotalAbonado();
+    },
+    calcularTotalAbonado(){
+      if (this.data.cuenta.total_inicial > 0 && this.data.cuenta.saldo_capital > 0)
+        this.data.cuenta.total_abonado = (parseFloat(this.data.cuenta.total_inicial) - parseFloat(this.data.cuenta.saldo_capital)).toFixed(2);
     },
     cargarCiudades(data){
       console.log(data.municipio)
@@ -670,6 +844,7 @@ export default {
         this.data.direcciones      = [];
         this.$axios.get('cliente_segumiento/'+this.data.cliente.identidad).then((res)=>{
           if (res.data.cliente){
+            this.data.cliente.id           = res.data.cliente.id;
             this.data.cliente.nombres      = res.data.cliente.nombres;
             this.data.cliente.apellidos    = res.data.cliente.apellidos;
             this.data.cliente.sexo         = res.data.cliente.sexo;
@@ -683,7 +858,9 @@ export default {
             this.notificacion('Se cargaron las direcciones del cliente','success');
             this.notificacion('Se cargaron los telefonos del cliente',  'success');
           }else{
-            this.load = false;
+            this.notificacion('El cliente no existe, tienes que ingresar sus datos','error')
+            this.load.identidad = false;
+            this.data.telefonos = [];
             this.data.direcciones.push({
               departamento: '',
               municipio:    '',
@@ -703,6 +880,7 @@ export default {
             this.logns.direcciones     = 0;
             this.logns.telefonos       = 0;
             this.data.disabled.cliente = true;
+            this.$refs.inputDCNombres.focus();
           }
         })
       }else{
@@ -748,25 +926,29 @@ export default {
         this.revision.user.revisados--;
     },
     crearPagos(){
-      this.data.pagos = [];
-      this.revision.user.mora = 0;
-      this.revision.user.revisados = 0;
-      let pagos = this.calcularPagos();
-      let fecha = new Date(this.data.cuenta.fecha_prima+'T00:00:00');
-      for (let i = 0; i <= pagos; i++){
-        if (i === 0){
-          this.agregarPago(this.data.cuenta.prima, this.data.cuenta.prima, 0,
-              this.data.cuenta.prima, this.data.cuenta.fecha_prima, 'Pago Inicial - Prima')
-        }else{
-          fecha = this.sumarDias(fecha);
-          this.agregarPago(this.data.cuenta.couta, this.data.cuenta.couta, 0,
-              this.data.cuenta.couta,
-              fecha.getFullYear()+'-'+fecha.getMonth()+'-'+fecha.getDate(), 'Cuota #'+(i));
+      if (this.$refs.FormNuevaCuentaManual.validate()){
+        this.revision.sis.revisados = 0;
+        this.revision.user.saldo_actual = 0;
+        this.data.pagos = [];
+        this.revision.user.mora = 0;
+        this.revision.user.revisados = 0;
+        let pagos = this.calcularPagos();
+        let fecha = new Date(this.data.cuenta.fecha_prima+'T00:00:00');
+        for (let i = 0; i <= pagos; i++){
+          if (i === 0){
+            this.agregarPago(this.data.cuenta.prima, this.data.cuenta.prima, 0,
+                this.data.cuenta.prima, this.data.cuenta.fecha_prima, 'Pago Inicial - Prima')
+          }else{
+            fecha = this.sumarDias(fecha);
+            this.agregarPago(this.data.cuenta.couta, this.data.cuenta.couta, 0,
+                this.data.cuenta.couta,
+                fecha.getFullYear()+'-'+(fecha.getMonth() + 1)+'-'+fecha.getDate(), 'Cuota #'+(i));
 
+          }
+          this.revision.sis.revisados++;
         }
-        this.revision.sis.revisados++;
+        this.totalRows = this.data.pagos.length;
       }
-      this.totalRows = this.data.pagos.length;
     },
     distribuirDirecciones(){
       this.data.direcciones.forEach((i)=>{
@@ -774,6 +956,60 @@ export default {
         this.cargarCiudades(i);
         this.cargarColonias(i);
       })
+    },
+    formatDate (date, tipo) {
+      if (tipo === 1){
+        let [year, month, day] = date.split('-');
+        return `${day}/${month}/${year}`;
+      }else{
+        let [year, month, day] = date.split('/');
+        return `${year}-${month}-${day}`;
+      }
+    },
+    guardarCiudad(){
+      this.Ciudad.dialogo = false;
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('ciudades',{
+        municipio: this.Ciudad.municipio,
+        nombre:    this.Ciudad.nombre,
+        tipo:      this.Ciudad.tipo
+      }).then((res)=>{
+        this.$store.commit('activarOverlay', false);
+        Vue.$toast.open({
+          message: `se ha registrado exitosamente ${this.Ciudad.nombre} como ${this.Ciudad.tipo}.`,
+          type: 'success',
+          position: 'bottom-left',
+          duration: 4000
+        });
+        this.Ciudad.nombre = '';
+        this.Ciudad.municipio = '';
+        this.$store.commit('direcciones/cargar_DISTRITOS')
+      })
+    },
+    guardarColonia(){
+      this.Colonia.dialogo = false;
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('colonias',{
+        ciudad_id: this.Colonia.ciudad,
+        nombre:    this.Colonia.nombre,
+      }).then((res)=>{
+        this.$store.commit('direcciones/cargar_COLONIAS')
+        this.$store.commit('activarOverlay', false);
+        Vue.$toast.open({
+          message: `se ha registrado exitosamente la colonia/barrio ${this.Colonia.nombre}.`,
+          type: 'success',
+          position: 'bottom-left',
+          duration: 4000
+        });
+        this.Colonia.nombre = '';
+        this.Colonia.municipio = '';
+      })
+    },
+    loadMunicipios(){
+      this.Municipios = this.MUNICIPIOS.filter(depto => depto.departamento_id === this.Ciudad.departamento)
+    },
+    loadCiudades(){
+      this.Ciudades = this.DISTRITOS.filter(muni => muni.municipio_id === this.Ciudad.municipio);
     },
     notificacion(text, color){
       Vue.$toast.open({
@@ -783,28 +1019,80 @@ export default {
         duration: 4000
       });
     },
-    saveFechaPago(data){
-      this.data.pagos.forEach((i, cont)=>{
-        console.log(this.$refs.dialogoFechaPago[cont])
+    registrarCliente(){
+      this.$store.commit('activarOverlay', true);
+      if (this.data.disabled.cliente){
+        this.$axios.post('cuenta/nueva/manual/cliente',{
+          identidad:    this.data.cliente.identidad,
+          nombres:      this.data.cliente.nombres,
+          apellidos:    this.data.cliente.apellidos,
+          sexo:         this.data.cliente.sexo,
+          nacionalidad: this.data.cliente.nacionalidad,
+          direcciones:  JSON.stringify(this.data.direcciones),
+          telefonos:    JSON.stringify(this.data.telefonos),
+          rtn:          ''
+        }).then((res)=>{
+          this.notificacion(res.data.msj,'success');
+          this.registrarCuenta(res.data.cliente_id);
+        }).catch((error)=>{
+          if (error.response.status === 422)
+            this.notificacion('El cliente ya existe','error');
+          else
+            this.notificacion('Hubo un error inesperado en el servidor','eror');
+
+          this.$store.commit('activarOverlay', false)
+        })
+      }else{
+        this.registrarCuenta(this.data.cliente.id);
+      }
+    },
+    registrarCuenta(cliente){
+      this.$axios.post('cuenta/nueva/manual/articulo',{
+        articulo_id:       this.data.articulo.id,
+        serie:             this.data.articulo.serie,
+        color:             this.data.articulo.color,
+        sucursal:          this.data.cuenta.sucursal,
+
+        precio_inicial:    this.data.cuenta.total_inicial,
+        cliente_id:        cliente,
+        colaborador_id:    this.data.cuenta.colaborador,
+        saldo_actual:      this.data.cuenta.saldo_actual,
+        num_cuota:         this.data.cuenta.cuotas,
+        identidad:         this.data.cliente.identidad,
+        saldo_mora:        this.data.cuenta.saldo_mora,
+        total_abonado:     this.data.cuenta.total_abonado,
+        total:             this.data.cuenta.total_inicial,
+        estado_cuenta:     this.data.cuenta.estado,
+
+        fecha_vencimiento: this.data.cuenta.fecha_vencimiento,
+        fecha_prima:       this.data.cuenta.fecha_prima,
+        tasa_anual:        0.0,
+        cuota:             this.data.cuenta.couta,
+        forma_pago:        this.data.cuenta.forma_pago,
+        prima:             this.data.cuenta.prima,
+        financiamiento:    0.0,
+
+        pagos:             this.data.pagos
+      }).then((res)=>{
+        this.notificacion(res.data.msj,'success');
+        this.$store.commit('activarOverlay', false)
+        this.$router.replace({path:'/ventas/'});
+      }).catch((error)=>{
+        this.notificacion('Hubo un error inesperado al crear la cuenta','error');
+        this.$store.commit('activarOverlay', false)
       })
-      data.dialogo = false;
     },
     saveFechaPrima() {
       this.$refs.dialogoFechaPrima.save(this.data.cuenta.fecha_prima);
+      this.calcularFechaVencimiento();
       this.dialogo.fechaPrima = false;
     },
     saveFechaVencimiento(){
       this.$refs.dialogoFechaVencimiento.save(this.data.cuenta.fecha_vencimiento);
       this.dialogo.fechaVencimiento = false;
     },
-    saveInicioMora(data){
-      // this.$refs.dialogoInicioMora[data.key].save(data.inicio_mora);
-      // console.log(this.$refs.dialogoFechaPago)
-      data.dialogoMora = false;
-    },
     sumarDias(fecha){
       let dias = 0;
-      console.log(fecha)
       if(this.data.cuenta.forma_pago !== 3){
         if (this.data.cuenta.forma_pago === 1)
           dias = 7;
@@ -819,13 +1107,19 @@ export default {
       }
 
     },
+    sumarSaldoActual(){
+      this.data.pagos.forEach((i)=>{
+        if (i.saldo_actual)
+          this.revision.user.saldo_actual = (parseFloat(this.revision.user.saldo_actual) + parseFloat(i.saldo_actual)).toFixed(2);
+      })
+    },
     sumarTotalMora(data){
       this.revision.user.mora = 0;
       this.data.pagos.forEach((i)=>{
-        if (i.total_mora > 0 && i.total_abonado > 0 && i.total_abonado < i.total_pago && i.saldo_actual > 0) {
-          this.revision.user.mora = parseFloat(this.revision.user.mora) + parseFloat(i.total_mora);
+        if (i.mora > 0 && i.total_abonado >= 0 && i.total_abonado < i.total_pago && i.saldo_actual > 0) {
+          this.revision.user.mora = parseFloat(this.revision.user.mora) + parseFloat(i.mora);
           data.is_mora = 1;
-          data.estado  = 2;
+          data.estao  = 3;
         }else{
           data.is_mora = 0;
         }
@@ -834,23 +1128,36 @@ export default {
     },
     sumarTotalPago(data){
       this.revision.user.saldo_actual = 0;
-      if (!isNaN(data.total_mora) || data.total_mora > 0) {
-        data.total_pago = parseFloat(data.total_mora) + parseFloat(data.pago_inicial);
+      if (!isNaN(data.mora) || data.mora > 0) {
+        data.total_pago = parseFloat(data.mora) + parseFloat(data.pago_inicial);
       }
 
-      if (!isNaN(data.total_abonado) && !isNaN(data.total_pago) || data.total_abonado > 0 && data.total_pago > 0)
-        data.saldo_actual =  parseFloat(data.total_pago) - parseFloat(data.total_abonado);
+      if (!isNaN(data.total_abonado) && !isNaN(data.total_pago) || data.total_abonado > 0 && data.total_pago > 0) {
+        data.saldo_actual = (parseFloat(data.total_pago) - parseFloat(data.total_abonado)).toFixed(2);
+        data.saldo_cap =    (parseFloat(data.pago_inicial) - parseFloat(data.total_abonado)).toFixed(2);
+      }
 
-      this.data.pagos.forEach((i)=>{
-        if (i.saldo_actual)
-          this.revision.user.saldo_actual = parseFloat(this.revision.user.saldo_actual) + parseFloat(i.saldo_actual);
-      })
+      this.sumarSaldoActual();
 
       if (data.saldo_actual === 0){
-        data.estado = 3;
+        data.estao = 3;
       }
 
       this.sumarTotalMora(data);
+    },
+    validarEnvio(){
+      if (this.$refs.FormValidarConcordanciaDePagos.validate())
+        this.registrarCliente()
+      else
+        this.notificacion('Hay datos que no concuerdan','error');
+    },
+    validarFormCiudad(){
+      if (this.$refs.FormCiudadNueva.validate())
+        this.guardarCiudad()
+    },
+    validarFormColonia(){
+      if (this.$refs.FormColoniaNueva.validate())
+        this.guardarColonia()
     },
   }
 }

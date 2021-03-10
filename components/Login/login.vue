@@ -97,9 +97,9 @@
                 }
                 for (let item in res.data.permisos){
                   permisos.push(res.data.permisos[item].num)
-                  console.log(res.data.permisos[item].num)
                 }
                 localStorage.setItem('permisosUser', permisos);
+                console.log(permisos)
                 //guardando las variables globales en estados de vue
                 this.$store.commit("guardarToken", localStorage.getItem('token'));
                 this.$store.commit("solicitud_credito/guardarToken", localStorage.getItem('token'));

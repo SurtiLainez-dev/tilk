@@ -19,6 +19,9 @@
       <v-list-item class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/devoluciones')">
         Devoluciones a Proveedores
       </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/ventas/contado/nueva')">
+        Crear Venta de Contado
+      </v-list-item>
     </v-list-group>
     <v-list-group>
       <template v-slot:activator value="true">

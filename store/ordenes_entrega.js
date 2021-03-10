@@ -14,7 +14,7 @@ export const mutations = {
     },
     cargar_DATA_PENDIENTES(state){
         state.LOAD_ORDENES = true;
-        this.$axios.get('ordenes_entrega/venta/pendientes').then((res)=>{
+        this.$axios.get('ordenes_entregas/venta/pendientes').then((res)=>{
             state.DATA_ORDENES_PENDIENTES = res.data.ordenes;
             state.LOAD_ORDENES = false;
         })

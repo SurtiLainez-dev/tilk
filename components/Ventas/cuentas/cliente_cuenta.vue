@@ -36,7 +36,7 @@
       </tr>
       <tr>
         <th>Fecha de Nacimiento</th>
-        <td>{{CUENTA.cliente.fecha_nacimiento.split('-')[2]}}/{{CUENTA.cliente.fecha_nacimiento.split('-')[1]}}/{{CUENTA.cliente.fecha_nacimiento.split('-')[2]}}</td>
+        <td v-if="CUENTA.cliente.fecha_nacimiento">{{CUENTA.cliente.fecha_nacimiento.split('-')[2]}}/{{CUENTA.cliente.fecha_nacimiento.split('-')[1]}}/{{CUENTA.cliente.fecha_nacimiento.split('-')[2]}}</td>
       </tr>
       </tbody>
     </template>

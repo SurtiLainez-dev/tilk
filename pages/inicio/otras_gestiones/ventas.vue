@@ -52,7 +52,8 @@
         </v-col>
       </v-row>
       <v-divider></v-divider>
-      <mis_ventas/>
+      <mis_ventas_contado v-if="tipo === 1"/>
+      <mis_ventas v-else-if="tipo === 2"/>
     </div>
   </v-card>
 </template>
@@ -60,15 +61,17 @@
 <script>
 import mis_ventas from "../../../components/Ventas/mis_ventas";
 import Mis_ventas from "../../../components/Ventas/mis_ventas";
+import mis_ventas_contado from "../../../components/Ventas/contado/mis_ventas_contado";
+import Mis_ventas_contado from "../../../components/Ventas/contado/mis_ventas_contado";
 export default {
-  components: {Mis_ventas},
+  components: {Mis_ventas_contado, Mis_ventas},
   comments:{
-  mis_ventas
+    mis_ventas,
+    mis_ventas_contado
 },
 name: "ventas",
   data(){
     return{
-      vista: 1,
       search: '',
       header:[
         {text: 'Cliente',         value:'cliente.nombres'},
@@ -78,7 +81,8 @@ name: "ventas",
         {text: 'Estado',          value:'estado'},
         {text: 'Aceptado por F.', value:'is_aceptado'},
         {text: 'Total',           value:'total'},
-      ]
+      ],
+      tipo: 0
     }
   },
   created() {
@@ -90,10 +94,20 @@ name: "ventas",
     },
     LOAD_VENTAS(){
       return this.$store.state.ventas.LOAD_MIS_VENTAS;
+    },
+    vista:{
+      get: function (){
+        return this.$store.state.ventas.VISTA;
+      },
+      set: function(val){
+        this.$store.commit('ventas/cambiar_VISTA', val)
+      }
     }
   },
   methods:{
     verVista(data){
+      this.tipo = data.tipo_venta
+      console.log(data.id)
       this.$store.commit('ventas/asignar_ID_VENTA', data.id);
       this.vista = 2;
     }

@@ -91,7 +91,7 @@
   import { ipcRenderer } from 'electron'
   import Swal from 'sweetalert2'
   export default {
-    name: "remision",
+    name: "guia_remision",
     props: {sucursales: Array, motivos: Array},
     data(){
       return{

@@ -3,21 +3,6 @@
     <div v-if="$store.state.vistaPrecioArticulo === 1">
       <v-row >
         <v-col md="3"><v-card-title>Inventario</v-card-title></v-col>
-        <v-col md="3" class="d-flex align-center">
-          <v-autocomplete v-model="primeraPeticion" label="Buscar por" :items="primer"></v-autocomplete>
-        </v-col>
-        <v-col md="3">
-          <v-autocomplete v-model="segundaPeticion" v-if="primeraPeticion === 2" :items="Proveedores"
-                          :item-value="'id'" :item-text="'nombre'" label="Buscar Proveedor"></v-autocomplete>
-          <v-autocomplete v-model="segundaPeticion" v-if="primeraPeticion === 3" :items="Marcas"
-                          :item-value="'id'" :item-text="'nombre'" label="Buscar Marca"></v-autocomplete>
-          <v-autocomplete v-model="segundaPeticion" v-if="primeraPeticion === 4" :items="Familias"
-                          :item-value="'id'" :item-text="'nombre'" label="Buscar Familia"></v-autocomplete>
-        </v-col>
-        <v-col md="3" class="d-flex justify-end align-center">
-          <v-btn v-if="segundaPeticion || primeraPeticion == 1" small color="indigo" class="ma-2"
-                 @click="consultarInventario" outlined dark>Consultar Inventario</v-btn>
-        </v-col>
       </v-row>
       <v-divider></v-divider>
       <v-row class="d-flex justify-end">
@@ -102,13 +87,7 @@
       },
       consultarInventario(){
         this.isPeticon = true
-        let val
-        if(this.primeraPeticion == 1){
-          val = 1
-        }else{
-          val = this.segundaPeticion
-        }
-        this.$axios.get('consultar_articulo/'+this.primeraPeticion+'/'+val).then((res)=>{
+        this.$axios.get('/2.0/inventario_contabilidad').then((res)=>{
           if (res.status === 200){
             this.Inventario = res.data.inventario
             this.isPeticon = false

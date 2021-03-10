@@ -23,7 +23,7 @@
 
           <v-col cols="9">
             <v-card flat :disabled="!IS_ACEPTADA">
-
+<!---->
               <v-stepper v-model="vista">
                 <v-stepper-header>
                   <v-stepper-step :complete="vista > 1" step="1">DOCUMENTOS</v-stepper-step>
@@ -34,10 +34,10 @@
                   <v-divider></v-divider>
                   <v-stepper-step step="4">FINALIZACIÓN DE VENTA</v-stepper-step>
                 </v-stepper-header>
-
-
+<!---->
+<!---->
                 <v-stepper-items>
-
+<!---->
                   <v-stepper-content step="1">
                     <v-card class="mb-12" flat>
                       <v-card-title>Subida de documentos</v-card-title>
@@ -231,20 +231,28 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                              <td>{{DATA_VENTA.remision_articulo.articulo.nombre_articulo}}</td>
-                              <td>{{DATA_VENTA.remision_articulo.articulo.codigo_proveedor}}</td>
-                              <td>{{DATA_VENTA.remision_articulo.articulo.marca.nombre}}</td>
-                              <td>{{DATA_VENTA.remision_articulo.articulo.modelo}}</td>
-                              <td>{{DATA_VENTA.remision_articulo.color}}</td>
-                              <td>{{DATA_VENTA.remision_articulo.serie_sistema}}</td>
+                            <tr v-if="DATA_VENTA.tipo_venta === 1" v-for="item in DATA_VENTA.facturas_contados">
+                              <td>{{item.remision_articulo.articulo.nombre_articulo}}</td>
+                              <td>{{item.remision_articulo.articulo.codigo_proveedor}}</td>
+                              <td>{{item.remision_articulo.articulo.marca.nombre}}</td>
+                              <td>{{item.remision_articulo.articulo.modelo}}</td>
+                              <td>{{item.remision_articulo.color}}</td>
+                              <td>{{item.remision_articulo.serie_sistema}}</td>
+                            </tr>
+                            <tr v-else-if="DATA_VENTA.tipo_venta === 2">
+                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo}}</td>
+                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.articulo.codigo_proveedor}}</td>
+                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</td>
+                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.articulo.modelo}}</td>
+                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.color}}</td>
+                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.serie_sistema}}</td>
                             </tr>
                             </tbody>
                           </template>
                         </v-simple-table>
                       </div>
-
-                      <div v-if="DATA_VENTA.remision_articulo.articulo.is_motocicleta"
+<!---->
+                      <div v-if="DATA_VENTA.contrato_cliente.remision_articulo.articulo.is_motocicleta && DATA_VENTA.tipo_venta === 1"
                            style="border: solid 1px #000" class="pl-3">
                         <small>Motocicleta</small>
                         <v-simple-table dense class="rowsTable">
@@ -260,17 +268,17 @@
                             </thead>
                             <tbody>
                             <tr>
-                              <td>{{DATA_VENTA.remision_articulo.motocicleta.chasis}}</td>
-                              <td>{{DATA_VENTA.remision_articulo.motocicleta.motor}}</td>
-                              <td>{{DATA_VENTA.remision_articulo.motocicleta.cilindraje}}</td>
-                              <td>{{DATA_VENTA.remision_articulo.motocicleta.placa}}</td>
-                              <td>{{DATA_VENTA.remision_articulo.motocicleta.color}}</td>
+                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.motocicleta.chasis}}</td>
+                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.motocicleta.motor}}</td>
+                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.motocicleta.cilindraje}}</td>
+                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.motocicleta.placa}}</td>
+                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.motocicleta.color}}</td>
                             </tr>
                             </tbody>
                           </template>
                         </v-simple-table>
                       </div>
-
+<!---->
                       <div style="border: solid 1px #000" class="pl-3">
                         <small>Componentes del artículo de la sucursal {{DATA_VENTA.colaborador.sucursal.nombre}}</small>
                         <v-simple-table dense class="rowsTable" height="400px" fixed-header>
@@ -296,15 +304,15 @@
                           </template>
                         </v-simple-table>
                       </div>
-
+<!---->
                       <v-card-actions class="d-flex justify-end">
                         <v-btn tile color="orange" dark small @click="vista = 1">Volver</v-btn>
                         <v-btn tile color="success" small dark @click="vista = 3">Siguiente</v-btn>
                       </v-card-actions>
-
+<!---->
                     </v-card>
                   </v-stepper-content>
-
+<!---->
                   <v-stepper-content step="3">
                     <v-card class="mb-12" flat>
                       <v-card-title>Revisión de Regalías</v-card-title>
@@ -335,14 +343,14 @@
                           </tbody>
                         </template>
                       </v-simple-table>
-
+<!---->
                       <v-card-actions class="d-flex justify-end">
                         <v-btn color="orange" dark @click="vista = 2" small tile>Volver</v-btn>
                         <v-btn color="success" @click="vista = 4" dark small tile>Siguiente</v-btn>
                       </v-card-actions>
                     </v-card>
                   </v-stepper-content>
-
+<!---->
                   <v-stepper-content step="4">
                     <v-card flat class="mb-12">
                       <v-card-title>Finalizar venta</v-card-title>
@@ -415,8 +423,8 @@
                       <v-divider></v-divider>
                       <v-card-actions class="d-flex justify-end" v-if="!Enviado">
                         <v-btn color="orange" small tile dark @click="vista = 3">Volver</v-btn>
-                        <v-btn color="red" small tile dark @click="ValidarDatos(2)">Rechazar venta</v-btn>
-                        <v-btn color="success" small tile dark @click="ValidarDatos(1)">Aceptar venta</v-btn>
+                        <v-btn :disabled="DATA_VENTA.estado !== 4" color="red" small tile class="text-white" @click="ValidarDatos(2)">Rechazar venta</v-btn>
+                        <v-btn :disabled="DATA_VENTA.estado !== 4" color="success" small tile class="text-white" @click="ValidarDatos(1)">Aceptar venta</v-btn>
                       </v-card-actions>
                     </v-card>
                   </v-stepper-content>
@@ -551,10 +559,12 @@ export default {
     cargarColaboradores(){
       this.$axios.get('colaborador_envio').then((res=>{
         res.data.colaboradores.forEach((i)=>{
-          this.Colaboradores.push({
-            correo: i.email,
-            nombre: i.colaborador.nombres+' '+i.colaborador.apellidos
-          })
+          if (i.colaborador){
+            this.Colaboradores.push({
+              correo: i.email,
+              nombre: i.colaborador.nombres+' '+i.colaborador.apellidos
+            })
+          }
         })
       }))
     },
@@ -619,7 +629,7 @@ export default {
         decision:    decision,
         regalias:    this.Regalias,
         componentes: this.Componentes,
-        remision_id: this.DATA_VENTA.remision_id,
+        remision_id: this.DATA_VENTA.contrato_cliente.remision_articulo_id,
         venta_id:    this.DATA_VENTA.id,
         sucursal_id: this.DATA_VENTA.colaborador.sucursal_id,
         correo:      this.Colaborador,
@@ -643,7 +653,7 @@ export default {
         }, 5000)
       }).catch((error)=>{
         this.$store.commit('activarOverlay', false);
-        this.notificacion('Se ha ocurrido un error, comunicate con el soporte técnico.','error');
+        this.notificacion('Ha ocurrido un error, comunicate con el soporte técnico.','error');
       })
     },
     ValidarDatos(decision){

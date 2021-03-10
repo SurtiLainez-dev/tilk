@@ -48,7 +48,7 @@
         <td>{{CUENTA.num_cuotas}} cuotas</td>
       </tr>
       <tr>
-        <th>Aceptado por facuturación</th>
+        <th>Aceptado por facturación</th>
         <td>
           <v-chip color="success" x-small v-if="CUENTA.is_aceptado === 1" dark>Sí</v-chip>
           <v-chip color="red" x-small v-else-if="CUENTA.is_aceptado === 2" dark>No</v-chip>

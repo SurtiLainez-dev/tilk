@@ -23,6 +23,7 @@
                     <v-chip v-else-if="item.estado === 2" x-small dark color="indigo">Falta documentación</v-chip>
                     <v-chip v-else-if="item.estado === 3" x-small dark color="red">Rechazado</v-chip>
                     <v-chip v-else-if="item.estado === 4" x-small dark color="success">Aprobado</v-chip>
+                    <v-chip v-else-if="item.estado === 5" x-small dark color="success">Aprobado y Vendido</v-chip>
                 </template>
             </v-data-table>
         </div>
