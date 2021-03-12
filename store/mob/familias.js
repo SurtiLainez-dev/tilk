@@ -1,17 +1,21 @@
 export const state = () => ({
-    VISTA:           1,
-    FAMILIAS:        [],
-    MARCAS:          [],
-    MODELOS:         [],
-    MOBILIARIOS:     [],
-    TRASLADOS:       [],
-    TRASLADO:        [],
-    MOBILIARIO:      null,
-    LOADFAMILIAS:    false,
-    LOADMARCAS:      false,
-    LOADMODELOS:     false,
-    LOADMIBILIARIOS: false,
-    LOADTRASLADOS:   false,
+    VISTA:              1,
+    FAMILIAS:           [],
+    MARCAS:             [],
+    MODELOS:            [],
+    MOBILIARIOS:        [],
+    TRASLADOS:          [],
+    TRASLADO:           [],
+    USOS:               [],
+    MANTENIMIENTOS:     [],
+    MOBILIARIO:         null,
+    LOADFAMILIAS:       false,
+    LOADMARCAS:         false,
+    LOADMODELOS:        false,
+    LOADMIBILIARIOS:    false,
+    LOADTRASLADOS:      false,
+    LOADUSOS:           false,
+    LOADMANTENIMIENTOS: false
 })
 
 export const mutations = {
@@ -59,7 +63,21 @@ export const mutations = {
             state.LOADTRASLADOS = false
         })
     },
+    cargar_USOS(state){
+      state.LOADUSOS = true;
+      this.$axios.get('mob/mobiliarios/usos').then((res)=>{
+          state.USOS     = res.data.usos;
+          state.LOADUSOS = false;
+      })
+    },
     asignar_etiquetas_MOBILIARIO(state, val){
         state.MOBILIARIO = val;
+    },
+    cargar_MANTENIMIENTOS(state){
+        state.LOADMANTENIMIENTOS = true;
+        this.$axios.get('mob/mobiliarios/mantenimientos').then((res)=>{
+            state.MANTENIMIENTOS     = res.data.mantenimientos;
+            state.LOADMANTENIMIENTOS = false;
+        })
     }
 }

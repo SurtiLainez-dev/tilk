@@ -3,35 +3,35 @@
     <v-toolbar flat color="grey lighten-5">
       <h6>Historial del Mobiliario</h6>
       <v-spacer></v-spacer>
+      <v-text-field placeholder="Buscar" dense v-model="search"></v-text-field>
     </v-toolbar>
-    <v-simple-table dense class="rowsTable">
-      <template v-slot:default>
-        <thead>
-        <tr>
-          <th>#</th>
-          <th>Usuario</th>
-          <th>Fecha</th>
-          <th>Detalle</th>
-          <th>Referencia</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(item, i) in JSON.parse(MOBILIARIO.historial)">
-          <td>{{i + 1}}</td>
-          <td>{{item.user}}</td>
-          <td>{{item.fecha.split('-')[2]}}/{{item.fecha.split('-')[1]}}/{{item.fecha.split('-')[0]}}</td>
-          <td>{{item.detale}}</td>
-          <td>{{item.referencia}}</td>
-        </tr>
-        </tbody>
+    <v-data-table dense
+                  :items-per-page="15"
+                  class="rowsTable"
+                  :search="search"
+                  :headers="header"
+                  :items="JSON.parse(MOBILIARIO.historial)">
+      <template v-slot:item.fecha="{item}">
+        {{item.fecha.split('-')[2]}}/{{item.fecha.split('-')[1]}}/{{item.fecha.split('-')[0]}}
       </template>
-    </v-simple-table>
+    </v-data-table>
   </v-card>
 </template>
 
 <script>
 export default {
   name: "historial",
+  data(){
+    return{
+      search: '',
+      header:[
+        {text:'Usuario', value:'user'},
+        {text:'Fecha', value:'fecha'},
+        {text:'Detalle', value:'detale'},
+        {text:'Referencia', value:'referencia'},
+      ]
+    }
+  },
   computed:{
     MOBILIARIO(){
       return this.$store.state.mob.familias.MOBILIARIO;

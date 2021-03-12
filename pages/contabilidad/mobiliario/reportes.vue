@@ -50,7 +50,6 @@ export default {
     },
     generarReporte(){
       if (this.sucursal) {
-        alert("pao")
         let url = this.$axios.defaults.baseURL+'mob/mobiliarios/reporte/suc/' + this.sucursal + '/' + this.USER;
         ipcRenderer.send('pint_navegador', url);
       }else

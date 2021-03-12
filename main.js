@@ -31,7 +31,11 @@ const {BrowserWindow} = require('electron');
 const path = require('path');
 const app = electron.app;
 const { autoUpdater } = require('electron-updater');
-require('update-electron-app')
+require('update-electron-app')({
+	repo: 'https://github.com/surtiLainezDev/adn-frinted',
+	updateInterval: '5 minutes',
+	logger: require('electron-log')
+})
 const newWin = () => {
 	win = new BrowserWindow({
 		// fullscreen: true,

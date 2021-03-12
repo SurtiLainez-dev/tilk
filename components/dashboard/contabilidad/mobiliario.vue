@@ -25,6 +25,9 @@
       <v-list-item class="itemOpciones" @click="go('/contabilidad/mobiliario/reportes')">
         Reportes
       </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/contabilidad/mobiliario/mantenimientos')">
+        Mantenimientos
+      </v-list-item>
     </v-list-group>
   </div>
 </template>

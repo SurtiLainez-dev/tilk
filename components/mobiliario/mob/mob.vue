@@ -20,14 +20,14 @@
     <v-col cols="10">
       <v-card flat class="ma-2">
         <info v-if="VISTA === 1"/>
-        <depreciacion v-else-if="VISTA === 2"/>
-        <referencias v-else-if="VISTA === 3"/>
-        <detalles    v-else-if="VISTA === 4"/>
-        <componentes v-else-if="VISTA === 5"/>
-        <historial   v-else-if="VISTA === 6"/>
-        <traslados   v-else-if="VISTA === 7"/>
-
-        <etiquetas v-else-if="VISTA === 10"/>
+        <depreciacion   v-else-if="VISTA === 2"/>
+        <referencias    v-else-if="VISTA === 3"/>
+        <detalles       v-else-if="VISTA === 4"/>
+        <componentes    v-else-if="VISTA === 5"/>
+        <historial      v-else-if="VISTA === 6"/>
+        <traslados      v-else-if="VISTA === 7"/>
+        <mantenimientos v-else-if="VISTA === 8"/>
+        <etiquetas      v-else-if="VISTA === 10"/>
       </v-card>
     </v-col>
 
@@ -44,6 +44,7 @@ import componentes from "./componentes";
 import historial from "./historial";
 import traslados from "./traslados";
 import etiquetas from "./etiquetas";
+import mantenimientos from "./mantenimientos";
 export default {
   components:{
     info,
@@ -53,7 +54,8 @@ export default {
     componentes,
     historial,
     traslados,
-    etiquetas
+    etiquetas,
+    mantenimientos
   },
   name: "mob",
   data(){

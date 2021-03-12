@@ -66,7 +66,7 @@ export default {
         }, 3500);
       }).catch((error)=>{
         this.$store.commit('activarOverlay', false);
-        this.$store.commit('notificacion',{texto:'Hubo un error en el servidor',color:'success'});
+        this.$store.commit('notificacion',{texto:'Hubo un error en el servidor',color:'error'});
       })
     },
     verDocumento(URL){

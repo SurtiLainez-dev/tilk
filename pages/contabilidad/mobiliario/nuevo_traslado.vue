@@ -118,7 +118,6 @@ export default {
       ],
       rulesRequiredC:[
         v => !!v || 'Este campo es requerido',
-        v => this.traslado.colaborador_salida !== v || 'Tiene que ser diferente al colaborador de salida'
       ],
       headerMob:[
         {text:'Colaborador Responsable Actual', value:'colaborador'},

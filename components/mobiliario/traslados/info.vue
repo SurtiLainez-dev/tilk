@@ -49,7 +49,7 @@
       </tr>
       <tr>
         <th>Documento Súbido</th>
-        <td v-if="TRASLADO.file_subido"><b-link @click="verDocumento(TRASLADO.file)">Imprimir</b-link></td>
+        <td v-if="TRASLADO.file_subido"><b-link @click="verDocumento(TRASLADO.file_subido)">Imprimir</b-link></td>
         <td v-else>Sin actualizaciones</td>
       </tr>
       <tr>

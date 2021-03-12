@@ -46,6 +46,5 @@ module.exports = {
 		'@nuxtjs/axios',
 		'@nuxtjs/vuetify',
 		'bootstrap-vue/nuxt',
-
 	],
 }

@@ -6,7 +6,7 @@
                     TILK
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                    Surtidora Laínez
+                    Surtidora Laíne
                 </v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>

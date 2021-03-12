@@ -12,11 +12,16 @@
                   @click:row="cambiarVista"
                   :items="MOBILIARIOS"
                   :loading="LOAD_MOBILIARIOS"
-                  :items-per-page="10"
+                  :items-per-page="18"
                   loading-text="Cargando Mobiliarios"
                   :headers="header">
       <template v-slot:item.colaborador.nombres="{item}">
-        {{item.colaborador.nombres}} {{item.colaborador.apellidos}}
+        <v-tooltip top>
+          <template v-slot:activator="{on, attrs}">
+            <span v-on="on" v-bind="attrs">{{item.colaborador.nombres}}</span>
+          </template>
+          <span>{{item.colaborador.nombres}} {{item.colaborador.apellidos}}</span>
+        </v-tooltip>
       </template>
       <template v-slot:item.serie_f="{item}">
         <v-tooltip top>
@@ -37,9 +42,6 @@
           <span>{{item.sucursal.nombre}}</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.precio_actual="{item}">
-        L {{item.precio_actual}}
-      </template>
       <template v-slot:item.estado="{item}">
         <v-chip x-small color="success" v-if="item.estado === 1" dark>Activo</v-chip>
         <v-chip x-small color="red" v-else-if="item.estado === 2" dark>Fuera de Servicio</v-chip>
@@ -47,6 +49,15 @@
         <v-chip x-small color="orange" v-else-if="item.estado === 4" dark>Movimiento</v-chip>
         <v-chip x-small color="orange" v-else-if="item.estado === 5" dark>Dañado</v-chip>
         <v-chip x-small color="orange" v-else-if="item.estado === 6" dark>Mantenimiento</v-chip>
+      </template>
+      <template v-slot:item.nombre="{item}">
+        <v-tooltip top v-if="item.nombre.length > 20">
+          <template v-slot:activator="{on, attrs}">
+            <span v-on="on" v-bind="attrs">{{item.nombre.substr(0,20)}} ...</span>
+          </template>
+          <span>{{item.nombre}}</span>
+        </v-tooltip>
+        <span v-else>{{item.nombre}}</span>
       </template>
     </v-data-table>
   </div>
@@ -78,7 +89,6 @@ export default {
         {text:'Serie del Fabricante',   value:'serie_f'},
         {text:'Nombre',                 value:'nombre'},
         {text:'Serie del Sistema',      value:'serie_s'},
-        {text:'Precio Actual',          value:'precio_actual'},
         {text:'Estado',                 value:'estado'},
       ]
     }
