@@ -32,8 +32,8 @@
       <v-chip x-small color="indigo" dark v-else>Facturas</v-chip>
     </template>
     <template v-slot:item.estado="{item}">
-      <v-chip x-small color="orange" dark v-if="item.estado === 1">Activo</v-chip>
-      <v-chip x-small color="indigo" dark v-else>Vencido</v-chip>
+      <v-chip x-small color="success" dark v-if="item.estado === 1">Activo</v-chip>
+      <v-chip x-small color="orange" dark v-else>Vencido</v-chip>
     </template>
   </v-data-table>
 

@@ -86,7 +86,7 @@
                       </v-dialog>
                     </v-col>
                     <v-col cols="3" class="d-flex align-center justify-end">
-                      <strong>Total de la Factura: L.</strong>{{Factura.totalFactura}}
+                      <strong>Total de la Factura: L.</strong>{{int.format(Factura.totalFactura)}}
                     </v-col>
                   </v-row>
                 </div>
@@ -168,6 +168,7 @@
                 </v-btn>
               </v-col>
             </v-row>
+
             <v-card class="pl-2 pr-2" width="100%" height="100%">
               <div class="bordes pl-3 pr-3">
                 <v-form ref="FormVerificarPagosFacturas1">
@@ -185,7 +186,7 @@
                       <v-btn @click="crearPagos" dark small color="indigo">Generar Pagos</v-btn>
                     </v-col>
                     <v-col cols="3" class="d-flex justify-end align-center">
-                      <h2><strong>Total: L.</strong>{{Factura.totalFactura.toFixed(2)}}</h2>
+                      <h2><strong>Total: L.</strong>{{int.format(Factura.totalFactura.toFixed(2))}}</h2>
                     </v-col>
                   </v-row>
                 </v-form>
@@ -226,7 +227,7 @@
                 </v-simple-table>
               </div>
               <div class="bordes pl-3 pr-3">
-                <v-textarea rows="2" v-model="Factura.observacion" label="Observación de la Factura"></v-textarea>
+                <v-textarea rows="2" v-model="Factura.observacion" label="Comentario de Partida"></v-textarea>
               </div>
               <v-card-actions>
                 <v-row>
@@ -343,9 +344,11 @@
     name: "registrar",
     created() {
       this.$store.commit('guardarTitulo', 'Contabilidad > Facturas > Proveedor > Registar');
+      this.$store.commit('activarOverlay', false);
     },
     data(){
       return{
+        int: new Intl.NumberFormat(),
         headerRemision:[
           {text:'Chasis', value:'chasis'},
           {text:'Motor', value:'motor'},
@@ -423,7 +426,8 @@
           dias: 0,
           primerPago: '',
           ultimoPago: '',
-          observacion: 'Sin Observaciones'
+          observacion: 'SC',
+          sucursal:    ''
         },
         TipoFactura:{
           dialogo: false,
@@ -440,37 +444,157 @@
       }
     },
     methods:{
-      verificarIgualOrden(data){
-        data.estado = !data.estado
-        this.Guias.forEach( (i) => {
-          if (i.estado === true){
-            if (i.orden !== data.orden){
-              Swal.fire(
-                'Selección Erronea',
-                `La mototicleta que haz seleccionado no concuerda con la orden en entrada que ya estan seleccionadas`,
-                'error'
-              );
-              data.estado = false
-            }else{
-              data.estado = true
-            }
-          }
-        })
+      calcularMensual(){
+        let SALDO = this.Factura.totalFactura;
+        let FECHA = this.FECHA;
+        console.log(FECHA)
+        let dia = new Date(FECHA.getFullYear(), FECHA.getMonth() + 1, 0).getDate();
+        for (let i = 0; i < this.Factura.pagos; i++){
+          SALDO = (SALDO - this.Pagos.cuota).toFixed(2);
+          if (SALDO < 0)
+            SALDO = 0
+          this.Factura.pagosGenerados.push({
+            "descripcion": 'Pago #'+(parseInt(i) + parseInt(1))+' de factura: '+this.Factura.num+', a '+this.Factura.nombreProveedor+'.',
+            "numPago": parseInt(i)+ 1,
+            "total_a_pagar": this.Pagos.cuota,
+            "total_pagado": 0,
+            "saldo_pendiente": SALDO,
+            "fecha_pago": FECHA.getFullYear()+'-'+(FECHA.getMonth() + 1)+'-'+dia,
+            "dialogo": false,
+            "estado":  1
+          })
+          if (this.Factura.primerPago.length === 0)
+            this.Factura.primerPago = FECHA.getFullYear()+'-'+(FECHA.getMonth()+ 1)+'-'+dia
+          this.Factura.ultimoPago = new Date(FECHA.getFullYear(),FECHA.getMonth(),dia)
+          FECHA.setMonth(FECHA.getMonth() + 1)
+          dia = new Date(FECHA.getMonth(), FECHA.getMonth() + 1, 0).getDate()
+        }
       },
-      verGuiaRemision(file){
-        this.dialogRemision = false
-        this.$store.commit('activarOverlay', true);
-        this.$axios.post('leer_documento/',{
-          ubicacion: file
-        },{
+      calcularMensualDespues(){
+        let SALDO = this.Factura.totalFactura;
+        let FECHA = this.FECHA;
+        let dia = new Date(FECHA.getMonth(), FECHA.getMonth(), 0).getDate()
+        for (let i = 0; i < this.Factura.pagos; i++){
+          SALDO = (SALDO - this.Pagos.cuota).toFixed(2);
+          if (SALDO < 0)
+            SALDO = 0
+
+          FECHA.setMonth(FECHA.getMonth() + 1)
+          dia = new Date(FECHA.getMonth(), FECHA.getMonth() + 1, 0).getDate()
+
+          this.Factura.pagosGenerados.push({
+            "descripcion": 'Pago #'+(parseInt(i) + parseInt(1))+' de factura: '+this.Factura.num+', a '+this.Factura.nombreProveedor+'.',
+            "numPago": parseInt(i)+ 1,
+            "total_a_pagar": this.Pagos.cuota,
+            "total_pagado": 0,
+            "saldo_pendiente": SALDO,
+            "fecha_pago": FECHA.getFullYear()+'-'+(FECHA.getMonth() + 1)+'-'+dia,
+            "dialogo": false,
+            "estado":  1
+          })
+          if (this.Factura.primerPago.length === 0)
+            this.Factura.primerPago = FECHA.getFullYear()+'-'+(FECHA.getMonth() + 1)+'-'+dia
+          this.Factura.ultimoPago = new Date(FECHA.getFullYear(),FECHA.getMonth(),dia)
+        }
+      },
+      calcularQuincena(){
+        let MES_ACTUAL = this.FECHA.getMonth();
+        let DIA_ACTUAL = this.FECHA.getDate();
+        let SALDO = this.Factura.totalFactura;
+        let PRIMER_FECHA = new Date(this.FECHA.getFullYear(),MES_ACTUAL, 15)
+        if (DIA_ACTUAL >= 14)
+          PRIMER_FECHA.setMonth(PRIMER_FECHA.getMonth() + 1)
+        for (let i = 0; i < this.Factura.pagos; i++){
+          SALDO = (SALDO - this.Pagos.cuota).toFixed(2);
+          if (SALDO < 0)
+            SALDO = 0
+          this.Factura.pagosGenerados.push({
+            "descripcion": 'Pago #'+(parseInt(i) + parseInt(1))+' de factura: '+this.Factura.num+', a '+this.Factura.nombreProveedor+'.',
+            "numPago": parseInt(i)+ 1,
+            "total_a_pagar": this.Pagos.cuota,
+            "total_pagado": 0,
+            "saldo_pendiente": SALDO,
+            "fecha_pago": PRIMER_FECHA.getFullYear()+'-'+(PRIMER_FECHA.getMonth() + 1)+'-'+PRIMER_FECHA.getDate(),
+            "dialogo": false,
+            "estado": 1
+          })
+          if (this.Factura.primerPago.length === 0)
+            this.Factura.primerPago = PRIMER_FECHA.getFullYear()+'-'+(PRIMER_FECHA.getMonth() + 1)+'-'+PRIMER_FECHA.getDate()
+          this.Factura.ultimoPago = new Date(PRIMER_FECHA.getFullYear(),PRIMER_FECHA.getMonth(),PRIMER_FECHA.getDate())
+          PRIMER_FECHA.setMonth(PRIMER_FECHA.getMonth() + 1)
+        }
+      },
+      cargarGuias(){
+        let Guias = [];
+        this.$axios.get('motocicletas_pendiente_facturacion',{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token
           }
         }).then((res)=>{
           if (res.status === 200){
-            ipcRenderer.send('open-nav', res.data.url)
-            this.$store.commit('activarOverlay', false);
-            this.dialogRemision = true
+            console.log(res.data)
+            res.data.guias.forEach( (i) => {
+              if (i.guia_remision){
+                i.guia_remision.motocicletas.forEach( (a) =>{
+                  if (a.facturado === 0){
+                    Guias.push({
+                      "remision_id":          i.guia_remision.id,
+                      "orden":                i.cuerpo_orden_entradas[0].orden_entrada_id,
+                      "codigo_orden":         i.codigo,
+                      "motor":                a.motor,
+                      "chasis":               a.chasis,
+                      "color":                a.color,
+                      "moto_id":              a.id,
+                      "file":                 i.file,
+                      "orden_entrada_id":     i.id,
+                      "proveedor":            i.proveedor.nombre,
+                      "logo":                 i.proveedor.logo,
+                      "articulo_id":          i.cuerpo_orden_entradas[0].articulo.id,
+                      "articulo_descripcion": i.cuerpo_orden_entradas[0].articulo.nombre_articulo+' - '+a.chasis,
+                      "articulo_nombre":      i.cuerpo_orden_entradas[0].articulo.descripcion_corta,
+                      "codigo":               i.cuerpo_orden_entradas[0].articulo.codigo_sistema,
+                      "estado":               false,
+                      "proveedor_id":         i.proveedor.id
+                    })
+                  }
+                })
+              }
+            })
+            this.Guias = Guias
+          }
+        })
+      },
+      cargarImpuestos(){
+        this.$axios.get('impuestos',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            res.data.impuestos.forEach( (i) => {
+              this.impuesto.Impuestos.push({
+                "text": i.nombre,
+                "value"    : i.id+'-'+i.porcentaje
+              })
+            })
+          }
+        })
+      },
+      cargarTipoFacturas(){
+        this.TipoFactura.load = true
+        this.$axios.get('tipo_facturas',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            res.data.tipos.forEach( (i) =>{
+              this.TipoFactura.Tipos.push({
+                "nombre": i.nombre,
+                "id"    : i.id+'-'+i.cantidad_pagos
+              })
+            })
+            this.TipoFactura.load = false
           }
         })
       },
@@ -490,89 +614,13 @@
               this.cargarImpuestos()
               this.$store.commit('activarOverlay', false);
               Swal.fire(
-                'Registro Exitoso',
-                `Se registro exitosamente el impuesto ${this.impuesto.nombre}.`,
-                'success'
+                  'Registro Exitoso',
+                  `Se registro exitosamente el impuesto ${this.impuesto.nombre}.`,
+                  'success'
               );
             }
           })
         }
-      },
-      cargarImpuestos(){
-        this.$axios.get('impuestos',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            res.data.impuestos.forEach( (i) => {
-              this.impuesto.Impuestos.push({
-                "text": i.nombre,
-                "value"    : i.id+'-'+i.porcentaje
-              })
-            })
-          }
-        })
-      },
-      subirFactura(){
-        if (this.$refs.FormVerificarPagosFacturas1.validate() && this.Factura.pagosGenerados.length > 0){
-          let tiempo = this.Factura.ultimoPago.getTime() - this.FECHA_AC.getTime();
-          this.Factura.dias = Math.floor(tiempo / (1000 * 60 * 60 * 24));
-          this.Factura.dialogoEviar = true
-        }
-      },
-      reajutarFecha(index, item){
-        let long = this.Factura.pagosGenerados.length;
-        if (index === 0){
-          this.Factura.primerPago = item.fecha_pago
-        }
-        if (long === (parseInt(1) + parseInt(index))){
-          this.Factura.ultimoPago = new Date(item.fecha_pago.split('-')[0],(parseInt(item.fecha_pago.split('-')[1]) - parseInt(1)), item.fecha_pago.split('-')[2])
-        }
-        item.dialogo = false
-      },
-      verificarForm(){
-        if (this.$refs.FormNuevaFacturaProveedor.validate())
-          this.registrarFactura()
-      },
-      registrarFactura(){
-        this.Factura.dialogoEviar = false
-        let cuerpoFactura  = JSON.stringify(this.Factura.cuerpo);
-        let pagosGenerados = JSON.stringify(this.Factura.pagosGenerados);
-        this.$store.commit('activarOverlay', true);
-        let data = new FormData();
-        data.append("orden_entrada_id",   this.Factura.ingreso);
-        data.append("proveedor_id",       this.Factura.proveedor_id);
-        data.append("tipo_factura_id" ,   this.Factura.tipoFactura);
-        data.append("num_factura",        this.Factura.num);
-        data.append("fecha_facturada",    this.Factura.fecha_facturada);
-        data.append("total",              this.Factura.totalFactura);
-        data.append("fecha_limite_pago",  this.Factura.ultimoPago.getFullYear()+'-'+(this.Factura.ultimoPago.getMonth()+ 1)+'-'+this.Factura.ultimoPago.getDate());
-        data.append("fecha_inicio_pago",  this.Factura.primerPago);
-        data.append("file_subir",         this.Factura.File);
-        data.append("observacion",        this.Factura.observacion);
-        data.append("cuerpo",             cuerpoFactura);
-        data.append("pagos",              pagosGenerados);
-        data.append("remision",           this.Factura.isRemision);
-        this.$axios({
-          method: 'post',
-          url: '/facturas_proveedor',
-          data:data,
-          headers:{
-            'Authorization': 'Bearer ' + this.$store.state.token,
-            'Content-Type': "multipart/form-data"
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.$router.replace({path:'/contabilidad/facturas/proveedor/'})
-            this.$store.commit('activarOverlay', false);
-            Swal.fire(
-              'Registro Exitoso',
-              `Se registro exitosamente la factura ${this.Factura.num}.`,
-              'success'
-            );
-          }
-        })
       },
       crearPagos(){
         this.Factura.primerPago = ''
@@ -598,7 +646,8 @@
                 "total_pagado": 0,
                 "saldo_pendiente": 0,
                 "fecha_pago": `${this.FECHA.getFullYear()}-${this.FECHA.getMonth() + 1}-${this.FECHA.getDate()}`,
-                "dialogo": false
+                "dialogo": false,
+                "estado": 1
               })
               if (this.Factura.primerPago.length === 0)
                 this.Factura.primerPago = this.FECHA.getFullYear()+'-'+(this.FECHA.getMonth() + 1)+'-'+this.FECHA.getDate()
@@ -608,83 +657,6 @@
               this.calcularMensualDespues();
               break;
           }
-        }
-      },
-      calcularMensualDespues(){
-        let SALDO = this.Factura.totalFactura;
-        let FECHA = this.FECHA;
-        let dia = new Date(FECHA.getMonth(), FECHA.getMonth(), 0).getDate()
-        for (let i = 0; i < this.Factura.pagos; i++){
-          SALDO = (SALDO - this.Pagos.cuota).toFixed(2);
-          if (SALDO < 0)
-            SALDO = 0
-
-          FECHA.setMonth(FECHA.getMonth() + 1)
-          dia = new Date(FECHA.getMonth(), FECHA.getMonth() + 1, 0).getDate()
-
-          this.Factura.pagosGenerados.push({
-            "descripcion": 'Pago #'+(parseInt(i) + parseInt(1))+' de factura: '+this.Factura.num+', a '+this.Factura.nombreProveedor+'.',
-            "numPago": parseInt(i)+ 1,
-            "total_a_pagar": this.Pagos.cuota,
-            "total_pagado": 0,
-            "saldo_pendiente": SALDO,
-            "fecha_pago": FECHA.getFullYear()+'-'+(FECHA.getMonth() + 1)+'-'+dia,
-            "dialogo": false
-          })
-          if (this.Factura.primerPago.length === 0)
-            this.Factura.primerPago = FECHA.getFullYear()+'-'+(FECHA.getMonth() + 1)+'-'+dia
-          this.Factura.ultimoPago = new Date(FECHA.getFullYear(),FECHA.getMonth(),dia)
-        }
-      },
-      calcularQuincena(){
-        let MES_ACTUAL = this.FECHA.getMonth();
-        let DIA_ACTUAL = this.FECHA.getDate();
-        let SALDO = this.Factura.totalFactura;
-        let PRIMER_FECHA = new Date(this.FECHA.getFullYear(),MES_ACTUAL, 15)
-        if (DIA_ACTUAL >= 14)
-          PRIMER_FECHA.setMonth(PRIMER_FECHA.getMonth() + 1)
-        for (let i = 0; i < this.Factura.pagos; i++){
-          SALDO = (SALDO - this.Pagos.cuota).toFixed(2);
-          if (SALDO < 0)
-            SALDO = 0
-          this.Factura.pagosGenerados.push({
-            "descripcion": 'Pago #'+(parseInt(i) + parseInt(1))+' de factura: '+this.Factura.num+', a '+this.Factura.nombreProveedor+'.',
-            "numPago": parseInt(i)+ 1,
-            "total_a_pagar": this.Pagos.cuota,
-            "total_pagado": 0,
-            "saldo_pendiente": SALDO,
-            "fecha_pago": PRIMER_FECHA.getFullYear()+'-'+(PRIMER_FECHA.getMonth() + 1)+'-'+PRIMER_FECHA.getDate(),
-            "dialogo": false
-          })
-          if (this.Factura.primerPago.length === 0)
-            this.Factura.primerPago = PRIMER_FECHA.getFullYear()+'-'+(PRIMER_FECHA.getMonth() + 1)+'-'+PRIMER_FECHA.getDate()
-          this.Factura.ultimoPago = new Date(PRIMER_FECHA.getFullYear(),PRIMER_FECHA.getMonth(),PRIMER_FECHA.getDate())
-          PRIMER_FECHA.setMonth(PRIMER_FECHA.getMonth() + 1)
-        }
-      },
-      calcularMensual(){
-        let SALDO = this.Factura.totalFactura;
-        let FECHA = this.FECHA;
-        console.log(FECHA)
-        let dia = new Date(FECHA.getFullYear(), FECHA.getMonth() + 1, 0).getDate();
-        for (let i = 0; i < this.Factura.pagos; i++){
-          SALDO = (SALDO - this.Pagos.cuota).toFixed(2);
-          if (SALDO < 0)
-            SALDO = 0
-          this.Factura.pagosGenerados.push({
-            "descripcion": 'Pago #'+(parseInt(i) + parseInt(1))+' de factura: '+this.Factura.num+', a '+this.Factura.nombreProveedor+'.',
-            "numPago": parseInt(i)+ 1,
-            "total_a_pagar": this.Pagos.cuota,
-            "total_pagado": 0,
-            "saldo_pendiente": SALDO,
-            "fecha_pago": FECHA.getFullYear()+'-'+(FECHA.getMonth() + 1)+'-'+dia,
-            "dialogo": false
-          })
-          if (this.Factura.primerPago.length === 0)
-            this.Factura.primerPago = FECHA.getFullYear()+'-'+(FECHA.getMonth()+ 1)+'-'+dia
-          this.Factura.ultimoPago = new Date(FECHA.getFullYear(),FECHA.getMonth(),dia)
-          FECHA.setMonth(FECHA.getMonth() + 1)
-          dia = new Date(FECHA.getMonth(), FECHA.getMonth() + 1, 0).getDate()
         }
       },
       creandoTipoFactura(){
@@ -701,38 +673,15 @@
           }).then((res)=>{
             if (res.status === 200){
               Swal.fire(
-                'Registro Exitoso',
-                `Se registro exitosamente el tipo de factura ${this.TipoFactura.nombre}.`,
-                'success'
+                  'Registro Exitoso',
+                  `Se registro exitosamente el tipo de factura ${this.TipoFactura.nombre}.`,
+                  'success'
               );
               this.cargarTipoFacturas();
               this.$store.commit('activarOverlay', false);
               this.TipoFactura.nombre = ''
               this.TipoFactura.pagos  = 1
             }
-          })
-        }
-      },
-      dialogoTipoFactura(){
-        this.TipoFactura.dialogo = true
-      },
-      vistaPago(){
-        if (this.$refs.FormValidandoDatosFacturaProveedor.validate()){
-          this.vista = 3
-        }
-      },
-      leerImpuesto(item){
-        item.impuesto_id = item.impuesto.split('-')[0];
-        item.impuesto    = item.impuesto.split('-')[1];
-        this.sumaTotal(item)
-      },
-      sumaTotal(item){
-        this.Factura.totalFactura = 0
-        item.sub_total = (item.cantidad * item.precio_unitario).toFixed(2)
-        if (item.impuesto > 0 ){
-          item.total     = (item.sub_total * (parseFloat(item.impuesto) + parseInt(1))).toFixed(2)
-          this.Factura.cuerpo.forEach( (i) => {
-            this.Factura.totalFactura = parseFloat(i.total) + parseFloat(this.Factura.totalFactura)
           })
         }
       },
@@ -759,24 +708,27 @@
             "guia_remision":   0
           })
         });
-        this.Factura.logoProveedor = this.Factura.select.proveedor.logo;
-        this.Factura.proveedor_id  = this.Factura.select.proveedor.id;
+        console.log(this.Factura.select)
+        this.Factura.logoProveedor   = this.Factura.select.proveedor.logo;
+        this.Factura.proveedor_id    = this.Factura.select.proveedor.id;
         this.Factura.nombreProveedor = this.Factura.select.proveedor.nombre;
-        this.Factura.ingreso = this.Factura.select.id;
-        this.Factura.codIngreso = this.Factura.select.codigo;
+        this.Factura.ingreso         = this.Factura.select.id;
+        this.Factura.codIngreso      = this.Factura.select.codigo;
+        this.Factura.sucursal        = this.Factura.select.sucursal_id;
         this.$store.commit('activarOverlay', false);
         this.vista = 2;
       },
       cuerpoFacturaRemision(){
         this.Factura.isRemision = true
         this.Factura.cuerpo = []
-        this.$store.commit('activarOverlay', true);
         this.Guias.forEach( (i) => {
           if (i.estado === true){
-            this.Factura.codIngreso = i.codigo_orden;
-            this.Factura.logoProveedor = i.logo;
+            this.Factura.codIngreso      = i.codigo_orden;
+            this.Factura.logoProveedor   = i.logo;
             this.Factura.nombreProveedor = i.proveedor;
-            this.Factura.ingreso = i.orden;
+            this.Factura.ingreso         = i.orden;
+            this.Factura.proveedor_id    = i.proveedor_id;
+            this.Factura.sucursal        = i.sucursal_id;
             this.Factura.cuerpo.push({
               "articulo_id":     i.articulo_id,
               "articulo":        i.articulo_nombre,
@@ -799,6 +751,9 @@
           }
         })
       },
+      dialogoTipoFactura(){
+        this.TipoFactura.dialogo = true
+      },
       fileIngreso(id){
         this.$store.commit('activarOverlay', true);
         this.$axios.get('orden_entrada/print/'+id,{
@@ -812,62 +767,127 @@
           }
         })
       },
-      cargarTipoFacturas(){
-        this.TipoFactura.load = true
-        this.$axios.get('tipo_facturas',{
+      leerImpuesto(item){
+        item.impuesto_id = item.impuesto.split('-')[0];
+        item.impuesto    = item.impuesto.split('-')[1];
+        this.sumaTotal(item)
+      },
+      reajutarFecha(index, item){
+        let long = this.Factura.pagosGenerados.length;
+        if (index === 0){
+          this.Factura.primerPago = item.fecha_pago
+        }
+        if (long === (parseInt(1) + parseInt(index))){
+          this.Factura.ultimoPago = new Date(item.fecha_pago.split('-')[0],(parseInt(item.fecha_pago.split('-')[1]) - parseInt(1)), item.fecha_pago.split('-')[2])
+        }
+        item.dialogo = false
+      },
+      registrarFactura(){
+        this.Factura.dialogoEviar = false
+        let cuerpoFactura  = JSON.stringify(this.Factura.cuerpo);
+        let pagosGenerados = JSON.stringify(this.Factura.pagosGenerados);
+        this.$store.commit('activarOverlay', true);
+        let data = new FormData();
+        data.append("orden_entrada_id",   this.Factura.ingreso);
+        data.append("proveedor_id",       this.Factura.proveedor_id);
+        data.append("tipo_factura_id" ,   this.Factura.tipoFactura);
+        data.append("num_factura",        this.Factura.num);
+        data.append("fecha_facturada",    this.Factura.fecha_facturada);
+        data.append("total",              this.Factura.totalFactura);
+        data.append("fecha_limite_pago",  this.Factura.ultimoPago.getFullYear()+'-'+(this.Factura.ultimoPago.getMonth()+ 1)+'-'+this.Factura.ultimoPago.getDate());
+        data.append("fecha_inicio_pago",  this.Factura.primerPago);
+        data.append("file_subir",         this.Factura.File);
+        data.append("observacion",        this.Factura.observacion);
+        data.append("cuerpo",             cuerpoFactura);
+        data.append("pagos",              pagosGenerados);
+        data.append("remision",           this.Factura.isRemision);
+        data.append("sucursal",           this.Factura.sucursal)
+        this.$axios({
+          method: 'post',
+          url: '/facturas_proveedor',
+          data:data,
+          headers:{
+            'Authorization': 'Bearer ' + this.$store.state.token,
+            'Content-Type': "multipart/form-data"
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.$router.replace({path:'/contabilidad/facturas/proveedor/'})
+            this.$store.commit('activarOverlay', false);
+            Swal.fire(
+                'Registro Exitoso',
+                `Se registro exitosamente la factura ${this.Factura.num}.`,
+                'success'
+            );
+          }
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+          Swal.fire(
+              'Hubo un error en el servidor',
+              `La factura ${this.Factura.num} no se pudo regstrar correctamente.`,
+              'error'
+          );
+        })
+      },
+      subirFactura(){
+        if (this.$refs.FormVerificarPagosFacturas1.validate() && this.Factura.pagosGenerados.length > 0){
+          let tiempo = this.Factura.ultimoPago.getTime() - this.FECHA_AC.getTime();
+          this.Factura.dias = Math.floor(tiempo / (1000 * 60 * 60 * 24));
+          this.Factura.dialogoEviar = true
+        }
+      },
+      sumaTotal(item){
+        this.Factura.totalFactura = 0
+        item.sub_total = (item.cantidad * item.precio_unitario).toFixed(2)
+        if (item.impuesto > 0 ){
+          item.total     = (item.sub_total * (parseFloat(item.impuesto) + parseInt(1))).toFixed(2)
+          this.Factura.cuerpo.forEach( (i) => {
+            this.Factura.totalFactura = parseFloat(i.total) + parseFloat(this.Factura.totalFactura)
+          })
+        }
+      },
+      verGuiaRemision(file){
+        this.dialogRemision = false
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('leer_documento/',{
+          ubicacion: file
+        },{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token
           }
         }).then((res)=>{
           if (res.status === 200){
-            res.data.tipos.forEach( (i) =>{
-              this.TipoFactura.Tipos.push({
-                "nombre": i.nombre,
-                "id"    : i.id+'-'+i.cantidad_pagos
-              })
-            })
-            this.TipoFactura.load = false
+            ipcRenderer.send('open-nav', res.data.url)
+            this.$store.commit('activarOverlay', false);
+            this.dialogRemision = true
           }
         })
       },
-      cargarGuias(){
-        let Guias = [];
-        this.$axios.get('motocicletas_pendiente_facturacion',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            console.log(res.data)
-            res.data.guias.forEach( (i) => {
-              if (i.guia_remision){
-                i.guia_remision.motocicletas.forEach( (a) =>{
-                  if (a.facturado === 0){
-                    Guias.push({
-                      "remision_id": i.guia_remision.id,
-                      "orden":i.cuerpo_orden_entradas[0].orden_entrada_id,
-                      "codigo_orden": i.codigo,
-                      "motor": a.motor,
-                      "chasis": a.chasis,
-                      "color": a.color,
-                      "moto_id": a.id,
-                      "file": i.file,
-                      "orden_entrada_id": i.id,
-                      "proveedor": i.proveedor.nombre,
-                      "logo": i.proveedor.logo,
-                      "articulo_id": i.cuerpo_orden_entradas[0].articulo.id,
-                      "articulo_descripcion": i.cuerpo_orden_entradas[0].articulo.nombre_articulo+' - '+a.chasis,
-                      "articulo_nombre": i.cuerpo_orden_entradas[0].articulo.descripcion_corta,
-                      "codigo": i.cuerpo_orden_entradas[0].articulo.codigo_sistema,
-                      "estado": false
-                    })
-                  }
-                })
-              }
-            })
-            this.Guias = Guias
+      verificarForm(){
+        if (this.$refs.FormNuevaFacturaProveedor.validate())
+          this.registrarFactura()
+      },
+      verificarIgualOrden(data){
+        data.estado = !data.estado
+        this.Guias.forEach( (i) => {
+          if (i.estado === true){
+            if (i.orden !== data.orden){
+              Swal.fire(
+                'Selección Erronea',
+                `La mototicleta que haz seleccionado no concuerda con la orden en entrada que ya estan seleccionadas`,
+                'error'
+              );
+              data.estado = false
+            }else{
+              data.estado = true
+            }
           }
         })
+      },
+      vistaPago(){
+        if (this.$refs.FormValidandoDatosFacturaProveedor.validate()){
+          this.vista = 3
+        }
       }
     },
     async fetch (){

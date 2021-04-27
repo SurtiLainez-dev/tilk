@@ -123,6 +123,9 @@
                     <v-col cols="3">
                       <v-text-field label="Prima" disabled v-model="Precio.prima" suffix="lps"></v-text-field>
                     </v-col>
+                    <v-col cols="3">
+                      <v-text-field label="Descuento en LPS" suffix="lps" v-model="Precio.descuento"></v-text-field>
+                    </v-col>
                   </v-row>
                 </v-form>
                 <small>Probar Financiamiento</small>
@@ -177,7 +180,7 @@
                         <v-list-item-content>
                           <v-list-item-title>Impuesto</v-list-item-title>
                           <v-list-item-subtitle>{{PrecioArticulo[0].impuesto.nombre}}</v-list-item-subtitle>
-                          <v-list-item-subtitle>L. {{((parseFloat(PrecioArticulo[0].precio_costo_actual) + parseFloat(PrecioArticulo[0].precio_costo_actual * (PrecioArticulo[0].margen_ganancia/100).toFixed(2))) * PrecioArticulo[0].impuesto.porcentaje).toFixed(2)}}</v-list-item-subtitle>
+                          <v-list-item-subtitle>L. {{new Intl.NumberFormat().format(((parseFloat(PrecioArticulo[0].precio_costo_actual) + parseFloat(PrecioArticulo[0].precio_costo_actual * (PrecioArticulo[0].margen_ganancia/100).toFixed(2))) * PrecioArticulo[0].impuesto.porcentaje).toFixed(2))}}</v-list-item-subtitle>
                         </v-list-item-content>
                       </v-list-item>
                     </v-col>
@@ -185,7 +188,7 @@
                       <v-list-item two-line-line>
                         <v-list-item-content>
                           <v-list-item-title>Precio de Contado</v-list-item-title>
-                          <v-list-item-subtitle>L. {{PrecioArticulo[0].precio_contado}}</v-list-item-subtitle>
+                          <v-list-item-subtitle>L. {{new Intl.NumberFormat().format(PrecioArticulo[0].precio_contado)}}</v-list-item-subtitle>
                         </v-list-item-content>
                       </v-list-item>
                     </v-col>
@@ -193,7 +196,7 @@
                       <v-list-item two-line-line>
                         <v-list-item-content>
                           <v-list-item-title>Prima</v-list-item-title>
-                          <v-list-item-subtitle>L. {{PrecioArticulo[0].minimo_prima}}</v-list-item-subtitle>
+                          <v-list-item-subtitle>L. {{new Intl.NumberFormat().format(PrecioArticulo[0].minimo_prima)}}</v-list-item-subtitle>
                         </v-list-item-content>
                       </v-list-item>
                     </v-col>
@@ -236,37 +239,41 @@
                 <hr>
                 <v-row>
                   <v-col cols="8"><small>Precio de Costo:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{Precio.precio_s_i}}</strong></small></v-col>
+                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio.precio_s_i)}}</strong></small></v-col>
                 </v-row>
                 <v-row>
                   <v-col cols="8"><small>Margen de Ganancia:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{Precio2.margenGanancia}}</strong></small></v-col>
+                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.margenGanancia)}}</strong></small></v-col>
                 </v-row>
                 <v-row>
                   <v-col cols="8"><small>Total del Impuesto:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{Precio2.impuesto}}</strong></small></v-col>
+                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.impuesto)}}</strong></small></v-col>
                 </v-row>
                 <hr>
                 <v-row>
                   <v-col cols="8"><small>Precio de Contado:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{(parseFloat(Precio2.impuesto)+parseFloat(Precio2.margenGanancia)+parseFloat(Precio.precio_s_i)).toFixed(2)}}</strong></small></v-col>
+                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format((parseFloat(Precio2.impuesto)+parseFloat(Precio2.margenGanancia)+parseFloat(Precio.precio_s_i)).toFixed(2))}}</strong></small></v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="8"><small>Mejor Precio de Contado:</small></v-col>
+                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format((parseFloat(Precio2.impuesto)+parseFloat(Precio2.margenGanancia)+parseFloat(Precio.precio_s_i)).toFixed(2) - Precio.descuento)}}</strong></small></v-col>
                 </v-row>
                 <v-row>
                   <v-col cols="8"><small>Prima mínima:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{Precio.prima}}</strong></small></v-col>
+                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio.prima)}}</strong></small></v-col>
                 </v-row>
                 <hr>
                 <v-row>
                   <v-col cols="8"><small>Precio a Financiar:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{Precio2.precioConPrima}}</strong></small></v-col>
+                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.precioConPrima)}}</strong></small></v-col>
                 </v-row>
                 <v-row>
                   <v-col cols="8"><small>Cuota Mensual:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{Precio2.cuota}}</strong></small></v-col>
+                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.cuota)}}</strong></small></v-col>
                 </v-row>
                 <v-row>
                   <v-col cols="8"><small>Total de Intereses:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{Precio2.totalInteres}}</strong></small></v-col>
+                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.totalInteres)}}</strong></small></v-col>
                 </v-row>
                 <small>Reusltados de la prueba de financiación:</small>
                 <v-simple-table v-if="Precio2.prueba.length > 0" class="rowsTable" fixed-header height="400px">
@@ -284,11 +291,11 @@
                     <tbody>
                     <tr v-for="item in Precio2.prueba">
                       <td>{{item.pago}}</td>
-                      <td>L. {{item.cuota}}</td>
-                      <td>L. {{item.antes}}</td>
-                      <td>L. {{item.capital}}</td>
-                      <td>L. {{item.intereses}}</td>
-                      <td>L. {{item.despues}}</td>
+                      <td>L. {{new Intl.NumberFormat().format(item.cuota)}}</td>
+                      <td>L. {{new Intl.NumberFormat().format(item.antes)}}</td>
+                      <td>L. {{new Intl.NumberFormat().format(item.capital)}}</td>
+                      <td>L. {{new Intl.NumberFormat().format(item.intereses)}}</td>
+                      <td>L. {{new Intl.NumberFormat().format(item.despues)}}</td>
                     </tr>
                     </tbody>
                   </template>
@@ -338,6 +345,7 @@
           margenPrima:'',
           prima:'',
           meses: '',
+          descuento: 0
         },
         Precio2:{
           margenGanancia: 0,
@@ -352,34 +360,6 @@
       }
     },
     methods:{
-      registrarPrecio(){
-        if (this.$refs.FormVerificarMargenUtilidadAnual.validate() && this.$refs.FormVerificarImpuestoAsignacionPrecio.validate()){
-          this.$store.commit('activarOverlay', true);
-          this.$axios.put('precio_articulos/'+this.data.articulo,{
-            precio_costo_antiguo: this.data.precio_costo,
-            precio_costo_actual:  this.Precio.precio_s_i,
-            precio_contado:       this.Precio.precioContado,
-            prima:                this.Precio.prima,
-            margen_ganancia:      this.Precio.margenUtilidad,
-            financiamiento_anual: this.Precio.financiamientoAnual,
-            impuesto:             this.Precio.impuesto_id
-          },{
-            headers: {
-              'Authorization': 'Bearer ' + this.$store.state.token
-            }
-          }).then((res)=>{
-            if (res.status === 200){
-              this.$store.commit('activarOverlay', false);
-              Swal.fire(
-                'Registro Exitoso',
-                `Se registro exitosamente el nuevo precio del artículo ${this.data.nombre_articulo}.`,
-                'success'
-              );
-              this.$store.commit('cambiarVistaPRecioArticulo', 1);
-            }
-          })
-        }
-      },
       calcularInteres(){
         let MESES  = this.Precio.meses;
         if (MESES > 0){
@@ -397,39 +377,17 @@
         }
 
       },
-      probarFinanciamiento(TASA_MENSUAL, T){
-        let PAGOS = [];
-        let antes = (parseFloat(this.Precio2.impuesto)+
-          parseFloat(this.Precio2.margenGanancia)
-          +parseFloat(this.Precio.precio_s_i)).toFixed(2);
-        let despues =  (antes - this.Precio.prima).toFixed(2);
-        let capital = 0
-        PAGOS.push({
-          "pago": 0,
-          "cuota": this.Precio.prima,
-          "antes": antes,
-          "capital": capital,
-          "intereses": 0,
-          "despues": despues
-        });
-        let intereses = 0;
-        for (let i = 0; i < T; i++){
-          antes = despues;
-          intereses = (antes * TASA_MENSUAL).toFixed(2);
-          capital = (this.Precio2.cuota - intereses).toFixed(2);
-          despues = (antes - capital).toFixed(2);
-          PAGOS.push({
-          "pago": parseInt(i) + parseInt(1),
-          "cuota": this.Precio2.cuota,
-          "antes": antes,
-          "capital": capital,
-          "intereses": intereses,
-          "despues": despues
-        });
-        this.Precio2.totalCapital = (parseFloat(this.Precio2.totalCapital) + parseFloat(capital)).toFixed(2);
-        this.Precio2.totalInteres = (parseFloat(this.Precio2.totalInteres) + parseFloat(intereses)).toFixed(2);
+      calcularPrecioContado(){
+        this.Precio.margenUtilidaReal = this.Precio.margenUtilidad
+        if (this.$refs.FormVerificarImpuestoAsignacionPrecio.validate()){
+          if (this.Precio.margenUtilidaReal > 1)
+            this.Precio.margenUtilidaReal = this.Precio.margenUtilidaReal / 100;
+          this.Precio2.margenGanancia = (parseFloat(this.Precio.precio_s_i * this.Precio.margenUtilidaReal)).toFixed(2)
+          let PRECIO_S_IMPUESTO = (parseFloat(this.Precio2.margenGanancia) + parseFloat(this.Precio.precio_s_i)).toFixed(2);
+          this.Precio2.impuesto = (parseFloat(PRECIO_S_IMPUESTO * this.Precio.impuesto)).toFixed(2)
+          let PRECIO_C_IMPUESTO = (parseFloat(this.Precio2.impuesto) + parseFloat(PRECIO_S_IMPUESTO)).toFixed(2);
+          this.Precio.precioContado = PRECIO_C_IMPUESTO
         }
-        this.Precio2.prueba = PAGOS;
       },
       calcularPrima(){
         let MARGEN_PRIMA = this.Precio.margenPrima;
@@ -443,26 +401,24 @@
         this.Precio2.precioConPrima = (parseFloat(PRECIO_CONTADO) - parseFloat(this.Precio.prima)).toFixed(2)
         this.calcularInteres()
       },
-      sacarFinanciamientoMensual(){
-        let margen = this.Precio.financiamientoAnual
-        if (margen < 1)
-          margen = margen * 100
-        this.Precio.financiamientoMensual = (margen / 12).toFixed(2)
-        this.calcularInteres()
+      cambiarPrecio(){
+        if (!this.Precio.selectPeps)
+          this.Precio.precio_s_i = this.Precio.peps;
+        else
+          this.Precio.precio_s_i = this.data.precio_costo;
+        this.calcularPrecioContado()
+        this.calcularPrima()
       },
-      getPeps(){
-        this.Peps = [];
-        this.peps = false;
-        this.$axios.get('peps/ultimo_registro/'+this.data.articulo,{
+      cargarPrecioArticulo(){
+        this.$axios.get('precio_articulos/'+this.data.articulo,{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token
           }
         }).then((res)=>{
-          if (res.status === 200 && res.data.peps.length > 0){
-            this.Peps = res.data.peps;
-            this.Precio.peps = this.Peps[0].valor_unitario;
+          if (res.status === 200){
+            this.PrecioArticulo = res.data.precio;
           }
-          this.peps = true;
+          this.cargarPRecio = true;
         })
       },
       getImpuestos(){
@@ -481,43 +437,96 @@
           }
         })
       },
+      getPeps(){
+        this.Peps = [];
+        this.peps = false;
+        this.$axios.get('peps/ultimo_registro/'+this.data.articulo,{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200 && res.data.peps.length > 0){
+            this.Peps = res.data.peps;
+            this.Precio.peps = this.Peps[0].valor_unitario;
+          }
+          this.peps = true;
+        })
+      },
       leerImpuesto(){
         this.Precio.impuesto_id = this.Precio.imp.split('-')[0];
         this.Precio.impuesto    = this.Precio.imp.split('-')[1];
         if (this.$refs.FormVerificarImpuestoAsignacionPrecio.validate())
           this.calcularPrecioContado()
       },
-      cambiarPrecio(){
-        if (!this.Precio.selectPeps)
-          this.Precio.precio_s_i = this.Precio.peps;
-        else
-          this.Precio.precio_s_i = this.data.precio_costo;
-        this.calcularPrecioContado()
-        this.calcularPrima()
+      probarFinanciamiento(TASA_MENSUAL, T){
+        let PAGOS = [];
+        let antes = (parseFloat(this.Precio2.impuesto)+
+            parseFloat(this.Precio2.margenGanancia)
+            +parseFloat(this.Precio.precio_s_i)).toFixed(2);
+        let despues =  (antes - this.Precio.prima).toFixed(2);
+        let capital = 0
+        PAGOS.push({
+          "pago": 0,
+          "cuota": this.Precio.prima,
+          "antes": antes,
+          "capital": capital,
+          "intereses": 0,
+          "despues": despues
+        });
+        let intereses = 0;
+        for (let i = 0; i < T; i++){
+          antes = despues;
+          intereses = (antes * TASA_MENSUAL).toFixed(2);
+          capital = (this.Precio2.cuota - intereses).toFixed(2);
+          despues = (antes - capital).toFixed(2);
+          PAGOS.push({
+            "pago": parseInt(i) + parseInt(1),
+            "cuota": this.Precio2.cuota,
+            "antes": antes,
+            "capital": capital,
+            "intereses": intereses,
+            "despues": despues
+          });
+          this.Precio2.totalCapital = (parseFloat(this.Precio2.totalCapital) + parseFloat(capital)).toFixed(2);
+          this.Precio2.totalInteres = (parseFloat(this.Precio2.totalInteres) + parseFloat(intereses)).toFixed(2);
+        }
+        this.Precio2.prueba = PAGOS;
       },
-      calcularPrecioContado(){
-        this.Precio.margenUtilidaReal = this.Precio.margenUtilidad
-        if (this.$refs.FormVerificarImpuestoAsignacionPrecio.validate()){
-          if (this.Precio.margenUtilidaReal > 1)
-            this.Precio.margenUtilidaReal = this.Precio.margenUtilidaReal / 100;
-          this.Precio2.margenGanancia = (parseFloat(this.Precio.precio_s_i * this.Precio.margenUtilidaReal)).toFixed(2)
-          let PRECIO_S_IMPUESTO = (parseFloat(this.Precio2.margenGanancia) + parseFloat(this.Precio.precio_s_i)).toFixed(2);
-          this.Precio2.impuesto = (parseFloat(PRECIO_S_IMPUESTO * this.Precio.impuesto)).toFixed(2)
-          let PRECIO_C_IMPUESTO = (parseFloat(this.Precio2.impuesto) + parseFloat(PRECIO_S_IMPUESTO)).toFixed(2);
-          this.Precio.precioContado = PRECIO_C_IMPUESTO
+      registrarPrecio(){
+        if (this.$refs.FormVerificarMargenUtilidadAnual.validate() && this.$refs.FormVerificarImpuestoAsignacionPrecio.validate()){
+          this.$store.commit('activarOverlay', true);
+          this.$axios.put('precio_articulos/'+this.data.articulo,{
+            precio_costo_antiguo: this.data.precio_costo,
+            precio_costo_actual:  this.Precio.precio_s_i,
+            precio_contado:       this.Precio.precioContado,
+            prima:                this.Precio.prima,
+            margen_ganancia:      this.Precio.margenUtilidad,
+            financiamiento_anual: this.Precio.financiamientoAnual,
+            impuesto:             this.Precio.impuesto_id,
+            descuento:            this.Precio.descuento
+          },{
+            headers: {
+              'Authorization': 'Bearer ' + this.$store.state.token
+            }
+          }).then((res)=>{
+            if (res.status === 200){
+              this.$store.commit('activarOverlay', false);
+              Swal.fire(
+                'Registro Exitoso',
+                `Se registro exitosamente el nuevo precio del artículo ${this.data.nombre_articulo}.`,
+                'success'
+              );
+              this.$store.commit('cambiarVistaPRecioArticulo', 1);
+            }
+          })
         }
       },
-      cargarPrecioArticulo(){
-        this.$axios.get('precio_articulos/'+this.data.articulo,{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.PrecioArticulo = res.data.precio;
-          }
-          this.cargarPRecio = true;
-        })
+      sacarFinanciamientoMensual(){
+        let margen = this.Precio.financiamientoAnual
+        if (margen < 1)
+          margen = margen * 100
+        this.Precio.financiamientoMensual = (margen / 12).toFixed(2)
+        this.calcularInteres()
       }
     },
     props:{data: Object},

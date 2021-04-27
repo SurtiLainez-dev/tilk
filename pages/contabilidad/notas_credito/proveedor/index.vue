@@ -40,7 +40,8 @@
           <span>{{scope.item.concepto}}</span>
         </v-tooltip>
       </template>
-      <template v-slot:cell(total)="scope">L {{scope.item.total}}</template>
+      <template v-slot:cell(total)="scope">L {{int.format(scope.item.total)}}</template>
+      <template v-slot:cell(factura_proveedor.total)="scope">L {{int.format(scope.item.factura_proveedor.total)}}</template>
       <template v-slot:cell(nota_c_p_devolucions.devolucion_proveedor.razon)="scope">
         <v-tooltip top v-if="scope.item.nota_c_p_devolucions">
           <template v-slot:activator="{on, attrs}">
@@ -125,6 +126,7 @@
     },
     data(){
       return{
+        int: new Intl.NumberFormat(),
         load: true,
         search: '',
         Notas: [],

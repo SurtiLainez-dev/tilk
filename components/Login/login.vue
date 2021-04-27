@@ -3,6 +3,7 @@
       <h5 class="text-center">Credenciales del Usuario</h5>
       <v-divider></v-divider>
       <v-form ref="formLogin" class="form" v-model="valid" :lazy-validation="lazy">
+        <v-text-field value="Surtidora Laínez" label="Nombre de la Empresa" disabled></v-text-field>
         <v-text-field v-model="Email" :rules="Login.rulesEmail" label="E-mail" required>
         </v-text-field>
         <v-text-field v-model="Login.password" :type="show ? 'text' : 'password'"
@@ -14,9 +15,10 @@
             <nuxt-link to="/recuperacion/">¿Se te olvidó tu contraseña?</nuxt-link>
           </v-col>
           <v-col cols="6" class="d-flex flex-row-reverse">
-            <v-btn @click="validate" color="warning" dark>Iniciar Sesión</v-btn>
+            <v-btn @click="validate" :disabled="load" tile small color="success" dark>Iniciar Sesión</v-btn>
           </v-col>
         </v-row>
+        <v-progress-linear v-if="load" indeterminate color="success"></v-progress-linear>
         <v-row v-if="isError">
           <v-col>
             <v-alert dense outlined type="error">
@@ -36,6 +38,7 @@
         props:{email: String},
         data(){
           return{
+            load: false,
             Email: this.email,
             valid: true,
             lazy: false,
@@ -62,6 +65,7 @@
             }
           },
           logear(){
+            this.load = true;
             return this.$axios({
               method: 'post',
               url: '/login',
@@ -114,6 +118,7 @@
                 this.$store.commit("guardarUsuarioId", localStorage.getItem('usuario_id'));
                 ipcRenderer.send('crear-usuario', this.Email)
                 this.$axios.setToken(this.$store.state.token, 'Bearer')
+                this.load = false;
                 this.$router.replace({path:'/inicio/'})
               }
             }).catch((error)=>{
@@ -131,8 +136,10 @@
                   this.error = error.response.data
                   // this.erroresServidor.push(error.response.data)
                 }
+                this.load  = false;
               }catch (e) {
                 this.error = 'Tiempo de espera agotado, el servidor tardo mucho en responder.'
+                this.load  = false;
               }
             })
           },

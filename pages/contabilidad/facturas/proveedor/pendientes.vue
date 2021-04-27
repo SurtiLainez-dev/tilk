@@ -11,14 +11,14 @@
       <v-divider></v-divider>
       <v-data-table class="rowsTable" :headers="header" @click:row="goFactura"
                     :search="search" :items="Facturas">
-        <template v-slot:item.orden_entrada.proveedor.nombre="{item}">
-          <v-avatar v-if="item.orden_entrada.proveedor.logo" size="25">
-            <img :src="item.orden_entrada.proveedor.logo" alt="John"></v-avatar>
+        <template v-slot:item.proveedor.nombre="{item}">
+          <v-avatar v-if="item.proveedor.logo" size="25">
+            <img :src="item.proveedor.logo" alt="John"></v-avatar>
           <v-avatar size="25" v-else><v-icon>fa fa-user</v-icon></v-avatar>
-          {{item.orden_entrada.proveedor.nombre}}
+          {{item.proveedor.nombre}}
         </template>
         <template v-slot:item.total="{item}">
-          <strong>L. {{item.total}}</strong>
+          <strong>L. {{int.format(item.total)}}</strong>
         </template>
         <template v-slot:item.estado="{item}">
           <v-chip v-if="item.estado === 0" color="orange" dark small>Al día</v-chip>
@@ -36,13 +36,13 @@
           <v-icon>fa fa-arrow-left</v-icon>
         </v-btn></v-col>
         <v-col class="d-flex justify-end pr-5">
-          <v-avatar v-if="datos.orden_entrada.proveedor.logo" size="25">
-            <img :src="datos.orden_entrada.proveedor.logo" alt="John"></v-avatar>
+          <v-avatar v-if="datos.proveedor.logo" size="25">
+            <img :src="datos.proveedor.logo" alt="John"></v-avatar>
           <v-avatar size="25" v-else><v-icon>fa fa-user</v-icon></v-avatar>
-          <strong>{{datos.orden_entrada.proveedor.nombre}}</strong>
+          <strong>{{datos.proveedor.nombre}}</strong>
         </v-col>
       </v-row>
-      <Factura :factura="datos"/>
+      <factura :factura="datos"/>
     </div>
   </v-card>
 </template>
@@ -50,18 +50,19 @@
 <script>
   import Factura from "../../../../components/contabilidad/Factura";
   export default {
-    components:{Factura},
+    components:{factura: Factura},
     created() {
       this.$store.commit('guardarTitulo', 'Contabilidad > Facturas Pendientes > Proveedor');
     },
     name: "pendientes",
     data(){
       return{
+        int: new Intl.NumberFormat(),
         datos: [],
         vista: 1,
         search: '',
         header:[
-          {text:'Proveedor', value:'orden_entrada.proveedor.nombre'},
+          {text:'Proveedor', value:'proveedor.nombre'},
           {text:'Número de Factura', value:'num_factura'},
           {text:'Orden de Entrada', value:'orden_entrada.codigo'},
           {text:'Sucursal Asignada', value:'orden_entrada.sucursal.nombre'},

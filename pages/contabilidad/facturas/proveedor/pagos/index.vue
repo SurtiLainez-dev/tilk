@@ -74,6 +74,7 @@
   export default {
     name: "index",
     created() {
+      this.$store.commit('activarOverlay', false);
       this.$store.commit('guardarTitulo', 'Contabilidad > Facturas > Proveedores > Pagos Realizados');
       this.cargarPagos()
     },

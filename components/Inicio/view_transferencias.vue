@@ -233,40 +233,9 @@
         this.selected = data;
         this.dialogoVerificacion = true;
       },
-      ver_remisiones(){
-        this.$axios.get('view_traslados/'+this.sucursal,{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          this.Transferencias = res.data.remisiones
-          this.load = false
-        })
-      },
-      ver_file_remision(){
-        this.dialogoVerificacion = false;
-        this.$store.commit('activarOverlay', true);
-        this.$axios.post('leer_documento/',{
-          ubicacion: this.selected.remision_transferencia.file_generado
-        },{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            ipcRenderer.send('open-nav', res.data.url)
-            this.$store.commit('activarOverlay', false);
-            this.dialogoVerificacion = true
-          }
-        })
-      },
       dialogoAbrirFile(){
         if (this.$refs.FormDecisionRemision.validate())
           this.dialogoFile = true;
-      },
-      validarFile(){
-        if (this.$refs.FormValidarFileRemision.validate())
-          this.guardarRemision()
       },
       guardarRemision(){
         let data = new FormData();
@@ -300,13 +269,44 @@
           }).then((res)=>{
             this.$store.commit('activarOverlay', false);
             Swal.fire(
-              'Registro Exitoso del Stock',
-              `Haz aceptado exitosamente la guía de remisión ${this.selected.remision_transferencia.numeracion}.
+                'Registro Exitoso del Stock',
+                `Haz aceptado exitosamente la guía de remisión ${this.selected.remision_transferencia.numeracion}.
               El stock del piso ${this.selected.destino.nombre} ya se actualizó, verífique el inventario. Si detexta alguna
               alteración de inventario incorrecta por favor notificarlo de inmediato.`,
-              'success'
+                'success'
             );
           })
+        })
+      },
+      validarFile(){
+        if (this.$refs.FormValidarFileRemision.validate())
+          this.guardarRemision()
+      },
+      ver_remisiones(){
+        this.$axios.get('view_traslados/'+this.sucursal,{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          this.Transferencias = res.data.remisiones
+          this.load = false
+        })
+      },
+      ver_file_remision(){
+        this.dialogoVerificacion = false;
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('leer_documento/',{
+          ubicacion: this.selected.remision_transferencia.file_generado
+        },{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            ipcRenderer.send('open-nav', res.data.url)
+            this.$store.commit('activarOverlay', false);
+            this.dialogoVerificacion = true
+          }
         })
       }
     },

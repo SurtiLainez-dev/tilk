@@ -9,7 +9,13 @@ export const state = () => ({
     CUENTA: [],
     TITULO: '',
     LOAD_CUENTAS: true,
-    FACTURA: []
+    FACTURA: [],
+    FACTURAS_HOY: [],
+    LOADFACTURAS_HOY: false,
+    RECIBOS_HOY: [],
+    LOADRECIBOS_HOY: false,
+    DOCUMENTOS_HOY: [],
+    LOADDOCUMENTOS_HOY: false
 })
 
 export const mutations = {
@@ -40,6 +46,28 @@ export const mutations = {
             state.CUENTAS = res.data.ventas
             state.LOAD_CUENTAS = false;
         })
+    },
+    cargar_DOCUMENTOS(state,data){
+
+        if (data.tipo === 1)
+            state.LOADFACTURAS_HOY   = true;
+        else if(state.tipo === 2)
+            state.LOADRECIBOS_HOY    = true;
+        else if (data.tipo === 3)
+            state.LOADDOCUMENTOS_HOY = true;
+
+        this.$axios.get(`caja/documentos/${data.fecha}/caja/${data.caja}/${data.tipo}`).then((res)=>{
+            if (data.tipo === 1){
+                state.FACTURAS_HOY       = res.data.documentos;
+                state.LOADFACTURAS_HOY   = false;
+            }else if (data.tipo === 2){
+                state.RECIBOS_HOY        = res.data.documentos;
+                state.LOADRECIBOS_HOY    = false;
+            }else if (data.tipo === 3){
+                state.DOCUMENTOS_HOY     = res.data.documentos;
+                state.LOADDOCUMENTOS_HOY = false;
+            }
+        });
     },
     cambiar_TITULO(state, titulo){
         state.TITULO = titulo

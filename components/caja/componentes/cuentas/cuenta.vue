@@ -21,7 +21,7 @@
                 </td>
               </tr>
               <tr>
-                <th>Documento:</th>
+                <th>Documento a Realizar:</th>
                 <td v-if="CUENTA.tipo_venta === 1">Factura de Contado</td>
                 <td v-else-if="CUENTA.tipo_venta === 2">Recibo</td>
               </tr>
@@ -126,7 +126,8 @@
             </v-tooltip>
             <v-tooltip top>
               <template v-slot:activator="{on, attr}">
-                <v-btn color="indigo" class="ma-1" v-bind="attr" v-on="on" fab tile x-small dark>
+                <v-btn color="indigo" class="ma-1" v-bind="attr"
+                       v-on="on" fab tile x-small dark @click="dialogoCalculadora = true">
                   <v-icon>fa fa-calculator</v-icon>
                 </v-btn>
               </template>
@@ -139,10 +140,10 @@
                   <v-icon>fa fa-expand-arrows-alt</v-icon>
                 </v-btn>
               </template>
-              <span>Documentos por Cobrarr</span>
+              <span>Documentos por Cobrar</span>
             </v-tooltip>
           </v-toolbar>
-          <v-simple-table dense height="180" class="rowsTable" fixed-header>
+          <v-simple-table dense height="250" class="rowsTable" >
             <template v-slot:default>
               <thead>
               <tr>
@@ -160,7 +161,7 @@
                 <td>
                   <v-tooltip top>
                     <template v-slot:activator="{on, attrs}">
-                      <span v-on="on" v-bind="attrs">{{item.detalle.substr(0,10)}} ...</span>
+                      <span v-on="on" v-bind="attrs">{{item.detalle.substr(0,8)}} ...</span>
                     </template>
                     <span>{{item.detalle}}</span>
                   </v-tooltip>
@@ -202,6 +203,9 @@
                       prefix="L" @click="calucularCambio" @keyup.enter="calucularCambio">
         </v-text-field>
         <v-text-field dense v-model="Abono.cambio" label="Cambio" disabled prefix="L"></v-text-field>
+        <v-text-field dense v-model="obsRecibo" label="Observación para el Recibo"
+                      counter v-if="CUENTA.tipo_venta === 2">
+        </v-text-field>
       </v-form>
       <v-card-actions class="d-flex justify-end">
         <v-btn small tile color="orange" dark @click="dialogoRegistrar = false">Cerrar</v-btn>
@@ -280,6 +284,40 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-dialog v-model="dialogoCalculadora" width="80%">
+    <v-card>
+      <v-toolbar color="grey lighten-5">
+        <h6>Tabla Para Calcular Pago</h6>
+        <v-spacer></v-spacer>
+        <h5>Total del Pago: <strong>L {{totalCalculadora}}</strong></h5>
+      </v-toolbar>
+      <v-data-table dense
+                    :items="CUENTA.pagos_contratos"
+                    class="rowsTable"
+                    v-model="calculadora"
+                    show-select
+                    :headers="headers">
+        <template v-slot:item.estado="{item}">
+          <v-chip color="orange" x-small dark v-if="item.estado === 1">Al día</v-chip>
+          <v-chip color="success" x-small dark v-else-if="item.estado === 3">Cancelado</v-chip>
+          <v-chip color="red" x-small dark v-else-if="item.estado === 2">En Mora</v-chip>
+        </template>
+        <template v-slot:item.mora="{item}">L {{item.mora}}</template>
+        <template v-slot:item.pago_inicial="{item}">L {{item.pago_inicial}}</template>
+        <template v-slot:item.total_pago="{item}">L {{item.total_pago}}</template>
+        <template v-slot:item.total_abonado="{item}">L {{item.total_abonado}}</template>
+        <template v-slot:item.saldo_actual="{item}">L {{item.saldo_actual}}</template>
+
+      </v-data-table>
+      <v-card-actions class="d-flex justify-end">
+        <v-btn small color="indigo" dark @click="calcularPago" tile>Calcular Pago</v-btn>
+        <v-btn small color="success" class="text-white" :disabled="!btnCalculadora"
+               @click="aceptarPagoCalculadora" tile>Tomar Resultado</v-btn>
+        <v-btn small color="orange" dark @click="cerrarCalculadora" tile>Cerrar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </v-card>
 </template>
 
@@ -293,6 +331,11 @@ export default {
   components:{info_pago},
   data(){
     return{
+      btnCalculadora: false,
+      calculadora: [],
+      totalCalculadora: 0,
+      dialogoCalculadora: false,
+      obsRecibo: '',
       FormasPago: [],
       dialogoRegistrar: false,
       vistaInfoPago: false,
@@ -304,6 +347,16 @@ export default {
         {text: 'Pago total', value:'total_pago'},
         {text: 'Abonado', value:'total_abonado'},
         {text: 'Saldo Actual', value:'saldo_actual'},
+      ],
+      headersC:[
+        {text: 'Detalle', value:'detalle'},
+        {text: 'Estado', value:'estado'},
+        {text: 'Mora', value:'mora'},
+        {text: 'Pago Inical', value:'pago_inicial'},
+        {text: 'Pago total', value:'total_pago'},
+        {text: 'Abonado', value:'total_abonado'},
+        {text: 'Saldo Actual', value:'saldo_actual'},
+        {text: 'Seleccionar', value:'id'},
       ],
       headersDXC:[
         {text: 'Detalle del Pago', value:'descripcion'},
@@ -368,15 +421,37 @@ export default {
       this.dialogoRegistrar = true;
       this.Abono.efectivo = this.Abono.total;
     },
+    aceptarPagoCalculadora(){
+      this.Abono.total = this.totalCalculadora;
+      this.dialogoCalculadora = false;
+      this.totalCalculadora   = 0;
+      this.calculadora        = [];
+      this.btnCalculadora     = false;
+      this.distribuirPago();
+    },
     calucularCambio(){
       this.Abono.cambio = (parseFloat(this.Abono.efectivo) - parseFloat(this.Abono.total)).toFixed(2);
       if (this.Abono.cambio < 0)
         this.Abono.cambio = 0;
     },
+    calcularPago(){
+      this.totalCalculadora = 0;
+      this.calculadora.forEach((i)=>{
+        this.totalCalculadora = this.totalCalculadora + i.saldo_actual;
+        this.btnCalculadora = true;
+      });
+      this.totalCalculadora.toFixed(2);
+    },
     cargarFormaPago(){
       this.$axios.get('forma_pagos').then((res)=>{
         this.FormasPago = res.data.formas
       })
+    },
+    cerrarCalculadora(){
+      this.dialogoCalculadora = false;
+      this.totalCalculadora   = 0;
+      this.calculadora        = [];
+      this.btnCalculadora     = false;
     },
     contado(){
       this.$axios.post('cajas/postear/factura',{
@@ -406,6 +481,42 @@ export default {
         else
           this.notificacion('Hubo un error al registrar el pago','error');
       })
+    },
+    credito(){
+      if (this.obsRecibo){
+        this.$axios.post('caja/postear/cuenta',{
+          sucursal_id:  this.SUCURSAL_ID,
+          total:        this.Abono.total,
+          venta_id:     this.CUENTA.id,
+          observacion:  this.obsRecibo,
+          pagos:        this.PagosDistrubuidos,
+          caja_id:      this.CAJA.id,
+          saldo_actual: this.CUENTA.saldo_actual,
+          forma_pago:   this.Abono.forma_pago,
+          referencia:   this.Abono.referencia
+        }).then((res)=>{
+          this.$store.commit('activarOverlay', false);
+          this.vistaInfoPago = true;
+          this.notificacion(res.data.msj,'success');
+          this.notificacion('Se cargará el documnto para su impresión','success');
+          if (res.data.isCancelada === true)
+            this.notificacion('El estado de la cuenta pasó a cancelada','success');
+          else{
+            this.notificacion('Esta cuenta aún tiene pagos pendientes','warning');
+          }
+          this.verDocumento(res.data.file)
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+          if (error.response.data.status === 422)
+            this.notificacion(error.response.data.error,'error');
+          else
+            this.notificacion('Hubo un error al registrar el pago','error');
+        })
+      }else {
+        this.notificacion('No hay observación en el recibo','warning');
+        this.$store.commit('activarOverlay', false);
+        this.dialogoRegistrar = true;
+      }
     },
     crearFactura(){
       this.$store.commit('activarOverlay', true);
@@ -532,6 +643,8 @@ export default {
       this.dialogoRegistrar = false;
       if (this.CUENTA.tipo_venta === 1)
         this.contado();
+      else
+        this.credito();
     },
     validarForm(){
       if (this.$refs.FormRegistrarVenta.validate())

@@ -6,7 +6,7 @@
           <v-row>
             <v-col cols="3" class="d-flex align-center">Proveedor: <strong>{{Orden.proveedor.nombre}}</strong></v-col>
             <v-col cols="3" class="d-flex align-center">Fecha de Creación: <strong>{{Orden.fecha_creacion}}</strong></v-col>
-            <v-col cols="3" class="d-flex align-center">Total de la Orden: <strong>L. {{Orden.total}}</strong></v-col>
+            <v-col cols="3" class="d-flex align-center">Total de la Orden: <strong>L. {{int.format(Orden.total)}}</strong></v-col>
             <v-col cols="3" class="d-flex justify-end align-center">
               <v-chip v-if="Orden.estado ===1" class="ma-2" color="success">Recibida</v-chip>
               <v-chip v-else color="warning" class="ma-2">Sin Acciones</v-chip>
@@ -19,16 +19,16 @@
         <v-container class="bordes">
           <v-data-table :headers="header" :items="Orden.cuerpo_orden_compras" class="rowsTable">
             <template v-slot:item.id="{item}">
-              L {{((item.cantidad * item.precio_costo) * ((item.impuesto/100) + 1)).toFixed(2)}}
+              L {{int.format(((item.cantidad * item.precio_costo) * ((item.impuesto/100) + 1)).toFixed(2))}}
             </template>
             <template v-slot:item.articulo_id="{item}">
-              L {{((item.cantidad * item.precio_costo)).toFixed(2)}}
+              L {{int.format(((item.cantidad * item.precio_costo)).toFixed(2))}}
             </template>
             <template v-slot:item.precio_costo="{item}">
-              L {{item.precio_costo}}
+              L {{int.format(item.precio_costo)}}
             </template>
             <template v-slot:item.created_at="{item}">
-              L {{((item.cantidad * item.precio_costo) * (item.impuesto/100)).toFixed(2)}}
+              L {{int.format(((item.cantidad * item.precio_costo) * (item.impuesto/100)).toFixed(2))}}
             </template>
           </v-data-table>
         </v-container>
@@ -50,6 +50,7 @@
     },
     data(){
       return{
+        int: new Intl.NumberFormat(),
         overlay: false,
         header:[
           {text:'Descripción del Artículo', value:'descripcion'},

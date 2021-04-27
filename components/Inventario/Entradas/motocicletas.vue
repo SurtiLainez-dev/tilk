@@ -199,75 +199,9 @@
       }
     },
     methods:{
-      cambiarTipo(){
-        if (this.Ingreso.tipoConsignacion === 2)
-          this.Ingreso.estado = true
-        else if (this.Ingreso.tipoConsignacion === 1)
-          this.Ingreso.estado = false
-        this.Ingreso.articulo.forEach( (i) => {
-          i.estado = this.Ingreso.tipoConsignacion
-        })
-      },
-      subirFile(){
-        if (this.$refs.FormSubirFileGuiaRemision.validate()){
-          this.popupSuburFile = false
-          let data = new FormData()
-          data.append('orden', this.idGuiaCreada);
-          data.append('file', this.file);
-          this.$store.commit('activarOverlay', true);
-          this.$axios({
-            method: 'post',
-            url:    'guia_remision/file',
-            data:   data,
-            headers:{
-              'Authorization': 'Bearer ' + this.$store.state.token,
-              'Content-Type': "multipart/form-data"
-            }
-          }).then((res)=>{
-            if (res.status === 200){
-              this.$store.commit('activarOverlay', false);
-              Swal.fire(
-                'Registro Exitoso',
-                `Se registro exitosamente la orden de ingreso`,
-                'success'
-              )
-              this.$router.replace({path:'/inventario/'})
-            }
-          })
-        }else{
-          this.notificacion('danger','Ingresa la guia escaneada','Sin Archivos', 4000)
-        }
-      },
       abrirPopupVerificar(tr){
         this.popupVeri = true
         this.datosVerificacion = tr
-      },
-      verificarForm(){
-        if (this.$refs.FormNuevaEntradaMotocicletas.validate())
-          this.registrarOrden()
-      },
-      registrarOrden(){
-        this.$store.commit('activarOverlay', true);
-        this.$axios.post('ordenes_entrada', {
-          proveedor:   this.Ingreso.proveedor,
-          sucursal:    this.Ingreso.sucursal,
-          tipo:        this.tipo,
-          articulos:   this.Ingreso.articulo,
-          observacion: this.Ingreso.observacion,
-          tipoGuia:    this.Ingreso.tipoConsignacion,
-          colaborador: this.Ingreso.colaborador,
-          numero:      this.Ingreso.numero
-        },{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.$store.commit('activarOverlay', false);
-            this.idGuiaCreada = res.data.orden
-            this.popupSuburFile = true
-          }
-        })
       },
       addCompuestos(articulo, fila){
         this.Ingreso.articulo.forEach( (i) => {
@@ -312,16 +246,14 @@
           "rCompuestos": [],
         })
       },
-      removeFila(fila){
-        if (this.Ingreso.articulo.length < 2){
-          alert("No puedes eliminar esta fila")
-        }else{
-          this.Ingreso.articulo.splice(fila, 1)
-          for (let item in this.Ingreso.articulo){
-            this.Ingreso.articulo[item].fila = item
-          }
-
-        }
+      cambiarTipo(){
+        if (this.Ingreso.tipoConsignacion === 2)
+          this.Ingreso.estado = true
+        else if (this.Ingreso.tipoConsignacion === 1)
+          this.Ingreso.estado = false
+        this.Ingreso.articulo.forEach( (i) => {
+          i.estado = this.Ingreso.tipoConsignacion
+        })
       },
       cargarColaborador(){
         this.$axios.get('colaboradores_suc/'+this.Ingreso.sucursal,{
@@ -381,6 +313,74 @@
             })
           }
         })
+      },
+      registrarOrden(){
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('ordenes_entrada', {
+          proveedor:   this.Ingreso.proveedor,
+          sucursal:    this.Ingreso.sucursal,
+          tipo:        this.tipo,
+          articulos:   this.Ingreso.articulo,
+          observacion: this.Ingreso.observacion,
+          tipoGuia:    this.Ingreso.tipoConsignacion,
+          colaborador: this.Ingreso.colaborador,
+          numero:      this.Ingreso.numero
+        },{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.$store.commit('activarOverlay', false);
+            this.idGuiaCreada = res.data.orden
+            this.popupSuburFile = true
+          }
+        })
+      },
+      removeFila(fila){
+        if (this.Ingreso.articulo.length < 2){
+          alert("No puedes eliminar esta fila")
+        }else{
+          this.Ingreso.articulo.splice(fila, 1)
+          for (let item in this.Ingreso.articulo){
+            this.Ingreso.articulo[item].fila = item
+          }
+
+        }
+      },
+      subirFile(){
+        if (this.$refs.FormSubirFileGuiaRemision.validate()){
+          this.popupSuburFile = false
+          let data = new FormData()
+          data.append('orden', this.idGuiaCreada);
+          data.append('file', this.file);
+          this.$store.commit('activarOverlay', true);
+          this.$axios({
+            method: 'post',
+            url:    'guia_remision/file',
+            data:   data,
+            headers:{
+              'Authorization': 'Bearer ' + this.$store.state.token,
+              'Content-Type': "multipart/form-data"
+            }
+          }).then((res)=>{
+            if (res.status === 200){
+              this.$store.commit('activarOverlay', false);
+              Swal.fire(
+                'Registro Exitoso',
+                `Se registro exitosamente la orden de ingreso`,
+                'success'
+              )
+              this.$router.replace({path:'/inventario/'})
+            }
+          })
+        }else{
+          this.notificacion('danger','Ingresa la guia escaneada','Sin Archivos', 4000)
+        }
+      },
+      verificarForm(){
+        if (this.$refs.FormNuevaEntradaMotocicletas.validate())
+          this.registrarOrden()
       },
     }
   }

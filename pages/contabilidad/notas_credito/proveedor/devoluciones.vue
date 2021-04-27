@@ -63,6 +63,7 @@
           </v-tooltip>
         </template>
       </v-data-table>
+
       <v-dialog v-model="dialogo" width="90%">
         <v-card>
           <v-row class="grey lighten-3" no-gutters>
@@ -78,6 +79,7 @@
           </div>
         </v-card>
       </v-dialog>
+
       <v-dialog v-model="Devolucion.dialogo" width="25%">
         <v-card>
           <v-card-title class="grey lighten-3">Subir documento generado</v-card-title>
@@ -91,7 +93,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      {{Devolucion.file}}
+
     </v-card>
 </template>
 
@@ -150,7 +152,7 @@
     },
     methods:{
       cargarOrdenes(){
-        this.$axios.get('orden_entrada_pendientes/'+this.sucursal,{
+        this.$axios.get('/orden_entradas/sucursal/'+this.sucursal,{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token
           }

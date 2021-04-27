@@ -19,6 +19,9 @@
       <v-list-item class="itemOpciones" @click="go('/colaborador/planillas/pagos')">
         Pago a Colaboradores
       </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/contabilidad/libro_diario')">
+        Libro Díario
+      </v-list-item>
     </v-list-group>
     <v-list-group>
       <template v-slot:activator value="true">
@@ -44,6 +47,9 @@
       </v-list-item>
       <v-list-item class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pagos/lista')">
         Crear Lista de Pagos
+      </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/ingreso_manual')">
+        Ingreso Manual a CC
       </v-list-item>
     </v-list-group>
   </div>

@@ -531,7 +531,7 @@ export default {
     },
     addLineaMoto(data){
       this.Venta.filas.push({
-        key: this.Venta.filas.length,
+        key:         this.Venta.filas.length,
         articulo:    data.remision_articulo.articulo.nombre_articulo,
         cantidad:    1,
         cantidadMax: 1,

@@ -254,7 +254,7 @@
           },
         },
         fields: [
-          { key: 'id', stickyColumn: true, isRowHeader: true, variant: 'light'}, 'codigo',
+          { key: 'id', label:'', stickyColumn: true, isRowHeader: true, variant: 'light'}, 'codigo',
           'tipo_entrada_articulo.nombre', 'proveedor.nombre', 'user.usuario', 'sucursal.abreviatura',
           'fecha_creacion', 'estado', 'file', 'observacion'
         ],

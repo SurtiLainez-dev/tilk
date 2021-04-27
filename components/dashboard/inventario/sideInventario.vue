@@ -33,6 +33,9 @@
       <v-list-item class="itemOpciones" @click="go('/inventario/ordenes-compra/')">
         Ver Ordenes de de Compra
       </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/inventario/ordenes-compra/orden_sucursal')">
+        Ordenes de Compra x Sucursal
+      </v-list-item>
       <v-list-item class="itemOpciones" @click="go('/inventario/ingresos/nuevo')">
         Crear Orden en Entrada
       </v-list-item>

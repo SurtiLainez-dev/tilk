@@ -10,7 +10,7 @@
           </v-stepper-header>
 
           <v-stepper-content step="1">
-            <v-card>
+            <v-card flat :loading="isPeticion">
               <v-card-title>
                 Recuperación de contraseña
               </v-card-title>
@@ -35,7 +35,7 @@
                   </v-col>
                 </v-row>
                 <v-card-actions class="d-flex justify-end">
-                  <v-btn class="mt-3" color="orange" :disabled="isPeticion"
+                  <v-btn class="mt-3" color="orange" tile small :disabled="isPeticion"
                          dark @click="validate(1)">Solicitar Código</v-btn>
                 </v-card-actions>
                 <v-row v-if="error">
@@ -48,10 +48,10 @@
               </v-form>
             </v-card>
             <v-divider></v-divider>
-            <v-btn class="mt-3" @click="backInicio" dark color="dark">Regresar</v-btn>
+            <v-btn class="mt-3" tile small @click="backInicio" dark color="dark">Regresar</v-btn>
           </v-stepper-content>
           <v-stepper-content step="2">
-            <v-card>
+            <v-card flat :loading="isPeticion">
               <v-card-title>
                 Ingresar Código de Validación
               </v-card-title>

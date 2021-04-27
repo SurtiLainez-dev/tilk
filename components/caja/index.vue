@@ -41,9 +41,11 @@
             <h6>{{TITULO}}</h6>
           </v-toolbar>
 
-          <inicio v-if="VISTA === 1"/>
-          <postear v-else-if="VISTA === 2"/>
-
+          <inicio       v-if="VISTA === 1"/>
+          <postear      v-else-if="VISTA === 2"/>
+          <venta        v-else-if="VISTA === 3"/>
+          <recibos_hoy  v-else-if="VISTA === 4"/>
+          <facturas_hoy v-else-if="VISTA === 5"/>
         </v-card>
       </v-col>
     </v-row>
@@ -56,10 +58,16 @@
 import inicio from "./componentes/inicio";
 import postear from "./componentes/postear";
 import Vue from "vue";
+import venta from "./componentes/venta";
+import facturas_hoy from "./componentes/facturas_hoy";
+import recibos_hoy from "./componentes/recibos_hoy";
 export default {
   components:{
     inicio,
-    postear
+    postear,
+    venta,
+    facturas_hoy,
+    recibos_hoy
   },
   name: "index",
   data(){
@@ -125,7 +133,7 @@ export default {
 
   },
   created() {
-    this.$store.commit('activarOverlay', true);
+    this.$store.commit('activarOverlay', false);
     this.$axios.get('/cajas/caja/'+this.$store.state.caja.CAJA_ID).then((res)=>{
       this.CAJA = res.data.caja;
       this.ESTADO = true;

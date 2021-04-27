@@ -1,6 +1,6 @@
 <template>
 <v-card flat>
-  <v-simple-table dense class="rowsTable">
+  <v-simple-table dense class="rowsTable" v-if="CUENTA.orden_entrega">
     <template v-slot:default>
       <tbody>
       <tr>

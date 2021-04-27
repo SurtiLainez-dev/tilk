@@ -30,6 +30,10 @@
         <th>Total del Crédito</th>
         <td><strong>L </strong>{{CUENTA.total}}</td>
       </tr>
+      <tr v-if="CUENTA.contrato_cliente">
+        <th>Saldo en Mora</th>
+        <td><strong>L </strong>{{CUENTA.contrato_cliente.saldo_mora}}</td>
+      </tr>
       <tr>
         <th>Saldo Actual</th>
         <td><strong>L </strong>{{CUENTA.saldo_actual}}</td>

@@ -1,23 +1,652 @@
 <template>
-  <v-container class="pl-2 pr-2">
-    <h5>estan en una cuenta de banco</h5>
+  <v-container class="pl-2 pr-2 ">
+    <v-card flat v-if="cuenta">
+      <v-toolbar flat color="grey lighten-3">
+        <v-btn color="orange" dark tile fab x-small @click="$router.replace({path:'/contabilidad/banco'})"><v-icon>fa fa-arrow-left</v-icon></v-btn>
+        <v-spacer></v-spacer>
+        <h5>{{cuenta.descripcion}}</h5>
+      </v-toolbar>
+
+      <v-row no-gutters>
+        <v-col cols="4">
+          <v-card height="100%" class="ma-2">
+            <v-card-title>Información de la Cuenta</v-card-title>
+            <v-divider></v-divider>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-title>Banco</v-list-item-title>
+                <v-list-item-subtitle>{{cuenta.banco.nombre}}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-title>Tipo de Cuenta</v-list-item-title>
+                <v-list-item-subtitle>{{cuenta.tipo_cuenta_banco.nombre}}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-title>Número de Cuenta</v-list-item-title>
+                <v-list-item-subtitle>{{cuenta.num}}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-title>Cuenta Contable</v-list-item-title>
+                <v-list-item-subtitle v-if="CuentaContable">{{CuentaContable.cod}} {{CuentaContable.nombre}}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-title><strong>TOTAL EN LA CUENTA</strong></v-list-item-title>
+                <v-list-item-subtitle><strong>L {{int.format(cuenta.total)}}</strong></v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-card>
+        </v-col>
+        <v-col cols="4">
+          <v-card height="100%" class="ma-2">
+            <v-card-title>Acciones</v-card-title>
+            <v-divider></v-divider>
+            <v-list dense>
+              <v-subheader>ACCIONES DISPONIBLES PARA ESTA CUENTA</v-subheader>
+              <v-list-item-group  color="primary">
+                <v-list-item  @click="montoInicial.dialogo = true">
+                  <v-list-item-icon>
+                    <v-icon>fa fa-money-bill-wave</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Registrar Monto Inicial</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item @click="abrirDialogoTransferencia">
+                  <v-list-item-icon>
+                    <v-icon>fa fa-exchange-alt</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Transferir a Otra Cuenta</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item>
+                  <v-list-item-icon>
+                    <v-icon>fa fa-cash-register</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Transferir a Caja Chica</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item>
+                  <v-list-item-icon>
+                    <v-icon>fa fa-exchange-alt</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Debitar de la Cuenta</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item v-if="cuenta.tipo_cuenta_banco_id === 2" @click="cheques.dialogo = true">
+                  <v-list-item-icon>
+                    <v-icon>fa fa-money-check-alt</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Crear Cheques</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item @click="historial.dialogo = true">
+                  <v-list-item-icon>
+                    <v-icon>fa fa-history</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Historial Completo de la Cuenta</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+              </v-list-item-group>
+            </v-list>
+          </v-card>
+        </v-col>
+        <v-col cols="4">
+          <v-card class="ma-2" height="100%">
+            <v-card-title>Últimas Transacciones</v-card-title>
+            <v-divider></v-divider>
+            <v-list-item two-line v-for="item in transacciones">
+              <v-list-item-content>
+                <v-list-item-title>{{item.detalle}}</v-list-item-title>
+                <v-list-item-subtitle>
+                  Total de transacción {{int.format(item.total)}} lps
+                </v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-card>
+        </v-col>
+      </v-row>
+      <br>
+      <v-card height="500" class="ma-2">
+        <v-toolbar flat>
+          <h6>Historial de la Cuenta Contable</h6>
+          <v-spacer></v-spacer>
+          <v-text-field class="ma-2" label="Buscar Registro" dense v-model="searchCuentaC"></v-text-field>
+        </v-toolbar>
+        <v-row no-gutters >
+          <v-col cols="2">
+            <v-text-field class="ma-2" disabled dense label="Código de la Cuenta Contable"
+                          :value="CuentaContable ? CuentaContable.cod: ''"></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field class="ma-2" disabled dense label="Nombre de la Cuenta Contable"
+                          :value="CuentaContable ? CuentaContable.nombre : ''"></v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field suffix="lps" class="ma-2" disabled dense label="Total de la Cuenta Contable"
+                          :value="CuentaContable ? CuentaContable.total : 0"></v-text-field>
+
+          </v-col>
+        </v-row>
+
+        <v-data-table dense :headers="headerCuentaC"
+                      :loading="Cuentas.load"
+                      :search="searchCuentaC"
+                      :items="RegistrosCuentaContable"
+                      loading-text="Carrgando Registros Contables de la Cuenta"
+                      :items-per-page="5">
+          <template v-slot:item.tipo="{item}">
+            <v-chip dark color="success" x-small v-if="item.tipo === 0">Crédito</v-chip>
+            <v-chip dark color="orange" x-small v-else-if="item.tipo === 1">Débito</v-chip>
+          </template>
+          <template v-slot:item.total="{item}">
+            L {{int.format(item.total)}}
+          </template>
+        </v-data-table>
+      </v-card>
+      <v-card :loading="cheques.load" height="550" class="ma-2" v-if="cuenta.tipo_cuenta_banco_id === 2">
+        <v-toolbar flat><h6>Cheques de la Cuenta</h6></v-toolbar>
+        <hr>
+      </v-card>
+
+      <v-dialog width="30%" v-model="montoInicial.dialogo">
+        <v-card>
+          <v-toolbar flat color="grey-lighten-5">
+            <h6>Registrando Monto Inicial</h6>
+          </v-toolbar>
+          <v-alert v-if="cuenta.total > 0" color="orange" dark dense class="ma-2">Esta cuenta no tiene permitida esta opción.</v-alert>
+          <v-form ref="FormCTBancoMontoInicial">
+            <v-text-field class="ma-2" dense label="Monto Inicial" :rules="[rules.req, rules.num]"
+                          prefix="L" v-model="montoInicial.total">
+            </v-text-field>
+            <v-text-field class="ma-2" dense label="Detalle" counter
+                          :rules="[rules.req, rules.min8, rules.max30]"
+                          v-model="montoInicial.detalle">
+            </v-text-field>
+          </v-form>
+          <v-card-actions class="d-flex justify-end">
+            <v-btn color="orange"  tile small dark @click="montoInicial.dialogo = false">Cerrar</v-btn>
+            <v-btn color="success" tile small dark @click="registrarMontoInicial">Registrar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog width="60%" v-model="Cuentas.dialogo">
+        <v-card>
+          <v-toolbar color="grey lighten-5">
+            <h6>Partida de Transferencia Entre Cuentas de Bancos</h6>
+          </v-toolbar>
+
+          <v-form class="pl-5 pr-5 pb-5 pt-5" ref="FormContabilidadBancosTransferencias">
+            <v-row no-gutters>
+              <v-col>
+                <v-text-field dense label="Cuenta de Banco de Origen" disabled
+                              class="ma-2" :value="cuenta.num"></v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field dense label="Nombre de la Contra Cuenta Contable" disabled :loading="Cuentas.load"
+                              class="ma-2" :value="Cuentas.contracuentaString"></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col>
+                <v-select dense label="Cuenta de Banco de Destino" class="ma-2" :items="cuentas_bancos"
+                          :loading="Cuentas.load" v-model="Cuentas.cuenta_banco_id2" :disabled="Cuentas.load"
+                          @change="asignarCuentaDestino" :rules="[rules.req, rules.dif]">
+                </v-select>
+              </v-col>
+              <v-col>
+                <v-text-field dense label="Nombre de la Cuenta Contable" disabled
+                              class="ma-2" v-model="Cuentas.cuentaString" :rules="[rules.req]">
+                </v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-row no-gutters>
+              <v-col>
+                <v-text-field label="Total de la Cuenta de Origen" dense v-model="cuenta.total"
+                              disabled prefix="L" class="ma-2">
+                </v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field label="Total de la Partida" dense v-model="Cuentas.total" type="number"
+                              class="ma-2" prefix="L" :min="1" :max="cuenta.total" :rules="[rules.req, rules.max]">
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-text-field dense label="Detalle de la Partida" :rules="[rules.req, rules.min8, rules.max200]"
+                          v-model="Cuentas.detalle" counter class="ma-2">
+            </v-text-field>
+          </v-form>
+
+          <v-divider></v-divider>
+
+          <v-container>
+            <small>Demostración de la Partida</small>
+            <table>
+              <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Ref.</th>
+                <th>Crédito</th>
+                <th>Débito</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(item,i) in partida">
+                <td>{{item.fecha}}</td>
+                <td v-if="i === 0">(-) {{item.detalle}}</td>
+                <td v-if="i === 1" >(+) {{item.detalle}}</td>
+                <td>{{item.ref}}</td>
+                <td v-if="i===0">L {{int.format(Cuentas.total)}}</td>
+                <td v-else> </td>
+                <td v-if="i === 1">L {{int.format(Cuentas.total)}}</td>
+                <td v-else> </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td class="text-center">{{Cuentas.detalle}}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              </tbody>
+            </table>
+          </v-container>
+
+          <v-divider></v-divider>
+
+          <v-card-actions class="d-flex justify-end">
+            <v-btn color="orange" dark tile small @click="Cuentas.dialogo = false">Cerrar</v-btn>
+            <v-btn color="success" dark tile small @click="registrarTransferencia">Registrar Transferencia</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog width="40%" v-model="cheques.dialogo">
+        <v-card>
+          <v-toolbar color="grey lighten-5" flat>
+            <h6>Creando Cheques Nuevos</h6>
+          </v-toolbar>
+          <v-form ref="FormContabilidadBancoRegistroCheques" class="ma-2">
+            <v-row no-gutters>
+              <v-col>
+                <v-text-field dense label="Numeración Post Contador" class="ma-2"
+                              v-model="cheques.postNum" :rules="[rules.req]">
+                </v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field dense label="Contador Inicial" class="ma-2" @keyup="calcularCantidadCheques"
+                              v-model="cheques.inicial" type="number" :rules="[rules.req, rules.cero]">
+                </v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field dense label="Contador Final" class="ma-2" @keyup="calcularCantidadCheques"
+                              v-model="cheques.final" type="number" :rules="[rules.req, rules.cero]">
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col>
+                <v-text-field dense label="Longitúd de Numeración" class="ma-2" :rules="[rules.req, rules.cero]"
+                              v-model="cheques.longitud" suffix="Carácteres">
+                </v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field dense label="Cantidad de Cheques" class="ma-2" disabled
+                              v-model="cheques.cantidad" :rules="[rules.req, rules.cero]">
+                </v-text-field>
+              </v-col>
+            </v-row>
+          </v-form>
+
+          <v-divider></v-divider>
+          <v-card-actions class="d-flex justify-end">
+            <v-btn color="orange" small tile dark @click="cheques.dialogo = false">Cerrar</v-btn>
+            <v-btn color="success" small tile dark @click="registrarCheques">Crear Cheques</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog width="100%" v-model="historial.dialogo">
+        <v-card >
+          <v-toolbar flat color="grey lighten-5">
+            <h6>Historial de la Cuenta</h6>
+            <v-spacer></v-spacer>
+            <v-text-field class="ma-2" dense v-model="historial.search" label="Buscar"></v-text-field>
+          </v-toolbar>
+
+          <v-data-table dense :items="histo"
+                        :items-per-page="10"
+                        :search="historial.search"
+                        :headers="historial.header">
+            <template v-slot:item.tipo="{item}">
+              <v-chip color="success" x-small dark v-if="item.tipo ===0">Crédito</v-chip>
+              <v-chip color="orange" x-small dark v-else-if="item.tipo ===1">Débito</v-chip>
+            </template>
+            <template v-slot:item.saldo_actual="{item}">L. {{int.format(item.saldo_actual)}}</template>
+            <template v-slot:item.saldo_inicial="{item}">L. {{int.format(item.saldo_inicial)}}</template>
+            <template v-slot:item.total="{item}">L. {{int.format(item.total)}}</template>
+          </v-data-table>
+
+          <v-card-actions class="d-flex justify-end">
+            <v-btn color="orange" small tile dark @click="historial.dialogo = false">Cerrar </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+    </v-card>
   </v-container>
 </template>
 
 <script>
   export default {
+    computed:{
+      CUENTAS(){
+        return this.$store.state.contabilidad.bancos.CUENTAS;
+      },
+    },
     data(){
       return{
-        flf:''
+        int: new Intl.NumberFormat(),
+        historial:{
+          data:    [],
+          dialogo: false,
+          search: '',
+          header:[
+            {text:'Usuario Responsable',value:'user.usuario'},
+            {text:'Partida',value:'partida.referencia'},
+            {text:'Detalle',value:'detalle'},
+            {text:'Saldo Inicial',value:'saldo_inicial'},
+            {text:'Total de Transacción',value:'total'},
+            {text:'Saldo Final',value:'saldo_actual'},
+            {text:'tipo',value:'tipo'},
+          ]
+        },
+        CuentaContable: null,
+        headerCuentaC:[
+          {text:'Tipo',value:'tipo'},
+          {text:'Fecha',value:'fecha'},
+          {text:'detalle',value:'detalle'},
+          {text:'Total',value:'total'},
+          {text:'Referencia Partida',value:'partida'},
+        ],
+        searchCuentaC: '',
+        RegistrosCuentaContable: [],
+        cuentas_bancos: [],
+        cheques:{
+          load:    false,
+          data:    [],
+          postNum: '',
+          cantidad: 0,
+          dialogo:  false,
+          vista:    '',
+          inicial:  0,
+          final:    0,
+          longitud: 0
+        },
+        Cuentas: {
+          data:            [],
+          load:            false,
+          dialogo:         false,
+          detalle:         '',
+          cuenta_id:        0,
+          cuentaString:     '',
+          contracuenta_id:  0,
+          contracuentaString: '',
+          nivel:            0,
+          total:            0,
+          cuenta_banco_id2: 0
+        },
+        montoInicial:{
+          dialogo: false,
+          total:   0,
+          detalle: 'Registrando Monto Inicial'
+        },
+        rules:{
+          req:    v => !!v                            || 'Campo requerido',
+          num:    v => /^[0-9]+([.][0-9]+)?$/.test(v) || 'Dato invalido',
+          max30:  v => v.length <= 30                 || 'Debe se menor o igual a 30 carácteres',
+          max200: v => v.length <= 200                || 'Debe se menor o igual a 200 carácteres',
+          min8:   v => v.length >= 8                  || 'Debe ingresar mínimo 8 carácteres',
+          dif:    v => v !== this.cuenta.id           || 'No puedes usar esta cuenta. Tiene que ser diferente la cuenta de origen',
+          max:    v => v <= this.cuenta.total         || 'No puedes sobrepasar el total de la cuenta de origen',
+          cero:   v => v > 0                          || 'Tiene que ser mayor a 0'
+        },
+        partida: [],
+        transacciones: []
       }
     },
     created() {
-      this.$store.commit('guardarTitulo', 'Cuenta')
-      console.log(this.$route.params.cuenta)
-    }
+      this.historialT();
+
+      this.acomodarCuentas();
+      this.cargarCuentas();
+      this.cargarCheques();
+    },
+    methods:{
+      abrirDialogoTransferencia(){
+        this.Cuentas.dialogo = true;
+      },
+      acomodarCuentas(){
+        this.CUENTAS.forEach((i)=>{
+          this.cuentas_bancos.push({
+            value: i.id,
+            text:  'Cuenta de '+i.tipo.nombre+' '+i.banco.nombre+ ' - '+i.num
+          })
+        })
+      },
+      asignarCuentaDestino(){
+        if (this.partida.length > 1)
+          this.partida.splice(1,1);
+
+        this.Cuentas.data.forEach((i)=>{
+          if (i.referencia_id == this.Cuentas.cuenta_banco_id2){
+            this.Cuentas.cuenta_id    = i.id;
+            this.Cuentas.cuentaString = i.cod+' - '+i.nombre;
+            this.CuentaContable       = i;
+            this.partida.push({
+              fecha: '',
+              detalle: '1113 - Bancos '+this.Cuentas.cuentaString,
+              ref:      this.Cuentas.cuentaString.split('-')[0],
+            })
+          }
+        })
+      },
+      calcularCantidadCheques(){
+        if (this.cheques.inicial > 0 && this.cheques.final > 0){
+          let total               = this.cheques.final - this.cheques.inicial;
+          this.cheques.cantidad   = parseInt(total) + parseInt(1);
+        }else{
+          this.cheques.cantidad   = 0;
+        }
+      },
+      cargarCheques(){
+        this.cheques.load = true;
+        this.$axios.get('cuenta/cheques/'+this.cuenta.id).then((res)=>{
+          this.cheques.data = res.data.cheques;
+          this.cheques.load = false;
+        })
+      },
+      cargarCuentas(){
+        this.Cuentas.load = true;
+        this.$axios.get('contabilidad/2.0/cargando_cuentas/1113').then((res)=>{
+          let fecha = new Date();
+          this.Cuentas.data = res.data.cuentas;
+          this.Cuentas.data.forEach((i)=>{
+            if (i.referencia_id == this.cuenta.id){
+              this.CuentaContable             = i;
+              if (i.registros)
+                this.RegistrosCuentaContable    = JSON.parse(i.registros)
+              else
+                this.RegistrosCuentaContable    = [];
+
+              this.Cuentas.contracuenta_id    = i.id;
+              this.Cuentas.contracuentaString = i.cod+' - '+i.nombre;
+            }
+          })
+          this.Cuentas.load = false;
+          this.partida.push({
+            fecha: fecha.getDate()+'/'+fecha.getMonth()+'/'+fecha.getFullYear(),
+            detalle: '1113 - Bancos '+this.Cuentas.contracuentaString,
+            ref:      this.Cuentas.contracuentaString.split('-')[0],
+          })
+        })
+      },
+      historialT(){
+        this.historial.data  = this.histo;
+
+        let transacciones    = this.histo;
+        if (transacciones.length > 5)
+          this.transacciones = transacciones.filter((item, cont) => cont < 5)
+        else
+          this.transacciones = transacciones;
+      },
+      registrarCheques(){
+        if (this.$refs.FormContabilidadBancoRegistroCheques.validate()){
+          this.$store.commit('activarOverlay', true);
+          this.cheques.dialogo = false;
+          this.$axios.post('cuenta/cheques',{
+            postNum:     this.cheques.postNum,
+            contInicial: this.cheques.inicial,
+            limite:      this.cheques.final,
+            long:        this.cheques.longitud,
+            cuenta_id:   this.cuenta.id,
+            cantidad:    this.cheques.cantidad,
+            saldo:       this.cuenta.total
+          }).then((res)=>{
+            this.cheques.longitud = 0;
+            this.cheques.cantidad = 0;
+            this.cheques.inicial  = 0;
+            this.cheques.final    = 0;
+            this.cheques.postNum  = ''
+            this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
+            this.$nuxt.refresh();
+            setTimeout(()=>{
+              this.cargarCuentas();
+              this.historialT();
+              this.cargarCheques();
+            }, 4500);
+          }).catch((error)=>{
+            this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
+            this.$store.commit('activarOverlay', false);
+            this.cheques.dialogo = true;
+          })
+        }else{
+          this.$store.commit('notificacion',{texto:'Formulario incompleto', color:'warning'});
+        }
+      },
+      registrarMontoInicial(){
+        if (this.cuenta.total <= 0){
+          if (this.$refs.FormCTBancoMontoInicial.validate()){
+            this.$store.commit('activarOverlay', true);
+            this.montoInicial.dialogo = false;
+            this.$axios.put('cuenta/'+this.cuenta.id,{
+              total:     this.montoInicial.total,
+              detalle:   this.montoInicial.detalle,
+              cuenta_id: this.Cuentas.contracuenta_id
+            }).then((res)=>{
+              this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
+              this.montoInicial.total = 0;
+              this.$nuxt.refresh();
+              setTimeout(()=>{
+                this.cargarCuentas();
+                this.cargarCheques();
+                this.historialT();
+              }, 4500);
+            }).catch((error)=>{
+              this.$store.commit('notificacion',{texto:'Hubo un error en el servisor', color:'error'});
+              this.$store.commit('activarOverlay', false);
+              this.montoInicial.dialogo = true;
+            })
+          }else{
+            this.$store.commit('notificacion',{texto:'Tienes que llenar los datos', color:'warning'});
+          }
+        }else{
+          this.$store.commit('notificacion',{texto:'Esta cuenta ya no se le puede ingresar monto inicial', color:'warning'});
+        }
+      },
+      registrarTransferencia(){
+        if (this.$refs.FormContabilidadBancosTransferencias.validate()){
+          this.$store.commit('activarOverlay', true);
+          this.Cuentas.dialogo = false;
+          this.$axios.post('contabilidad/2.0/bancos/cuentas/transferencias',{
+            detalle:            this.Cuentas.detalle,
+            total:              this.Cuentas.total,
+            stringContraCuenta: this.Cuentas.contracuentaString,
+            contraCuenta_id:    this.Cuentas.contracuenta_id,
+            stringCuenta:       this.Cuentas.cuentaString,
+            cuenta_id:          this.Cuentas.cuenta_id,
+            cuenta_banco_id:    this.cuenta.id,
+            cuenta_banco_id2:   this.Cuentas.cuenta_banco_id2
+          }).then((res)=>{
+            this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
+
+            this.Cuentas.cuentaString = '';
+            this.Cuentas.cuenta_id    = '';
+            this.Cuentas.detalle      = '';
+            this.$nuxt.refresh();
+            setTimeout(()=>{
+              this.cargarCuentas();
+              this.historialT();
+            }, 4500);
+          }).catch((error)=>{
+            this.$store.commit('notificacion',{texto:'Hubo un error en el servisor', color:'error'});
+            this.$store.commit('activarOverlay', false);
+            this.Cuentas.dialogo = true;
+          })
+        }else{
+          this.$store.commit('notificacion',{texto:'Hay datos incompletos en el formulario', color:'warning'});
+        }
+      }
+    },
+    asyncData({$axios,route, store}){
+      return $axios.get('cuenta/'+route.params.cuenta).then((res)=>{
+        store.commit('activarOverlay', false);
+        let historial = res.data.cuenta.historial_bancos;
+
+        return{
+          cuenta:        res.data.cuenta,
+          histo:         historial
+        }
+      })
+
+    },
   }
 </script>
 
 <style scoped>
-
+table{
+  width: 100%;
+  border: solid 0.5px #ECECEE;
+  border-collapse: collapse;
+}
+table thead tr th{
+  font-size: 15px;
+  border-right: solid 0.5px #ECECEE;
+  border-bottom: solid 0.5px #ECECEE;
+}
+table tbody tr{
+  cursor: pointer;
+  font-size: 13px;
+}
 </style>

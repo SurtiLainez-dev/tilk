@@ -29,7 +29,7 @@
 
 <script>
 import info from "./info";
-actualizar
+
 import {ipcRenderer} from "electron";
 import actualizar from "./actualizar";
 export default {

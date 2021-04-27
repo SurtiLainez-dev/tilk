@@ -5,7 +5,7 @@
       <v-col class="pl-2 pr-2 pt-2 pb-5">
         <v-card>
           <v-card-title>Datos de la Nota</v-card-title>
-          <hr>
+          <v-divider></v-divider>
           <v-form class="pl-2 pr-2" ref="FormNuevaNotaCreditoProveedor">
             <v-row no-gutters>
               <v-col cols="7" class="pr-2">
@@ -35,7 +35,12 @@
                 <v-btn color="warning" small dark v-if="Nota.tipo === 2" @click="dialogoFactura = true" class="ma-2">Buscar Factura</v-btn>
               </v-col>
             </v-row>
-            <hr>
+            <v-divider></v-divider>
+            <v-radio-group label="Cuenta Contable a Acréditar" v-model="Nota.cc" :rules="[rule.referencia.req]">
+              <v-radio :value="2161" label="Nota de Crédito por Volumen de Compra - 2161"></v-radio>
+              <v-radio :value="2162" label="Nota de Crédito por Garantías - 2162"></v-radio>
+              <v-radio :value="2163" label="Nota de Crédito por Devolución de Mercancias - 2163"></v-radio>
+            </v-radio-group>
           </v-form>
           <v-card-actions class="d-flex justify-end">
             <v-btn color="success" dark small @click="validarForm">Registrar Nota</v-btn>
@@ -59,28 +64,38 @@
               </div></v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col cols="4"></v-col>
+              <v-col cols="4">
+                <small><strong>Cuenta Contable:</strong></small><div class="fontG">
+                <strong v-if="cc">{{cc.cod_dep}} - {{cc.nombre}}</strong>
+                <v-progress-linear indeterminate rounded v-if="loadcc"></v-progress-linear>
+              </div>
+              </v-col>
               <v-col cols="5">
                 <small><strong>Saldo Pendiente:</strong></small><div class="fontG">
-                <strong>L {{Nota.Recalcular.saldoPendiente}}</strong>
+                <strong>L {{int.format(Nota.Recalcular.saldoPendiente)}}</strong>
                 </div>
               </v-col>
               <v-col cols="3">
                 <small><strong>Total de la Factura:</strong></small><div class="fontG">
-                <strong>L {{Nota.Recalcular.totalAntigulo}}</strong>
+                <strong>L {{int.format(Nota.Recalcular.totalAntigulo)}}</strong>
               </div>
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col cols="4"></v-col>
+              <v-col cols="4">
+                <small><strong>Total de la Cuenta Contable:</strong></small><div class="fontG">
+                <strong v-if="cc">L {{int.format(cc.total)}}</strong>
+                <v-progress-linear indeterminate rounded v-if="loadcc"></v-progress-linear>
+              </div>
+              </v-col>
               <v-col cols="5">
                 <small><strong>Total de la Nota:</strong></small><div class="fontG">
-                <strong>L {{Nota.total}}</strong>
+                <strong>L {{int.format(Nota.total)}}</strong>
               </div>
               </v-col>
               <v-col cols="3">
                 <small><strong>Nuevo Saldo:</strong></small><div class="fontG">
-                <strong>L {{Nota.Recalcular.nuevoSaldo}}</strong>
+                <strong>L {{int.format(Nota.Recalcular.nuevoSaldo)}}</strong>
               </div>
               </v-col>
             </v-row>
@@ -109,13 +124,13 @@
               <template v-slot:head(saldo_pendiente)="scope"><div class="text-nowrap">Saldo Pendiente</div></template>
               <template v-slot:head(E_total_a_pagar)="scope"><div class="text-nowrap">Cuota Recalculada</div></template>
               <template v-slot:head(fecha_pago)="scope"><div class="text-nowrap">Fecha de Pago</div></template>
-              <template v-slot:cell(total_a_pagar)="scope">L {{scope.item.total_a_pagar}}</template>
+              <template v-slot:cell(total_a_pagar)="scope">L {{int.format(scope.item.total_a_pagar)}}</template>
               <template v-slot:cell(E_total_a_pagar)="scope">
                 <b-form-input :disabled="scope.item.per" size="sm" v-model="scope.item.E_total_a_pagar"></b-form-input>
               </template>
-              <template v-slot:cell(total_pagado)="scope">L {{scope.item.total_pagado}}</template>
+              <template v-slot:cell(total_pagado)="scope">L {{int.format(scope.item.total_pagado)}}</template>
               <template v-slot:cell(descripcion)="scope"><small>{{scope.item.descripcion}}</small></template>
-              <template v-slot:cell(saldo_pendiente)="scope">L {{scope.item.saldo_pendiente}}</template>
+              <template v-slot:cell(saldo_pendiente)="scope">L {{int.format(scope.item.saldo_pendiente)}}</template>
               <template v-slot:cell(estado)="scope">
                 <v-chip v-if="scope.item.estado === 1" color="orange" dark x-small>Al día</v-chip>
                 <v-chip v-else-if="scope.item.estado === 2" color="success" dark x-small>Cancelado</v-chip>
@@ -295,6 +310,7 @@
   export default {
     data(){
       return{
+        int: new Intl.NumberFormat(),
         dialogoFactura: false,
         dialogoDevoluciones: false,
         rule: {
@@ -327,7 +343,11 @@
             totalAntigulo: 0,
             nuevoSaldo: 0,
             saldoPendiente: 0
-          }
+          },
+          cc:'',
+          proveedor_id: '',
+          proveedor: '',
+          sucursal_id: ''
         },
         Facturas: [],
         searchDevolucion: '',
@@ -366,116 +386,19 @@
           'orden_entrada.sucursal.nombre',
           'orden_entrada.proveedor.nombre',
           'file_generado'
-        ]
+        ],
+        cc: null,
+        loadcc: false,
       }
     },
     created() {
       this.$store.commit('guardarTitulo', 'Contabilidad > Notas de Crédito > Proveedores > Nueva');
+      this.$store.commit('activarOverlay', false);
       this.cargarDevoluciones();
       this.cargarFacturasPendientes();
     },
     name: "nuevo",
     methods:{
-      registrarNota(){
-        this.$store.commit('activarOverlay', true);
-        let data = new FormData();
-        let pagos = JSON.stringify(this.Nota.pagos);
-        //datos de la factura
-        data.append('factura_id', this.Nota.factura_id);
-        data.append('total_nuevo', this.Nota.Recalcular.nuevoSaldo);
-        data.append('pagos', pagos);
-        //datos de la nota
-        data.append('referencia', this.Nota.referencia);
-        data.append('total', this.Nota.total);
-        data.append('concepto', this.Nota.concepto);
-        data.append('file', this.Nota.file);
-        data.append('tipo', this.Nota.tipo);
-        //datos de la devolucion
-        data.append('devolucion_id', this.Nota.devolucion);
-        this.$axios({
-          method: 'post',
-          url: 'notas_credito',
-          data:data,
-          headers:{
-            'Authorization': 'Bearer ' + this.$store.state.token,
-            'Content-Type': "multipart/form-data"
-          }
-        }).then((res)=>{
-          this.$store.commit('activarOverlay', false);
-          this.$router.replace({path:'/contabilidad/notas_credito/proveedor'});
-          Swal.fire(
-            'Registro Exitoso',
-            `Se ha registrado la nota de crédito, el total y los pagos de la factura ${this.Nota.numFactura}
-            se han editado exitosamente`,
-            'success'
-          );
-        })
-      },
-      validarForm(){
-        if (this.$refs.FormNuevaNotaCreditoProveedor.validate() && this.Nota.isRevisado)
-          this.registrarNota()
-        else{
-          Swal.fire(
-            'Error en la Validación',
-            `No se ha validado el formulario o te hace falta aceptar los pagos modificados.`,
-            'error'
-          );
-        }
-      },
-      revisadoPagos(){
-          Swal.fire({
-            title: `Verificar Pagos`,
-            html: `Los pagos de la factura ${this.Nota.numFactura} se van a editar y guardar con los nuevos pagos que se recalcularon`,
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: `Aprobar Pagos`,
-            denyButtonText: `Cerrar`,
-          }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-              this.Nota.isRevisado = true
-            }
-          })
-      },
-      recalcularSaldo(){
-        this.Nota.recalculado = true;
-        let coutasPendientes = 0,nuevoSaldo = 0, totalCuota= 0;
-        nuevoSaldo = (parseFloat(this.Nota.Recalcular.saldoPendiente) - parseFloat(this.Nota.total)).toFixed(2);
-        this.Nota.pagos.forEach( (i) => {
-          if (i.estado != 2 && i.estado != 4)
-            coutasPendientes++
-        });
-        totalCuota = (parseFloat(nuevoSaldo) / parseInt(coutasPendientes)).toFixed(2);
-        this.Nota.Recalcular.nuevoSaldo = nuevoSaldo;
-        this.Nota.pagos.forEach( (i) => {
-          if (i.estado != 2 && i.estado != 4)
-            i.E_total_a_pagar = totalCuota
-        });
-      },
-      onRowSelectedFacturas(items){
-        this.dialogoFactura                 = false;
-        this.Nota.factura_id                = items[0].id;
-        this.Nota.numFactura                = items[0].num_factura;
-        this.Nota.Recalcular.totalAntigulo  = items[0].total;
-        this.Nota.Recalcular.saldoPendiente = items[0].saldo_pendiente;
-        this.Nota.data                      = items[0];
-        this.asignarPago(items[0].pagos_facturas);
-      },
-      onRowSelected(items){
-        if (items.length > 0 ){
-          if (items[0].orden_entrada.factura_proveedor){
-            this.dialogoDevoluciones            = false;
-            this.Nota.factura_id                = items[0].orden_entrada.factura_proveedor.id;
-            this.Nota.numFactura                = items[0].orden_entrada.factura_proveedor.num_factura;
-            this.Nota.Recalcular.totalAntigulo  = items[0].orden_entrada.factura_proveedor.total;
-            this.Nota.Recalcular.saldoPendiente = items[0].orden_entrada.factura_proveedor.saldo_pendiente;
-            this.Nota.data                      = items[0];
-            this.Nota.devolucion                = items[0].id;
-            console.log(items)
-            this.asignarPago(items[0].orden_entrada.factura_proveedor.pagos_facturas)
-          }
-        }
-      },
       asignarPago(pagos){
         this.Nota.pagos = [];
         this.Nota.recalculado = false;
@@ -499,6 +422,157 @@
             "per":             per
           })
         })
+      },
+      cargarCuentaContable(){
+        this.loadcc = true;
+        this.$store.$axios.post('contabilidad/2.0/busqueda_cc_dep', {
+          tabla1:  'proveedors',
+          tabla2:  'factura_proveedors',
+          id1:     this.Nota.proveedor_id,
+          id2:     this.Nota.factura_id,
+          cod_dep: 2111
+        }).then((res)=>{
+          this.cc     = res.data.cc;
+          this.loadcc = false;
+        })
+      },
+      cargarDevoluciones(){
+        this.$axios.get('devoluciones_proveedor/pendientes',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          this.Devoluciones = res.data.devoluciones;
+        })
+      },
+      cargarFacturasPendientes(){
+        this.$axios.get('facturas_proveedor/pendientes',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          this.Facturas = res.data.facturas;
+        })
+      },
+      onRowSelected(items){
+        if (items.length > 0 ){
+          if (items[0].orden_entrada.factura_proveedor){
+            this.dialogoDevoluciones            = false;
+            this.Nota.factura_id                = items[0].orden_entrada.factura_proveedor.id;
+            this.Nota.numFactura                = items[0].orden_entrada.factura_proveedor.num_factura;
+            this.Nota.Recalcular.totalAntigulo  = items[0].orden_entrada.factura_proveedor.total;
+            this.Nota.Recalcular.saldoPendiente = items[0].orden_entrada.factura_proveedor.saldo_pendiente;
+            this.Nota.data                      = items[0];
+            this.Nota.devolucion                = items[0].id;
+            this.Nota.proveedor_id              = items[0].orden_entrada.proveedor_id;
+            this.Nota.proveedor                 = items[0].orden_entrada.proveedor.nombre;
+            this.Nota.sucursal_id               = items[0].orden_entrada.sucursal_id;
+            this.asignarPago(items[0].orden_entrada.factura_proveedor.pagos_facturas)
+            this.cargarCuentaContable();
+          }
+        }
+      },
+      onRowSelectedFacturas(items){
+        this.dialogoFactura                 = false;
+        this.Nota.factura_id                = items[0].id;
+        this.Nota.numFactura                = items[0].num_factura;
+        this.Nota.Recalcular.totalAntigulo  = items[0].total;
+        this.Nota.Recalcular.saldoPendiente = items[0].saldo_pendiente;
+        this.Nota.data                      = items[0];
+        this.Nota.proveedor_id              = items[0].orden_entrada.proveedor_id;
+        this.Nota.proveedor                 = items[0].orden_entrada.proveedor.nombre;
+        this.Nota.sucursal_id               = items[0].orden_entrada.sucursal_id;
+
+        this.asignarPago(items[0].pagos_facturas);
+        this.cargarCuentaContable();
+      },
+      recalcularSaldo(){
+        this.Nota.recalculado = true;
+        let coutasPendientes = 0,nuevoSaldo = 0, totalCuota= 0;
+        nuevoSaldo = (parseFloat(this.Nota.Recalcular.saldoPendiente) - parseFloat(this.Nota.total)).toFixed(2);
+        this.Nota.pagos.forEach( (i) => {
+          if (i.estado != 2 && i.estado != 4)
+            coutasPendientes++
+        });
+        totalCuota = (parseFloat(nuevoSaldo) / parseInt(coutasPendientes)).toFixed(2);
+        this.Nota.Recalcular.nuevoSaldo = nuevoSaldo;
+        let saldoResta = nuevoSaldo;
+        this.Nota.pagos.forEach( (i) => {
+          if (i.estado != 2 && i.estado != 4) {
+            i.E_total_a_pagar = totalCuota;
+            i.saldo_pendiente = (saldoResta - totalCuota).toFixed(2);
+            saldoResta = saldoResta - totalCuota;
+          }
+        });
+      },
+      registrarNota(){
+        this.$store.commit('activarOverlay', true);
+        let data = new FormData();
+        let pagos = JSON.stringify(this.Nota.pagos);
+        //datos de la factura
+        data.append('factura_id', this.Nota.factura_id);
+        data.append('total_nuevo', this.Nota.Recalcular.nuevoSaldo);
+        data.append('pagos', pagos);
+        data.append('nombre_proveedor', this.Nota.proveedor);
+        //datos de la nota
+        data.append('referencia', this.Nota.referencia);
+        data.append('total', this.Nota.total);
+        data.append('concepto', this.Nota.concepto);
+        data.append('file', this.Nota.file);
+        data.append('tipo', this.Nota.tipo);
+        //datos de la devolucion
+        data.append('devolucion_id', this.Nota.devolucion);
+        //cc
+        data.append('ccProveedor', this.cc.id);
+        data.append('ccNota',      this.Nota.cc);
+        data.append('sucursal_id',      this.Nota.sucursal_id);
+        this.$axios({
+          method: 'post',
+          url: 'notas_credito',
+          data:data,
+          headers:{
+            'Authorization': 'Bearer ' + this.$store.state.token,
+            'Content-Type': "multipart/form-data"
+          }
+        }).then((res)=>{
+          this.$store.commit('activarOverlay', false);
+          this.$router.replace({path:'/contabilidad/notas_credito/proveedor'});
+          Swal.fire(
+            'Registro Exitoso',
+            `Se ha registrado la nota de crédito, el total y los pagos de la factura ${this.Nota.numFactura}
+            se han editado exitosamente`,
+            'success'
+          );
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
+        })
+      },
+      revisadoPagos(){
+        Swal.fire({
+          title: `Verificar Pagos`,
+          html: `Los pagos de la factura ${this.Nota.numFactura} se van a editar y guardar con los nuevos pagos que se recalcularon`,
+          showDenyButton: true,
+          showCancelButton: true,
+          confirmButtonText: `Aprobar Pagos`,
+          denyButtonText: `Cerrar`,
+        }).then((result) => {
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+            this.Nota.isRevisado = true
+          }
+        })
+      },
+      validarForm(){
+        if (this.$refs.FormNuevaNotaCreditoProveedor.validate() && this.Nota.isRevisado)
+          this.registrarNota()
+        else{
+          Swal.fire(
+            'Error en la Validación',
+            `No se ha validado el formulario o te hace falta aceptar los pagos modificados.`,
+            'error'
+          );
+        }
       },
       verDocumento(ubicacion, val){
         this.$store.commit('activarOverlay', true);
@@ -527,24 +601,6 @@
           else
             this.dialogoFactura = true;
           this.$store.commit('activarOverlay', false);
-        })
-      },
-      cargarDevoluciones(){
-        this.$axios.get('devoluciones_proveedor/pendientes',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          this.Devoluciones = res.data.devoluciones;
-        })
-      },
-      cargarFacturasPendientes(){
-        this.$axios.get('facturas_proveedor/pendientes',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          this.Facturas = res.data.facturas;
         })
       }
     }

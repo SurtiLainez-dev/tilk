@@ -73,6 +73,7 @@
       }
     },
     created() {
+      this.$store.commit('activarOverlay', false);
       this.$store.commit('guardarTitulo', 'Inicio')
       this.$store.commit('valorDialogo', false);
     },

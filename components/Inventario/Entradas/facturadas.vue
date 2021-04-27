@@ -202,6 +202,19 @@
       this.cargarEstados()
     },
     methods:{
+      addFila(){
+        let fila = this.Ingreso.articulo.length
+        this.Ingreso.articulo.push({
+          "is":       false,"revisado": false,
+          "articulo": '',
+          "cantidad": 1,
+          "estado":   1,
+          "fila":     fila,
+          "isCompuesto": false,
+          "rCompuestos": [],
+          "descripcion": '',
+        })
+      },
       abrirModalCompuesto(item){
         this.compuestos = item.rCompuestos
         this.modalCompuesto = true
@@ -210,6 +223,53 @@
       abrirModalIncentario(item){
         this.modalIventario = true;
         this.modalId = item.fila
+      },
+      cargarColaborador(){
+        this.$axios.get('colaboradores_suc/'+this.Ingreso.sucursal,{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.Colaboradores = res.data.col
+            this.isLoadCol = true
+          }
+        })
+      },
+      cargarInventario(){
+        this.Ingreso.articulo = [
+          {
+            is: false, revisado:false,
+            articulo: '',
+            cantidad: 1,
+            descripcion:'',
+            estado:   1,
+            fila: 0,
+            isCompuesto: false,
+            rCompuestos: []
+          }
+        ]
+        this.$axios.get('inventario/'+this.Ingreso.proveedor,{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status == 200){
+            this.Inventario = res.data.inventario
+            this.cargarArticulo = true
+          }
+        })
+      },
+      cargarEstados(){
+        this.$axios.get('estados_articulos',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.Estados = res.data.estados
+          }
+        })
       },
       registrarFila(tr){
         this.Ingreso.articulo[this.modalId].articulo = tr.id;
@@ -238,10 +298,6 @@
         }
         this.modalIventario = false
       },
-      validate(){
-        if (this.$refs.FormNuevoIngresoFacturado.validate())
-          this.registrarOrden()
-      },
       registrarOrden(){
         this.$store.commit('activarOverlay', true);
         this.$axios.post('ordenes_entrada', {
@@ -257,22 +313,11 @@
           if (res.status === 200){
             this.$store.commit('activarOverlay', false);
             Swal.fire(
-              'Registro Exitoso',
-              `La orden de ingreso manual se ha creado exitosamente.`,
-              'success'
+                'Registro Exitoso',
+                `La orden de ingreso manual se ha creado exitosamente.`,
+                'success'
             )
             this.$router.replace({path:'/inventario/'})
-          }
-        })
-      },
-      cargarEstados(){
-        this.$axios.get('estados_articulos',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.Estados = res.data.estados
           }
         })
       },
@@ -286,54 +331,9 @@
           }
         }
       },
-      cargarInventario(){
-        this.Ingreso.articulo = [
-          {
-            is: false, revisado:false,
-            articulo: '',
-            cantidad: 1,
-            descripcion:'',
-            estado:   1,
-            fila: 0,
-            isCompuesto: false,
-            rCompuestos: []
-          }
-        ]
-        this.$axios.get('inventario/'+this.Ingreso.proveedor,{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status == 200){
-            this.Inventario = res.data.inventario
-            this.cargarArticulo = true
-          }
-        })
-      },
-      addFila(){
-        let fila = this.Ingreso.articulo.length
-        this.Ingreso.articulo.push({
-          "is":       false,"revisado": false,
-          "articulo": '',
-          "cantidad": 1,
-          "estado":   1,
-          "fila":     fila,
-          "isCompuesto": false,
-          "rCompuestos": [],
-          "descripcion": '',
-        })
-      },
-      cargarColaborador(){
-        this.$axios.get('colaboradores_suc/'+this.Ingreso.sucursal,{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.Colaboradores = res.data.col
-            this.isLoadCol = true
-          }
-        })
+      validate(){
+        if (this.$refs.FormNuevoIngresoFacturado.validate())
+          this.registrarOrden()
       },
     }
   }

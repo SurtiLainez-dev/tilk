@@ -21,7 +21,7 @@
           <v-chip v-else color="warning">Sin Acciones</v-chip>
         </template>
         <template v-slot:item.total="{item}">
-          L. {{item.total}}
+          L. {{int.format(item.total)}}
         </template>
       </v-data-table>
     </v-card>
@@ -35,6 +35,7 @@
     },
     data(){
       return{
+        int: new Intl.NumberFormat(),
         search: '',
         header:[
           {text:'Código',value:'codigo'},

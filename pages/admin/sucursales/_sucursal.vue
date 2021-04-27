@@ -104,11 +104,13 @@
                   <v-col cols="5">
                     <v-text-field v-model="datosSucursal.abreviatura"
                                   :rules="[rules.abreviatura.req,rules.abreviatura.min,rules.abreviatura.max]"
-                                  label="Abreviatura" counter="5" required></v-text-field>
+                                  label="Abreviatura" counter="5" required>
+                    </v-text-field>
                   </v-col>
                   <v-col cols="7">
                     <v-text-field v-model="datosSucursal.email" :rules="rules.email"
-                                  label="E-mail" required></v-text-field>
+                                  label="E-mail" required>
+                    </v-text-field>
                   </v-col>
                 </v-row>
                 <v-row>
@@ -232,10 +234,12 @@
     },
     created() {
       this.$store.commit('guardarTitulo', 'Sucursal > '+this.datosSucursal.nombre)
-      if (this.datosSucursal.isContable === 1)
-        this.datosSucursal.isContable = true
-      else
-        this.datosSucursal.isContable = false
+      this.datosSucursal.isContable = this.datosSucursal.isContable === 1;
+
+      if (!this.datosSucursal.telefono)
+        this.datosSucursal.telefono = '';
+      if (!this.datosSucursal.email)
+        this.datosSucursal.email= '';
     },
     asyncData({$axios, store, route}){
       return $axios.get('/sucursales/'+route.params.sucursal,{

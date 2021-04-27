@@ -1,6 +1,6 @@
 <template>
   <v-container class="pl-2 pr-2 d-flex justify-center">
-    <v-card width="1000px" class="pl-2">
+    <v-card :height="CUENTAS.length > 4? '100%':'500px'" width="1000px" class="pl-2">
       <v-row>
         <v-col cols="7"><v-card-title>Bancos Afiliados</v-card-title></v-col>
         <v-col cols="5" class="d-flex justify-end">
@@ -15,17 +15,17 @@
                         label="Buscar cuenta" single-line hide-details></v-text-field>
         </v-col>
       </v-row>
-      <v-data-table :items-per-page="10" :items="Cuentas" :search="search" @click:row="irCuenta"
-                    :headers="header" :loading="isPeticion" class="rowsTable"
+      <v-data-table :items-per-page="10" :items="CUENTAS" :search="search" @click:row="irCuenta"
+                    :headers="header" :loading="LOAD_CUENTAS" class="rowsTable"
                     loading-text="Cargando cuentas... por favor espere un momento">
         <template v-slot:item.total="{item}">
-          L. {{item.total}}
+          L. {{int.format(item.total)}}
         </template>
       </v-data-table>
     </v-card>
 
 
-    <v-navigation-drawer v-model="side" right absolute width="450px" id="side">
+    <v-navigation-drawer v-model="side" right absolute height="98%" width="450px" id="side">
       <v-card class="pl-2 pr-2" height="100%" color="black" dark>
         <v-row>
           <v-col class="d-flex justify-start" cols="2">
@@ -58,6 +58,10 @@
             <v-text-field v-model="cuenta.num" :rules="[rule.required, rule.min, rule.maxB]"
                           label="Número de Cuenta" required :counter="30">
             </v-text-field>
+            <v-text-field v-model="cuenta.descr" :rules="[rule.required, rule.min]"
+                          hint="No escriba el número de cuenta"
+                          label="Descripción de la Cuenta en el Catalogo Contable" required :counter="30">
+            </v-text-field>
             <v-row>
               <v-col class="d-flex justify-end">
                 <v-btn color="deep-orange" small @click="registrarBanco" dark>Registrar Banco</v-btn>
@@ -87,8 +91,17 @@
       },
     },
     name: "bancos",
+    computed:{
+      CUENTAS(){
+        return this.$store.state.contabilidad.bancos.CUENTAS;
+      },
+      LOAD_CUENTAS(){
+        return this.$store.state.contabilidad.bancos.LOADCUENTAS;
+      }
+    },
     data(){
       return{
+        int: new Intl.NumberFormat(),
         overlay: false,
         opcionesTipo:[
           {'id':1, 'nombre': 'Ahorro'},
@@ -110,28 +123,28 @@
           {text:'Número de Cuenta', value:'num'},
           {text:'Total', value:'total'},
         ],
-        Cuentas:     [],
-        isPeticion:  true,
         tiposCuenta: null,
         Bancos:      null,
         nombreBanco: '',
         cuenta:      {
           tipo:  '',
           num:   '',
-          banco: ''
+          banco: '',
+          descr: ''
         },
-        nombreBanco: null,
         erroresSer:  []
       }
     },
     created() {
+      this.$store.commit('activarOverlay', false)
       this.$store.commit('guardarTitulo', 'Contabilidad > Bancos')
-      this.cargarCuentas()
+      this.$store.commit('contabilidad/bancos/cargar_CUENTAS');
       this.tipoCuenta();
       this.cargarBancos();
     },
     methods:{
       irCuenta(val){
+        this.$store.commit('activarOverlay', true);
         this.$router.replace({path:'/contabilidad/bancos/cuentas/sl/'+val.id})
       },
       cerrarSide(){
@@ -152,9 +165,10 @@
           this.erroresSer = []
           this.overlay = true
           this.$axios.post('cuentas',{
-            tipo:  this.cuenta.tipo,
-            banco: this.cuenta.banco,
-            num:   this.cuenta.num
+            tipo:        this.cuenta.tipo,
+            banco:       this.cuenta.banco,
+            num:         this.cuenta.num,
+            descripcion: this.cuenta.descr
           },{
             headers: {
               'Authorization': 'Bearer ' + this.$store.state.token
@@ -167,7 +181,7 @@
                 `La cuenta ${this.cuenta.num} se ha registrado exitosamente.`,
                 'success'
               )
-              this.cargarCuentas();
+              this.$store.commit('contabilidad/bancos/cargar_CUENTAS');
               this.cuenta.tipo = '';
               this.cuenta.banco ='';
               this.cuenta.num = ''
@@ -179,18 +193,6 @@
             }
           })
         }
-      },
-      cargarCuentas(){
-        this.$axios.get('cuentas', {
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.isPeticion = false
-            this.Cuentas = res.data.cuentas
-          }
-        })
       },
       guardarBanco(){
         if (this.$refs.FormNuevoBanco.validate()){

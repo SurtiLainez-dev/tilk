@@ -1,4 +1,3 @@
-import Swal from "sweetalert2";
 <template>
     <v-container class="pl-2 pr-2">
       <v-card>
@@ -71,40 +70,61 @@ import Swal from "sweetalert2";
         </v-data-table>
       </v-card>
 
-      <v-dialog v-model="popupPago" width="700px">
+      <v-dialog v-model="popupPago" width="90%">
         <v-card class="pl-5 pr-5">
           <v-card-title>Pagando a {{Pago.nombreCompleto}}</v-card-title>
           <v-divider></v-divider>
           <v-form ref="FormPagoPlanilla">
-            <v-row class="pl-2 pr-2">
-              <v-col md="5" cols="12">
-                <v-select disabled label="Selecione un banco" ></v-select>
+            <v-row no-gutters>
+              <v-col cols="4">
+                <v-select :items="cuentas.data" :loading="cuentas.load" label="Cunta de Banco" :rules="[req.req]"
+                          @change="capturarCuentaBanco" class="ma-2" v-model="cuentas.cuenta">
+                </v-select>
               </v-col>
-              <v-col md="4" cols="12">
-                <v-select disabled label="Selecione una cuenta" ></v-select>
+              <v-col cols="2">
+                <v-text-field v-model="cuentas.total" class="ma-2" :rules="[req.req]"
+                              disabled label="Total de la Cuenta" prefix="L">
+                </v-text-field>
               </v-col>
-              <v-col md="3" cols="12">
-                <v-text-field  v-model="Pago.montoPagar" disabled label="Monto a Pagar"></v-text-field>
+              <v-col cols="2">
+                <v-text-field v-model="Pago.montoPagar" class="ma-2" :rules="[req.req]"
+                              disabled label="Total del Pago" prefix="L">
+                </v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field label="Cuenta Contable" class="ma-2" :rules="[req.req]"
+                              disabled v-model="ccBancos.nombre">
+                </v-text-field>
               </v-col>
             </v-row>
+
             <v-row class="pl-2 pr-2">
-              <v-col md="5"cols="12">
+              <v-col md="4" cols="12">
+                <v-text-field v-model="ccColaboradores.nombre" label="Cuenta Contable Sueldo y Salarios"
+                              :rules="[req.req]" disabled>
+                </v-text-field>
+                <v-progress-linear indeterminate v-if="ccColaboradores.load"></v-progress-linear>
+              </v-col>
+              <v-col md="4"cols="12">
                 <v-text-field  v-model="Pago.referencia" :rules="[req.req, req.max]" :counter="25"
                                label="Referencia de Pago"></v-text-field>
               </v-col>
-              <v-col md="7"cols="12">
+              <v-col md="4"cols="12">
                 <v-file-input  accept="application/pdf, image/*" v-model="Pago.file"
                                :rules="[req.req]" label="Comprobante de Pago en PDF"></v-file-input>
               </v-col>
             </v-row>
+            <v-divider></v-divider>
             <v-row>
               <v-col class="d-flex justify-end">
-                <v-btn small color="orange" dark @click="validate">Registrar Pago</v-btn>
+                <v-btn small tile class="ma-2" color="orange" dark @click="popupPago = false">Cerrar</v-btn>
+                <v-btn small tile class="ma-2" color="success" dark @click="validate">Registrar Pago</v-btn>
               </v-col>
             </v-row>
           </v-form>
         </v-card>
       </v-dialog>
+
       <v-dialog v-model="popupInicio" width="600px">
         <v-card class="pl-5 pr-5">
           <v-progress-linear indeterminate color="green" v-if="isPeticion"></v-progress-linear>
@@ -203,6 +223,7 @@ import Swal from "sweetalert2";
 </template>
 
 <script>
+
   import { ipcRenderer } from 'electron'
   import Swal from 'sweetalert2'
   export default {
@@ -261,55 +282,37 @@ import Swal from "sweetalert2";
           cargando: false,
           referencia: 'cargando...',
           obs: 'cargando...'
+        },
+        cuentas:{
+          load:   true,
+          data:   [],
+          cuenta: '',
+          id:     '',
+          total:  0
+        },
+        ccBancos:{
+          load:   true,
+          data:   [],
+          id:     '',
+          nombre: ''
+        },
+        ccColaboradores:{
+          load:   true,
+          data:   [],
+          id:     '',
+          nombre: ''
         }
       }
     },
     created() {
+      this.$store.commit('activarOverlay', false);
       this.$store.commit('guardarTitulo', 'Contabilidad > Planillas > Pagos')
       this.isPeticion = true
-      this.cargarInfo()
+      this.cargarInfo();
+      this.cargarCuentas();
+      this.cargarCuentasContables(1113);
     },
     methods:{
-      verPdf(){
-        ipcRenderer.send('open-nav', this.urlPago)
-      },
-      validate(){
-        if (this.$refs.FormPagoPlanilla.validate())
-          this.registrarPago()
-      },
-      registrarPago(){
-        this.overlay = true
-        this.popupPago = false
-        let data = new FormData()
-        this.isPago = true
-        data.append('cuerpo', this.Pago.cuerpoId);
-        data.append('referencia', this.Pago.referencia);
-        data.append('observacion', this.Pago.observacion);
-        data.append('planilla', this.Pago.planilla);
-        data.append('foto', this.Pago.file);
-        this.$axios({
-          method: 'post',
-          url:    'pagos',
-          data:   data,
-          headers:{
-            'Authorization': 'Bearer ' + this.$store.state.token,
-            'Content-Type': "multipart/form-data"
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.overlay = false
-            Swal.fire(
-              'Registro Exitoso',
-              `El pago se registró exitosamente en la base de datos.`,
-              'success'
-            )
-            this.cargarColaboradores()
-            this.Pago.file = null
-            this.Pago.referencia = null
-            this.isPago = false
-          }
-        })
-      },
       abrirModalPagado(tr){
         this.Pago.nombreCompleto = tr.nombres+' '+tr.apellidos
         this.Pago.identidad = tr.identidad
@@ -329,8 +332,29 @@ import Swal from "sweetalert2";
         this.Pago.observacion = `Pagando a ${this.Pago.nombreCompleto} ${tr.total_pagar} lps de planilla ${tr.codigo}`
         this.popupPago = true
       },
+      capturarCuentaBanco(){
+        this.cuentas.id    = this.cuentas.cuenta.split('-')[0];
+        this.cuentas.total = this.cuentas.cuenta.split('-')[4];
+        this.ccBancos.data.forEach((i)=>{
+          if (i.referencia_id == this.cuentas.id){
+            this.ccBancos.id     = i.id;
+            this.ccBancos.nombre = i.cod+' - '+i.nombre;
+          }
+        })
+      },
+      capturaCuentaColaborador(){
+        this.ccColaboradores.data.forEach((i)=>{
+          if (i.referencia_id == this.Consulta.sucursal){
+            this.ccColaboradores.id     = i.id;
+            this.ccColaboradores.nombre = i.cod+' - '+i.nombre;
+            this.ccColaboradores.load   = false;
+          }
+        })
+      },
       cargarColaboradores(){
-        this.isPeticion = true
+        this.isPeticion = true;
+        this.$store.commit('activarOverlay', true);
+        this.popupInicio = false;
         this.$axios.get(`revision_planillas/${this.Consulta.anio}/${this.Consulta.mes}/${this.Consulta.sucursal}`,{
           headers:{
             'Authorization': 'Bearer '+ this.$store.state.token,
@@ -339,8 +363,39 @@ import Swal from "sweetalert2";
           if (res.status === 200){
             this.isPeticion = false
             this.Colaboradores = res.data.col
-            this.popupInicio = false
+            this.$store.commit('activarOverlay', false);
+            this.cargarCuentasContables(2151);
+          }
+        })
+      },
+      cargarCuentas(){
+        this.$axios.get('cuentas',{
+          headers:{
+            'Authorization': 'Bearer '+ this.$store.state.token
+          }
+        }).then((res)=>{
+          res.data.cuentas.forEach((i)=>{
+            this.cuentas.data.push({
+              value: i.id+' - '+i.num+' - '+i.tipo.nombre+' - '+i.banco.nombre+' - '+i.total,
+              text: i.num+' - '+i.tipo.nombre+' - '+i.banco.nombre
+            })
+          });
+          this.cuentas.load = false;
+        })
+      },
+      cargarCuentasContables(val){
+        if (val === 1113)
+          this.ccBancos.load          = true;
+        else if (val === 2151)
+          this.ccColaboradores.load   = true;
 
+        this.$axios.get('contabilidad/2.0/cargando_cuentas/'+val).then((res)=>{
+          if (val === 1113) {
+            this.ccBancos.data        = res.data.cuentas;
+            this.ccBancos.load        = false;
+          }else if (val === 2151){
+            this.ccColaboradores.data = res.data.cuentas;
+            this.capturaCuentaColaborador();
           }
         })
       },
@@ -376,6 +431,52 @@ import Swal from "sweetalert2";
             this.cargaPago.cargando = true
           }
         })
+      },
+      registrarPago(){
+        this.overlay = true
+        this.popupPago = false
+        let data = new FormData()
+        this.isPago = true
+        data.append('cuerpo',      this.Pago.cuerpoId);
+        data.append('referencia',  this.Pago.referencia);
+        data.append('observacion', this.Pago.observacion);
+        data.append('planilla',    this.Pago.planilla);
+        data.append('foto',        this.Pago.file);
+        data.append('ccBanco',     this.ccBancos.id);
+        data.append('ccCol',       this.ccColaboradores.id);
+        data.append('total',       this.Pago.montoPagar);
+        data.append('cuenta_id',   this.cuentas.id);
+        this.$axios({
+          method: 'post',
+          url:    'pagos',
+          data:   data,
+          headers:{
+            'Authorization': 'Bearer ' + this.$store.state.token,
+            'Content-Type': "multipart/form-data"
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.overlay = false
+            Swal.fire(
+                'Registro Exitoso',
+                `El pago se registró exitosamente en la base de datos.`,
+                'success'
+            )
+            this.cargarColaboradores()
+            this.Pago.file = null
+            this.Pago.referencia = null
+            this.isPago = false
+          }
+        }).catch((error)=>{
+          this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
+        })
+      },
+      validate(){
+        if (this.$refs.FormPagoPlanilla.validate())
+          this.registrarPago()
+      },
+      verPdf(){
+        ipcRenderer.send('open-nav', this.urlPago)
       }
     }
   }

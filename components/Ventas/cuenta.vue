@@ -2,7 +2,7 @@
 <v-card flat>
   <v-row>
     <v-col cols="2">
-      <v-card height="366" width="256" class="mx-auto">
+      <v-card height="410" width="256" class="mx-auto">
         <v-navigation-drawer permanent>
           <v-list dense nav>
             <v-list-item v-for="item in items" :key="item.title" link @click="cambiarDatosMenu(item)">
@@ -30,7 +30,9 @@
         <pago_nuevo             v-else-if="VISTA === 4"/>
         <pagos_agregados_cuenta v-else-if="VISTA === 5"/>
         <pagos_cuenta           v-else-if="VISTA === 6"/>
+        <estado_cuenta          v-else-if="VISTA === 7"/>
         <orden_entrega          v-else-if="VISTA === 8"/>
+        <recibos                v-else-if="VISTA === 9"/>
       </v-card>
     </v-col>
   </v-row>
@@ -46,6 +48,8 @@ import pago_nuevo from "./cuentas/pago_nuevo";
 import pagos_agregados_cuenta from "./cuentas/pagos_agregados_cuenta";
 import articulos_contado from "./cuentas/articulos_contado";
 import orden_entrega from "./cuentas/orden_entrega";
+import estado_cuenta from "./cuentas/estado_cuenta";
+import recibos from "./cuentas/recibos";
 export default {
   components:{
     datos_cuenta,
@@ -54,21 +58,24 @@ export default {
     pagos_cuenta, pago_nuevo,
     pagos_agregados_cuenta,
     articulos_contado,
-    orden_entrega
+    orden_entrega,
+    estado_cuenta,
+    recibos
   },
   name: "cuenta",
   data(){
     return{
       tituloMenu: 'Datos',
       items: [
-        { title: 'Datos',             val:1},
-        { title: 'Cliente',           val:2},
-        { title: 'Artículo',          val:3 },
-        { title: 'Agregar Pagos',     val:4 },
+        { title: 'Datos',                 val:1},
+        { title: 'Cliente',               val:2},
+        { title: 'Artículo',              val:3 },
+        { title: 'Agregar Pagos',         val:4 },
         { title: 'Documentos x Cobrar',   val:5 },
-        { title: 'Pagos a la Cuenta', val:6 },
-        { title: 'Estado de Cuenta',  val:7 },
-        { title: 'Orden de Entrega',  val:8 },
+        { title: 'Pagos a la Cuenta',     val:6 },
+        { title: 'Estado de Cuenta',      val:7 },
+        { title: 'Orden de Entrega',      val:8 },
+        { title: 'Documentos',            val:9 },
       ],
       vistaMenu: 1
     }

@@ -6,7 +6,8 @@
           <div class="pl-3 pr-3 bordes">
             <v-row >
               <v-col cols="4">
-                <v-select v-model="Orden.proveedor" :items="Proveedores" :item-value="'id'" :rules="[rule.req]"
+                <v-select v-model="Orden.proveedor" :items="Proveedores" :item-value="'id'"
+                          :rules="[rule.req]" :loading="loadProveedor" :loader-height="2"
                           :item-text="'nombre'" @change="cargarInventario" label="Proveedor"></v-select>
               </v-col>
               <v-col cols="4">
@@ -14,7 +15,7 @@
                           :item-value="'id'" label="Sucursal de Entrada" :rules="[rule.req]"></v-select>
               </v-col>
               <v-col class="d-flex align-center justify-center">
-                <h1>L. <strong>{{totales.totalF}}</strong></h1>
+                <h1>L. <strong>{{int.format(totales.totalF)}}</strong></h1>
               </v-col>
             </v-row>
           </div>
@@ -85,9 +86,9 @@
           <div class="bordes">
             <v-row>
               <v-col cols="3" class="d-flex justify-center"><small>Total de Artículo: <strong>{{totales.cantidad}}</strong></small></v-col>
-              <v-col cols="3" class="d-flex justify-center"><small>Total: <strong>L. {{totales.total}}</strong></small></v-col>
-              <v-col cols="3" class="d-flex justify-center"><small>Total de Impuestos: <strong>L. {{totales.impuesto}}</strong></small></v-col>
-              <v-col cols="3" class="d-flex justify-center"><small>Total Final: <strong>L. {{totales.totalF}}</strong></small></v-col>
+              <v-col cols="3" class="d-flex justify-center"><small>Total: <strong>L. {{int.format(totales.total)}}</strong></small></v-col>
+              <v-col cols="3" class="d-flex justify-center"><small>Total de Impuestos: <strong>L. {{int.format(totales.impuesto)}}</strong></small></v-col>
+              <v-col cols="3" class="d-flex justify-center"><small>Total Final: <strong>L. {{int.format(totales.totalF)}}</strong></small></v-col>
             </v-row>
             <v-divider></v-divider>
             <v-row>
@@ -112,7 +113,7 @@
           <v-data-table :headers="header" :items-per-page="10"
                         :items="Inventario" class="rowsTable" :search="search">
             <template v-slot:item.precio_costo="{item}">
-              L. {{item.precio_costo}}
+              L. {{int.format(item.precio_costo)}}
             </template>
             <template v-slot:item.id="{item}">
               <v-btn color="success" @click="registrarFila(item)" small dark>Seleccionar</v-btn>
@@ -143,6 +144,7 @@
     },
     data(){
       return{
+        int: new Intl.NumberFormat(),
         overlay: false,
         search: '',
         rule:{
@@ -159,18 +161,18 @@
           {text:'Precio Costo', value:'precio_costo'},
           {text:'Seleccionar', value:'id'},
         ],
-        Proveedores: null,
+        Proveedores: [],
         isLoad: false,
         Orden:{
-          proveedor: null,
-          sucursal: null,
+          proveedor: '',
+          sucursal: '',
           Articulos: [
             {fila:0, articulo:'', required:false, requiredC: false, cantidad:1, impuesto:15, precio:0, total:0, precio_s:0,art: null}
           ]
         },
         error: false,
         errorRequired:'Este campo no puede quedar vacio',
-        Sucursales: null,
+        Sucursales: [],
         Inventario: [],
         isPeticion: false,
         modalInventario: false,
@@ -183,7 +185,8 @@
         },
         msgPrompt: null,
         isPrompt: false,
-        redirectOrden: null
+        redirectOrden: null,
+        loadProveedor: false
       }
     },
     created() {
@@ -193,9 +196,72 @@
       this.cargarSucursales()
     },
     methods:{
-      redireccionar(){
-        this.isPrompt = false
-        this.$router.replace({path:'/inventario/ordenes-compra/ordenes/'+this.redirectOrden})
+      abrirModal(fila){
+        this.modalId = fila
+        this.modalInventario = true
+      },
+      addFila(){
+        let fila = this.Orden.Articulos.length
+        this.Orden.Articulos.push({
+          "fila": fila ,
+          "articulo": '',
+          "required": false,
+          "requiredC": false,
+          "cantidad": 1,
+          "impuesto": 15,
+          "precio": 0,
+          "total": 0,
+          "art": null
+        })
+      },
+      cargarInventario(){
+        this.isPeticion = true
+        this.Orden.Articulos = [
+          {fila:0, articulo:'', required:false, requiredC: false, cantidad:1, impuesto:15, precio:0, total:0, precio_s:0,art: null}
+        ]
+        this.$axios.get('busqueda_x_proveedor/'+this.Orden.proveedor,{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            if (this)
+              this.Inventario = res.data.inventario
+            this.isPeticion = false
+          }
+        })
+      },
+      cargarProveedor(){
+        this.loadProveedor = true;
+        this.$axios.get('proveedores',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          this.Proveedores   = res.data.proveedores
+          this.loadProveedor = false;
+        })
+      },
+      cargarSucursales(){
+        this.$axios.get('/sucursales',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.Sucursales = res.data.suc
+            this.isLoad = false
+          }
+        })
+      },
+      multiplicarTotalFila(fila){
+        let impuesto = this.Orden.Articulos[fila].impuesto / 100
+        impuesto = impuesto + 1
+        let precio = this.Orden.Articulos[fila].precio * impuesto
+        this.Orden.Articulos[fila].precio_s = precio.toFixed(2)
+        let total = (this.Orden.Articulos[fila].cantidad * precio).toFixed(2)
+        this.Orden.Articulos[fila].total = total
+        this.totalOrder()
       },
       nuevo(){
         this.Orden.proveedor = null;
@@ -204,6 +270,17 @@
           {fila:0, articulo:'', required:false, requiredC: false, cantidad:1, impuesto:15, precio:0, total:0, precio_s:0,art:null}
         ]
         this.isPrompt = false
+      },
+      redireccionar(){
+        this.isPrompt = false
+        this.$router.replace({path:'/inventario/ordenes-compra/ordenes/'+this.redirectOrden})
+      },
+      registrarFila(tr){
+        this.Orden.Articulos[this.modalId].articulo = tr.modelo+' - '+tr.nombre_articulo +' - '+tr.codigo_proveedor
+        this.Orden.Articulos[this.modalId].precio = tr.precio_costo
+        this.Orden.Articulos[this.modalId].art = tr.articulo
+        this.multiplicarTotalFila(this.modalId)
+        this.modalInventario = false
       },
       registrarOrden(){
         if (this.$refs.FormNuevaOrdenCompra.validate()){
@@ -274,6 +351,17 @@
         //   // }
         // }
       },
+      removeFila(fila){
+        if (this.Orden.Articulos.length < 2){
+          alert("No puedes eliminar esta fila.")
+        }else{
+          this.Orden.Articulos.splice(fila, 1)
+          for (let item in this.Orden.Articulos){
+            this.Orden.Articulos[item].fila = item
+          }
+          this.totalOrder()
+        }
+      },
       totalOrder(){
         let precios = 0, cantidad = 0
         let impuestos = 0
@@ -287,91 +375,6 @@
         this.totales.total = precios.toFixed(2)
         this.totales.impuesto = impuestos
         this.totales.totalF = (parseFloat(impuestos) + parseFloat(precios)).toFixed(2)
-      },
-      registrarFila(tr){
-        this.Orden.Articulos[this.modalId].articulo = tr.modelo+' - '+tr.nombre_articulo +' - '+tr.codigo_proveedor
-        this.Orden.Articulos[this.modalId].precio = tr.precio_costo
-        this.Orden.Articulos[this.modalId].art = tr.articulo
-        this.multiplicarTotalFila(this.modalId)
-        this.modalInventario = false
-      },
-      multiplicarTotalFila(fila){
-        let impuesto = this.Orden.Articulos[fila].impuesto / 100
-        impuesto = impuesto + 1
-        let precio = this.Orden.Articulos[fila].precio * impuesto
-        this.Orden.Articulos[fila].precio_s = precio.toFixed(2)
-        let total = (this.Orden.Articulos[fila].cantidad * precio).toFixed(2)
-        this.Orden.Articulos[fila].total = total
-        this.totalOrder()
-      },
-      abrirModal(fila){
-        this.modalId = fila
-        this.modalInventario = true
-      },
-      addFila(){
-        let fila = this.Orden.Articulos.length
-        this.Orden.Articulos.push({
-          "fila": fila ,
-          "articulo": '',
-          "required": false,
-          "requiredC": false,
-          "cantidad": 1,
-          "impuesto": 15,
-          "precio": 0,
-          "total": 0,
-          "art": null
-        })
-      },
-      removeFila(fila){
-        if (this.Orden.Articulos.length < 2){
-          alert("No puedes eliminar esta fila.")
-        }else{
-          this.Orden.Articulos.splice(fila, 1)
-          for (let item in this.Orden.Articulos){
-            this.Orden.Articulos[item].fila = item
-          }
-          this.totalOrder()
-        }
-      },
-      cargarProveedor(){
-        this.$axios.get('proveedores',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status == 200){
-            this.Proveedores = res.data.proveedores
-          }
-        })
-      },
-      cargarSucursales(){
-        this.$axios.get('/sucursales',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.Sucursales = res.data.suc
-            this.isLoad = false
-          }
-        })
-      },
-      cargarInventario(){
-        this.isPeticion = true
-        this.Orden.Articulos = [
-          {fila:0, articulo:'', required:false, requiredC: false, cantidad:1, impuesto:15, precio:0, total:0, precio_s:0,art: null}
-        ]
-        this.$axios.get('busqueda_x_proveedor/'+this.Orden.proveedor,{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            if (this)
-              this.Inventario = res.data.inventario
-              this.isPeticion = false
-          }
-        })
       }
     }
   }

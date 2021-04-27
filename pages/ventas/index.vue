@@ -70,7 +70,6 @@ export default {
       header:[
         {text: 'Código', value: 'cod'},
         {text: 'Nombre del Cliente', value: 'cliente.nombres'},
-        {text: 'Artículo', value: 'remision_articulo.articulo.nombre_articulo'},
         {text: 'total', value: 'total'},
         {text: 'Saldo Actual', value: 'saldo_actual'},
         {text: 'Estado', value: 'estado'},
