@@ -1,165 +1,120 @@
 <template>
-    <v-container >
-        <div class="d-flex justify-center">
-            <v-card width="80%">
-                <v-row no-gutters>
-                    <v-col cols="6">
-                        <v-card-title>Tareas programadas</v-card-title>
-                    </v-col>
-                    <v-col cols="6" class="d-flex justify-end align-center">
-                        <v-btn class="ma-1" color="warning" x-small dark @click="ordenarTabla(1)">Pendientes</v-btn>
-                        <v-btn class="ma-1" color="red" x-small dark @click="ordenarTabla(2)">Vencidas</v-btn>
-                        <v-btn class="ma-1" color="indigo" x-small dark @click="ordenarTabla(3)">Abiertas</v-btn>
-                        <v-btn class="ma-1" color="success" x-small dark @click="ordenarTabla(4)">Terminadas</v-btn>
-                    </v-col>
-                </v-row>
-                <div class="contenedorTable d-flex justify-center">
-                    <table class="rowsTable">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Usuario</th>
-                            <th>Fecha creado</th>
-                            <th>Tarea</th>
-                            <th>Tipo de tarea</th>
-                            <th>Hora abierto</th>
-                            <th></th>
-                            <th class="d-flex align-center justify-center">
-                                <v-icon color="success" small>fa fa-eye</v-icon></th>
-                            <th>Duración</th>
-                            <th>Terminado</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="(item, i) in Tareas" @click="verTarea(item)">
-                            <td>{{i}}</td>
-                            <td>{{item.user.usuario}}</td>
-                            <td>{{item.fecha_creado.split('-')[2]}}/{{item.fecha_creado.split('-')[1]}}/{{item.fecha_creado.split('-')[0]}}</td>
-                            <td v-if="item.detalle.length < 35">
-                                {{item.detalle}}
-                            </td>
-                            <td v-else>
-                                <v-tooltip top>
-                                    <template v-slot:activator="{on, attrs}">
-                                        <span v-on="on" v-bind="attrs">{{item.detalle.substring(0, 35)}}...</span>
-                                    </template>
-                                    <span>{{item.detalle}}</span>
-                                </v-tooltip>
-                            </td>
-                            <td>{{item.tipo_tarea}}</td>
-                            <td >
-                                <span v-if="item.hora_abierto">{{item.hora_abierto}}</span>
-                                <span v-else >Aún no se ha abierto</span>
-                            </td>
-                            <td>
-                                <v-chip x-small dark color="warning" v-if="item.estado === 1"></v-chip>
-                                <v-chip x-small dark color="red" v-if="item.estado === 2"></v-chip>
-                                <v-chip x-small dark color="indigo" v-if="item.estado === 3"></v-chip>
-                                <v-chip x-small dark color="success" v-if="item.estado === 4"></v-chip>
-                            </td>
-                            <td class="d-flex align-center justify-center">
-                                <v-icon v-if="item.is_revisado" color="success" small>fa fa-check</v-icon>
-                                <v-icon v-else color="red" small>fa fa-times</v-icon>
-                            </td>
-                            <td>
-                                <span v-if="item.tiempo_duracion">{{item.tiempo_duracion}} minutos</span>
-                            </td>
-                            <td>{{item.fecha_concluido}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </v-card>
-        </div>
+  <v-card flat>
+    <v-toolbar class="grey lighten-4" dense flat><h5>Tareas</h5></v-toolbar>
+    <v-data-table :headers="header" :items="Tareas" @click:row="verTarea" dense class="cursor">
+      <template v-slot:item.fecha_creado="{item}">
+        {{item.fecha_creado.split('-')[2]}}/{{item.fecha_creado.split('-')[1]}}/{{item.fecha_creado.split('-')[0]}}
+      </template>
+      <template v-slot:item.detalle="{item}">
+        <span v-if="item.detalle.length < 35">{{item.detalle}}</span>
+        <v-tooltip v-else top>
+          <template v-slot:activator="{on, attrs}">
+            <span v-on="on" v-bind="attrs">{{item.detalle.substring(0, 35)}}...</span>
+          </template>
+          <span>{{item.detalle}}</span>
+        </v-tooltip>
+      </template>
+      <template v-slot:item.hora_abierto="{item}">
+        <span v-if="item.hora_abierto">{{item.hora_abierto}}</span>
+        <span v-else>
+          <v-icon small color="red">fa fa-eye-slash</v-icon>
+        </span>
+      </template>
+      <template v-slot:item.tiempo_duracion="{item}">
+        <span v-if="item.tiempo_duracion">{{item.tiempo_duracion}} minutos</span>
+        <span v-else>-</span>
+      </template>
+      <template v-slot:item.id="{item}">
+        <v-chip x-small dark color="warning" v-if="item.estado === 1">Pendiente</v-chip>
+        <v-chip x-small dark color="red" v-if="item.estado === 2">Vencida</v-chip>
+        <v-chip x-small dark color="indigo" v-if="item.estado === 3">Abierta</v-chip>
+        <v-chip x-small dark color="success" v-if="item.estado === 4">Terminado</v-chip>
+      </template>
+    </v-data-table>
 
-
-        <v-navigation-drawer v-model="View_Tarea" clipped right absolute width="100%" class="side">
+    <v-dialog  v-model="View_Tarea" width="100%" >
+      <v-card>
+        <v-row no-gutters class="pl-3 pr-3">
+          <v-col cols="2">
+            <small>Información de las tarea</small>
+            <b-list-group>
+              <b-list-group-item @click="vista = 1" button>Información</b-list-group-item>
+              <b-list-group-item @click="vista = 2" button>Historial</b-list-group-item>
+            </b-list-group>
+            <v-divider></v-divider>
             <v-row no-gutters>
-                <v-col cols="1" class="d-flex align-center">
-                    <v-btn class="ma-2" dark fab x-small text color="red" @click="cerrarNavegacion">
-                        <v-icon>fa fa-times</v-icon>
-                    </v-btn>
-                </v-col>
-                <v-col cols="11" class="d-flex justify-center align-center"><h4>Tarea</h4></v-col>
+              <v-col><small><strong>Tipo:</strong> {{Tarea.tipo_tarea}}</small></v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col><small><strong>Detalle:</strong> {{Tarea.detalle}}</small></v-col>
+            </v-row>
+            <v-row no-gutters v-if="Tarea.fecha_abierto">
+              <v-col><small><strong>Día abierto:</strong> {{Tarea.fecha_abierto.split('-')[2]}}/{{Tarea.fecha_abierto.split('-')[1]}}/{{Tarea.fecha_abierto.split('-')[0]}}</small></v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col><small><strong>Duración:</strong> {{Tarea.tiempo_duracion}} minutos</small></v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col><small>{{Tarea.fecha_concluido}}</small></v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col><small><strong>Hora abierto:</strong> {{Tarea.hora_abierto}}</small></v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col><small><strong>Estado:</strong>
+                <v-chip x-small dark color="warning" v-if="Tarea.estado === 1">Pendiente</v-chip>
+                <v-chip x-small dark color="red" v-if="Tarea.estado === 2">Vencida</v-chip>
+                <v-chip x-small dark color="indigo" v-if="Tarea.estado === 3">Abierta</v-chip>
+                <v-chip x-small dark color="success" v-if="Tarea.estado === 4">Terminada</v-chip>
+              </small></v-col>
             </v-row>
             <v-divider></v-divider>
-            <v-row no-gutters class="pl-3 pr-3">
-                <v-col cols="2">
-                    <small>Información de las tarea</small>
-                    <b-list-group>
-                        <b-list-group-item @click="vista = 1" button>Información</b-list-group-item>
-                        <b-list-group-item @click="vista = 2" button>Historial</b-list-group-item>
-                    </b-list-group>
-                    <v-divider></v-divider>
-                    <v-row no-gutters>
-                        <v-col><small><strong>Tipo:</strong> {{Tarea.tipo_tarea}}</small></v-col>
-                    </v-row>
-                    <v-row no-gutters>
-                        <v-col><small><strong>Detalle:</strong> {{Tarea.detalle}}</small></v-col>
-                    </v-row>
-                    <v-row no-gutters v-if="Tarea.fecha_abierto">
-                        <v-col><small><strong>Día abierto:</strong> {{Tarea.fecha_abierto.split('-')[2]}}/{{Tarea.fecha_abierto.split('-')[1]}}/{{Tarea.fecha_abierto.split('-')[0]}}</small></v-col>
-                    </v-row>
-                    <v-row no-gutters>
-                        <v-col><small><strong>Duración:</strong> {{Tarea.tiempo_duracion}} minutos</small></v-col>
-                    </v-row>
-                    <v-row no-gutters>
-                        <v-col><small>{{Tarea.fecha_concluido}}</small></v-col>
-                    </v-row>
-                    <v-row no-gutters>
-                        <v-col><small><strong>Hora abierto:</strong> {{Tarea.hora_abierto}}</small></v-col>
-                    </v-row>
-                    <v-row no-gutters>
-                        <v-col><small><strong>Estado:</strong>
-                            <v-chip x-small dark color="warning" v-if="Tarea.estado === 1">Pendiente</v-chip>
-                            <v-chip x-small dark color="red" v-if="Tarea.estado === 2">Vencida</v-chip>
-                            <v-chip x-small dark color="indigo" v-if="Tarea.estado === 3">Abierta</v-chip>
-                            <v-chip x-small dark color="success" v-if="Tarea.estado === 4">Terminada</v-chip>
-                        </small></v-col>
-                    </v-row>
-                    <v-divider></v-divider>
-                    <div v-if="Tarea.estado !== 4">
-                        <v-row no-gutters>
-                            <v-col class="d-flex align-center"><small>Estado:</small></v-col>
-                            <v-col class="d-flex justify-end align-center">
-                                <v-switch dense v-model="estado"></v-switch>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col class="d-flex justify-end">
-                                <v-btn :disabled="!estado" @click="terminacionTarea"
-                                       color="success" x-small>Registrar</v-btn>
-                            </v-col>
-                        </v-row>
-                    </div>
+            <div v-if="Tarea.estado !== 4">
+              <v-row no-gutters>
+                <v-col class="d-flex align-center"><small>Estado:</small></v-col>
+                <v-col class="d-flex justify-end align-center">
+                  <v-switch dense v-model="estado"></v-switch>
                 </v-col>
-                <v-col cols="10" class="pl-3 pr-3">
-                    <b-overlay :show="overlay || overlaySolicitud" rounded="xl">
-                        <v-card :disabled="view_seguimiento">
-                            <div v-if="vista === 1">
-                                <div v-if="overlay || overlaySolicitud">
-                                    <v-skeleton-loader v-bind="attrs" type="article"></v-skeleton-loader>
-                                    <v-skeleton-loader v-bind="attrs" type="article"></v-skeleton-loader>
-                                    <v-skeleton-loader v-bind="attrs" type="article"></v-skeleton-loader>
-                                    <v-skeleton-loader v-bind="attrs" type="article"></v-skeleton-loader>
-                                </div>
-                                <div v-else>
-                                    <seguimiento v-if="Tarea.tipo === 1" :tipo="3"/>
-                                    <solicitud   v-else-if="Tarea.tipo === 2"/>
-                                    <soli_credito_vista_vendedor v-else-if="Tarea.tipo === 3" :tipo="2"/>
-                                </div>
-                            </div>
-                            <div v-else-if="vista === 2" class="pl-3 pr-3">
-                                <strong>Historial</strong>
-                                <historial :historial="Historial"/>
-                            </div>
-                        </v-card>
-                    </b-overlay>
+              </v-row>
+              <v-row>
+                <v-col class="d-flex justify-end">
+                  <v-btn :disabled="!estado" block @click="terminacionTarea"
+                         color="success"tile small>Registrar</v-btn>
                 </v-col>
-            </v-row>
+              </v-row>
+            </div>
+            <v-btn block dark tile small color="red" @click="cerrarNavegacion">
+              Cerrar
+            </v-btn>
+          </v-col>
+          <v-col cols="10" class="pl-3 pr-3">
+            <b-overlay :show="overlay || overlaySolicitud" rounded="xl">
+              <v-card flat :disabled="Tarea.estado === 4">
+                <div v-if="vista === 1">
+                  <div v-if="overlay || overlaySolicitud">
+                    <v-skeleton-loader v-bind="attrs" type="article"></v-skeleton-loader>
+                    <v-skeleton-loader v-bind="attrs" type="article"></v-skeleton-loader>
+                    <v-skeleton-loader v-bind="attrs" type="article"></v-skeleton-loader>
+                    <v-skeleton-loader v-bind="attrs" type="article"></v-skeleton-loader>
+                  </div>
+                  <div v-else>
+                    <seguimiento v-if="Tarea.tipo === 1" :tipo="3"/>
+                    <solicitud   v-else-if="Tarea.tipo === 2"/>
+                    <soli_credito_vista_vendedor v-else-if="Tarea.tipo === 3" :tipo="2"/>
+                  </div>
+                </div>
+                <div v-else-if="vista === 2" class="pl-3 pr-3">
+                  <strong>Historial</strong>
+                  <historial :historial="Historial"/>
+                </div>
+              </v-card>
+            </b-overlay>
+          </v-col>
+        </v-row>
+      </v-card>
 
-        </v-navigation-drawer>
-    </v-container>
+    </v-dialog>
+  </v-card>
 </template>
 
 <script>
@@ -185,6 +140,16 @@
                     boilerplate: true,
                     elevation: 2,
                 },
+                header:[
+                  {text:'Usuario', value:'user.usuario'},
+                  {text:'Fecha', value:'fecha_creado'},
+                  {text:'Tarea', value:'detalle'},
+                  {text:'Tipo de Tarea', value:'tipo_tarea'},
+                  {text:'Abierto', value:'hora_abierto'},
+                  {text:'Duración', value:'tiempo_duracion'},
+                  {text:'Términado', value:'fecha_concluido'},
+                  {text:'Estado', value:'id'},
+                ],
                 vista: 1
             }
         },
@@ -284,6 +249,7 @@
             },
             terminacionTarea(){
                 if (this.estado){
+                    this.$store.commit('tareas/cambiarValorVista', false);
                     this.$store.commit('activarOverlay', true);
                     this.$axios.get('tarea/terminada/'+this.Tarea.id)
                     .then((res)=>{
@@ -316,35 +282,7 @@
 </script>
 
 <style scoped>
-    .rowsTable{
-        cursor: pointer;
-    }
-    table{
-        width: 95%;
-    }
-    table tbody{
-        font-size: 12px;
-    }
-    table tbody tr td input[type=text], select{
-        width: 100%;
-        box-sizing: border-box;
-        padding: 2px 10px;
-        margin: 1px;
-        border: 1px solid #ccc;
-        border-radius: 1px;
-        cursor: pointer;
-    }
-    table tbody tr td input:hover{
-        background-color: #FFF !important;
-    }
-    table tbody tr:hover{
-        background-color: #cccccc;
-    }
-    .contenedorTable{
-        height: 400px;
-        overflow-y: auto;
-    }
-    table thead{
-        border-bottom: solid 1px #47494e;
+    .cursor{
+      cursor: pointer;
     }
 </style>

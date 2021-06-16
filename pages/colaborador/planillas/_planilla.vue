@@ -4,67 +4,67 @@ import Swal from "sweetalert2";
       <v-card>
         <v-progress-linear indeterminate color="green" v-if="!cargaPagina"></v-progress-linear>
         <div v-if="Planilla">
-          <v-row>
-            <v-col cols="9"><v-card-title>Información General de la Planilla {{Planilla.codigo}}</v-card-title></v-col>
-            <v-col cols="3" class="d-flex align-center justify-end">
-              <div class="pl-2 pr-2" v-if="estadoPlanillaSubida || estadoPlanillaSubida === 1">
-                <v-tooltip top>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn @click="verFile"  v-on="on" v-bind="attrs" color="red" fab x-small dark>
-                      <v-icon>fa fa-file-pdf</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Ver planilla subida firmada</span>
-                </v-tooltip>
-              </div>
-              <div class="pl-2 pr-2">
-                <v-tooltip top>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn @click="popupSubir = true"  v-on="on" v-bind="attrs" color="success" fab x-small dark>
-                      <v-icon>fa fa-upload</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Subir planilla firmada</span>
-                </v-tooltip>
-              </div>
-              <div class="pl-2 pr-2">
-                <v-tooltip top>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn @click="pdf"  v-on="on" v-bind="attrs" color="primary" fab x-small dark>
-                      <v-icon>fa fa-print</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Imprimir Planilla</span>
-                </v-tooltip>
-              </div>
-            </v-col>
-          </v-row>
-          <div style="border: solid #000 1px; height: 160px">
-            <v-row class="pl-2 pr-2" dense >
-              <v-col cols="6">Périodo: <strong>{{Planilla.periodo}} de {{Planilla.mes_asignado}} de {{Planilla.ano}}</strong></v-col>
-              <v-col cols="6" class="d-flex justify-end">Fecha de Creación: <strong>{{Planilla.fecha_creacion}}</strong></v-col>
-            </v-row>
-            <v-row class="pl-2 pr-2" dense>
-              <v-col class="d-flex justify-end">Usuario Creador: <strong>{{Planilla.user.usuario}}</strong></v-col>
-            </v-row>
-            <v-row dense class="pl-2 pr-2">
-              <v-col cols="6" class="d-flex justify-start">
-                Sucursal: <strong>{{Planilla.sucursal.nombre}}</strong>
-              </v-col>
-              <v-col class="d-flex justify-end">Total de la Planilla: <strong>L. {{Planilla.total_planilla}}</strong></v-col>
-            </v-row>
-            <v-row class="pl-2 pr-2" dense><v-col class="d-flex justify-end">
-              Estado de Firma:
-              <v-icon v-if="Planilla.estado ===1" color="success">fa fa-check-circle</v-icon>
-              <v-icon v-else color="red">fa fa-times</v-icon>
-            </v-col></v-row>
-            <v-row class="pl-2 pr-2" dense><v-col class="d-flex justify-end">
-              Estado de Pagado el Total de la Planilla:
-              <v-icon v-if="Planilla.is_pagado ===1" color="success">fa fa-check-circle</v-icon>
-              <v-icon v-else color="red">fa fa-times</v-icon>
-            </v-col></v-row>
-          </div>
-          <v-card-title>Cuerpo de la Planilla</v-card-title>
+<!--          <v-row>-->
+<!--            <v-col cols="9"><v-card-title>Información General de la Planilla {{Planilla.codigo}}</v-card-title></v-col>-->
+<!--            <v-col cols="3" class="d-flex align-center justify-end">-->
+<!--              <div class="pl-2 pr-2" v-if="estadoPlanillaSubida || estadoPlanillaSubida === 1">-->
+<!--                <v-tooltip top>-->
+<!--                  <template v-slot:activator="{ on, attrs }">-->
+<!--                    <v-btn @click="verFile"  v-on="on" v-bind="attrs" color="red" fab x-small dark>-->
+<!--                      <v-icon>fa fa-file-pdf</v-icon>-->
+<!--                    </v-btn>-->
+<!--                  </template>-->
+<!--                  <span>Ver planilla subida firmada</span>-->
+<!--                </v-tooltip>-->
+<!--              </div>-->
+<!--              <div class="pl-2 pr-2">-->
+<!--                <v-tooltip top>-->
+<!--                  <template v-slot:activator="{ on, attrs }">-->
+<!--                    <v-btn @click="popupSubir = true"  v-on="on" v-bind="attrs" color="success" fab x-small dark>-->
+<!--                      <v-icon>fa fa-upload</v-icon>-->
+<!--                    </v-btn>-->
+<!--                  </template>-->
+<!--                  <span>Subir planilla firmada</span>-->
+<!--                </v-tooltip>-->
+<!--              </div>-->
+<!--              <div class="pl-2 pr-2">-->
+<!--                <v-tooltip top>-->
+<!--                  <template v-slot:activator="{ on, attrs }">-->
+<!--                    <v-btn @click="pdf"  v-on="on" v-bind="attrs" color="primary" fab x-small dark>-->
+<!--                      <v-icon>fa fa-print</v-icon>-->
+<!--                    </v-btn>-->
+<!--                  </template>-->
+<!--                  <span>Imprimir Planilla</span>-->
+<!--                </v-tooltip>-->
+<!--              </div>-->
+<!--            </v-col>-->
+<!--          </v-row>-->
+<!--          <div style="border: solid #000 1px; height: 160px">-->
+<!--            <v-row class="pl-2 pr-2" dense >-->
+<!--              <v-col cols="6">Périodo: <strong>{{Planilla.periodo}} de {{Planilla.mes_asignado}} de {{Planilla.ano}}</strong></v-col>-->
+<!--              <v-col cols="6" class="d-flex justify-end">Fecha de Creación: <strong>{{Planilla.fecha_creacion}}</strong></v-col>-->
+<!--            </v-row>-->
+<!--            <v-row class="pl-2 pr-2" dense>-->
+<!--              <v-col class="d-flex justify-end">Usuario Creador: <strong>{{Planilla.user.usuario}}</strong></v-col>-->
+<!--            </v-row>-->
+<!--            <v-row dense class="pl-2 pr-2">-->
+<!--              <v-col cols="6" class="d-flex justify-start">-->
+<!--                Sucursal: <strong>{{Planilla.sucursal.nombre}}</strong>-->
+<!--              </v-col>-->
+<!--              <v-col class="d-flex justify-end">Total de la Planilla: <strong>L. {{Planilla.total_planilla}}</strong></v-col>-->
+<!--            </v-row>-->
+<!--            <v-row class="pl-2 pr-2" dense><v-col class="d-flex justify-end">-->
+<!--              Estado de Firma:-->
+<!--              <v-icon v-if="Planilla.estado ===1" color="success">fa fa-check-circle</v-icon>-->
+<!--              <v-icon v-else color="red">fa fa-times</v-icon>-->
+<!--            </v-col></v-row>-->
+<!--            <v-row class="pl-2 pr-2" dense><v-col class="d-flex justify-end">-->
+<!--              Estado de Pagado el Total de la Planilla:-->
+<!--              <v-icon v-if="Planilla.is_pagado ===1" color="success">fa fa-check-circle</v-icon>-->
+<!--              <v-icon v-else color="red">fa fa-times</v-icon>-->
+<!--            </v-col></v-row>-->
+<!--          </div>-->
+<!--          <v-card-title>Cuerpo de la Planilla</v-card-title>-->
           <v-simple-table>
             <template v-slot:default>
               <thead>

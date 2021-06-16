@@ -343,7 +343,9 @@
         })
       },
       capturaCuentaColaborador(){
+        console.log(this.Consulta.sucursal)
         this.ccColaboradores.data.forEach((i)=>{
+          console.log(i)
           if (i.referencia_id == this.Consulta.sucursal){
             this.ccColaboradores.id     = i.id;
             this.ccColaboradores.nombre = i.cod+' - '+i.nombre;
@@ -364,7 +366,7 @@
             this.isPeticion = false
             this.Colaboradores = res.data.col
             this.$store.commit('activarOverlay', false);
-            this.cargarCuentasContables(2151);
+            this.cargarCuentasContables(215);
           }
         })
       },
@@ -386,14 +388,14 @@
       cargarCuentasContables(val){
         if (val === 1113)
           this.ccBancos.load          = true;
-        else if (val === 2151)
+        else if (val === 215)
           this.ccColaboradores.load   = true;
 
         this.$axios.get('contabilidad/2.0/cargando_cuentas/'+val).then((res)=>{
           if (val === 1113) {
             this.ccBancos.data        = res.data.cuentas;
             this.ccBancos.load        = false;
-          }else if (val === 2151){
+          }else if (val === 215){
             this.ccColaboradores.data = res.data.cuentas;
             this.capturaCuentaColaborador();
           }

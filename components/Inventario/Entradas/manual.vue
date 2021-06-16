@@ -186,45 +186,61 @@
       }
     },
     methods:{
+      abrirModal(fila){
+        this.modalInventario = true
+        this.modalId = fila
+      },
       abrirModalCompuesto(item){
         this.compuestos = item.rCompuestos
         this.modalCompuesto = true
         this.modalId = item.fila
       },
-      verificarEstado(item){
-        this.modalId = item.fila
-        if (item.estado === 3 || item.estado === 1){
-          this.popupEstado = false
-        }else{
-          this.popupEstado = true
-        }
+      addFila(){
+        let fila = this.Ingreso.articulo.length
+        this.Ingreso.articulo.push({
+          "fila":        fila ,
+          "articulo":    null,
+          "required":    false,
+          "requiredC":   false,
+          "cantidad":    1,
+          "serie":       null,
+          "requiredS":   false,
+          "descripcion": null,
+          "codigo":      null,
+          "estado":      1,
+          "lote":        false,
+          "isCompuesto": false,
+          "compuesto":   null,
+          "rCompuestos": [],
+          "revisionCompuesto": false
+        })
       },
-      registrarOrden(){
-        this.$store.commit('activarOverlay', true);
-        this.$axios.post('ordenes_entrada', {
-          proveedor: this.Ingreso.proveedor,
-          sucursal:  this.Ingreso.sucursal,
-          tipo:      this.Ingreso.tipoEntrada,
-          articulos: this.Ingreso.articulo
-        },{
+      cargarEstados(){
+        this.$axios.get('estados_articulos',{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token
           }
         }).then((res)=>{
           if (res.status === 200){
-            this.$store.commit('activarOverlay', false);
-            Swal.fire(
-              'Registro Exitoso',
-              `La orden de ingreso manual se ha creado exitosamente.`,
-              'success'
-            )
-            this.$router.replace({path:'/inventario/'})
+            this.Estados = res.data.estados
           }
         })
       },
-      verificarForm(){
-        if (this.$refs.FormNuevaEntradaManual.validate())
-          this.registrarOrden()
+      cargarInventario(){
+        this.Ingreso.articulo = [
+          {articulo: null, descripcion: null, serie:null, cantidad: 1, requiredS: false, isCompuesto: false, revisionCompuesto:false,
+            estado: 1, required: false, fila:0, codigo: null, requiredC: false, lote: false, compuesto: null, rCompuestos: []}
+        ]
+        this.$axios.get('inventario/'+this.Ingreso.proveedor,{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status == 200){
+            this.Inventario = res.data.inventario
+            this.cargaArticulo = false
+          }
+        })
       },
       registrarFila(tr){
         this.Ingreso.articulo[this.modalId].articulo = tr.id;
@@ -254,28 +270,27 @@
 
         this.modalInventario = false
       },
-      abrirModal(fila){
-        this.modalInventario = true
-        this.modalId = fila
-      },
-      addFila(){
-        let fila = this.Ingreso.articulo.length
-        this.Ingreso.articulo.push({
-          "fila":        fila ,
-          "articulo":    null,
-          "required":    false,
-          "requiredC":   false,
-          "cantidad":    1,
-          "serie":       null,
-          "requiredS":   false,
-          "descripcion": null,
-          "codigo":      null,
-          "estado":      1,
-          "lote":        false,
-          "isCompuesto": false,
-          "compuesto":   null,
-          "rCompuestos": [],
-          "revisionCompuesto": false
+      registrarOrden(){
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('ordenes_entrada', {
+          proveedor: this.Ingreso.proveedor,
+          sucursal:  this.Ingreso.sucursal,
+          tipo:      this.Ingreso.tipoEntrada,
+          articulos: this.Ingreso.articulo
+        },{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.$store.commit('activarOverlay', false);
+            Swal.fire(
+                'Registro Exitoso',
+                `La orden de ingreso manual se ha creado exitosamente.`,
+                'success'
+            )
+            this.$router.replace({path:'/inventario/'})
+          }
         })
       },
       removeFila(fila){
@@ -288,32 +303,17 @@
           }
         }
       },
-      cargarInventario(){
-        this.Ingreso.articulo = [
-          {articulo: null, descripcion: null, serie:null, cantidad: 1, requiredS: false, isCompuesto: false, revisionCompuesto:false,
-            estado: 1, required: false, fila:0, codigo: null, requiredC: false, lote: false, compuesto: null, rCompuestos: []}
-        ]
-        this.$axios.get('inventario/'+this.Ingreso.proveedor,{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status == 200){
-            this.Inventario = res.data.inventario
-            this.cargaArticulo = false
-          }
-        })
+      verificarEstado(item){
+        this.modalId = item.fila
+        if (item.estado === 3 || item.estado === 1){
+          this.popupEstado = false
+        }else{
+          this.popupEstado = true
+        }
       },
-      cargarEstados(){
-        this.$axios.get('estados_articulos',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.Estados = res.data.estados
-          }
-        })
+      verificarForm(){
+        if (this.$refs.FormNuevaEntradaManual.validate())
+          this.registrarOrden()
       },
     }
   }

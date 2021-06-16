@@ -74,9 +74,11 @@
                 if (bandera > 0){
                     this.dialogo = false;
                     this.$store.commit('activarOverlay', true);
+                    this.$store.commit('tareas/cambiarValorVista', false);
                     this.$axios.put('solicitud_credito/tareas/'+this.Soli.id,{
                         tareas: JSON.stringify(this.data_Tareas)
                     }).then((res)=>{
+                        this.$store.commit('tareas/cambiarValorVista', true);
                         this.notificacion('Se han actualizados las tareas.','success');
                         console.log(this.Soli.tareas);
                         this.Tareas  = JSON.stringify(this.data_Tareas);
@@ -87,6 +89,7 @@
                         this.notificacion('Error al actualizar tareas.','error');
                         this.dialogo = true;
                         this.$store.commit('activarOverlay', false);
+                        this.$store.commit('tareas/cambiarValorVista', true);
                     })
                 }else{
                     this.notificacion('No hay tareas disponibles para enviar.','error');

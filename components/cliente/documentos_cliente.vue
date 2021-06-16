@@ -19,7 +19,7 @@
           <td>
             <v-btn v-if="item.status === 1 || item.status" color="red" @click="verDocumento(item.dir)"
                    dark x-small >Ver Documento</v-btn>
-            <v-file-input dense counter accept="application.pdf"
+            <v-file-input dense counter accept=".pdf"
                           v-else v-model="item.file"></v-file-input>
           </td>
           <td>

@@ -145,6 +145,14 @@
                     return this.$store.state.solicitud_credito.DetallesPrecio;
                 }
             },
+            View_Tarea: {
+                get: function () {
+                  return this.$store.state.tareas.Tareas_view;
+                },
+                set: function (val) {
+                  this.$store.commit('tareas/cambiarValorVista', val)
+                }
+            }
         },
         created() {
             this.$store.commit('activarOverlay', false);
@@ -276,6 +284,7 @@
             },
             registrarPrecio(){
                 this.dialogo = false;
+                this.View_Tarea = false;
                 this.$store.commit('activarOverlay', true);
                 let forma_pago= '';
                 if (this.formaPago === 1)
@@ -293,6 +302,7 @@
                     cuota:           this.Soli.cuota
                 }).then((res)=>{
                     this.dialogo = true;
+                    this.View_Tarea = true;
                     this.$store.commit('activarOverlay', false);
                     this.notificacion(
                         'Se ha registrado el cambio en el precio de la solicitud exitosamente',
@@ -306,6 +316,7 @@
                         'Error',
                         'success'
                     );
+                    this.View_Tarea = true;
                     this.$store.commit('activarOverlay', false);
                 })
             },

@@ -22,6 +22,9 @@
       <v-list-item class="itemOpciones" @click="go('/contabilidad/libro_diario')">
         Libro Díario
       </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/contabilidad/cheques')">
+        Cheques
+      </v-list-item>
     </v-list-group>
     <v-list-group>
       <template v-slot:activator value="true">

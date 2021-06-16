@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pl-2 pr-2">
+  <v-card flat class="pl-2 pr-2">
     <div v-if="vista === 1">
       <v-row>
         <v-col cols="9" class="d-flex align-center"><v-card-title>Mis ventas</v-card-title></v-col>

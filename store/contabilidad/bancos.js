@@ -1,9 +1,13 @@
 export const state = () => ({
     CUENTAS:     [],
-    LOADCUENTAS: false
+    LOADCUENTAS: false,
+    CUENTA:      {}
 })
 
 export const mutations = {
+    asignar_CUENTA(state, cuenta) {
+      state.CUENTA = cuenta;
+    },
     cargar_CUENTAS(state){
         state.LOADCUENTAS = true;
         this.$axios.get('cuentas').then((res)=>{

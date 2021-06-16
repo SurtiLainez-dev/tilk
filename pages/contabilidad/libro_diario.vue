@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card flat>
     <v-toolbar flat color="grey lighten-2">
       <h5>Libro Díario SURTIDORA LAÍNEZ</h5>
     </v-toolbar>
@@ -149,7 +149,7 @@
                   <tr>
                     <th>Documento:</th>
                     <td>
-                      <b-link @click="verDocumento(partida.file_generado)">Ver Documento</b-link>
+                      <b-link @click="printPartida">Ver Documento</b-link>
                     </td>
                   </tr>
                   </tbody>
@@ -246,6 +246,9 @@ export default {
     this.cargarPartidad();
   },
   computed:{
+    USUARIO(){
+      return this.$store.state.usuario;
+    },
     LOADFECHAS(){
       return this.$store.state.contabilidad.libro_diario.LOADFECHAS;
     },
@@ -264,6 +267,12 @@ export default {
       this.partida        = data;
       this.dialogoPartida = true;
     },
+    abrirNavegador(clave){
+      let url = this.$axios.defaults.baseURL+'documentos/partida/usuario='+this.USUARIO+'/partida='+this.partida.referencia+'/'+clave;
+      ipcRenderer.send('pint_navegador', url);
+      this.$store.commit('activarOverlay', false);
+      this.dialogoPartida = true;
+    },
     cargarPartidad(){
       if (this.query.dia){
         this.loadPartidas = true;
@@ -280,6 +289,16 @@ export default {
       this.Partidas.forEach((i)=>{
         this.totalCredito = parseFloat(this.totalCredito) + parseFloat(i.credito)
         this.totalDebito  = parseFloat(this.totalCredito) + parseFloat(i.debitp)
+      })
+    },
+    printPartida(){
+      this.$store.commit('activarOverlay', true);
+      this.dialogoPartida = false;
+      this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+        this.abrirNavegador(res.data.clave);
+      }).catch((error)=>{
+        this.dialogoPartida = true;
+        this.$store.commit('activarOverlay', false);
       })
     },
     verDocumento(URL){

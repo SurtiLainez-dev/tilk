@@ -44,7 +44,7 @@
             <tr v-for="(item, i) in Orden">
               <td width="80%">
                 -- <strong>{{item.articulo.nombre_articulo}}</strong> <br>
-                [{{item.articulo.descripcion_corta}}] [{{item.articulo.modelo}}] [{{item.articulo.marca.nombre}}]
+                [{{item.articulo.descripcion_corta}}] [{{item.articulo.modelo}}] [{{item.articulo.marca.nombre}}] [[<strong>{{item.articulo.codigo_sistema}}</strong>]]
                 <v-list v-if="item.is_compuesto === 1" class="borderH">
                   <v-subheader>Artículos compuestos </v-subheader>
                   <v-list-item-group v-model="i" color="primary">

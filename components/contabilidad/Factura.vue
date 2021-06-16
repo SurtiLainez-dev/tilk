@@ -2,24 +2,26 @@
     <div>
       <div class="bordes pl-2 pr-2">
         <v-row>
-          <v-col cols="4"><strong>Número de Factura:</strong>{{Factura.num_factura}}</v-col>
-          <v-col cols="4"><strong>Fecha de Vencimiento:</strong> {{Factura.fecha_limite_pago.split('-')[2]}}/{{Factura.fecha_limite_pago.split('-')[1]}}/{{Factura.fecha_limite_pago.split('-')[0]}}</v-col>
-          <v-col v-if="Factura.orden_entrada" cols="4"><strong>Orden de Ingreso:</strong>
+          <v-col ><strong>Número de Factura:</strong>{{Factura.num_factura}}</v-col>
+          <v-col ><strong>Fecha de Vencimiento:</strong> {{Factura.fecha_limite_pago.split('-')[2]}}/{{Factura.fecha_limite_pago.split('-')[1]}}/{{Factura.fecha_limite_pago.split('-')[0]}}</v-col>
+          <v-col v-if="Factura.orden_entrada"><strong>Orden de Ingreso:</strong>
             {{Factura.orden_entrada.codigo}}
             <v-btn width="22px" height="22px" @click="verOrden" color="indigo" x-small fab dark>
               <v-icon size="15px">fa fa-print</v-icon></v-btn>
           </v-col>
+          <v-col ><strong>Flete:</strong><span v-if="Factura.is_flete === 0">No</span><span v-else></span>Sí</v-col>
         </v-row>
         <v-row>
-          <v-col cols="4"><strong>Tipo de Factura:</strong> {{Factura.tipo_factura.nombre}}</v-col>
-          <v-col cols="4"><strong>Usuario Registrador:</strong> {{Factura.user.usuario}}</v-col>
-          <v-col cols="4"><strong>Estado:</strong>
+          <v-col ><strong>Tipo de Factura:</strong> {{Factura.tipo_factura.nombre}}</v-col>
+          <v-col ><strong>Usuario Registrador:</strong> {{Factura.user.usuario}}</v-col>
+          <v-col ><strong>Estado:</strong>
             <v-chip v-if="Factura.estado === 0" color="orange" dark small>Al día</v-chip>
             <v-chip v-else-if="Factura.estado === 1" color="success" dark small>Cancelada</v-chip>
             <v-chip v-else-if="Factura.estado === 2" color="red" dark small>Retrasado</v-chip>
             <v-btn width="22px" height="22px" @click="verFile" color="red" x-small fab dark>
               <v-icon size="15px">fa fa-file-pdf</v-icon></v-btn>
           </v-col>
+          <v-col><strong>Flete:</strong> L {{int.format(Factura.flete)}}</v-col>
         </v-row>
         <v-row>
           <v-col v-if="Factura.orden_entrada" cols="3"><strong>Sucursal Asignada:</strong> {{Factura.orden_entrada.sucursal.nombre}}</v-col>

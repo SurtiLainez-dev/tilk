@@ -66,6 +66,7 @@
             registrarDocumento(){
                 if (this.file){
                     this.dialogo = false;
+                    this.$store.commit('tareas/cambiarValorVista', false);
                     this.$store.commit('activarOverlay', true);
                     let data = new FormData();
                     data.append('file', this.file);
@@ -80,12 +81,14 @@
                         }
                     }).then((res)=>{
                         this.dialogo = true;
+                        this.$store.commit('tareas/cambiarValorVista', true);
                         this.$store.commit('activarOverlay', false);
                         this.$store.commit('solicitud_credito/agregarFile', res.data.url);
                         this.url = res.data.url;
                         this.notificacion('Se registró exitosamente el documento.','success')
                     }).catch((error)=>{
                         this.dialogo = true;
+                        this.$store.commit('tareas/cambiarValorVista', true);
                         this.$store.commit('activarOverlay', false);
                         this.notificacion('Hubo error al cargar el documento.','error')
                     })
@@ -95,15 +98,18 @@
             },
             verDocumento(){
                 this.dialogo = false;
+              this.$store.commit('tareas/cambiarValorVista', false);
                 this.$store.commit('activarOverlay', true);
                 this.$axios.post('leer_documento/',
                     {ubicacion: this.url}).then((res)=>{
+                  this.$store.commit('tareas/cambiarValorVista', true);
                     if (res.status === 200){
                         ipcRenderer.send('open-nav', res.data.url);
                         this.$store.commit('activarOverlay', false);
                         this.dialogo = true;
                     }
                 }).catch((error)=>{
+                  this.$store.commit('tareas/cambiarValorVista', true);
                     this.$store.commit('activarOverlay', false);
                     this.dialogo = true;
                 })

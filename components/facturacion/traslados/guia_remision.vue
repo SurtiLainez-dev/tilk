@@ -58,7 +58,7 @@
           <v-hover v-slot:default="{ hover }" close-delay="100">
             <v-card color="blue-grey lighten-3" dark height="63px"
                     class="pl-2 pr-2 pt-2 pb-2  rowsTable" :elevation="hover ? 16 : 2">
-              <h4 class="text-center">Encargado de Trasnportar</h4>
+              <h4 class="text-center">Trasnportista</h4>
               <h6 class="text-center">{{remision.traslado.nombres}} {{remision.traslado.apellidos}}</h6>
             </v-card>
           </v-hover>

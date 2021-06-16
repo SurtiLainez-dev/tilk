@@ -69,7 +69,6 @@
             return this.$axios({
               method: 'post',
               url: '/login',
-              timeout: 15000,
               data: qs.stringify({
                 email: this.Email,
                 password: this.Login.password,
@@ -119,7 +118,7 @@
                 ipcRenderer.send('crear-usuario', this.Email)
                 this.$axios.setToken(this.$store.state.token, 'Bearer')
                 this.load = false;
-                this.$router.replace({path:'/inicio/'})
+                this.$router.replace({path:'/inicio/'});
               }
             }).catch((error)=>{
               this.isError = true

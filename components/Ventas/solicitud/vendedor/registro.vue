@@ -88,14 +88,17 @@
             registrarSolicitud(){
                 if (this.usuario){
                     this.dialogo = false;
+                    this.$store.commit('tareas/cambiarValorVista', false);
                     this.$store.commit('activarOverlay', true);
                     this.$axios.put('solicitud_credito/registrar/'+this.Soli.id,{
                         usuario: this.usuario
                     }).then((res)=>{
                         this.$store.commit('activarOverlay', false);
+                        this.$store.commit('tareas/cambiarValorVista', true);
                         this.notificacion('La solicitud se registro exitosamente.','success')
                     }).catch((error)=>{
                         this.dialogo = true;
+                        this.$store.commit('tareas/cambiarValorVista', true);
                         this.$store.commit('activarOverlay', false);
                         this.notificacion('Hubo un error al registrar la solicitud.','error')
                     });

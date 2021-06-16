@@ -74,7 +74,15 @@
             },
             Imgs(){
                 return this.$store.state.solicitud_credito.Solicitud.articulo.fotos_articulos;
-            }
+            },
+            View_Tarea: {
+                get: function () {
+                    return this.$store.state.tareas.Tareas_view;
+                },
+                set: function (val) {
+                    this.$store.commit('tareas/cambiarValorVista', val)
+                }
+            },
         },
         data(){
             return{

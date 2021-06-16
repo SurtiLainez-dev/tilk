@@ -935,6 +935,7 @@
                 this.CM.forEach( (i) => {
                     i.ingresado = true;
                 });
+                this.$store.commit('tareas/cambiarValorVista', false);
                 this.$store.commit('activarOverlay', true);
                 this.$axios.put('solicitud_credito/'+this.ID,{
                     estado:      tipo,
@@ -942,12 +943,14 @@
                     tareas:      this.Tareas.data,
                     referencias: JSON.stringify(this.Ref)
                 }).then((res)=>{
+                    this.$store.commit('tareas/cambiarValorVista', true);
                     this.$store.commit('activarOverlay', false);
                     this.btnRegistro = false;
                     this.notificacion('Se han registrado los datos de solicitud exitosamente','success');
                     this.$store.commit('solicitud_credito/cargarSolicitudes');
                     this.notificacion('Para ver los cambios actualizados salga y vuelva anetrar.');
                 }).catch((error)=>{
+                    this.$store.commit('tareas/cambiarValorVista', true);
                     this.$store.commit('activarOverlay', false);
                     this.btnEnvio = false;
                 })
@@ -1002,16 +1005,19 @@
                     this.dialogoArchivos = false;
 
                 this.$store.commit('activarOverlay', true);
+                this.$store.commit('tareas/cambiarValorVista', false);
                 this.$axios.post('leer_documento/', {
                     ubicacion: dir
                 }).then((res)=>{
                     if (res.status === 200){
+                        this.$store.commit('tareas/cambiarValorVista', true);
                         ipcRenderer.send('open-nav', res.data.url);
                         this.$store.commit('activarOverlay', false);
                         if (tipo === 2)
                             this.dialogoArchivos = false;
                     }
                 }).catch((error)=>{
+                    this.$store.commit('tareas/cambiarValorVista', true);
                     this.$store.commit('activarOverlay', false);
                     if (tipo === 2)
                         this.dialogoArchivos = false;

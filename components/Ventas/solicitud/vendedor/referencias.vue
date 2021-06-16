@@ -99,6 +99,14 @@
                     this.$store.commit('solicitud_credito/cambiarValorDialogoSolicitud', val);
                 }
             },
+          View_Tarea: {
+            get: function () {
+              return this.$store.state.tareas.Tareas_view;
+            },
+            set: function (val) {
+              this.$store.commit('tareas/cambiarValorVista', val)
+            }
+          },
         },
         data(){
             return{
@@ -143,6 +151,7 @@
             },
             registrarReferencias(){
                 this.dialogo = false;
+                this.View_Tarea = false;
                 this.$store.commit('activarOverlay', true);
                 this.$axios.put('solicitud_credito/referencias/'+this.Soli.id,{
                     referencias: JSON.stringify(this.Referencias_d)
@@ -151,9 +160,11 @@
                     this.Referencias_d = this.Referencias;
                     this.dialogo = true;
                     this.$store.commit('activarOverlay', false);
+                    this.View_Tarea = true;
                     this.notificacion('Actualización de referencias exitosa','success')
                 }).catch((error)=>{
                     this.dialogo = true;
+                    this.View_Tarea = true;
                     this.$store.commit('activarOverlay', error);
                     this.notificacion('Error en la actualización de referencias exitosa','error')
                 })

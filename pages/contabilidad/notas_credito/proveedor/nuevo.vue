@@ -36,11 +36,19 @@
               </v-col>
             </v-row>
             <v-divider></v-divider>
-            <v-radio-group label="Cuenta Contable a Acréditar" v-model="Nota.cc" :rules="[rule.referencia.req]">
-              <v-radio :value="2161" label="Nota de Crédito por Volumen de Compra - 2161"></v-radio>
-              <v-radio :value="2162" label="Nota de Crédito por Garantías - 2162"></v-radio>
-              <v-radio :value="2163" label="Nota de Crédito por Devolución de Mercancias - 2163"></v-radio>
+            <v-radio-group label="Tipo de Nota de Crédito" v-model="Nota.cc" :rules="[rule.referencia.req]">
+              <v-radio :value="1" label="Nota de Crédito por Volumen de Compra"></v-radio>
+              <v-radio :value="2" label="Nota de Crédito por Garantías"></v-radio>
+              <v-radio :value="3" label="Nota de Crédito por Devolución de Mercancias"></v-radio>
+              <v-radio :value="4" label="Nota de Crédito por Anulación de Factura"></v-radio>
             </v-radio-group>
+            <v-row no-gutters >
+              <v-col cols="9"></v-col>
+              <v-col cols="3">
+                <v-text-field v-if="Nota.cc === 3" dense class="ma-2" v-model="flete" disabled
+                              label="Incluir Flete" suffix="lps"></v-text-field>
+              </v-col>
+            </v-row>
           </v-form>
           <v-card-actions class="d-flex justify-end">
             <v-btn color="success" dark small @click="validarForm">Registrar Nota</v-btn>
@@ -310,6 +318,7 @@
   export default {
     data(){
       return{
+        flete:0,
         int: new Intl.NumberFormat(),
         dialogoFactura: false,
         dialogoDevoluciones: false,
@@ -327,6 +336,7 @@
           }
         },
         Nota:{
+          orden_entrada: null,
           recalculado: false,
           isRevisado: false,
           devolucion: null,
@@ -467,12 +477,14 @@
             this.Nota.proveedor_id              = items[0].orden_entrada.proveedor_id;
             this.Nota.proveedor                 = items[0].orden_entrada.proveedor.nombre;
             this.Nota.sucursal_id               = items[0].orden_entrada.sucursal_id;
+            this.Nota.orden_entrada             = items[0].orden_entrada.id;
             this.asignarPago(items[0].orden_entrada.factura_proveedor.pagos_facturas)
             this.cargarCuentaContable();
           }
         }
       },
       onRowSelectedFacturas(items){
+        this.Nota.orden_entrada             = null;
         this.dialogoFactura                 = false;
         this.Nota.factura_id                = items[0].id;
         this.Nota.numFactura                = items[0].num_factura;
@@ -506,7 +518,6 @@
         });
       },
       registrarNota(){
-        this.$store.commit('activarOverlay', true);
         let data = new FormData();
         let pagos = JSON.stringify(this.Nota.pagos);
         //datos de la factura
@@ -522,10 +533,12 @@
         data.append('tipo', this.Nota.tipo);
         //datos de la devolucion
         data.append('devolucion_id', this.Nota.devolucion);
+        data.append('orden_entrada', this.Nota.orden_entrada);
         //cc
         data.append('ccProveedor', this.cc.id);
         data.append('ccNota',      this.Nota.cc);
         data.append('sucursal_id',      this.Nota.sucursal_id);
+        this.$store.commit('activarOverlay', true);
         this.$axios({
           method: 'post',
           url: 'notas_credito',
@@ -565,13 +578,25 @@
       },
       validarForm(){
         if (this.$refs.FormNuevaNotaCreditoProveedor.validate() && this.Nota.isRevisado)
-          this.registrarNota()
+          if (this.Nota.cc === 2163) {
+            if (this.validarOrdenEntrada())
+              this.registrarNota()
+          }else
+            this.registrarNota();
         else{
           Swal.fire(
-            'Error en la Validación',
-            `No se ha validado el formulario o te hace falta aceptar los pagos modificados.`,
-            'error'
+              'Error en la Validación',
+              `No se ha validado el formulario o te hace falta aceptar los pagos modificados.`,
+              'error'
           );
+        }
+      },
+      validarOrdenEntrada(){
+        if (this.Nota.orden_entrada && this.Nota.cc === 3)
+          return true;
+        else{
+          this.$store.commit('notificacion',{texto:'No haz seleccionado una devolución.', color:'error'});
+          return false;
         }
       },
       verDocumento(ubicacion, val){

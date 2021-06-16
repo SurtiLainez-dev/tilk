@@ -271,7 +271,7 @@
             Swal.fire(
                 'Registro Exitoso del Stock',
                 `Haz aceptado exitosamente la guía de remisión ${this.selected.remision_transferencia.numeracion}.
-              El stock del piso ${this.selected.destino.nombre} ya se actualizó, verífique el inventario. Si detexta alguna
+              El stock del piso ${this.selected.destino.nombre} ya se actualizó, verífique el inventario. Si detecta alguna
               alteración de inventario incorrecta por favor notificarlo de inmediato.`,
                 'success'
             );

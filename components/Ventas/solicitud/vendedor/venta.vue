@@ -144,7 +144,7 @@
 
                 <v-stepper-content step="2">
                   <v-card-text>La venta se realizó con exito, descarga y sube los documentos de la venta desde el apartado
-                  de MIS VEENTAS en el menú. Tienes que esperar a que el facturado apruebe la venta. Si estas en la
+                  de MIS VENTAS en el menú. Tienes que esperar a que el facturado apruebe la venta. Si estas en la
                   pantalla de tareas ya puedes cerrar la tarea.</v-card-text>
                 </v-stepper-content>
             </v-stepper-items>
@@ -480,10 +480,12 @@
             },
             declinarVenta(){
               this.$store.commit('activarOverlay', true);
+              this.$store.commit('tareas/cambiarValorVista', false);
               this.$axios.post('venta',{
                 tipo:              2,
                 solicitud_credito: this.Soli.id,
               }).then((res)=>{
+                this.$store.commit('tareas/cambiarValorVista', true);
                 this.$store.commit('activarOverlay', false);
                 this.notificacion('Se ha declinado la solicitúd de crédito','error');
                 this.dialogo = true;
@@ -492,7 +494,7 @@
             },
             crearVenta(){
                 this.AArticulo.remision = this.AArticulo.serie === this.AArticulo.verificar_remision;
-
+                this.$store.commit('tareas/cambiarValorVista', false);
                 this.$store.commit('activarOverlay', true);
                 this.dialogo = false;
                 let forma_pago = 0;
@@ -547,12 +549,15 @@
                 }, {
                       timeout: 15000,
                     }).then((res)=>{
+                    this.$store.commit('tareas/cambiarValorVista', true);
                     this.$store.commit('activarOverlay', false);
                     this.notificacion('Se ha registró la venta exitosamente.','success')
                     this.SECC = 2;
                     this.dialogo = true;
                     this.vistaVenta = true
+
                 }).catch((error)=>{
+                    this.$store.commit('tareas/cambiarValorVista', true);
                     this.$store.commit('activarOverlay', false);
                     this.notificacion('Hubo un error al ingresar la venta','error');
                     if (error.response.status === 422)

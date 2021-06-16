@@ -46,7 +46,7 @@
                             :item-value="'id'"
                             :item-text="'nombre'"
                             label="Colaborador Despachante"
-                            :items="ColEnvio">
+                            :items="Colaboradores">
             </v-autocomplete>
           </v-col>
           <v-col cols="3">
@@ -54,7 +54,7 @@
                             :item-value="'id'"
                             :item-text="'nombre'"
                             label="Colaborador que Recibe"
-                            :items="ColRecibir">
+                            :items="Colaboradores">
             </v-autocomplete>
           </v-col>
           <v-col cols="3">
@@ -163,34 +163,6 @@
           })
         })
       },
-      cargarColaboradorEnvio(){
-        this.$axios.get('colaboradores_suc/'+this.datos[0].sucursal_id,{
-          headers:{
-            'Authorization': `Bearer ${this.$store.state.token}`
-          }
-        }).then((res)=>{
-          res.data.col.forEach( (i) =>{
-            this.ColEnvio.push({
-              "id": i.id,
-              "nombre": i.nombres+' '+i.apellidos
-            })
-          })
-        })
-      },
-      cargarColaboradorRecibir(){
-        this.$axios.get('colaboradores_suc/'+this.datos[0].sucursal_destino,{
-          headers:{
-            'Authorization': `Bearer ${this.$store.state.token}`
-          }
-        }).then((res)=>{
-          res.data.col.forEach( (i) =>{
-            this.ColRecibir.push({
-              "id": i.id,
-              "nombre": i.nombres+' '+i.apellidos
-            })
-          })
-        })
-      },
       cargarPdf(){
         this.$store.commit('activarOverlay', true);
         this.$store.commit('valorDialogo', false);
@@ -212,8 +184,6 @@
       }
     },
     created() {
-      this.cargarColaboradorEnvio();
-      this.cargarColaboradorRecibir();
       this.cargarColaboradores();
     }
   }

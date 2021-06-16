@@ -99,6 +99,7 @@
                         <th>Código</th>
                         <th>Cantidad</th>
                         <th>Precio Unitario</th>
+                        <th>Descuento</th>
                         <th>Sub-total</th>
                         <th>Impuesto</th>
                         <th>Total</th>
@@ -107,8 +108,8 @@
                       </thead>
                       <tbody>
                       <tr v-for="item in Factura.cuerpo">
-                        <td width="45%">{{item.articulo}}
-                          <hr>
+                        <td width="35%">{{item.articulo}}
+                          <br>
                           <small>{{item.descripcion}}</small></td>
                         <td width="10%">{{item.codigo}}</td>
                         <td width="5%">{{item.cantidad}}</td>
@@ -117,11 +118,15 @@
                                         @keyup="sumaTotal(item)" dense></v-text-field>
                         </td>
                         <td width="10%">
+                          <v-text-field v-model="item.descuento" @keyup="sumaTotal(item)" :rules="[rules.condicion.igual]"
+                                        dense></v-text-field>
+                        </td>
+                        <td width="10%">
                           <v-text-field disabled v-model="item.sub_total" dense></v-text-field>
                         </td>
                         <td width="5%">
                           <v-select :items="impuesto.Impuestos" @change="leerImpuesto(item)"
-                                    v-model="item.impuesto" :rules="[rules.mayor.req]"></v-select>
+                                    v-model="item.imp" :rules="[rules.mayor.req]"></v-select>
                         </td>
                         <td width="10%">
                           <v-text-field disabled v-model="item.total" dense></v-text-field>
@@ -145,6 +150,25 @@
                     </template>
                   </v-simple-table>
                 </div>
+                <br>
+                <v-row no-gutters>
+                  <v-col cols="8">
+                    <v-checkbox label="Seleccionar si viene un cargo por flete"
+                                v-model="flete.is" dense class="ma-2"></v-checkbox>
+                  </v-col>
+                  <v-col cols="4">
+                    <v-text-field class="ma-2" dense :disabled="!flete.is"
+                                  label="Total del Flete" v-model="flete.total" suffix="lps"></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row no-gutters>
+                  <v-col cols="8">
+                  </v-col>
+                  <v-col cols="4">
+                    <v-text-field class="ma-2" dense :disabled="Factura.is_descuento" @change="habilitarDescuento"
+                                  label="Total del Descuento" v-model="Factura.decuento" suffix="lps"></v-text-field>
+                  </v-col>
+                </v-row>
                 <v-card-actions>
                   <v-row>
                     <v-col class="d-flex justify-start">
@@ -348,6 +372,10 @@
     },
     data(){
       return{
+        flete:{
+          is: false,
+          total: 0
+        },
         int: new Intl.NumberFormat(),
         headerRemision:[
           {text:'Chasis', value:'chasis'},
@@ -380,7 +408,8 @@
             min: v => v.length > 5  || 'Tiene que ser mayor a 5 carácteres'
           },
           condicion:{
-            min: v => v > 0 || 'Tiene que ser mayor a 0'
+            min: v => v > 0 || 'Tiene que ser mayor a 0',
+            igual: v => v >= 0 || 'no tiene que ser menor a cero'
           },
           mayor:{
             req: v => !!v || 'Campo requerido',
@@ -404,6 +433,8 @@
         OrdenesIngreso: [],
         OrdenesCompra: [],
         Factura:{
+          is_descuento: false,
+          decuento: 0,
           proveedor_id: null,
           isRemision:  false,
           File: null,
@@ -554,7 +585,8 @@
                       "articulo_nombre":      i.cuerpo_orden_entradas[0].articulo.descripcion_corta,
                       "codigo":               i.cuerpo_orden_entradas[0].articulo.codigo_sistema,
                       "estado":               false,
-                      "proveedor_id":         i.proveedor.id
+                      "proveedor_id":         i.proveedor.id,
+                      "sucursal_id":          i.sucursal_id
                     })
                   }
                 })
@@ -701,11 +733,13 @@
             "sub_total":       0,
             "impuesto":        0,
             "impuesto_id":     0,
+            "imp":             0,
             "total":           0,
             "observacion":     '',
             "dialogoObs":      false,
             "motocicleta_id":  0,
-            "guia_remision":   0
+            "guia_remision":   0,
+            "descuento":       0
           })
         });
         console.log(this.Factura.select)
@@ -723,6 +757,7 @@
         this.Factura.cuerpo = []
         this.Guias.forEach( (i) => {
           if (i.estado === true){
+            console.log(i)
             this.Factura.codIngreso      = i.codigo_orden;
             this.Factura.logoProveedor   = i.logo;
             this.Factura.nombreProveedor = i.proveedor;
@@ -767,9 +802,24 @@
           }
         })
       },
+      habilitarDescuento(){
+        if (this.Factura.decuento === '')
+          this.Factura.decuento = 0;
+
+        if (!this.Factura.is_descuento){
+          let cantidad  = this.Factura.cuerpo.reduce((total,i)=> total + i.cantidad, 0);
+          let descuento = (this.Factura.decuento/cantidad).toFixed(2);
+          this.Factura.cuerpo.forEach((i)=>{
+            i.descuento = descuento;
+            i.sub_total = (i.cantidad * (i.precio_unitario - descuento)).toFixed(2);
+            i.total     = (i.sub_total * (parseFloat(i.impuesto) + parseFloat(1))).toFixed(2);
+          });
+          this.Factura.totalFactura = this.Factura.totalFactura - this.Factura.decuento;
+        }
+      },
       leerImpuesto(item){
-        item.impuesto_id = item.impuesto.split('-')[0];
-        item.impuesto    = item.impuesto.split('-')[1];
+        item.impuesto_id = item.imp.split('-')[0];
+        item.impuesto    = item.imp.split('-')[1];
         this.sumaTotal(item)
       },
       reajutarFecha(index, item){
@@ -801,7 +851,10 @@
         data.append("cuerpo",             cuerpoFactura);
         data.append("pagos",              pagosGenerados);
         data.append("remision",           this.Factura.isRemision);
-        data.append("sucursal",           this.Factura.sucursal)
+        data.append("sucursal",           this.Factura.sucursal);
+        data.append("is_flete",           this.flete.is);
+        data.append("flete",              this.flete.total);
+        data.append("descuento",              this.Factura.decuento);
         this.$axios({
           method: 'post',
           url: '/facturas_proveedor',
@@ -837,13 +890,24 @@
         }
       },
       sumaTotal(item){
-        this.Factura.totalFactura = 0
-        item.sub_total = (item.cantidad * item.precio_unitario).toFixed(2)
+        let total      = 0;
+        item.sub_total = (item.cantidad * (item.precio_unitario -  item.descuento)).toFixed(2)
         if (item.impuesto > 0 ){
+          this.Factura.decuento = 0;
           item.total     = (item.sub_total * (parseFloat(item.impuesto) + parseInt(1))).toFixed(2)
           this.Factura.cuerpo.forEach( (i) => {
-            this.Factura.totalFactura = parseFloat(i.total) + parseFloat(this.Factura.totalFactura)
-          })
+            total = parseFloat(i.total) + parseFloat(total);
+            this.Factura.totalFactura = total;
+            this.Factura.decuento     = parseFloat(this.Factura.decuento) + (i.descuento * i.cantidad);
+          });
+
+          this.Factura.decuento = this.Factura.decuento.toFixed(2);
+          if (this.Factura.decuento > 0) {
+            this.Factura.is_descuento = true;
+          }else {
+            this.Factura.is_descuento = false;
+            this.Factura.descuento = 0;
+          }
         }
       },
       verGuiaRemision(file){
@@ -886,6 +950,9 @@
       },
       vistaPago(){
         if (this.$refs.FormValidandoDatosFacturaProveedor.validate()){
+          if (!this.flete.is)
+            this.flete.total = 0;
+          this.Factura.totalFactura = parseFloat(this.Factura.totalFactura) + parseFloat(this.flete.total);
           this.vista = 3
         }
       }

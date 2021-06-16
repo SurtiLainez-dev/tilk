@@ -19,7 +19,7 @@
                   <v-col v-if="item.id === 1" class="d-flex justify-center" @click="go(item.url, item.id, item.accion)">
                       <v-tooltip right>
                           <template v-slot:activator="{ on, attrs }">
-                              <v-btn @click="select = item.id" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
+                              <v-btn @click="itemsMenu(item.id)" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
                                   <v-icon>{{item.icono}}</v-icon>
                               </v-btn>
                           </template>
@@ -50,7 +50,7 @@
                   <v-col v-else-if="item.id > 3" class="d-flex justify-center">
                     <v-tooltip right>
                       <template v-slot:activator="{ on, attrs }">
-                        <v-btn @click="select = item.id" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
+                        <v-btn @click="itemsMenu(item.id)" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
                           <v-icon>{{item.icono}}</v-icon>
                         </v-btn>
                       </template>
@@ -176,13 +176,41 @@
           {'color': 'purple',  'titulo':'Cuentas',  'icono':'fa fa-file-invoice',
             'url':'/inicio/', 'id':8, 'modulo': 0, 'accion': false},
           {'color':'pink darken-4', 'titulo':'Caja', 'icono':'fa fa-cash-register',
-            'url': '/caja/', 'id': 9, 'modulo': 0, 'accion': true}
+            'url': '/caja/', 'id': 9, 'modulo': 0, 'accion': true},
+          {'color':'green darken-4', 'titulo':'Reportes', 'icono':'fa fa-file-contract',
+            'url': '', 'id': 11, 'modulo': 0, 'accion': false},
+          {'color':'light-blue darken-4', 'titulo':'Cerrar Sesión', 'icono':'fa fa-sign-in-alt',
+            'url': '', 'id': 10, 'modulo': 0, 'accion': false}
         ]
     }
     },
     methods:{
+      cerrarSesion(){
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('logout').then((res)=>{
+          this.$store.commit("guardarToken", null);
+          this.$store.commit("solicitud_credito/guardarToken", null);
+          this.$store.commit('notificacion', {texto:res.data.msj, color:'success'});
+          setTimeout(()=>{
+            this.$store.commit('activarOverlay', false);
+          },2000);
+          this.$router.replace({path:'/'});
+        }).catch((error)=>{
+          this.$store.commit("guardarToken", null);
+          this.$store.commit("solicitud_credito/guardarToken", null);
+          this.$store.commit('notificacion', {texto:'Se ha cerrado sesión exitosamente', color:'success'});
+          this.$store.commit('activarOverlay', false);
+          this.$router.replace({path:'/'});
+        })
+      },
+      itemsMenu(val){
+        if (val !== 10)
+          this.select = val;
+        else
+          this.cerrarSesion();
+      },
       go(url, id, accion){
-        this.select = id;
+        this.itemsMenu(id);
         if (accion)
           this.$router.push(url)
       },

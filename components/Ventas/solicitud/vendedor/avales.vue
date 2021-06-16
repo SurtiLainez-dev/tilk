@@ -323,6 +323,7 @@
                         }
                     })
                     this.dialogo = false;
+                    this.$store.commit('tareas/cambiarValorVista', false);
                     this.$store.commit('activarOverlay', true);
                     this.$axios.put('solicitud_credito/avales/'+this.Soli.id,{
                         avales: avales
@@ -353,11 +354,13 @@
                         this.existsEditado = false;
                         this.dialogo = true;
                         this.$store.commit('activarOverlay', false);
+                        this.$store.commit('tareas/cambiarValorVista', true);
                     })
                 }else{
                     this.notificacion('No hay avales que agregar','error')
                     this.dialogo = true;
                     this.$store.commit('activarOverlay', false);
+                    this.$store.commit('tareas/cambiarValorVista', true);
                 }
             },
             registrarCliente(data){
@@ -367,6 +370,7 @@
                         && regexId.test(this.data_Aval.identidad)){
                     this.dialogo = false;
                     this.$store.commit('activarOverlay', true);
+                    this.$store.commit('tareas/cambiarValorVista', false);
                     this.$axios({
                         method: 'post',
                         url:    'clientes',
@@ -386,12 +390,14 @@
                         });
                         this.Archivos = res.data.files;
                         this.$store.commit('activarOverlay', false);
+                        this.$store.commit('tareas/cambiarValorVista', true);
                         this.dialogo = true;
                         this.data_Aval.existe = true;
                         this.existsEditado = true;
                         this.notificacion('Se creo el cliente exitosamente','success');
                         this.notificacion('Se agregaron los documentos exitosemente','success');
                     }).catch((error)=>{
+                        this.$store.commit('tareas/cambiarValorVista', true);
                         this.notificacion('Error al crear el cliente.','error')
                     })
                 }else{

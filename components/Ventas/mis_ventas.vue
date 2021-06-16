@@ -613,7 +613,7 @@ export default {
       }
     },
     mostrarPdf(url){
-      ipcRenderer.send('open-nav', url);
+      ipcRenderer.send('pint_navegador', url);
     },
     notificacion(text, color){
       Vue.$toast.open({
@@ -679,7 +679,7 @@ export default {
       this.$axios.post('leer_documento/',
           {ubicacion: url}).then((res)=>{
         if (res.status === 200){
-          ipcRenderer.send('open-nav', res.data.url);
+          ipcRenderer.send('pint_navegador', res.data.url);
           this.$store.commit('activarOverlay', false);
         }
       }).catch((error)=>{

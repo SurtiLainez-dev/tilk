@@ -49,8 +49,10 @@
         methods:{
             declinar(){
                 this.dialogo = false;
+                this.$store.commit('tareas/cambiarValorVista', false);
                 this.$store.commit('activarOverlay', true);
                 this.$axios.put('solicitud_credito/declinar/'+this.Soli.id).then((res)=>{
+                    this.$store.commit('tareas/cambiarValorVista', true);
                     this.$store.commit('solicitud_credito/cargarSolicitudes');
                     this.notificacion('Se estan cargando nuevamente las solicitudes. Espera el cambio','warning');
                     this.notificacion('Se ha declinado la solicitud exitosamente','success');
@@ -58,7 +60,8 @@
                 }).catch((error)=>{
                     this.dialogo = true;
                     this.$store.commit('activarOverlay', false);
-                    this.notificacion('Error al declinar.','error')
+                    this.notificacion('Error al declinar.','error');
+                    this.$store.commit('tareas/cambiarValorVista', true);
                 })
             },
             notificacion(text, color){

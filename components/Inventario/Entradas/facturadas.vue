@@ -191,7 +191,7 @@
             }
           ]
         },
-        Colaboradores: null,
+        Colaboradores: [],
         cargarArticulo: false,
         Inventario: null,
         compuestos:[]
@@ -231,8 +231,10 @@
           }
         }).then((res)=>{
           if (res.status === 200){
-            this.Colaboradores = res.data.col
-            this.isLoadCol = true
+            if (res.data.col.length > 0)
+              this.Colaboradores = res.data.col;
+
+            this.isLoadCol     = true
           }
         })
       },

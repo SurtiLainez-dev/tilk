@@ -522,7 +522,8 @@
           cuentasProveedor:      [],
           loadCuentasProveedor:  false,
           cuentaProveedorString: '',
-          cuentaProveedorId:     0
+          cuentaProveedorId:     0,
+          totalcuenta:           0
         },
         cheques:{
           data: [],
@@ -585,9 +586,15 @@
       capturarCuentaBanco(){
         this.CC.cuentasBancos.forEach((i)=>{
           if (i.referencia_id == this.Pago.cuenta_id){
-            this.CC.cuentaBancoID     = i.id;
-            this.CC.cuentaBancoString = i.cod+' - '+i.nombre;
-            this.cargarCheques();
+            if (i.total > 0) {
+              this.cargarCheques();
+              this.CC.cuentaBancoID     = i.id;
+              this.CC.cuentaBancoString = i.cod+' - '+i.nombre;
+              this.CC.totalcuenta       = i.total;
+            }else {
+              this.Pago.cuenta_id       = '';
+              this.$store.commit('notificacion', {'texto': 'Esta cuenta no tiene fondos.', color: 'error'});
+            }
           }
         })
       },
@@ -663,7 +670,7 @@
           res.data.cuentas.forEach((i)=>{
             this.Cuentas.push({
               "id": i.id,
-              "nombre": i.num+' - '+i.tipo.nombre+' - '+i.banco.nombre
+              "nombre": i.num+' - '+i.tipo.nombre+' - '+i.banco.nombre+' - L. '+i.total
             })
           });
           this.loading.cuentas = false;

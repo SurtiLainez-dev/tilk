@@ -3,7 +3,7 @@
         <v-row no-gutters>
             <v-col cols="2" class="d-flex align-center"><h5>Cliente</h5></v-col>
             <v-col cols="10" class="d-flex justify-end">
-                <v-tooltip>
+                <v-tooltip top>
                     <template v-slot:activator="{on, attrs}">
                         <v-btn class="ma-2" text fab x-small @click="addArchivo"
                                v-on="on" v-bind="attrs" color="red">
@@ -12,7 +12,7 @@
                     </template>
                     <span>Añadir documento al cliente</span>
                 </v-tooltip>
-                <v-tooltip>
+                <v-tooltip top>
                     <template v-slot:activator="{on, attrs}">
                         <v-btn class="ma-2" text fab x-small @click="addTelefono"
                                v-on="on" v-bind="attrs" color="success">
@@ -21,7 +21,7 @@
                     </template>
                     <span>Añadir telefono al cliente</span>
                 </v-tooltip>
-                <v-tooltip>
+                <v-tooltip top>
                     <template v-slot:activator="{on, attrs}">
                         <v-btn class="ma-2" text fab x-small @click="addDetalle"
                                v-on="on" v-bind="attrs" color="success">
@@ -314,6 +314,14 @@
                     return JSON.parse(this.$store.state.solicitud_credito.Solicitud.cliente.direcciones);
                 }
             },
+            View_Tarea: {
+                get: function () {
+                  return this.$store.state.tareas.Tareas_view;
+                },
+                set: function (val) {
+                  this.$store.commit('tareas/cambiarValorVista', val)
+                }
+            },
         },
         created() {
             console.log(this.EstadoVista)
@@ -476,6 +484,7 @@
             },
             validarActualizacionDelCliente(){
                 this.vista = false;
+                this.View_Tarea = false;
                 this.$store.commit('activarOverlay', true);
                 let data = new FormData();
                 let archivos = [], cont = 0, th = this.data_Cliente;
@@ -553,6 +562,7 @@
                     this.Soli.cliente.detalles = JSON.stringify(th.Detalles);
                     this.Soli.cliente.archivos = JSON.stringify(archivos);
                     this.$store.commit('activarOverlay', false);
+                    this.View_Tarea = true;
                     this.vista = true;
                     this.notificacion('Se han registrados los cambios del cliente correctamente','success')
                 }).catch((error)=>{

@@ -59,14 +59,12 @@
         data: [],
         search: '',
         header:[
-          {text:'Proveedor',value:'proveedor'},
           {text:'Marcá',value:'marca'},
           {text:'Módelo',value:'modelo'},
           {text:'Código Sístema',value:'codigo_sistema'},
           {text:'Nombre del Artículo',value:'nombre_articulo'},
           {text:'Código Proveedor',value:'codigo_proveedor'},
           {text:'Sub-familia',value:'fam'},
-          {text:'Acciones',value:'articulo'},
         ],
         show: false,
         tooltipInventario:[

@@ -30,6 +30,9 @@
             <v-list-item class="itemOpciones" @click="go('/inicio/otras_gestiones/ventas')">
               Ver ventas
             </v-list-item>
+            <v-list-item class="itemOpciones" @click="go('/inicio/otras_gestiones/mi_perfil')">
+              Mi perfil
+            </v-list-item>
         </v-list-group>
     </div>
 </template>
