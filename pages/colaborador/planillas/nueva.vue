@@ -5,8 +5,8 @@ import Swal from "sweetalert2";
 <!--  Encabezado de la pagina    -->
       <v-row>
         <v-col cols="4" class="d-flex justify-center align-center">
-          <v-btn dark color="orange" small class="ma-2" @click="popupPlanilla = true">Crear Planilla</v-btn>
-          <v-btn dark color="primary" small class="ma-2" @click="popupAcciones = true">Crear Acciones</v-btn>
+          <v-btn dark color="orange" tile small class="ma-2" @click="popupPlanilla = true">Crear Planilla</v-btn>
+          <v-btn dark color="primary" tile small class="ma-2" @click="popupAcciones = true">Crear Acciones</v-btn>
         </v-col>
         <v-col cols="8" class="d-flex justify-center">
           <v-card-title>
@@ -159,7 +159,7 @@ import Swal from "sweetalert2";
         </v-data-table>
         <v-row>
           <v-col class="d-flex justify-end">
-            <v-btn dark color="orange" @click="planillaCol"
+            <v-btn dark color="orange" @click="planillaCol" small tile
                    v-if="selectedColaboradores.length > 0">Registrar Empleados</v-btn>
           </v-col>
         </v-row>
@@ -280,12 +280,10 @@ import Swal from "sweetalert2";
         <v-card-title>Registro Exitoso</v-card-title>
         <v-card-text>La planilla se guardo exitosamente. Puede realizar una
         de las siguientes acciones: </v-card-text>
+        <v-divider></v-divider>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-divider></v-divider>
-          <v-btn dark small color="orange">Imprimir</v-btn>
-          <v-btn dark small color="pink">Ver</v-btn>
-          <v-btn dark small color="primary" @click="dialogoImprimir = false">Crear Nueva</v-btn>
+          <v-btn dark small color="orange" @click="verPlanillaPdf(urlPdf)" tile>Ver</v-btn>
+          <v-btn dark small color="primary" @click="dialogoImprimir = false" tile>Crear Nueva</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -297,6 +295,7 @@ import Swal from "sweetalert2";
 
 <script>
   import Swal from 'sweetalert2'
+  import {ipcRenderer} from "electron";
   var elemtos = []
   export default {
     watch: {
@@ -328,6 +327,7 @@ import Swal from "sweetalert2";
           {id:'1', nombre: 'Suma'},
           {id:'2', nombre: 'Resta'},
         ],
+        urlPdf: '',
         search: '',
         header:[
           {text:'Nombre Completo', value:'nombres'},
@@ -385,6 +385,33 @@ import Swal from "sweetalert2";
       this.$store.commit('guardarTitulo', 'Planilla > Nueva')
     },
     methods:{
+      addAccion: function(){
+        this.dataPlanilla[this.index].acciones++
+      },
+      addAcciones: function(){
+        if (this.$refs.FormNuevoTipoAccionPlanilla.validate()){
+          this.$axios.post('tipos_acciones',{
+            nombre: this.AccionesP.nombre,
+            tipo: this.AccionesP.tipo
+          },{
+            headers:{
+              'Authorization': 'Bearer '+ this.$store.state.token,
+            }
+          }).then((res)=>{
+            if (res.data.status){
+              Swal.fire(
+                  'Registro Exitoso',
+                  `Se registro exitosamente el tipo de acción ${this.AccionesP.nombre}.`,
+                  'success'
+              )
+              this.AccionesP.nombre = ''
+              this.AccionesP.tipo = ''
+              this.cargarTipoAccionesPlanillas()
+              this.popupAcciones = false
+            }
+          })
+        }
+      },
       anios: function(){
         let fecha = new Date();
         let ano = fecha.getFullYear();
@@ -395,12 +422,42 @@ import Swal from "sweetalert2";
         this.anos.push(ano)
         this.anos.push(anomas)
       },
-      print: function(){
-        this.$router.replace({path:'/colaborador/planillas/pdf/'+this.codPlanillasGo})
+      buscarColaboradores: function() {
+        console.log(this.sucursal_id)
+        this.isPeticionSucursal    = true
+        this.sucursal.id           = this.sucursal_id
+        let fecha                  = new Date();
+        this.sucursal.mes          = fecha.getMonth() + 1;
+        this.selected              = []
+        this.selectedColaboradores = []
+        this.dataPlanilla          = []
+        return this.$axios.get('empleados_plantilla/'+this.sucursal.id, {
+          headers:{
+            'Authorization': 'Bearer '+ this.$store.state.token,
+          }
+        }).then((res) =>{
+          this.isPeticionSucursal = false
+          this.colaboradores = res.data.col
+
+        })
       },
-      irPlanillas(){
-        this.dialogoImprimir = false
-        this.$router.replace({path:"/colaborador/planillas/"+this.codPlanillasGo})
+      cargarRangos:function () {
+        return this.$axios.get('rangos', {
+          headers:{
+            'Authorization': 'Bearer '+ this.$store.state.token,
+          }
+        }).then((res)=>{
+          this.rangos = res.data.rangos
+        })
+      },
+      cargarTipoAccionesPlanillas: function () {
+        return this.$axios.get('tipos_acciones', {
+          headers:{
+            'Authorization': 'Bearer '+ this.$store.state.token,
+          }
+        }).then((res)=>{
+          this.tipoAcciones = res.data.acciones
+        })
       },
       crearPlanilla(){
         if (this.$refs.FormRegistroPlanilla.validate()){
@@ -425,13 +482,44 @@ import Swal from "sweetalert2";
               this.checkEnviar = false
               this.codPlanillasGo = res.data.id
               this.overlay = false
-
+              this.urlPdf         = res.data.url;
             }
           })
         }else{
           this.checkEnviar = false
           this.dialogoVerificar = false
         }
+      },
+      deleteAccion: function(item){
+        if (item === 0){
+          this.dataPlanilla[this.index].tipoAccion = []
+          this.dataPlanilla[this.index].totalAccion = []
+          this.dataPlanilla[this.index].accionesCol = []
+        }
+        this.dataPlanilla[this.index].acciones--
+        this.dataPlanilla[this.index].tipoAccion.splice(item, item)
+        this.dataPlanilla[this.index].totalAccion.splice(item, item)
+        this.dataPlanilla[this.index].accionesCol.splice(item, item)
+        this.suma()
+      },
+      diasTrabajados: function(item){
+        let diasTrabajados = this.dataPlanilla[item].tipoPago.split('-')[1]
+        this.dataPlanilla[item].dias_trabajados = diasTrabajados
+        this.dataPlanilla[item].rangoPago = this.dataPlanilla[item].tipoPago.split('-')[0]
+        this.totalPago(item)
+      },
+      habilitarBtnVerificacion: function(){
+        if (elemtos.length == this.empleadosSeleccionados){
+          this.disabledVerificar = true
+        }
+      },
+      handleSelected(index) {
+        this.index = index
+        this.popupAccionPlanilla = true
+      },
+      irPlanillas(){
+        this.dialogoImprimir = false
+        this.$router.replace({path:"/colaborador/planillas/"+this.codPlanillasGo})
       },
       mesesString: function(){
         for (let item in this.meses){
@@ -440,17 +528,41 @@ import Swal from "sweetalert2";
           }
         }
       },
-      suma: function(){
-        this.dataPlanilla[this.index].totalAgregado = 0;
-        this.dataPlanilla[this.index].totalDeducido = 0;
-        for (let items in this.dataPlanilla[this.index].accionesCol){
-          if (this.dataPlanilla[this.index].accionesCol[items].tipoId ==  1){
-            this.dataPlanilla[this.index].totalAgregado = (parseFloat(this.dataPlanilla[this.index].totalAgregado) + parseFloat(this.dataPlanilla[this.index].accionesCol[items].totalAccion)).toFixed(2)
-          }else if (this.dataPlanilla[this.index].accionesCol[items].tipoId == 2){
-            this.dataPlanilla[this.index].totalDeducido = (parseFloat(this.dataPlanilla[this.index].totalDeducido) + parseFloat(this.dataPlanilla[this.index].accionesCol[items].totalAccion)).toFixed(2)
-          }
+      planillaCol: function() {
+        this.sucursal.nombre = this.selectedColaboradores[0].sucursal
+        this.habilitarVerificacion = []
+        elemtos = []
+        this.disabledVerificar = false
+        this.dataPlanilla = [];
+        this.habilitarVerificacion = 0;
+        this.disabledArea = true;
+        this.empleadosSeleccionados = this.selectedColaboradores.length;
+        for (let item in this.selectedColaboradores){
+          this.dataPlanilla.push({
+            "colaborador_id": this.selectedColaboradores[item].id, // es el id del colaborador seleccionado
+            "dias_trabajados": 0, //este es el campo en el que determina cuanto dias trabajo el trabajador
+            "nombreCompleto": this.selectedColaboradores[item].nombres+' '+this.selectedColaboradores[item].apellidos, //nombre completo del trabajador
+            "identidad": this.selectedColaboradores[item].identidad, //identidad del trabajador
+            "tipoCol": this.selectedColaboradores[item].puesto, //tipo de puesto que tiene en la empresa el empleado
+            "sueldo_base": this.selectedColaboradores[item].pago, //este es el sueldo base del trabajador
+            "tipoPago": null, //si quicena, mensualidad, semana
+            "rangoPago": null, //si quicena, mensualidad, semana
+            "totalAgregado": 0, // este es total de dinero que tiene extra sobre el sueldo base
+            "totalDeducido": 0, //este es el total de dinero que tiene deducido del total del pago
+            "pago": 0, //este es el sueldo base sin deducciones ni sumas
+            "totalPago": 0, //esto es el total que se le pagara al trabajador  =(sueldo_base - totalDeducido) + totalAgregado
+            "observacion": '', //esta es la observacion corta de este empleado *esta sale impresa
+            "acciones": 0, //esta es la cantidad de acciones que tiene el empleado (vales, anticipos, comision)
+            "accionesCol": [], //esto es el registro de todas las acciones del empleado
+            "tipoAccion":[], //este es para el campo tipo acciones en el select
+            "totalAccion": [] //este es el total de la accion que se eligio
+          })
         }
-        this.dataPlanilla[this.index].totalPago = ((parseFloat(this.dataPlanilla[this.index].pago) - parseFloat(this.dataPlanilla[this.index].totalDeducido)) + parseFloat(this.dataPlanilla[this.index].totalAgregado)).toFixed(2)
+        this.mesesString();
+        this.popupPlanilla = false
+      },
+      print: function(){
+        this.$router.replace({path:'/colaborador/planillas/pdf/'+this.codPlanillasGo})
       },
       selectTipoAccion: function(item){
         if (this.dataPlanilla[this.index].tipoAccion[item] && this.dataPlanilla[this.index].totalAccion[item]){
@@ -489,25 +601,17 @@ import Swal from "sweetalert2";
           }
         }
       },
-      addAccion: function(){
-        this.dataPlanilla[this.index].acciones++
-      },
-      deleteAccion: function(item){
-        if (item === 0){
-          this.dataPlanilla[this.index].tipoAccion = []
-          this.dataPlanilla[this.index].totalAccion = []
-          this.dataPlanilla[this.index].accionesCol = []
+      suma: function(){
+        this.dataPlanilla[this.index].totalAgregado = 0;
+        this.dataPlanilla[this.index].totalDeducido = 0;
+        for (let items in this.dataPlanilla[this.index].accionesCol){
+          if (this.dataPlanilla[this.index].accionesCol[items].tipoId ==  1){
+            this.dataPlanilla[this.index].totalAgregado = (parseFloat(this.dataPlanilla[this.index].totalAgregado) + parseFloat(this.dataPlanilla[this.index].accionesCol[items].totalAccion)).toFixed(2)
+          }else if (this.dataPlanilla[this.index].accionesCol[items].tipoId == 2){
+            this.dataPlanilla[this.index].totalDeducido = (parseFloat(this.dataPlanilla[this.index].totalDeducido) + parseFloat(this.dataPlanilla[this.index].accionesCol[items].totalAccion)).toFixed(2)
+          }
         }
-        this.dataPlanilla[this.index].acciones--
-        this.dataPlanilla[this.index].tipoAccion.splice(item, item)
-        this.dataPlanilla[this.index].totalAccion.splice(item, item)
-        this.dataPlanilla[this.index].accionesCol.splice(item, item)
-        this.suma()
-      },
-      habilitarBtnVerificacion: function(){
-        if (elemtos.length == this.empleadosSeleccionados){
-          this.disabledVerificar = true
-        }
+        this.dataPlanilla[this.index].totalPago = ((parseFloat(this.dataPlanilla[this.index].pago) - parseFloat(this.dataPlanilla[this.index].totalDeducido)) + parseFloat(this.dataPlanilla[this.index].totalAgregado)).toFixed(2)
       },
       totalPago: function(item){
         let elem = elemtos.includes(item)
@@ -519,110 +623,20 @@ import Swal from "sweetalert2";
         this.dataPlanilla[item].totalPago = (((this.dataPlanilla[item].dias_trabajados * pagoDia) + parseFloat(this.dataPlanilla[item].totalAgregado)) - parseFloat(this.dataPlanilla[item].totalDeducido)).toFixed(2)
         this.dataPlanilla[item].pago = (this.dataPlanilla[item].dias_trabajados * pagoDia).toFixed(2)
       },
-      handleSelected(index) {
-        this.index = index
-        this.popupAccionPlanilla = true
-      },
-      buscarColaboradores: function() {
-        console.log(this.sucursal_id)
-        this.isPeticionSucursal    = true
-        this.sucursal.id           = this.sucursal_id
-        let fecha                  = new Date();
-        this.sucursal.mes          = fecha.getMonth() + 1;
-        this.selected              = []
-        this.selectedColaboradores = []
-        this.dataPlanilla          = []
-        return this.$axios.get('empleados_plantilla/'+this.sucursal.id, {
-          headers:{
-            'Authorization': 'Bearer '+ this.$store.state.token,
+      verPlanillaPdf(URL){
+        this.dialogoImprimir = false;
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('leer_documento/',
+            {ubicacion: URL}).then((res)=>{
+          if (res.status === 200){
+            ipcRenderer.send('pint_navegador', res.data.url);
+            this.$store.commit('activarOverlay', false);
           }
-        }).then((res) =>{
-          this.isPeticionSucursal = false
-          this.colaboradores = res.data.col
-
+        }).catch((error)=>{
+          this.$store.commit('notificacion',{texto:'Hubo un error al cargar el documento', color:'error'});
+          this.$store.commit('activarOverlay', false);
         })
-      },
-      diasTrabajados: function(item){
-        let diasTrabajados = this.dataPlanilla[item].tipoPago.split('-')[1]
-        this.dataPlanilla[item].dias_trabajados = diasTrabajados
-        this.dataPlanilla[item].rangoPago = this.dataPlanilla[item].tipoPago.split('-')[0]
-        this.totalPago(item)
-      },
-      cargarRangos:function () {
-        return this.$axios.get('rangos', {
-          headers:{
-            'Authorization': 'Bearer '+ this.$store.state.token,
-          }
-        }).then((res)=>{
-          this.rangos = res.data.rangos
-        })
-      },
-      cargarTipoAccionesPlanillas: function () {
-        return this.$axios.get('tipos_acciones', {
-          headers:{
-            'Authorization': 'Bearer '+ this.$store.state.token,
-          }
-        }).then((res)=>{
-          this.tipoAcciones = res.data.acciones
-        })
-      },
-      addAcciones: function(){
-        if (this.$refs.FormNuevoTipoAccionPlanilla.validate()){
-          this.$axios.post('tipos_acciones',{
-            nombre: this.AccionesP.nombre,
-            tipo: this.AccionesP.tipo
-          },{
-            headers:{
-              'Authorization': 'Bearer '+ this.$store.state.token,
-            }
-          }).then((res)=>{
-            if (res.data.status){
-              Swal.fire(
-                'Registro Exitoso',
-                `Se registro exitosamente el tipo de acción ${this.AccionesP.nombre}.`,
-                'success'
-              )
-              this.AccionesP.nombre = ''
-              this.AccionesP.tipo = ''
-              this.cargarTipoAccionesPlanillas()
-              this.popupAcciones = false
-            }
-          })
-        }
-      },
-      planillaCol: function() {
-        this.sucursal.nombre = this.selectedColaboradores[0].sucursal
-        this.habilitarVerificacion = []
-        elemtos = []
-        this.disabledVerificar = false
-        this.dataPlanilla = [];
-        this.habilitarVerificacion = 0;
-        this.disabledArea = true;
-        this.empleadosSeleccionados = this.selectedColaboradores.length;
-        for (let item in this.selectedColaboradores){
-          this.dataPlanilla.push({
-            "colaborador_id": this.selectedColaboradores[item].id, // es el id del colaborador seleccionado
-            "dias_trabajados": 0, //este es el campo en el que determina cuanto dias trabajo el trabajador
-            "nombreCompleto": this.selectedColaboradores[item].nombres+' '+this.selectedColaboradores[item].apellidos, //nombre completo del trabajador
-            "identidad": this.selectedColaboradores[item].identidad, //identidad del trabajador
-            "tipoCol": this.selectedColaboradores[item].puesto, //tipo de puesto que tiene en la empresa el empleado
-            "sueldo_base": this.selectedColaboradores[item].pago, //este es el sueldo base del trabajador
-            "tipoPago": null, //si quicena, mensualidad, semana
-            "rangoPago": null, //si quicena, mensualidad, semana
-            "totalAgregado": 0, // este es total de dinero que tiene extra sobre el sueldo base
-            "totalDeducido": 0, //este es el total de dinero que tiene deducido del total del pago
-            "pago": 0, //este es el sueldo base sin deducciones ni sumas
-            "totalPago": 0, //esto es el total que se le pagara al trabajador  =(sueldo_base - totalDeducido) + totalAgregado
-            "observacion": '', //esta es la observacion corta de este empleado *esta sale impresa
-            "acciones": 0, //esta es la cantidad de acciones que tiene el empleado (vales, anticipos, comision)
-            "accionesCol": [], //esto es el registro de todas las acciones del empleado
-            "tipoAccion":[], //este es para el campo tipo acciones en el select
-            "totalAccion": [] //este es el total de la accion que se eligio
-          })
-        }
-        this.mesesString();
-        this.popupPlanilla = false
-      },
+      }
     },
     asyncData({$axios, store}){
       return $axios.get('/sucursales',{
