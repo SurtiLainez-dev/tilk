@@ -11,7 +11,7 @@
       <v-row no-gutters >
         <v-col>
           <v-card flat>
-            <v-toolbar flat color="grey lighten-4">
+            <v-toolbar flat color="grey lighten-5">
               Totales de la Factura
             </v-toolbar>
 
@@ -26,11 +26,15 @@
                           disabled  dense label="Total de la Factura">
             </v-text-field>
 
+            <v-text-field class="ma-4" suffix="lps" dense label="Total del Descuento a Aplicar"
+                          v-model="pago.des_aplicado" @keyup="aplicarDescuento" :rules="[rules.select.des]">
+            </v-text-field>
+
           </v-card>
         </v-col>
         <v-col >
           <v-card flat >
-            <v-toolbar color="grey lighten-4" flat>
+            <v-toolbar color="grey lighten-5" flat>
               Datos de la Factura
               <v-spacer></v-spacer>
               <v-btn small tile dark class="ma-2" color="indigo"
@@ -42,7 +46,7 @@
 
             <v-tooltip top>
               <template v-slot:activator="{on, attrs}">
-                <v-text-field v-on="on" v-bind="attrs" class="ma-4" dense
+                <v-text-field v-on="on" v-bind="attrs" class="ma-4" dense @dblclick="dialogoBuscarCliente = true"
                               v-model="Venta.nombre" :rules="[rules.select.req]"
                               label="Cliente" @keyup.enter="dialogoBuscarCliente = true">
                 </v-text-field>
@@ -71,7 +75,6 @@
           <thead>
           <tr>
             <th>Detalle del Artículo</th>
-            <th>Código del Sistema</th>
             <th>Cant.</th>
             <th>Precio</th>
             <th>Total</th>
@@ -80,8 +83,7 @@
           </thead>
           <tbody>
           <tr v-for="(item,i) in Venta.filas" >
-            <td>{{i + 1}}</td>
-            <td>{{item.articulo}}</td>
+            <td>{{i+1}} - {{item.articulo}} - Cod.Sis[{{item.cod_sistema}}]</td>
             <td>
               <b-form-input dense type="number" size="sm" style="height: 25px"
                             :min="1" :max="item.cantidadMax"
@@ -100,8 +102,8 @@
           </tbody>
         </template>
       </v-simple-table>
-
-      <br>
+      <v-divider></v-divider>
+      <v-card-text>Descuento que se puede aplicar L. {{int.format(pago.descuento)}}</v-card-text>
       <br>
       <v-toolbar flat color="grey lighten-5">
         <small>Cuerpo de Regalías</small>
@@ -252,11 +254,16 @@
           <h6>Realizar Documento</h6>
         </v-toolbar>
         <v-form class="pl-5 pr-5 pb-5" ref="FormRegistrarVenta">
-          <v-select dense :items="FormasPago" label="Forma de Pago"
+          <v-select dense :items="FormasPago" label="Forma de Pago" @change="cargarCcCuentasBancos"
                     v-model="pago.forma_pago" :rules="[rules.referencia.req]"
                     :item-value="'id'" :item-text="'nombre'">
           </v-select>
-          <v-text-field dense v-model="pago.referencia" label="Referencia Pago"></v-text-field>
+          <v-autocomplete dense v-if="pago.forma_pago === 2 || pago.forma_pago === 4"
+                          :rules="[rules.select.req]" v-model="pago.cc_banco"
+                          :loading="loadccBancos" :items="ccCuentasB" :item-text="'nombre'"
+                          label="Seleccionar Cuenta" :item-value="'id'"></v-autocomplete>
+          <v-text-field dense v-model="pago.referencia"
+                        label="Referencia Pago"></v-text-field>
           <v-text-field dense v-model="pago.efectivo" label="Efectivo" type="number"
                         :rules="[rules.referencia.req, rules.efectivo.min]" @keyup="calucularCambio"
                         prefix="L" @click="calucularCambio" @keyup.enter="calucularCambio">
@@ -317,15 +324,24 @@ export default {
   },
   data(){
     return{
+      int: new Intl.NumberFormat(),
+      loadccBancos: false,
+      ccCuentasB: [],
       searchRegalia: '',
       dialogoRegalia: false,
       FormasPago: [],
       pago:{
-        dialogo: false,
-        referencia: '',
-        forma_pago: '',
-        efectivo:   0,
-        cambio:     0,
+        cc_banco:     '',
+        dialogo:      false,
+        referencia:   '',
+        forma_pago:   '',
+        efectivo:     0,
+        cambio:       0,
+        descuento:    0,
+        des_aplicado: 0,
+        totalState:   0,
+        ccDescuento:  0,
+        impState:     0
       },
       searchCliente:        '',
       dialogoBuscarCliente: false,
@@ -335,9 +351,10 @@ export default {
         },
         select: {
           req: v => !!v || 'Campo requerido',
+          des: v => v <= this.pago.descuento || 'El descuento máximo es de L. '+this.pago.descuento
         },
         efectivo:{
-          min: v => v >= this.Venta.total || 'No puede ser menor que el total que se distribuyó',
+          min: v => parseFloat(v) >= parseFloat(this.Venta.total) || 'No puede ser menor que el total que se distribuyó',
         },
         identidad: {
           some:v => (v.length === 0 || v.length === 13 || v.length === 14) || 'Tiene que ser de 13 o 14 carácteres.',
@@ -425,7 +442,8 @@ export default {
             totalFila:   (1 * data.articulo.precio_activo.precio_contado).toFixed(2),
             estado:      1,
             vali_serie:  false,
-            vali_color:  false
+            vali_color:  false,
+            descuento:   data.articulo.precio_activo.descuento
           });
 
           this.sumarTotalFactura();
@@ -442,6 +460,8 @@ export default {
           color: 'warning'
         });
       }
+
+      this.pago.descuento = this.Venta.filas.reduce((total, item) => total + item.descuento, 0);
     },
     addRegalia(data){
       if (data.stock_actual > 0 && data.articulo.precio_activo){
@@ -453,6 +473,17 @@ export default {
           key:         this.Venta.regalias.length
         });
         this.dialogoRegalia = false;
+      }
+    },
+    aplicarDescuento(){
+      if (this.pago.des_aplicado && this.pago.des_aplicado > 0){
+        this.Venta.total     = (this.pago.totalState - this.pago.des_aplicado).toFixed(2);
+        this.Venta.impuesto  = (this.Venta.total - (this.Venta.total / 1.15)).toFixed(2);
+        this.Venta.sub_total = (this.Venta.total - this.Venta.impuesto).toFixed(2);
+        this.pago.ccDescuento = (this.pago.impState - this.Venta.impuesto).toFixed(2);
+        console.log(this.pago.ccDescuento)
+      }else{
+        this.sumarTotalFactura();
       }
     },
     asignarCliente(data){
@@ -468,6 +499,17 @@ export default {
       this.pago.cambio = (parseFloat(this.pago.efectivo) - parseFloat(this.Venta.total)).toFixed(2);
       if (this.pago.cambio < 0)
         this.pago.cambio = 0;
+    },
+    cargarCcCuentasBancos(){
+      if (this.ccCuentasB.length === 0){
+        if (this.pago.forma_pago === 2 || this.pago.forma_pago === 4){
+          this.loadccBancos = true;
+          this.$axios.get('contabilidad/2.0/cargando_cuentas/1113').then((res)=>{
+            this.ccCuentasB   = res.data.cuentas;
+            this.loadccBancos = false
+          });
+        }
+      }
     },
     cargarColaboradores(){
       this.Colaboradores = [];
@@ -511,6 +553,7 @@ export default {
       data.totalFila = (data.cantidad * data.precio).toFixed(2);
 
       this.sumarTotalFactura();
+      this.pago.descuento = this.Venta.filas.reduce((total, item) => total + (item.descuento * item.cantidad), 0);
     },
     registrarCliente(){
       this.Cliente.dialogo = false;
@@ -525,6 +568,7 @@ export default {
         telefonos:    null,
         rtn:          this.Cliente.rtn
       }).then((res)=>{
+        this.$store.commit('cliente/cargar_CLIENTES');
         this.Cliente.rtn       = '';
         this.Cliente.identidad = '';
         this.Cliente.nombres   = '';
@@ -559,13 +603,14 @@ export default {
         cambio:         this.pago.cambio,
         efectivo:       this.pago.efectivo,
         forma_pago_id:  this.pago.forma_pago,
-        referencia:     this.pago.referencia
+        referencia:     this.pago.referencia,
+        ccBanco:        this.pago.cc_banco
 
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion',{texto:res.data.msj,color:'success'});
         this.verDocumento(res.data.file);
-        this.$store.commit('caja/cambiar_VISTA', 1)
+        // this.$store.commit('caja/cambiar_VISTA', 1)
       }).catch((error)=>{
         this.pago.dialogo = true;
         this.$store.commit('activarOverlay', false);
@@ -579,9 +624,11 @@ export default {
       this.Venta.filas.forEach((i)=>{
         total = (parseFloat(total) + (i.precio) * i.cantidad).toFixed(2);
       });
-      this.Venta.total = total;
-      this.Venta.impuesto = (this.Venta.total * 0.15).toFixed(2);
+      this.Venta.total     = total;
+      this.Venta.impuesto  = (this.Venta.total - (this.Venta.total / 1.15)).toFixed(2);
       this.Venta.sub_total = (this.Venta.total - this.Venta.impuesto).toFixed(2);
+      this.pago.totalState = this.Venta.total;
+      this.pago.impState   = this.Venta.impuesto;
     },
     validarForm(){
       if (this.$refs.FormVentaContadoCaja.validate() && this.Venta.filas.length > 0)
@@ -597,7 +644,8 @@ export default {
     },
     validarFormPago(){
       if (this.$refs.FormRegistrarVenta.validate())
-        this.registrarCompra();
+        // this.registrarCompra();
+        alert("paso")
       else
         this.$store.commit('notificacion',{texto:'No puedes registrar la venta',color:'warning'})
     },

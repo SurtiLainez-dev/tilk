@@ -58,7 +58,7 @@
                 <td>
                   <v-text-field v-model="item.descripcion" :rules="[rules.nombre.req]" dense></v-text-field>
                 </td>
-                <td width="5%">
+                <td width="8%">
                   <v-text-field v-model="item.cantidad" type="number" min="1" @keyup.enter="addFila"
                                 :rules="[rules.nombre.req]" dense></v-text-field>
                 </td>

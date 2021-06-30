@@ -729,7 +729,7 @@ export default {
           cuenta_banco_id2:   this.Cuentas.cuenta_banco_id2
         }).then((res)=>{
           this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
-
+          this.$store.commit('activarOverlay', false)
           this.Cuentas.cuentaString = '';
           this.Cuentas.cuenta_id    = '';
           this.Cuentas.detalle      = '';

@@ -76,7 +76,7 @@ export default {
       items: [
         { title: 'Inicio', icon: 'fa fa-cash-register', val:1},
         { title: 'Postear Cuenta', icon: 'fa fa-check-circle', val:2},
-        { title: 'Hacer Factura', icon: 'fa fa-file-invoice-dollar', val:3},
+        { title: 'Factura de Contado', icon: 'fa fa-file-invoice-dollar', val:3},
         { title: 'Recibos de Hoy', icon: 'fa fa-file-invoice', val:4 },
         { title: 'Facturas de Hoy', icon: 'fa fa-file-invoice-dollar', val:5 },
         { title: 'Calendario de Pago', icon: 'fa fa-calendar-day', val:6 },

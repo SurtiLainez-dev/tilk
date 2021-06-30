@@ -23,7 +23,7 @@
           </v-tooltip>
         </v-col>
         <v-col>
-          <v-text-field dense disabled class="ma-2" v-model="Venta.rtn" :rules="[rules.select.req]"
+          <v-text-field dense disabled class="ma-2" v-model="Venta.rtn"
                         label="Rtn del Cliente"></v-text-field>
         </v-col>
         <v-col>
