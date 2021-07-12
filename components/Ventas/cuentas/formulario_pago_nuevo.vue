@@ -91,9 +91,6 @@ export default {
       }
     }
   },
-  created() {
-    console.log(this.CUENTA)
-  },
   methods:{
     enviarDatos(){
       if (this.accion === 2)

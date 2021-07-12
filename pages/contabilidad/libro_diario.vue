@@ -299,7 +299,7 @@ export default {
       }).catch((error)=>{
         this.dialogoPartida = true;
         this.$store.commit('activarOverlay', false);
-      })
+      });
     },
     verDocumento(URL){
       this.dialogoPartida = false;

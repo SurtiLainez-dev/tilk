@@ -17,7 +17,7 @@
               <tr v-if="CUENTA.facturada === 0">
                 <th>Facturar:</th>
                 <td>
-                  <v-btn x-small dark color="indigo" @click="crearFactura">Facturar</v-btn>
+                  <v-btn :disabled="CUENTA.tipo_venta === 1" x-small class="text-white" color="indigo" @click="crearFactura">Facturar</v-btn>
                 </td>
               </tr>
               <tr>
@@ -194,9 +194,12 @@
       </v-toolbar>
       <v-form class="pl-5 pr-5 pb-5" ref="FormRegistrarVenta">
         <v-select dense :items="FormasPago" label="Forma de Pago"
-                  v-model="Abono.forma_pago" :rules="[rules.referencia.req]"
+                  v-model="Abono.forma_pago" :rules="[rules.referencia.req, rules.referencia.prohibido]"
                   :item-value="'id'" :item-text="'nombre'">
         </v-select>
+        <v-select dense :items="ccCuentasB" v-model="ccBanco" v-if="Abono.forma_pago === 2 || Abono.forma_pago === 4"
+                  label="Cuenta a Seleccionar" :item-value="'id'" :rules="[rules.referencia.req]"
+                  :item-text="'nombre'" :loading="loadccBancos"></v-select>
         <v-text-field dense v-model="Abono.referencia" label="Referencia Pago"></v-text-field>
         <v-text-field dense v-model="Abono.efectivo" label="Efectivo" type="number"
                       :rules="[rules.referencia.req, rules.efectivo.min]" @keyup="calucularCambio"
@@ -244,7 +247,7 @@
         <template v-slot:item.id="{item}">
           <v-tooltip top>
             <template v-slot:activator="{on, attrs}">
-              <v-btn width="25" height="25" fab v-on="on"
+              <v-btn width="25" height="25" fab v-on="on" @click="distribuirPagoDXC(item)"
                      tile color="success" dark v-bind="attrs">
                 <v-icon>fa fa-arrow-right</v-icon>
               </v-btn>
@@ -331,6 +334,7 @@ export default {
   components:{info_pago},
   data(){
     return{
+      dxc: 0,
       btnCalculadora: false,
       calculadora: [],
       totalCalculadora: 0,
@@ -369,7 +373,7 @@ export default {
       dialogoPagos: false,
       show: true,
       Abono:{
-        total: '',
+        total: 0,
         efectivo: 0,
         forma_pago: '',
         cambio:   0,
@@ -382,14 +386,21 @@ export default {
       rules: {
         referencia: {
           req: v => !!v || 'Campo requerido',
+          prohibido:  v => v == 3 || v == 5 || 'Tienes prohibido a seleccionar este opción'
         },
         efectivo:{
           min: v => v >= this.Abono.total || 'No puede ser menor que el total que se distribuyó',
         },
       },
+      ccCuentasB: [],
+      loadccBancos: false,
+      ccBanco:      0
     }
   },
   computed:{
+    USUARIO(){
+      return this.$store.state.usuario;
+    },
     CAJA(){
       return this.$store.state.caja.CAJA;
     },
@@ -418,8 +429,11 @@ export default {
   },
   methods:{
     abrirDialogoRegistrar(){
-      this.dialogoRegistrar = true;
-      this.Abono.efectivo = this.Abono.total;
+      if (this.CUENTA.facturada === 1 || this.CUENTA.tipo_venta === 1){
+        this.dialogoRegistrar = true;
+        this.Abono.efectivo = this.Abono.total;
+      }else
+        this.$store.commit('notificacion',{texto:'Primero tienes que facturar', color:'warning'})
     },
     aceptarPagoCalculadora(){
       this.Abono.total = this.totalCalculadora;
@@ -430,8 +444,9 @@ export default {
       this.distribuirPago();
     },
     calucularCambio(){
-      this.Abono.cambio = (parseFloat(this.Abono.efectivo) - parseFloat(this.Abono.total)).toFixed(2);
-      if (this.Abono.cambio < 0)
+      if (this.Abono.efectivo && this.Abono.efectivo > 0){
+        this.Abono.cambio = (parseFloat(this.Abono.efectivo) - parseFloat(this.Abono.total)).toFixed(2);
+      }else
         this.Abono.cambio = 0;
     },
     calcularPago(){
@@ -441,6 +456,17 @@ export default {
         this.btnCalculadora = true;
       });
       this.totalCalculadora.toFixed(2);
+    },
+    cargarCcCuentasBancos(){
+      if (this.ccCuentasB.length === 0){
+        if (this.Abono.forma_pago === 2 || this.Abono.forma_pago === 4){
+          this.loadccBancos = true;
+          this.$axios.get('contabilidad/2.0/cargando_cuentas/1113').then((res)=>{
+            this.ccCuentasB   = res.data.cuentas;
+            this.loadccBancos = false
+          });
+        }
+      }
     },
     cargarFormaPago(){
       this.$axios.get('forma_pagos').then((res)=>{
@@ -455,14 +481,16 @@ export default {
     },
     contado(){
       this.$axios.post('cajas/postear/factura',{
-        sucursal_id:   this.SUCURSAL_ID,
-        total:         this.Abono.total,
-        venta_id:      this.CUENTA.id,
-        caja_id:       this.CAJA.id,
-        cuerpo:        this.PagosDistrubuidos,
-        cambio:        this.Abono.cambio,
-        efectivo:      this.Abono.efectivo,
-        forma_pago_id: this.Abono.forma_pago
+        sucursal_id:     this.SUCURSAL_ID,
+        total:           this.Abono.total,
+        venta_id:        this.CUENTA.id,
+        caja_id:         this.CAJA.id,
+        cuerpo:          this.PagosDistrubuidos,
+        cambio:          this.Abono.cambio,
+        efectivo:        this.Abono.efectivo,
+        forma_pago_id:   this.Abono.forma_pago,
+        cc_cuenta_banco: this.ccBanco,
+        referencia:      this.Abono.referencia
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.vistaInfoPago = true;
@@ -493,7 +521,8 @@ export default {
           caja_id:      this.CAJA.id,
           saldo_actual: this.CUENTA.saldo_actual,
           forma_pago:   this.Abono.forma_pago,
-          referencia:   this.Abono.referencia
+          referencia:   this.Abono.referencia,
+          ccBanco:      this.ccBanco
         }).then((res)=>{
           this.$store.commit('activarOverlay', false);
           this.vistaInfoPago = true;
@@ -550,6 +579,7 @@ export default {
       })
     },
     distribuirPago(){
+      this.dxc = 0;
       if (this.Abono.total > 0){
         if (this.Abono.total <= this.CUENTA.saldo_actual){
           let saldo = this.Abono.total, estado = true;
@@ -630,6 +660,49 @@ export default {
       }
       console.log(this.PagosDistrubuidos)
     },
+    distribuirPagoDXC(item){
+      this.PagosDistrubuidos = [];
+      this.PagosDistrubuidos.push({
+        status: 3,
+        pago_id: item.id,
+        tipo: 'DXP',
+        detalle: item.descripcion,
+        pendiente: item.total,
+        pagara:    item.total,
+        saldo:     0,
+        hay:       0
+      });
+      this.dxc              = 1;
+      this.dialogoDXC       = false;
+      this.btnRegistrar     = true;
+      this.Abono.total      = item.total;
+    },
+    dxcPost(){
+      this.$axios.post('caja/postear/documento_x_cobrar',{
+        sucursal_id:     this.SUCURSAL_ID,
+        total:           this.Abono.total,
+        venta_id:        this.CUENTA.id,
+        caja_id:         this.CAJA.id,
+        cuerpo:          this.PagosDistrubuidos,
+        cambio:          this.Abono.cambio,
+        efectivo:        this.Abono.efectivo,
+        forma_pago_id:   this.Abono.forma_pago,
+        cc_cuenta_banco: this.ccBanco,
+        referencia:      this.Abono.referencia
+      }).then((res)=>{
+        this.$store.commit('activarOverlay', false);
+        this.vistaInfoPago = true;
+        this.solicitarClave(res.data.recibo)
+        this.notificacion(res.data.msj,'success');
+        this.notificacion('Se cargará el documento para su impresión en un momnto','success');
+      }).catch((error)=>{
+        this.$store.commit('activarOverlay', false);
+        if (error.response.data.status === 422)
+          this.notificacion(error.response.data.error,'error');
+        else
+          this.notificacion('Hubo un error al registrar el pago','error');
+      })
+    },
     notificacion(text, color){
       Vue.$toast.open({
         message: text,
@@ -638,17 +711,38 @@ export default {
         duration: 4000
       });
     },
+    print_DXC(clave, recibo){
+      let url = this.$axios.defaults.baseURL+'documentos/cajas/recibo_dxc/usuario='+this.USUARIO+'/recibo='+recibo+'/'+clave;
+      ipcRenderer.send('pint_navegador', url);
+      this.$store.commit('activarOverlay', false);
+    },
     registrarPago(){
       this.$store.commit('activarOverlay', true);
       this.dialogoRegistrar = false;
-      if (this.CUENTA.tipo_venta === 1)
-        this.contado();
-      else
-        this.credito();
+      if(this.dxc !== 1){
+        if (this.CUENTA.tipo_venta === 1)
+          this.contado();
+        else
+          this.credito();
+      }else
+        this.dxcPost();
+
+    },
+    solicitarClave(recibo){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+        this.print_DXC(res.data.clave, recibo);
+      }).catch((error)=>{
+        this.dialogoPartida = true;
+        this.$store.commit('activarOverlay', false);
+      });
     },
     validarForm(){
-      if (this.$refs.FormRegistrarVenta.validate())
-        this.registrarPago();
+      if (this.Abono.forma_pago !== 1) {
+        if (this.$refs.FormRegistrarVenta.validate())
+          this.registrarPago();
+      }else
+        this.$store.commit('notificacion',{texto:'No se aceptan cheques', color:'warning'});
     },
     verDocumento(URL){
       this.$store.commit('activarOverlay', true);

@@ -700,7 +700,7 @@ export default {
         },
         revision:{
           revisados: value => this.revision.sis.revisados === value || this.revision.user.revisados +' de '+this.revision.sis.revisados+' revisados',
-          saldo_actual: value => this.data.cuenta.saldo_actual == value || 'Saldo actual de la cuenta: L '+this.data.cuenta.saldo_actual+' - Saldo de actual de los pagos: L '+value,
+          saldo_actual: value => parseFloat(this.data.cuenta.saldo_actual) === parseFloat(value) || 'Saldo actual de la cuenta: L '+this.data.cuenta.saldo_actual+' - Saldo de actual de los pagos: L '+value,
           saldo_mora:   value => this.data.cuenta.saldo_mora == value || 'Saldo en mora de la cuenta: L '+this.data.cuenta.saldo_mora+' - Saldo en mora de los pagos: L'+ value
         },
         moneda:{

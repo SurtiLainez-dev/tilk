@@ -84,6 +84,7 @@
               <articulos-conta/>
               <notas-credito/>
               <mobiliario/>
+              <gastos/>
             </v-list>
           </v-col>
             <v-col cols="9" v-if="select === 5">
@@ -130,6 +131,7 @@
   import sideCuentas from "./cuentas/sideCuentas";
   import sideCaja from "./sideCaja";
   import mobiliario from "./contabilidad/mobiliario";
+  import gastos from "@/components/dashboard/contabilidad/gastos";
   export default {
     components:{
       admin,
@@ -145,7 +147,8 @@
       sideSeguimientos,
       sideCuentas,
       sideCaja,
-      mobiliario
+      mobiliario,
+      gastos
     },
     name: "side",
     data(){

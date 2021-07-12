@@ -87,6 +87,7 @@ name: "ventas",
   },
   created() {
     this.$store.commit('ventas/cargar_MIS_VENTAS');
+    this.vista = 1;
   },
   computed:{
     VENTAS(){

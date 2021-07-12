@@ -1,6 +1,6 @@
 <template>
   <v-card flat>
-    <v-toolbar color="grey lighten-4" flat>
+    <v-toolbar color="grey lighten-3" flat>
       <h6>Nueva Venta de Contado</h6>
       <v-spacer></v-spacer>
       <v-btn small color="indigo" @click="Cliente.dialogo = true" tile class="text-white">Cliente Nuevo</v-btn>
@@ -106,6 +106,7 @@
                    width="25" height="25px" dark><v-icon>fa fa-times</v-icon></v-btn>
           </template>
         </b-table>
+        <v-card-text>Descuento que se puede aplicar L. {{descuento.inicial}}</v-card-text>
       </v-card>
       <v-card class="ma-2" flat style="border: solid 1px #000">
         <v-row no-gutters>
@@ -135,37 +136,46 @@
               </template>
             </v-simple-table>
           </v-col>
-          <v-col cols="2">
-            <v-row no-gutters style="border: solid 1px #000">
-              <v-col class="d-flex justify-end">
-                <span class="ma-2"><strong>Sub-total:</strong></span>
+          <v-col>
+            <v-row no-gutters>
+              <v-col>
+                <v-btn color="grey" small dark block tile @click="descuento.dialogo = true">Descuento</v-btn>
               </v-col>
             </v-row>
-            <v-row no-gutters style="border: solid 1px #000">
-              <v-col class="d-flex justify-end">
-                <span class="ma-2"><strong>Impuesto:</strong></span>
+            <v-row no-gutters>
+              <v-col cols="8">
+                <v-row no-gutters style="border: solid 1px #000">
+                  <v-col class="d-flex justify-end">
+                    <span class="ma-2"><strong>Sub-total:</strong></span>
+                  </v-col>
+                </v-row>
+                <v-row no-gutters style="border: solid 1px #000">
+                  <v-col class="d-flex justify-end">
+                    <span class="ma-2"><strong>Impuesto:</strong></span>
+                  </v-col>
+                </v-row>
+                <v-row no-gutters style="border: solid 1px #000">
+                  <v-col class="d-flex justify-end">
+                    <span class="ma-2"><strong>Total:</strong></span>
+                  </v-col>
+                </v-row>
               </v-col>
-            </v-row>
-            <v-row no-gutters style="border: solid 1px #000">
-              <v-col class="d-flex justify-end">
-                <span class="ma-2"><strong>Total:</strong></span>
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="1">
-            <v-row no-gutters style="border: solid 1px #000">
-              <v-col class="d-flex justify-end">
-                <span class="ma-2"><strong>L {{Venta.sub_total}}</strong></span>
-              </v-col>
-            </v-row>
-            <v-row no-gutters style="border: solid 1px #000">
-              <v-col class="d-flex justify-end">
-                <span class="ma-2"><strong>L {{Venta.impuesto}}</strong></span>
-              </v-col>
-            </v-row>
-            <v-row no-gutters style="border: solid 1px #000">
-              <v-col class="d-flex justify-end">
-                <span class="ma-2"><strong>L {{Venta.total}}</strong></span>
+              <v-col cols="4">
+                <v-row no-gutters style="border: solid 1px #000">
+                  <v-col class="d-flex justify-end">
+                    <span class="ma-2"><strong>L {{Venta.sub_total}}</strong></span>
+                  </v-col>
+                </v-row>
+                <v-row no-gutters style="border: solid 1px #000">
+                  <v-col class="d-flex justify-end">
+                    <span class="ma-2"><strong>L {{Venta.impuesto}}</strong></span>
+                  </v-col>
+                </v-row>
+                <v-row no-gutters style="border: solid 1px #000">
+                  <v-col class="d-flex justify-end">
+                    <span class="ma-2"><strong>L {{Venta.total}}</strong></span>
+                  </v-col>
+                </v-row>
               </v-col>
             </v-row>
           </v-col>
@@ -200,7 +210,7 @@
           </v-col></v-row>
           <v-row no-gutters><v-col>
             <v-text-field class="ma-2" dense label="Rtn"
-                          :rules="[rules.select.req,rules.identidad.id, rules.identidad.some]"
+                          :rules="[rules.identidad.id, rules.identidad.some]"
                           v-model="Cliente.rtn"></v-text-field>
           </v-col></v-row>
           <v-row no-gutters><v-col>
@@ -361,6 +371,20 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="descuento.dialogo" width="25%">
+      <v-card >
+        <v-toolbar flat color="gray lighten-3">
+          Aplicando Descuento a la Venta
+        </v-toolbar>
+        <v-card-text>El descuento que se le puede aplicar a la venta es de L. {{descuento.inicial}}</v-card-text>
+
+        <v-text-field class="ma-5" suffix="lps" dense label="Descuento a Aplicar" v-model="descuento.aplicado"></v-text-field>
+       <v-card-actions class="d-flex justify-end">
+         <v-btn color="warning" dark small tile @click="validarDescuento">Cerrar</v-btn>
+       </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -375,6 +399,12 @@ export default {
   },
   data(){
     return{
+      descuento:{
+        inicial:  0,
+        aplicado: 0,
+        dialogo:  false,
+        stateTotal: 0
+      },
       tab: 0,
       dialogoRegalia: false,
       search: '',
@@ -517,10 +547,12 @@ export default {
             totalFila:   (1 * data.articulo.precio_activo.precio_contado).toFixed(2),
             estado:      1,
             vali_serie:  false,
-            vali_color:  false
+            vali_color:  false,
+            descuento:   data.articulo.precio_activo.descuento
           });
 
           this.sumarTotalFactura();
+          this.descuento.inicial = this.Venta.filas.reduce((total, item) => total + item.descuento, 0);
           this.dialogoBusqueda = false;
         }else{
           this.notificacion('El artículo que seleccionaste es una motocicleta','warning');
@@ -548,10 +580,12 @@ export default {
         totalFila:   (1 * this.precioMotocicleta(data)).toFixed(2),
         estado:      data.remision_articulo.estado_articulo_id,
         vali_serie:  false,
-        vali_color:  false
+        vali_color:  false,
+        descuento:   0
       });
 
       this.sumarTotalFactura();
+      this.descuento.inicial = this.Venta.filas.reduce((total, item) => total + item.descuento, 0);
       this.dialogoBusqueda = false;
     },
     addLineaRemision(data){
@@ -575,11 +609,13 @@ export default {
           totalFila:   (1 * data.precio_actual).toFixed(2),
           estado:      data.estado_articulo_id,
           vali_serie:  false,
-          vali_color:  false
+          vali_color:  false,
+          descuento:   0
         });
         console.log(this.Venta.filas.length)
         this.sumarTotalFactura();
         this.validarColor(data);
+        this.descuento.inicial = this.Venta.filas.reduce((total, item) => total + item.descuento, 0);
         this.dialogoBusqueda = false;
       }else{
         this.notificacion('El artículo que seleccionaste es una motocicleta','warning');
@@ -725,7 +761,8 @@ export default {
         fecha:       this.Venta.fecha,
         colaborador_id: this.Venta.vendedor,
         filas:       this.Venta.filas,
-        regalias:    this.Venta.regalias
+        regalias:    this.Venta.regalias,
+        descuento:   this.descuento.aplicado
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.notificacion(res.data.msj,'success');
@@ -745,11 +782,28 @@ export default {
         total = (parseFloat(total) + (i.precio) * i.cantidad).toFixed(2);
       });
       this.Venta.total = total;
-      this.Venta.impuesto = (this.Venta.total * 0.15).toFixed(2);
+      this.Venta.impuesto = (this.Venta.total - (this.Venta.total / 1.15)).toFixed(2);
       this.Venta.sub_total = (this.Venta.total - this.Venta.impuesto).toFixed(2);
+      this.descuento.stateTotal = this.Venta.total;
     },
     validarColor(data){
       data.vali_color = data.color.length > 1;
+    },
+    validarDescuento(){
+      if (this.descuento.aplicado > this.descuento.inicial) {
+        this.$store.commit('notificacion', {texto: 'No se pudo aplicar el descuento', color: 'warning'});
+        this.descuento.aplicado = 0;
+        this.sumarTotalFactura();
+      }else{
+        if (this.descuento.aplicado && this.descuento.aplicado > 0){
+          this.Venta.total     = (this.descuento.stateTotal - this.descuento.aplicado).toFixed(2);
+          this.Venta.impuesto  = (this.Venta.total - (this.Venta.total / 1.15)).toFixed(2);
+          this.Venta.sub_total = (this.Venta.total - this.Venta.impuesto).toFixed(2);
+        }else{
+          this.sumarTotalFactura();
+        }
+        this.descuento.dialogo = false;
+      }
     },
     validarEnvio(){
       let longIsSerie = 0, isColor = 0, isSerie = 0;
@@ -774,7 +828,12 @@ export default {
 
       if (longIsSerie === isSerie && longIsSerie === isColor
           && this.$refs.formVentaContado.validate() && this.Venta.filas.length > 0)
-        this.registrarVenta();
+        if (this.descuento.aplicado > this.descuento.inicial){
+          this.$store.commit('notificacion', {texto: 'No se pudo aplicar el descuento', color: 'warning'});
+          this.descuento.aplicado = 0;
+          this.sumarTotalFactura();
+        }else
+          this.registrarVenta();
       else
         this.notificacion('Hay datos incompletos','error');
     },

@@ -254,8 +254,8 @@
           <h6>Realizar Documento</h6>
         </v-toolbar>
         <v-form class="pl-5 pr-5 pb-5" ref="FormRegistrarVenta">
-          <v-select dense :items="FormasPago" label="Forma de Pago" @change="cargarCcCuentasBancos"
-                    v-model="pago.forma_pago" :rules="[rules.referencia.req]"
+          <v-select dense :items="FormasPago" label="Forma de Pago"
+                    v-model="pago.forma_pago" :rules="[rules.referencia.req, rules.referencia.prohibido]"
                     :item-value="'id'" :item-text="'nombre'">
           </v-select>
           <v-autocomplete dense v-if="pago.forma_pago === 2 || pago.forma_pago === 4"
@@ -348,6 +348,7 @@ export default {
       rules: {
         referencia: {
           req: v => !!v || 'Campo requerido',
+          prohibido:  v => v == 3 || v == 5 || 'Tienes prohibido a seleccionar este opción'
         },
         select: {
           req: v => !!v || 'Campo requerido',
@@ -587,8 +588,6 @@ export default {
       })
     },
     registrarCompra(){
-      console.log(this.Venta)
-      console.log(this.pago)
       this.$store.commit('activarOverlay', true);
       this.pago.dialogo = false;
       this.$axios.post('venta/contado/rapida',{
@@ -604,13 +603,15 @@ export default {
         efectivo:       this.pago.efectivo,
         forma_pago_id:  this.pago.forma_pago,
         referencia:     this.pago.referencia,
-        ccBanco:        this.pago.cc_banco
-
+        ccBanco:        this.pago.cc_banco,
+        descuento:      this.pago.des_aplicado,
+        impuesto:       this.pago.impState,
+        stateTotal:     this.pago.totalState
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion',{texto:res.data.msj,color:'success'});
         this.verDocumento(res.data.file);
-        // this.$store.commit('caja/cambiar_VISTA', 1)
+        this.$store.commit('caja/cambiar_VISTA', 1)
       }).catch((error)=>{
         this.pago.dialogo = true;
         this.$store.commit('activarOverlay', false);
@@ -631,9 +632,14 @@ export default {
       this.pago.impState   = this.Venta.impuesto;
     },
     validarForm(){
-      if (this.$refs.FormVentaContadoCaja.validate() && this.Venta.filas.length > 0)
-        this.pago.dialogo = true;
-      else
+      if (this.$refs.FormVentaContadoCaja.validate() && this.Venta.filas.length > 0) {
+        if (this.Venta.regalias.length === 0 && this.pago.des_aplicado == 0 ||
+            this.Venta.regalias.length > 0 && this.pago.des_aplicado === 0 ||
+            this.Venta.regalias.length === 0 && this.pago.des_aplicado > 0)
+          this.pago.dialogo = true;
+        else
+          this.$store.commit('notificacion', {texto: 'No se puede dar descuento, si hay regalías', color: 'warning'})
+      }else
         this.$store.commit('notificacion',{texto:'Hay datos invalidos',color:'warning'})
     },
     validarFormNuevoCliente(){
@@ -644,8 +650,8 @@ export default {
     },
     validarFormPago(){
       if (this.$refs.FormRegistrarVenta.validate())
-        // this.registrarCompra();
-        alert("paso")
+        this.registrarCompra();
+        // alert("paso")
       else
         this.$store.commit('notificacion',{texto:'No puedes registrar la venta',color:'warning'})
     },

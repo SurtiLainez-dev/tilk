@@ -1,7 +1,7 @@
 <template>
-<v-card>
+<v-card flat>
   <v-card flat v-if="ESTADO">
-    <v-toolbar flat color="grey lighten-4">
+    <v-toolbar flat color="grey lighten-2">
       <h5>Caja General del {{SUCURSAL}}</h5>
       <v-spacer></v-spacer>
       {{FECHA}}
@@ -9,7 +9,7 @@
 
     <v-row no-gutters class="pa-3">
       <v-col cols="3">
-        <v-card height="500" width="256" class="mx-auto">
+        <v-card height="600" width="256" class="mx-auto">
           <v-navigation-drawer permanent>
             <v-list-item>
               <v-list-item-content>
@@ -37,15 +37,18 @@
       </v-col>
       <v-col cols="9">
         <v-card>
-          <v-toolbar flat class="grey lighten-4">
+          <v-toolbar flat class="grey lighten-3">
             <h6>{{TITULO}}</h6>
           </v-toolbar>
 
-          <inicio       v-if="VISTA === 1"/>
-          <postear      v-else-if="VISTA === 2"/>
-          <venta        v-else-if="VISTA === 3"/>
-          <recibos_hoy  v-else-if="VISTA === 4"/>
-          <facturas_hoy v-else-if="VISTA === 5"/>
+          <inicio        v-if="VISTA === 1"/>
+          <postear       v-else-if="VISTA === 2"/>
+          <venta         v-else-if="VISTA === 3"/>
+          <recibos_hoy   v-else-if="VISTA === 4"/>
+          <facturas_hoy  v-else-if="VISTA === 5"/>
+          <transacciones v-else-if="VISTA === 7"/>
+          <egreso        v-else-if="VISTA === 8"/>
+          <cierre        v-else-if="VISTA === 10"/>
         </v-card>
       </v-col>
     </v-row>
@@ -61,13 +64,20 @@ import Vue from "vue";
 import venta from "./componentes/venta";
 import facturas_hoy from "./componentes/facturas_hoy";
 import recibos_hoy from "./componentes/recibos_hoy";
+import egreso from "@/components/caja/componentes/egreso";
+import transacciones from "@/components/caja/componentes/transacciones";
+import cierre from "@/components/caja/componentes/cierre";
+
 export default {
   components:{
     inicio,
     postear,
     venta,
     facturas_hoy,
-    recibos_hoy
+    recibos_hoy,
+    egreso,
+    transacciones,
+    cierre
   },
   name: "index",
   data(){
@@ -81,7 +91,9 @@ export default {
         { title: 'Facturas de Hoy', icon: 'fa fa-file-invoice-dollar', val:5 },
         { title: 'Calendario de Pago', icon: 'fa fa-calendar-day', val:6 },
         { title: 'Transacciones', icon: 'fa fa-history', val:7 },
-        { title: 'Cierre de Caja', icon: 'fa fa-sign-out-alt', val:8 },
+        { title: 'Egreso', icon: 'fa fa-file-invoice-dollar', val:8 },
+        { title: 'Caja Chica', icon: 'fa fa-wallet', val:9},
+        { title: 'Cierre de Caja', icon: 'fa fa-sign-out-alt', val:10 },
       ],
     }
   },

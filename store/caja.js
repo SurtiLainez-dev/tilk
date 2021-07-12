@@ -15,7 +15,13 @@ export const state = () => ({
     RECIBOS_HOY: [],
     LOADRECIBOS_HOY: false,
     DOCUMENTOS_HOY: [],
-    LOADDOCUMENTOS_HOY: false
+    LOADDOCUMENTOS_HOY: false,
+    LOAD_HISTORIAL: false,
+    HISTORIAL: [],
+    CAJA_EFECTIVO: 0,
+    LOAD_TRANSACCIONES: false,
+    TRANSACCIONES: []
+
 })
 
 export const mutations = {
@@ -67,9 +73,24 @@ export const mutations = {
                 state.DOCUMENTOS_HOY     = res.data.documentos;
                 state.LOADDOCUMENTOS_HOY = false;
             }
+            state.CAJA_EFECTIVO = res.data.caja.total;
         });
     },
     cambiar_TITULO(state, titulo){
         state.TITULO = titulo
     },
+    cargar_HISTORIAL(state, fecha){
+        state.LOAD_HISTORIAL = true;
+        this.$axios.get('cajas/'+state.CAJA_ID+'/forma_pagos/fecha/'+fecha).then((res)=>{
+            state.HISTORIAL      = res.data.historial;
+            state.LOAD_HISTORIAL = false;
+        })
+    },
+    cargar_TRANSACCIONES(state, fecha){
+        state.LOAD_TRANSACCIONES = true;
+        this.$axios.get('caja/'+state.CAJA_ID+'/historial/'+fecha).then((res)=>{
+            state.TRANSACCIONES      = res.data.historial;
+            state.LOAD_TRANSACCIONES = false;
+        })
+    }
 }

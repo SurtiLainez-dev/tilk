@@ -282,6 +282,7 @@ export default {
   name: "pendientes",
   data(){
     return{
+      int: new Intl.NumberFormat(),
       Inventario: [],
       isPeticon: false,
       Venta: null,

@@ -176,15 +176,59 @@
       this.cargarPuesto()
     },
     methods:{
-      validate(){
-        if (this.$refs.FormNuevoColaborador.validate()) {
-          this.erroresServidor = []
-          this.registrarColaborador()
-        }
+      agregarPuesto: function () {
+        this.isPeticionPuestos = true
+        this.$axios.post('/puesto_colaborador',{
+          nombre: this.nombrePuesto
+        },{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.data.status){
+            Swal.fire(
+                'Registro Exitoso',
+                `Se registro exitosamente el puesto de trabajo ${this.nombrePuesto}.`,
+                'success'
+            )
+            this.dialogPuesto = false
+            this.isPeticionPuestos = false
+          }
+          this.cargarPuesto()
+        })
       },
-      validate2(){
-        if (this.$refs.FormNuevoPuestoTrabajo.validate())
-          this.agregarPuesto()
+      cargarBancos(){
+        this.$axios.get('bancos',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.Bancos = res.data.bancos
+          }
+        })
+      },
+      cargarPuesto: function () {
+        this.$axios.get('/puestos_colaborador',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          this.puestos = res.data.puestos
+        })
+      },
+      cargarSucursales(){
+        this.isPeticion = true
+        this.$axios.get('/sucursales',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.isPeticion = false
+            this.sucursales = res.data.suc
+          }
+        })
       },
       registrarColaborador: function(){
         this.isPeticion = true
@@ -211,9 +255,9 @@
           this.isPeticion = false
           if (res.status === 200){
             Swal.fire(
-              'Registro Exitoso',
-              `Se registro exitosamente el colaborador ${this.colaborador.nombres} ${this.colaborador.apellidos}.`,
-              'success'
+                'Registro Exitoso',
+                `Se registro exitosamente el colaborador ${this.colaborador.nombres} ${this.colaborador.apellidos}.`,
+                'success'
             )
             this.$router.replace({path:"/colaborador/"})
           }
@@ -223,67 +267,23 @@
             this.erroresServidor = error.response.data.errors
           }else if (error.response.status === 400){
             Swal.fire(
-              'Registro Exitoso',
-              error.response.data.error,
-              'success'
+                'Registro Exitoso',
+                error.response.data.error,
+                'success'
             )
           }
 
         })
       },
-      agregarPuesto: function () {
-        this.isPeticionPuestos = true
-        this.$axios.post('/puesto_colaborador',{
-          nombre: this.nombrePuesto
-        },{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.data.status){
-            Swal.fire(
-              'Registro Exitoso',
-              `Se registro exitosamente el puesto de trabajo ${this.nombrePuesto}.`,
-              'success'
-            )
-            this.dialogPuesto = false
-            this.isPeticionPuestos = false
-          }
-          this.cargarPuesto()
-        })
+      validate2(){
+        if (this.$refs.FormNuevoPuestoTrabajo.validate())
+          this.agregarPuesto()
       },
-      cargarPuesto: function () {
-        this.$axios.get('/puestos_colaborador',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          this.puestos = res.data.puestos
-        })
-      },
-      cargarSucursales(){
-        this.isPeticion = true
-        this.$axios.get('/sucursales',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.isPeticion = false
-            this.sucursales = res.data.suc
-          }
-        })
-      },
-      cargarBancos(){
-        this.$axios.get('bancos',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.Bancos = res.data.bancos
-          }
-        })
+      validate(){
+        if (this.$refs.FormNuevoColaborador.validate()) {
+          this.erroresServidor = []
+          this.registrarColaborador()
+        }
       }
     },
   }

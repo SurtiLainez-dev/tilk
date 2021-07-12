@@ -16,10 +16,10 @@
                   :headers="header"
                   class="rowsTable">
       <template v-slot:item.total="{item}">
-        L {{item.total}}
+        L {{int.format(item.total)}}
       </template>
       <template v-slot:item.saldo_actual="{item}">
-        L {{item.saldo_actual}}
+        L {{int.format(item.saldo_actual)}}
       </template>
       <template v-slot:item.cliente.nombres="{item}">
         {{item.cliente.nombres}} {{item.cliente.apellidos}}
@@ -64,6 +64,7 @@ export default {
   components:{cuenta},
   data(){
     return{
+      int: new Intl.NumberFormat(),
       Load:    true,
       vista: 1,
       search: '',
