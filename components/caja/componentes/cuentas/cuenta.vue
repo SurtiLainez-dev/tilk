@@ -209,6 +209,21 @@
         <v-text-field dense v-model="obsRecibo" label="Observación para el Recibo"
                       counter v-if="CUENTA.tipo_venta === 2">
         </v-text-field>
+        <v-dialog ref="dialogoRecordatorio" :return-value.sync="fecha_recordatorio" persistent
+                  width="290px" v-model="dialofo_fecha_recordatorio">
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field v-model="fecha_recordatorio" label="Fecha del siguiente recordatorio" dense
+                          v-bind="attrs" v-on="on" persistent-hint hint="Hacerlo solo con cuentas que estan en mora">
+            </v-text-field>
+          </template>
+          <v-date-picker v-model="fecha_recordatorio" scrollable>
+            <v-spacer></v-spacer>
+            <v-btn tile small dark color="orange" @click="dialofo_fecha_recordatorio = false">Cerrar</v-btn>
+            <v-btn tile small color="indigo" class="text-white"
+                   @click="$refs.dialogoRecordatorio.save(fecha_recordatorio)">Seleccionar</v-btn>
+          </v-date-picker>
+
+        </v-dialog>
       </v-form>
       <v-card-actions class="d-flex justify-end">
         <v-btn small tile color="orange" dark @click="dialogoRegistrar = false">Cerrar</v-btn>
@@ -394,7 +409,9 @@ export default {
       },
       ccCuentasB: [],
       loadccBancos: false,
-      ccBanco:      0
+      ccBanco:      0,
+      fecha_recordatorio: null,
+      dialofo_fecha_recordatorio: false
     }
   },
   computed:{
@@ -428,6 +445,20 @@ export default {
     this.cargarFormaPago();
   },
   methods:{
+    abrirNavegador(clave, tipo, recibo, cod){
+      let url = '';
+      if (tipo === 1)
+        url = this.$axios.defaults.baseURL+'documentos/cajas/factura/usuario='+this.USUARIO+'/factura='+cod+'/'+clave;
+      else if(tipo === 2 && recibo === 2)
+        url = this.$axios.defaults.baseURL + 'documentos/cajas/recibos/usuario=' + this.USUARIO + '/recibo=' + cod + '/' + clave;
+      else if(tipo === 2 && recibo === 3)
+        url = this.$axios.defaults.baseURL + 'documentos/cajas/recibo_dxc/usuario=' + this.USUARIO + '/recibo=' + cod + '/' + clave;
+      else if (tipo === 2 && recibo === 5)
+        url = this.$axios.defaults.baseURL+'documentos/cajas/recibo_anticipo/usuario='+this.USUARIO+'/recibo='+cod+'/'+clave;
+
+      ipcRenderer.send('pint_navegador', url);
+      this.$store.commit('activarOverlay', false);
+    },
     abrirDialogoRegistrar(){
       if (this.CUENTA.facturada === 1 || this.CUENTA.tipo_venta === 1){
         this.dialogoRegistrar = true;
@@ -522,12 +553,14 @@ export default {
           saldo_actual: this.CUENTA.saldo_actual,
           forma_pago:   this.Abono.forma_pago,
           referencia:   this.Abono.referencia,
-          ccBanco:      this.ccBanco
+          ccBanco:      this.ccBanco,
+          recordatorio: this.fecha_recordatorio
         }).then((res)=>{
           this.$store.commit('activarOverlay', false);
           this.vistaInfoPago = true;
           this.notificacion(res.data.msj,'success');
           this.notificacion('Se cargará el documnto para su impresión','success');
+          this.abrirNavegador(res.data.clave, 2,2, res.data.codigo)
           if (res.data.isCancelada === true)
             this.notificacion('El estado de la cuenta pasó a cancelada','success');
           else{
@@ -568,7 +601,6 @@ export default {
         this.notificacion('Se creó la factura','success');
         this.notificacion('Se está cargando la factura','success');
         this.$store.commit('activarOverlay', false);
-        this.verDocumento(res.data.file);
       }).catch((error)=>{
         if (error.response.data.status === 422)
           this.notificacion(error.response.data.error,'warning');
@@ -589,7 +621,7 @@ export default {
           pagos.forEach((item)=>{
             console.log(item)
             if (saldo > 0){
-              if (item.is_mora === 1) {
+              if (item.is_mora === 1 && item.mora > 0) {
                 if (saldo > item.mora) {
                   pago = item.mora;
                   saldo_p = 0
@@ -688,7 +720,8 @@ export default {
         efectivo:        this.Abono.efectivo,
         forma_pago_id:   this.Abono.forma_pago,
         cc_cuenta_banco: this.ccBanco,
-        referencia:      this.Abono.referencia
+        referencia:      this.Abono.referencia,
+        recordatorio:    this.fecha_recordatorio
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.vistaInfoPago = true;
@@ -726,7 +759,6 @@ export default {
           this.credito();
       }else
         this.dxcPost();
-
     },
     solicitarClave(recibo){
       this.$store.commit('activarOverlay', true);

@@ -321,6 +321,9 @@ export default {
     CAJA(){
       return this.$store.state.caja.CAJA;
     },
+    USUARIO(){
+      return this.$store.state.usuario;
+    },
   },
   data(){
     return{
@@ -422,6 +425,20 @@ export default {
     this.cargarFormaPago();
   },
   methods:{
+    abrirNavegador(clave, tipo, recibo, cod){
+      let url = '';
+      if (tipo === 1)
+        url = this.$axios.defaults.baseURL+'documentos/cajas/factura/usuario='+this.USUARIO+'/factura='+cod+'/'+clave;
+      else if(tipo === 2 && recibo === 2)
+        url = this.$axios.defaults.baseURL + 'documentos/cajas/recibos/usuario=' + this.USUARIO + '/recibo=' + cod + '/' + clave;
+      else if(tipo === 2 && recibo === 3)
+        url = this.$axios.defaults.baseURL + 'documentos/cajas/recibo_dxc/usuario=' + this.USUARIO + '/recibo=' + cod + '/' + clave;
+      else if (tipo === 2 && recibo === 5)
+        url = this.$axios.defaults.baseURL+'documentos/cajas/recibo_anticipo/usuario='+this.USUARIO+'/recibo='+cod+'/'+clave;
+
+      ipcRenderer.send('pint_navegador', url);
+      this.$store.commit('activarOverlay', false);
+    },
     addLineaArticulo(data){
       if (data.articulo.precio_activo){
         if (data.articulo.is_motocicleta !== 1){
@@ -610,8 +627,8 @@ export default {
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion',{texto:res.data.msj,color:'success'});
-        this.verDocumento(res.data.file);
-        this.$store.commit('caja/cambiar_VISTA', 1)
+        this.abrirNavegador(res.data.clave, 1,1, res.data.codigo);
+        this.$store.commit('caja/cambiar_VISTA', 1);
       }).catch((error)=>{
         this.pago.dialogo = true;
         this.$store.commit('activarOverlay', false);

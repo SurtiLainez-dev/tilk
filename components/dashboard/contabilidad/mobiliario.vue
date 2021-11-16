@@ -4,28 +4,28 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Mobiliario</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/mobiliario/modelos')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/mobiliario/modelos')">
         Familías
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/mobiliario/')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/mobiliario/')">
         Mobiliario
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/mobiliario/usos')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/mobiliario/usos')">
         Usos de Consumibles
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/mobiliario/traslados')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/mobiliario/traslados')">
         Traslados
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/mobiliario/nuevo_traslado')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/mobiliario/nuevo_traslado')">
         Nuevo Traslado
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/mobiliario/nueva_entrada')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/mobiliario/nueva_entrada')">
         Entrada de Mobiliario
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/mobiliario/reportes')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/mobiliario/reportes')">
         Reportes
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/mobiliario/mantenimientos')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/mobiliario/mantenimientos')">
         Mantenimientos
       </v-list-item>
     </v-list-group>

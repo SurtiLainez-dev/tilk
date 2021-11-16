@@ -25,10 +25,10 @@
               <v-divider></v-divider>
               <div v-if="DATA_VENTA">
                 <v-btn tile small color="indigo" block dark @click="revisar">Finalizar Revisión</v-btn>
-                <v-btn tile small color="success" v-if="itemId === 3 && DATA_VENTA.estado ===4" :disabled="!btnEnvio"
+                <v-btn tile small color="success" v-if="itemId === 4 && DATA_VENTA.estado === 4" :disabled="!btnEnvio"
                        block class="text-white" @click="registrarVenta(1)">
                   Finalizar Venta</v-btn>
-                <v-btn tile small color="warning" v-if="itemId === 3 && DATA_VENTA.estado ===4" :disabled="!btnEnvio"
+                <v-btn tile small color="warning" v-if="itemId === 4 && DATA_VENTA.estado ===4" :disabled="!btnEnvio"
                        block class="text-white" @click="registrarVenta(2)">
                   Cancelar Venta</v-btn>
               </div>
@@ -42,12 +42,91 @@
         <v-col cols="8" v-if="DATA_VENTA">
 
           <v-card v-if="itemId === 1" flat>
+            <v-alert dense color="warning" dark class="ma-2">Si el artículo es una <strong>MOTOCICLETA</strong>, subir los archivos que se le solicitan. Sino es
+            motocicleta, prosiga a la finalización de la venta.</v-alert>
+            <v-card flat v-if="!DATA_VENTA.documento_ventas">
+              <v-simple-table dense class="rowsTable">
+                <template v-slot:default>
+                  <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nombre del Documento</th>
+                    <th>Descargar</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>Hoja Conocimiento de Trámite</td>
+                    <td><b-link @click="mostrarPdf($axios.defaults.baseURL+'print_hoja_conocimientos_venta/'+DATA_VENTA.id)">Descargar</b-link></td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>Traspaso Vehícular</td>
+                    <td><b-link @click="mostrarPdf($axios.defaults.baseURL+'print_traspaso_venta/'+DATA_VENTA.id)">Descargar</b-link></td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>Carta Poder</td>
+                    <td><b-link @click="mostrarPdf($axios.defaults.baseURL+'print_carta_poder_venta/'+DATA_VENTA.id)">Descargar</b-link></td>
+                  </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+              <v-divider></v-divider>
+              <v-file-input dense class="ma-4" v-model="doc.hoja_conocimiento" label="Cargar Hoja Conocimiento Trámites"></v-file-input>
+              <v-file-input dense class="ma-4" v-model="doc.carta_poder" label="Cargar Carta Poder"></v-file-input>
+              <v-file-input dense class="ma-4" v-model="doc.traspaso" label="Cargar Traspaso"></v-file-input>
+              <v-file-input dense class="ma-4" v-model="doc.garantia" label="Cargar Hoja de Garantía"></v-file-input>
+              <v-divider></v-divider>
+            </v-card>
+            <v-card flat v-else>
+              <v-simple-table dense class="rowsTable">
+                <template v-slot:default>
+                  <thead>
+                  <tr>
+                    <th></th>
+                    <th>Nombre del Documento</th>
+                    <th>Ver</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr >
+                    <th>1</th>
+                    <td>Traspaso Vehícular</td>
+                    <td><b-link @click="verDocumento(DATA_VENTA.documento_ventas.traspaso)">ver</b-link></td>
+                  </tr>
+                  <tr >
+                    <th>2</th>
+                    <td>Hojas de Conocimiento de Trámites</td>
+                    <td><b-link @click="verDocumento(DATA_VENTA.documento_ventas.conocimiento_tramite)">ver</b-link></td>
+                  </tr>
+                  <tr >
+                    <th>3</th>
+                    <td>Carta Poder</td>
+                    <td><b-link @click="verDocumento(DATA_VENTA.documento_ventas.carta_poder)">ver</b-link></td>
+                  </tr>
+                  <tr >
+                    <th>4</th>
+                    <td>Hoja de Garantía</td>
+                    <td><b-link @click="verDocumento(DATA_VENTA.documento_ventas.garantia_articulo)">ver</b-link></td>
+                  </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-card>
+            <v-card-actions class="d-flex justify-end">
+              <v-btn class="ma-2" color="success" dark small tile v-if="!DATA_VENTA.documento_ventas" @click="registrarDocumentos">Registrar Documentos</v-btn>
+            </v-card-actions>
+          </v-card>
+          <v-card v-if="itemId === 2" flat>
             <v-simple-table dense class="rowsTable">
               <template v-slot:default>
                 <thead>
                 <tr>
                   <th>#</th>
                   <th>Nombre del Artículo</th>
+                  <th>Estado</th>
                   <th>Modelo</th>
                   <th>Cantidad</th>
                   <th>Precio</th>
@@ -60,6 +139,7 @@
                 <tr v-for="(item,i) in DATA_VENTA.facturas_contados">
                   <td>{{i + 1}}</td>
                   <td>{{item.articulo.nombre_articulo}}</td>
+                  <td>{{item.remision_articulo.estado_articulo.nombre}}</td>
                   <td>{{item.articulo.modelo}}</td>
                   <td>{{item.cantidad}}</td>
                   <td>L {{item.precio}}</td>
@@ -172,7 +252,7 @@
 
 <!--          -->
 
-          <v-card v-else-if="itemId === 2" flat>
+          <v-card v-else-if="itemId === 3" flat>
             <v-simple-table dense class="rowsTable">
               <thead>
               <tr>
@@ -197,7 +277,7 @@
               </tbody>
             </v-simple-table>
           </v-card>
-          <v-card v-else-if="itemId === 3" flat>
+          <v-card v-else-if="itemId === 4" flat>
             <v-card-title>Finalizar venta</v-card-title>
             <v-divider></v-divider>
             <v-card-text>
@@ -268,6 +348,10 @@
             <br>
             <b-input size="sm" placeholder="Introducir la dirección manualmente" v-model="Direccion"></b-input>
             <v-divider></v-divider>
+
+            <v-card-actions class="d-flex justify-end">
+              <v-btn small dark color="indigo" tile>Crear Orden de Entrega </v-btn>
+            </v-card-actions>
           </v-card>
 
         </v-col>
@@ -300,24 +384,35 @@
 </template>
 
 <script>
+import {vsUpload} from 'vuesax';
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css';
 import Vue from "vue";
+import {ipcRenderer} from "electron";
 export default {
   name: "mis_ventas_contado",
   data(){
     return{
       tituloMenu: 'Salida de Inventario',
       items: [
-        { title: 'Salida de Inventario',  val:1, dib: false},
-        { title: 'Revisión de Regalias',  val:2, dib: true},
-        { title: 'Finalización de Venta', val:3, dib: true},
+        { title: 'Documentos',  val:1, dib: false},
+        { title: 'Salida de Inventario',  val:2, dib: false},
+        { title: 'Revisión de Regalias',  val:3, dib: true},
+        { title: 'Finalización de Venta', val:4, dib: true},
       ],
+      disableDoc: false,
+      doc:{
+        carta_poder:       null,
+        hoja_conocimiento: null,
+        garantia:          null,
+        traspaso:          null
+      },
       itemId: 1,
       Direccion: '',
       Componentes: [],
       Colaborador: '',
       revisado:{
+        docs:   false,
         salida: false,
         regalia: false,
         final:   false
@@ -364,6 +459,7 @@ export default {
     this.Componentes = this.DATA_COMPONENTES;
     this.Regalias    = this.DATA_REGALIAS;
     this.cargarColaboradores();
+    Vue.use(vsUpload)
   },
   methods:{
     cambiarVista(data){
@@ -391,6 +487,9 @@ export default {
       console.log(this.revisado)
       this.btnEnvio = this.revisado.final && this.revisado.regalia && this.revisado.salida;
     },
+    mostrarPdf(url){
+      ipcRenderer.send('pint_navegador', url);
+    },
     notificacion(text, color){
       Vue.$toast.open({
         message: text,
@@ -400,18 +499,50 @@ export default {
       });
     },
     revisar(){
-      if (this.itemId === 1){
-        this.revisado.salida = true;
-        this.itemId          = 2;
-        this.items[1].dib    = false;
+      if (this.itemId === 1) {
+        this.revisado.docs = true;
+        this.itemId = 2;
+        this.items[1].dib = false;
       }else if (this.itemId === 2){
-        this.revisado.regalia = true;
+        this.revisado.salida = true;
         this.itemId           = 3;
         this.items[2].dib     = false;
       }else if (this.itemId === 3){
+        this.revisado.regalia = true;
+        this.itemId = 4;
+        this.items[3].dib     = false;
+      } else if (this.itemId === 4){
         this.revisado.final = true;
       }
       this.habilitarBtnEnvio();
+    },
+    registrarDocumentos(){
+      console.log(this.doc)
+      if (this.validarFiles()){
+        this.$store.commit('activarOverlay', true);
+        let data = new FormData();
+        data.append('carta_poder',  this.doc.carta_poder);
+        data.append('garantia',     this.doc.garantia);
+        data.append('traspaso',     this.doc.traspaso);
+        data.append('conocimiento', this.doc.hoja_conocimiento);
+        data.append('id',           this.DATA_VENTA.id);
+        this.$axios({
+          method: 'post',
+          url:    'cargar_documentos_venta',
+          data:   data,
+          headers:{
+            'Authorization': 'Bearer ' + this.$store.state.token,
+            'Content-Type': "multipart/form-data"
+          }
+        }).then((res)=>{
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('notificacion',{texto:res.data.msg, color:'success'});
+          this.$store.commit('ventas/cambiar_VISTA', 1);
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+        })
+
+      }
     },
     registrarVenta(val){
       if (this.Colaborador && this.Direccion){
@@ -436,9 +567,27 @@ export default {
           this.notificacion('Hubo un error en el servidor','error');
         })
       }else{
-        this.notificacion('Selecciona un colaborador o revisa que tengas una dirección','warning');
+        this.$store.commit('notificacion',{texto:'Selecciona un colaborador o revisa que tengas una dirección', color:'warning'})
       }
-    }
+    },
+    validarFiles(){
+      if (this.doc.carta_poder && this.doc.garantia && this.doc.traspaso && this.doc.hoja_conocimiento)
+        return true;
+      else
+        this.$store.commit('notificacion',{texto:'Tienes que cargar los archivos que se te solicitan', color:'warning'});
+    },
+    verDocumento(url){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('leer_documento/',
+          {ubicacion: url}).then((res)=>{
+        if (res.status === 200){
+          ipcRenderer.send('pint_navegador', res.data.url);
+          this.$store.commit('activarOverlay', false);
+        }
+      }).catch((error)=>{
+        this.$store.commit('activarOverlay', false);
+      })
+    },
   }
 }
 </script>

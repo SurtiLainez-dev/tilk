@@ -38,8 +38,9 @@
               <th>Artículo</th>
               <th>Código</th>
               <th>Cantidad</th>
-              <th>Sub_total</th>
               <th>Precio Unitario</th>
+              <td>Descuento</td>
+              <th>Sub_total</th>
               <th>Impuesto</th>
               <th>Total</th>
             </tr>
@@ -51,8 +52,9 @@
                 <small>{{item.articulo.descripcion_corta}}</small></td>
               <td>{{item.articulo.codigo_sistema}}</td>
               <td>{{item.cantidad}}</td>
-              <td><strong>L. {{int.format(item.sub_total)}}</strong></td>
               <td><strong>L. {{int.format(item.precio_unitario)}}</strong></td>
+              <td><strong>L. {{int.format(item.descuento)}}</strong></td>
+              <td><strong>L. {{int.format(item.sub_total)}}</strong></td>
               <td>{{item.impuesto.nombre}} %</td>
               <td><strong>L. {{int.format(item.total)}}</strong></td>
             </tr>

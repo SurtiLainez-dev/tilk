@@ -275,6 +275,9 @@
               alteración de inventario incorrecta por favor notificarlo de inmediato.`,
                 'success'
             );
+          }).catch((error)=>{
+            this.$store.commit('activarOverlay', false);
+            this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
           })
         })
       },

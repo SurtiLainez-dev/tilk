@@ -241,7 +241,7 @@
             this.Venta = this.Soli.estado === 4;
             console.log(this.Venta)
             this.$store.commit('solicitud_credito/agregadDetallesPrecios', JSON.parse(this.Soli.detalles_precio))
-            this.vista = 1;
+            // this.vista = 1;
 
             let dataAval = null;
             this.$store.commit('solicitud_credito/agregarAvalesEstaticos', {tipo: 2});

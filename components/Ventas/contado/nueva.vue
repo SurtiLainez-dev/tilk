@@ -107,10 +107,12 @@
           </template>
         </b-table>
         <v-card-text>Descuento que se puede aplicar L. {{descuento.inicial}}</v-card-text>
+        <br>
+        <v-alert dense type="warning" class="ma-2" border="left" outlined dismissible dark>Recuerda que solo puedes facturar <strong>un artículo</strong>, para cosas pequeñas, se debe facturar en caja.</v-alert>
       </v-card>
       <v-card class="ma-2" flat style="border: solid 1px #000">
         <v-row no-gutters>
-          <v-col cols="9">
+          <v-col cols="7">
             <v-simple-table dense class="rowsTable">
               <template v-slot:default>
                 <caption class="pl-5">Regalias</caption>
@@ -135,6 +137,15 @@
                 </tbody>
               </template>
             </v-simple-table>
+          </v-col>
+          <v-col cols="2">
+            <v-card flat>
+              <v-toolbar flat dense>Tipo de Venta</v-toolbar>
+              <v-chip class="ma-2" small v-if="tipoVenta === 1">Nuevo</v-chip>
+              <v-chip class="ma-2" small v-else-if="tipoVenta === 2">Consignado</v-chip>
+              <v-chip class="ma-2" small v-else-if="tipoVenta === 3">Reingreso</v-chip>
+              <v-chip class="ma-2" small v-else>No identificado</v-chip>
+            </v-card>
           </v-col>
           <v-col>
             <v-row no-gutters>
@@ -221,6 +232,7 @@
             <v-text-field class="ma-2" dense label="Nacionalidad" :rules="[rules.select.req]"
                           v-model="Cliente.nacionalidad"></v-text-field>
           </v-col></v-row>
+          <v-divider></v-divider>
         </v-form>
         <v-card-actions class="d-flex justify-end">
           <v-btn tile small dark color="orange" @click="Cliente.dialogo = false">Cerrar</v-btn>
@@ -399,6 +411,7 @@ export default {
   },
   data(){
     return{
+      tipoVenta: 0,
       descuento:{
         inicial:  0,
         aplicado: 0,
@@ -527,6 +540,7 @@ export default {
   },
   methods:{
     addLineaArticulo(data){
+      this.tipoVenta = 1;
       if (data.articulo.precio_activo){
         if (data.articulo.is_motocicleta !== 1){
           this.Venta.filas.push({
@@ -551,7 +565,7 @@ export default {
             descuento:   data.articulo.precio_activo.descuento
           });
 
-          this.sumarTotalFactura();
+          this.sumarTotalFactura(1);
           this.descuento.inicial = this.Venta.filas.reduce((total, item) => total + item.descuento, 0);
           this.dialogoBusqueda = false;
         }else{
@@ -584,7 +598,9 @@ export default {
         descuento:   0
       });
 
-      this.sumarTotalFactura();
+      this.tipoVenta = data.remision_articulo.estado_articulo_id;
+
+      this.sumarTotalFactura(data.estado_articulo_id);
       this.descuento.inicial = this.Venta.filas.reduce((total, item) => total + item.descuento, 0);
       this.dialogoBusqueda = false;
     },
@@ -612,8 +628,8 @@ export default {
           vali_color:  false,
           descuento:   0
         });
-        console.log(this.Venta.filas.length)
-        this.sumarTotalFactura();
+        this.tipoVenta = data.estado_articulo_id;
+        this.sumarTotalFactura(data.estado_articulo_id);
         this.validarColor(data);
         this.descuento.inicial = this.Venta.filas.reduce((total, item) => total + item.descuento, 0);
         this.dialogoBusqueda = false;
@@ -690,7 +706,7 @@ export default {
       this.Venta.filas.forEach((item, i)=>{
         item.key = i;
       });
-      this.sumarTotalFactura();
+      this.sumarTotalFactura(1);
     },
     deleteRegalia(key){
       this.Venta.regalias.splice(key, 1);
@@ -746,7 +762,7 @@ export default {
         if (error.response.status === 422)
           this.notificacion('El cliente ya existe','error');
         else
-          this.notificacion('Hubo un error inesperado en el servidor','eror');
+          this.notificacion('Hubo un error inesperado en el servidor','error');
 
         this.$store.commit('activarOverlay', false)
       })
@@ -762,7 +778,8 @@ export default {
         colaborador_id: this.Venta.vendedor,
         filas:       this.Venta.filas,
         regalias:    this.Venta.regalias,
-        descuento:   this.descuento.aplicado
+        descuento:   this.descuento.aplicado,
+        tipoVenta:   this.tipoVenta
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.notificacion(res.data.msj,'success');
@@ -776,15 +793,25 @@ export default {
       this.$refs.dialogoFechaVenta.save(this.Venta.fecha);
       this.dialogoFecha = false;
     },
-    sumarTotalFactura(){
+    sumarTotalFactura(reingreso){
       let total = 0;
-      this.Venta.filas.forEach((i)=>{
-        total = (parseFloat(total) + (i.precio) * i.cantidad).toFixed(2);
-      });
-      this.Venta.total = total;
-      this.Venta.impuesto = (this.Venta.total - (this.Venta.total / 1.15)).toFixed(2);
-      this.Venta.sub_total = (this.Venta.total - this.Venta.impuesto).toFixed(2);
-      this.descuento.stateTotal = this.Venta.total;
+      if(reingreso !== 3){
+        this.Venta.filas.forEach((i)=>{
+          total = (parseFloat(total) + (i.precio) * i.cantidad).toFixed(2);
+        });
+        this.Venta.total = total;
+        this.Venta.impuesto = (this.Venta.total - (this.Venta.total / 1.15)).toFixed(2);
+        this.Venta.sub_total = (this.Venta.total - this.Venta.impuesto).toFixed(2);
+        this.descuento.stateTotal = this.Venta.total;
+      }else{
+        this.Venta.filas.forEach((i)=>{
+          total = (parseFloat(total) + (i.precio) * i.cantidad).toFixed(2);
+        });
+        this.Venta.total = total;
+        this.Venta.impuesto = 0;
+        this.Venta.sub_total = (this.Venta.total - this.Venta.impuesto).toFixed(2);
+        this.descuento.stateTotal = this.Venta.total;
+      }
     },
     validarColor(data){
       data.vali_color = data.color.length > 1;
@@ -806,42 +833,46 @@ export default {
       }
     },
     validarEnvio(){
-      let longIsSerie = 0, isColor = 0, isSerie = 0;
-      this.Venta.filas.forEach((i)=>{
-        if (i.is_serie){
-          longIsSerie++;
-          if (i.serie){
-            isSerie++;
-            i.vali_serie = true;
-          }else{
-            i.vali_serie = false;
-          }
+      if (this.tipoVenta > 0 && this.tipoVenta <=3){
 
-          if (i.color){
-            isColor++;
-            i.vali_color = true;
-          }else{
-            i.vali_color = false;
-          }
-        }
-      });
+        let longIsSerie = 0, isColor = 0, isSerie = 0;
+        this.Venta.filas.forEach((i)=>{
+          if (i.is_serie){
+            longIsSerie++;
+            if (i.serie){
+              isSerie++;
+              i.vali_serie = true;
+            }else{
+              i.vali_serie = false;
+            }
 
-      if (longIsSerie === isSerie && longIsSerie === isColor
-          && this.$refs.formVentaContado.validate() && this.Venta.filas.length > 0)
-        if (this.descuento.aplicado > this.descuento.inicial){
-          this.$store.commit('notificacion', {texto: 'No se pudo aplicar el descuento', color: 'warning'});
-          this.descuento.aplicado = 0;
-          this.sumarTotalFactura();
-        }else
-          this.registrarVenta();
-      else
-        this.notificacion('Hay datos incompletos','error');
+            if (i.color){
+              isColor++;
+              i.vali_color = true;
+            }else{
+              i.vali_color = false;
+            }
+          }
+        });
+
+        if (longIsSerie === isSerie && longIsSerie === isColor
+            && this.$refs.formVentaContado.validate() && this.Venta.filas.length > 0)
+          if (this.descuento.aplicado > this.descuento.inicial){
+            this.$store.commit('notificacion', {texto: 'No se pudo aplicar el descuento', color: 'warning'});
+            this.descuento.aplicado = 0;
+            this.sumarTotalFactura();
+          }else
+            this.registrarVenta();
+        else
+          this.notificacion('Hay datos incompletos','error');
+      }
     },
     validarFormNuevoCliente(){
       if (this.$refs.FormClienteNuevo.validate())
         this.registrarCliente();
-      else
-        this.notificacion('Hay campos incompletos','error')
+      else {
+        this.notificacion('Hay campos incompletos', 'error');
+      }
     },
     validarSerie(data){
       data.vali_serie = data.serie.length > 2;

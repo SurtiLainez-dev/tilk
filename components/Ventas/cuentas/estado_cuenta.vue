@@ -19,9 +19,9 @@
           <td>{{item.fecha}}</td>
           <td>{{item.descripcion}}</td>
           <td>{{item.referencia}}</td>
-          <td>L {{parseFloat(item.debito).toFixed(2)}}</td>
-          <td>L {{parseFloat(item.credito).toFixed(2)}}</td>
-          <td>L {{parseFloat(item.saldo).toFixed(2)}}</td>
+          <td>L {{int.format(item.debito)}}</td>
+          <td>L {{int.format(item.credito)}}</td>
+          <td>L {{int.format(item.saldo)}}</td>
         </tr>
         </tbody>
       </template>
@@ -37,6 +37,11 @@ export default {
       return this.$store.state.cuentas.CUENTA;
     },
   },
+  data(){
+    return{
+      int: Intl.NumberFormat()
+    }
+  }
 }
 </script>
 

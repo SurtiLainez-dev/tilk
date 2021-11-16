@@ -1,20 +1,22 @@
 <template>
-    <v-navigation-drawer app permanent dark>
-        <v-list-item>
+    <v-navigation-drawer app dark permanent>
+        <v-list>
+          <v-list-item >
             <v-list-item-content>
-                <v-list-item-title class="title">
-                    TILK
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                    Surtidora Laínez
-                </v-list-item-subtitle>
+              <v-list-item-title class="title">
+                TILK
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                Surtidora Laínez
+              </v-list-item-subtitle>
             </v-list-item-content>
-        </v-list-item>
+          </v-list-item>
+        </v-list>
 
         <v-divider></v-divider>
 
         <v-row>
-            <v-col class="subMenu rounded-lg" cols="3">
+            <v-col class="subMenu rounded-lg px-2" cols="3">
                 <v-row v-for="item in opciones">
                   <v-col v-if="item.id === 1" class="d-flex justify-center" @click="go(item.url, item.id, item.accion)">
                       <v-tooltip right>
@@ -47,7 +49,7 @@
                       <span>{{item.titulo}}</span>
                     </v-tooltip>
                   </v-col>
-                  <v-col v-else-if="item.id > 3" class="d-flex justify-center">
+                  <v-col v-else-if="item.id > 3" class="d-flex justify-center px-2">
                     <v-tooltip right>
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn @click="itemsMenu(item.id)" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
@@ -61,7 +63,7 @@
             </v-col>
 
             <v-col cols="9" v-if="select === 1">
-              <v-container style="color: #FFF">
+              <v-container class="px-2" style="color: #FFF">
                 <strong>Inicio</strong>
               </v-container>
               <side-seguimientos/>
@@ -132,6 +134,7 @@
   import sideCaja from "./sideCaja";
   import mobiliario from "./contabilidad/mobiliario";
   import gastos from "@/components/dashboard/contabilidad/gastos";
+
   export default {
     components:{
       admin,
@@ -218,9 +221,6 @@
           this.$router.push(url)
       },
     },
-    mounted() {
-      console.log(this.PERMISOS.includes(0))
-    },
     computed:{
       tipoUser: function () {
         return this.$store.state.tipoUsuario
@@ -232,6 +232,14 @@
           per.push(parseInt(item))
         })
         return per;
+      },
+      ESTADOMENU:{
+        get: function (){
+          return this.$store.state.MENU;
+        },
+        set: function (val){
+          this.$store.commit('cambiar_MENU');
+        }
       }
     }
   }

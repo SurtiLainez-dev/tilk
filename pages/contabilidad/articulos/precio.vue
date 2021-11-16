@@ -81,29 +81,14 @@
       }
     },
     methods:{
-      goPrecio(item){
-        this.dataPrecio = item
-        this.$store.commit('cambiarVistaPRecioArticulo', 2);
-      },
-      consultarInventario(){
-        this.isPeticon = true
-        this.$axios.get('/2.0/inventario_contabilidad').then((res)=>{
-          if (res.status === 200){
-            this.Inventario = res.data.inventario
-            this.isPeticon = false
-          }
-        })
-      },
-      cargarProveedor(){
-        this.$axios.get('proveedores',{
+      cargarFamilias(){
+        this.$axios.get('familias',{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token
           }
         }).then((res)=>{
-          if (res.status == 200){
-            this.Proveedores = res.data.proveedores
-            this.buscadorProveedor = res.data.proveedores
-            this.cargarMarcasP()
+          if (res.status === 200){
+            this.Familias = res.data.familias
           }
         })
       },
@@ -119,16 +104,31 @@
           }
         }
       },
-      cargarFamilias(){
-        this.$axios.get('familias',{
+      cargarProveedor(){
+        this.$axios.get('proveedores',{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token
           }
         }).then((res)=>{
-          if (res.status === 200){
-            this.Familias = res.data.familias
+          if (res.status == 200){
+            this.Proveedores = res.data.proveedores
+            this.buscadorProveedor = res.data.proveedores
+            this.cargarMarcasP()
           }
         })
+      },
+      consultarInventario(){
+        this.isPeticon = true
+        this.$axios.get('/2.0/inventario_contabilidad').then((res)=>{
+          if (res.status === 200){
+            this.Inventario = res.data.inventario
+            this.isPeticon = false
+          }
+        })
+      },
+      goPrecio(item){
+        this.dataPrecio = item
+        this.$store.commit('cambiarVistaPRecioArticulo', 2);
       }
     },
     async fetch(){

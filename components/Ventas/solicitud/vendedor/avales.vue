@@ -23,13 +23,14 @@
         <v-divider></v-divider>
         <div v-if="verInfo">
             <small>Datos del aval</small>
-            <v-card flat color="grey lighten-4">
+            <v-card flat color="grey lighten-4" >
+                <v-progress-linear indeterminate v-if="busqueda"></v-progress-linear>
                 <table class="rowsTable ma-2">
                     <tbody>
                     <tr>
                         <th>Identidad:</th>
                         <td>
-                            <input v-model="data_Aval.identidad" type="text"
+                            <input v-model="data_Aval.identidad" type="text" :disabled="busqueda"
                                    @keyup.enter="buscarCliente(data_Aval)">
                         </td>
                     </tr>
@@ -37,14 +38,14 @@
                         <th>Nombres:</th>
                         <td>
                             <input ref="campoNombresAvales"  @keyup.enter="$refs.campoApellidosAvales.focus()"
-                                   v-model="data_Aval.nombres" type="text">
+                                   v-model="data_Aval.nombres" type="text" >
                         </td>
                     </tr>
                     <tr>
                         <th>Apellidos:</th>
                         <td>
                             <input v-model="data_Aval.apellidos"
-                                   type="text" ref="campoApellidosAvales">
+                                   type="text" ref="campoApellidosAvales" >
                         </td>
                     </tr>
                     <tr>
@@ -99,7 +100,7 @@
                 </v-row>
             </v-card>
         </div>
-        <hr>
+        <v-divider></v-divider>
         <v-card-actions class="d-flex justify-end">
             <v-btn color="success" @click="registrarAvales" dark small >Registrar Avales</v-btn>
         </v-card-actions>
@@ -141,13 +142,15 @@
         },
         data(){
             return{
+                busqueda: false,
                 data_Aval: [],
                 avales: [],
                 longAvales: 0,
                 verInfo: false,
                 Archivos: [],
                 existsEditado: false,
-                SinGuardar: []
+                SinGuardar: [],
+                save: false
             }
         },
         created() {
@@ -202,8 +205,9 @@
                 let regexId = RegExp("^[+]?([0-9]+(?:[\\.][0-9]*)?|\\.[0-9]+)$");
                 if (item.key > this.longAvales){
                     if (item.identidad.length === 13 && regexId.test(item.identidad)){
-                        this.dialogo = false;
-                        this.$store.commit('activarOverlay', true);
+                        // this.dialogo = false;
+                        this.busqueda = true;
+                        // this.$store.commit('activarOverlay', true);
                         this.$axios.get('cliente_segumiento/'+item.identidad)
                         .then((res)=>{
                             if (res.data.cliente){
@@ -219,6 +223,7 @@
                                 this.dialogo = true;
                                 this.data_Aval.existe = true;
                             }else{
+                              this.$refs.campoNombresAvales.focus()
                                 this.existsEditado = false;
                                 this.data_Aval.existe = false;
                                 let archivos = [
@@ -238,11 +243,12 @@
                                 this.dialogo = true;
                                 this.notificacion('El cliente no existe. Cargar los datos manualmente','error');
                             }
+                            this.busqueda = false;
                         })
                     }
                     item.consultado = true;
                 }
-                this.$refs.campoNombresAvales.focus()
+
             },
             notificacion(text, color){
                 Vue.$toast.open({

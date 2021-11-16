@@ -276,29 +276,11 @@
       }
     },
     methods:{
-      validarRazon(){
-        if (this.$refs.FormDatosDevolucionProveedor.validate())
-          this.vista = 2
-      },
-      verDocumento(dir){
-        this.$store.commit('activarOverlay', true);
-        this.$store.commit('valorDialogo', false);
-        this.$axios.post('leer_documento/',{
-          ubicacion: dir
-        },{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            ipcRenderer.send('open-nav', res.data.url);
-            this.$store.commit('activarOverlay', false);
-            this.$store.commit('valorDialogo', true);
-          }
-        }).catch((error)=>{
-          this.$store.commit('activarOverlay', false);
-          this.$store.commit('valorDialogo', true);
-        })
+      cancelarRevisado(data){
+        data.seleccionado = !data.seleccionado;
+        if (data.seleccionado === false){
+          data.revisado = false;
+        }
       },
       capturarOrden(data){
         this.Devolucion.Orden = [];
@@ -330,19 +312,71 @@
           console.log(i)
         })
       },
-      verificarOrden(){
-        if (this.Devolucion.Orden)
-          this.vista = 3
+      registrarDevolucion(){
+        let cuerpo = JSON.stringify(this.Devolucion.Envio);
+        this.$store.commit('activarOverlay', true);
+        this.Devolucion.dialogoEnviar = false;
+        this.$store.commit('valorDialogo', false);
+        this.$axios.post('devoluciones_proveedor',{
+          orden_entrada_id: this.Devolucion.orden_id,
+          cuerpo:           cuerpo,
+          razon:            this.Devolucion.razon,
+          sucursal:         this.suc
+        },{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          this.vista = 1;
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('cargarDevoluciones');
+          Swal.fire(
+              'Registro Exitoso',
+              `Se registro exitosamente la devolución.`,
+              'success'
+          );
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
+        })
+      },
+      validarRazon(){
+        if (this.$refs.FormDatosDevolucionProveedor.validate())
+          this.vista = 2
+      },
+      verDocumento(dir){
+        this.$store.commit('activarOverlay', true);
+        this.$store.commit('valorDialogo', false);
+        this.$axios.post('leer_documento/',{
+          ubicacion: dir
+        },{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            ipcRenderer.send('open-nav', res.data.url);
+            this.$store.commit('activarOverlay', false);
+            this.$store.commit('valorDialogo', true);
+          }
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('valorDialogo', true);
+        })
       },
       verificarCantidad(min, val, data){
         if (val > min){
           data.cantidad_salida = 0;
           Swal.fire(
-            'Error',
-            `Haz sobrepasado la cantidad permitida de ${min}.`,
-            'warning'
+              'Error',
+              `Haz sobrepasado la cantidad permitida de ${min}.`,
+              'warning'
           );
         }
+      },
+      verificarOrden(){
+        if (this.Devolucion.Orden)
+          this.vista = 3
       },
       verificarRevisiones(){
         let contador = 0;
@@ -367,37 +401,6 @@
             'warning'
           );
         }
-      },
-      cancelarRevisado(data){
-        data.seleccionado = !data.seleccionado;
-        if (data.seleccionado === false){
-          data.revisado = false;
-        }
-      },
-      registrarDevolucion(){
-        let cuerpo = JSON.stringify(this.Devolucion.Envio);
-        this.$store.commit('activarOverlay', true);
-        this.Devolucion.dialogoEnviar = false;
-        this.$store.commit('valorDialogo', false);
-        this.$axios.post('devoluciones_proveedor',{
-          orden_entrada_id: this.Devolucion.orden_id,
-          cuerpo:           cuerpo,
-          razon:            this.Devolucion.razon,
-          sucursal:         this.suc
-        },{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          this.vista = 1;
-          this.$store.commit('activarOverlay', false);
-          this.$store.commit('cargarDevoluciones');
-          Swal.fire(
-            'Registro Exitoso',
-            `Se registro exitosamente la devolución.`,
-            'success'
-          );
-        })
       }
     }
   }

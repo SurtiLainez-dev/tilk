@@ -13,6 +13,7 @@
         <v-chip dark x-small v-else-if="item.tipo_doc === 2" color="indigo">Recibo</v-chip>
         <v-chip dark x-small v-else-if="item.tipo_doc === 3" color="pink">DXC</v-chip>
         <v-chip dark x-small v-else-if="item.tipo_doc === 4" color="orange">Egreso</v-chip>
+        <v-chip dark x-small v-else-if="item.tipo_doc === 5" >Anticipo</v-chip>
       </template>
       <template v-slot:item.tipo="{item}">
         <span v-if="item.tipo === 0">+</span>
@@ -212,6 +213,8 @@ export default {
           detalle = `Pago de documento por cobrar de ${item.recibo.venta.cliente.nombres} ${item.recibo.venta.cliente.apellidos}, de venta # ${item.recibo.venta.cod}`;
         else if (item.tipo_documento === 4)
           detalle = `Egreso a depósito`;
+        else if (item.tipo_documento === 5)
+          detalle = 'Anticipo de cliente'
 
         if (item.tipo === 0)
           saldo = parseFloat(saldo) + parseFloat(item.total);
@@ -288,7 +291,7 @@ export default {
           this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
           this.$store.commit('notificacion',{texto:'Se ha cerrado la caja, por el día de hoy ya pondrás acceder',color:'warning'});
           this.$store.commit('activarOverlay', false);
-          this.$store.commit('quitar_pestania');
+          this.$store.commit('quitar_pestania', 1);
         }).catch((error)=>{
           this.$store.commit('activarOverlay', false);
           this.$store.commit('notificacion',{texto:'Hubo un errror en el servidor', color:'error'});

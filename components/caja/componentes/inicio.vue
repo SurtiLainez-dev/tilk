@@ -52,14 +52,16 @@
               <v-chip dark x-small color="success" v-if="item.tipo_documento === 1">Factura</v-chip>
               <v-chip dark x-small color="indigo" v-if="item.tipo_documento === 2">Recibo</v-chip>
               <v-chip dark x-small color="indigo" v-if="item.tipo_documento === 3">DXC</v-chip>
+              <v-chip dark x-small color="indigo" v-if="item.tipo_documento === 5">Anticipos</v-chip>
             </template>
             <template v-slot:item.total="{item}">
               L {{int.format(item.total)}}
             </template>
             <template v-slot:item.id="{item}">
-              <b-link v-if="item.tipo_documento === 1 && item.factura" @click="verDocumento(item.factura.file)">{{item.factura.contador}}</b-link>
-              <b-link v-else-if="item.tipo_documento === 2 && item.recibo" @click="verDocumento(item.recibo.file)">{{item.recibo.codigo}}</b-link>
-              <b-link v-else-if="item.tipo_documento === 3 && item.recibo" @click="verDocumento(item.recibo.codigo)">{{item.recibo.codigo}}</b-link>
+              <b-link v-if="item.tipo_documento === 1 && item.factura" @click="solicitarClave(1, 0, item)">{{item.factura.contador}}</b-link>
+              <b-link v-else-if="item.tipo_documento === 2 && item.recibo" @click="solicitarClave(2,2,item.recibo)">{{item.recibo.codigo}}</b-link>
+              <b-link v-else-if="item.tipo_documento === 3 && item.recibo" @click="solicitarClave(2,3,item.recibo)">{{item.recibo.codigo}}</b-link>
+              <b-link v-else-if="item.tipo_documento === 5 && item.recibo" @click="solicitarClave(2,5,item.recibo)">{{item.recibo.codigo}}</b-link>
             </template>
           </v-data-table>
         </v-card>
@@ -76,7 +78,8 @@ export default {
     total(){
       let total = 0;
       this.DOCUMENTOS.forEach((i)=>{
-        total = parseFloat(total) + parseFloat(i.total);
+        if (i.tipo_documento !== 4)
+          total = parseFloat(total) + parseFloat(i.total);
       });
       return total.toFixed(2);
     },
@@ -97,6 +100,9 @@ export default {
     },
     TOTAL_CAJA(){
       return this.$store.state.caja.CAJA_EFECTIVO;
+    },
+    USUARIO(){
+      return this.$store.state.usuario;
     }
   },
   data(){
@@ -110,7 +116,8 @@ export default {
       headerFP:[
         {text:'Nombre',value:'nombre'},
         {text:'Total',value:'total'},
-      ]
+      ],
+      fac: {},
     }
   },
   created() {
@@ -118,8 +125,33 @@ export default {
     let fecha = f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate();
     this.$store.commit('caja/cargar_DOCUMENTOS',{fecha: fecha, caja: this.CAJA.id, tipo: 3});
     this.$store.commit('caja/cargar_HISTORIAL', fecha);
+    this.$store.commit('activarOverlay', false);
   },
   methods:{
+    abrirNavegador(clave, tipo, recibo){
+      let url = '';
+      if (tipo === 1)
+        url = this.$axios.defaults.baseURL+'documentos/cajas/factura/usuario='+this.USUARIO+'/factura='+this.fac.factura.contador+'/'+clave;
+      else if(tipo === 2 && recibo === 2)
+        url = this.$axios.defaults.baseURL + 'documentos/cajas/recibos/usuario=' + this.USUARIO + '/recibo=' + this.fac.codigo + '/' + clave;
+      else if(tipo === 2 && recibo === 3)
+        url = this.$axios.defaults.baseURL + 'documentos/cajas/recibo_dxc/usuario=' + this.USUARIO + '/recibo=' + this.fac.codigo + '/' + clave;
+      else if (tipo === 2 && recibo === 5)
+        url = this.$axios.defaults.baseURL+'documentos/cajas/recibo_anticipo/usuario='+this.USUARIO+'/recibo='+this.fac.codigo+'/'+clave;
+
+      ipcRenderer.send('pint_navegador', url);
+      this.$store.commit('activarOverlay', false);
+    },
+    solicitarClave(tipo, recibo, data){
+      this.$store.commit('activarOverlay', true);
+      this.fac = data;
+      this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+        this.abrirNavegador(res.data.clave, tipo, recibo);
+      }).catch((error)=>{
+        this.$store.commit('notificacion',{texto:'Ocurrio un error', color:'error'});
+        this.$store.commit('activarOverlay', false);
+      })
+    },
     verDocumento(URL){
       this.$store.commit('activarOverlay',  true);
       this.$axios.post('leer_documento/',

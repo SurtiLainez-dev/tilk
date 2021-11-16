@@ -1,5 +1,6 @@
 module.exports = {
 	mode: 'spa',
+	components: true,
 	head: {
 		meta: [
 			{ charset: 'utf-8' },
@@ -40,7 +41,8 @@ module.exports = {
 		'@/assets/css/global.css'
 	],
 	plugins:[
-		'@/plugins/icons'
+		'@/plugins/icons',
+		'@/plugins/chartjs',
 	],
 	modules: [
 		'@nuxtjs/axios',

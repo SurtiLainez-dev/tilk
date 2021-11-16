@@ -94,7 +94,7 @@
                     </v-col>
                     <v-col cols="4">
                       <v-text-field label="Precio de Costo sin Impuesto"
-                                    disabled v-model="Precio.precio_s_i" suffix="lps"></v-text-field>
+                                    v-model="Precio.precio_s_i" suffix="lps"></v-text-field>
                     </v-col>
                     <v-col cols="3">
                       <v-text-field label="Margen de Utilidad" @keyup="calcularPrecioContado"

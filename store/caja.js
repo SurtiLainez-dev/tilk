@@ -20,7 +20,12 @@ export const state = () => ({
     HISTORIAL: [],
     CAJA_EFECTIVO: 0,
     LOAD_TRANSACCIONES: false,
-    TRANSACCIONES: []
+    TRANSACCIONES: [],
+    LOAD_CAJACHICA: false,
+    CAJACHICA:      {},
+    GASTOS:         [],
+    TIPOGASTOS:     [],
+    HISTORIALCAJACHICA: []
 
 })
 
@@ -73,7 +78,10 @@ export const mutations = {
                 state.DOCUMENTOS_HOY     = res.data.documentos;
                 state.LOADDOCUMENTOS_HOY = false;
             }
-            state.CAJA_EFECTIVO = res.data.caja.total;
+            if (res.data.caja)
+                state.CAJA_EFECTIVO = res.data.caja.total;
+            else
+                state.CAJA_EFECTIVO = 0;
         });
     },
     cambiar_TITULO(state, titulo){
@@ -92,5 +100,26 @@ export const mutations = {
             state.TRANSACCIONES      = res.data.historial;
             state.LOAD_TRANSACCIONES = false;
         })
-    }
+    },
+    cargar_CAJACHICA(state){
+        state.LOAD_CAJACHICA = true;
+        state.GASTOS         = [];
+        let i                = 0;
+        this.$axios.get('contabilidad/caja_chica/sucursal/'+ state.CAJA.sucursal_id).then((res)=>{
+            state.CAJACHICA     = res.data.caja;
+            state.TIPOGASTOS    = res.data.tipo_gastos;
+            res.data.historial.forEach((item)=>{
+                if (item.gasto){
+                    state.GASTOS.push({
+                        num: i+1,
+                        total: item.saldo_transaccion,
+                        gasto: item.gasto.tipo_gasto.nombre
+                    })
+                    i++;
+                }
+            });
+            state.HISTORIALCAJACHICA = res.data.historial;
+            state.LOAD_CAJACHICA = false;
+        })
+    },
 }

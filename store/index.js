@@ -4,6 +4,7 @@ export const strict = false;
 export const state = () =>({
   pestana:[
     {
+      valor: 0,
       titulo: 'titulo',
       key: 0
     },
@@ -39,13 +40,15 @@ export const state = () =>({
   Seguimiento: [],
   Seguimientos: [],
   loadSeguimiento: false,
-  tab: 1
+  tab: 1,
+  MENU: false
 });
 
 export const mutations = {
+  cambiar_MENU(state){
+    state.MENU = !state.MENU;
+  },
   notificacion(state,data){
-    console.log(data)
-    console.log(data.color)
     Vue.$toast.open({
       message: data.texto,
       type:   data.color,
@@ -53,16 +56,34 @@ export const mutations = {
       duration: 5000
     })
   },
-  cambiarTab(state, val){
-    state.tab = val;
+  cambiarTab(state,data){
+    console.log(data)
+    state.pestana.forEach((item, i)=>{
+      if (data.tipo){
+        if (item.valor === data.val)
+          state.tab = item.valor;
+      }else{
+        if (item.key === data.val)
+          state.tab = item.valor
+      }
+    });
+    // state.tab = 0;
   },
-  quitar_pestania(state){
-    state.pestana.splice(1, 1);
+  quitar_pestania(state, val){
+    val = parseInt(val);
+    state.pestana.forEach((item, i)=>{
+      if (item.valor === val)
+        state.pestana.splice(i,1);
+    });
+    state.pestana.forEach((item, i)=>{
+      item.valor = i;
+    })
   },
-  anadirCaja(state){
+  anadirCaja(state, data){
       state.pestana.push({
-        titulo: 'Caja',
-        key:    1
+        titulo: data.titulo,
+        key:    data.key,
+        valor: state.pestana.length
       })
   },
   asignarDatosSeguimiento(state, data){

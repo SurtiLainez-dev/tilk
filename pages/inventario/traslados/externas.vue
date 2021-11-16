@@ -251,56 +251,6 @@
       }
     },
     methods:{
-      registrarFileFirmado(){
-        if (this.$refs.FormCargarDocumentoTrasladoFirmado.validate()){
-          this.$store.commit('activarOverlay', true);
-          this.Traslado.dialogoArchivo = false;
-          let data = new FormData();
-          data.append('file_referencia', this.Traslado.fileFirmado);
-          data.append('traslado', this.Traslado.Traslado_id)
-          this.$axios({
-            method: 'post',
-            url: 'traslados_externos/file',
-            data:data,
-            headers:{
-              'Authorization': 'Bearer ' + this.$store.state.token,
-              'Content-Type': "multipart/form-data"
-            }
-          }).then((res)=>{
-            this.$router.replace({path:'/inventario/traslados/traslados_externos'});
-            this.$store.commit('activarOverlay', false);
-            Swal.fire(
-              'Registro Exitoso',
-              `El traslado externo a ${this.Traslado.remitente} se ha realizado correctamente. Verífique su inventario
-              y si ve datos incorrectos en el stock reportarlo de inmediato.`,
-              'success'
-            );
-          }).catch((error)=>{
-            this.$store.commit('activarOverlay', false);
-          })
-        }
-      },
-      verificarCantidad(cant, salida,item){
-        if (salida > cant){
-          Swal.fire(
-            'Cantidad Excedida',
-            `La cantidad de salida es mayor a la cantidad en piso.`,
-            'warning'
-          );
-          item.cantidad_salida = 0;
-        }
-        if (salida > 1){
-          Swal.fire(
-            'Cantidad Excedida',
-            `La cantidad máxima de salida de este componente es 1.`,
-            'warning'
-          );
-          item.cantidad_salida = 1;
-        }
-      },
-      onRowSelected(items){
-        this.Traslado.select = items;
-      },
       cargarMotocicletas(){
         this.$axios.get('traslados_externos/'+this.sucursal,{
           headers: {
@@ -352,31 +302,37 @@
           this.load = false
         })
       },
-      validarForm(){
-        let bandera = this.Traslado.select.length, contador = 0;
-        if (bandera > 0) {
-          this.Traslado.select.forEach( (i) => {
-            if (i.revisado)
-              contador++
-          });
-          if (bandera === contador){
-            if (this.$refs.FormRegistroTrasladoExterno.validate()) {
-              this.registrarTraslado();
+      onRowSelected(items){
+        this.Traslado.select = items;
+      },
+      registrarFileFirmado(){
+        if (this.$refs.FormCargarDocumentoTrasladoFirmado.validate()){
+          this.$store.commit('activarOverlay', true);
+          this.Traslado.dialogoArchivo = false;
+          let data = new FormData();
+          data.append('file_referencia', this.Traslado.fileFirmado);
+          data.append('traslado', this.Traslado.Traslado_id)
+          this.$axios({
+            method: 'post',
+            url: 'traslados_externos/file',
+            data:data,
+            headers:{
+              'Authorization': 'Bearer ' + this.$store.state.token,
+              'Content-Type': "multipart/form-data"
             }
-          }else{
+          }).then((res)=>{
+            this.$router.replace({path:'/inventario/traslados/traslados_externos'});
+            this.$store.commit('activarOverlay', false);
             Swal.fire(
-              'Error en el Revisado',
-              `Falta la revisión de componentes de las motocicletas que estan en lista de salida.`,
-              'warning'
+              'Registro Exitoso',
+              `El traslado externo a ${this.Traslado.remitente} se ha realizado correctamente. Verífique su inventario
+              y si ve datos incorrectos en el stock reportarlo de inmediato.`,
+              'success'
             );
-          }
-        }else{
-            Swal.fire(
-              'Sin datos',
-              `No se ha seleccionado ninguna motocicleta.`,
-              'warning'
-            );
-          }
+          }).catch((error)=>{
+            this.$store.commit('activarOverlay', false);
+          })
+        }
       },
       registrarTraslado(){
         let data = new FormData();
@@ -403,6 +359,32 @@
           this.$store.commit('activarOverlay', false);
         })
       },
+      validarForm(){
+        let bandera = this.Traslado.select.length, contador = 0;
+        if (bandera > 0) {
+          this.Traslado.select.forEach( (i) => {
+            if (i.revisado)
+              contador++
+          });
+          if (bandera === contador){
+            if (this.$refs.FormRegistroTrasladoExterno.validate()) {
+              this.registrarTraslado();
+            }
+          }else{
+            Swal.fire(
+                'Error en el Revisado',
+                `Falta la revisión de componentes de las motocicletas que estan en lista de salida.`,
+                'warning'
+            );
+          }
+        }else{
+          Swal.fire(
+              'Sin datos',
+              `No se ha seleccionado ninguna motocicleta.`,
+              'warning'
+          );
+        }
+      },
       verDocumento(){
         this.$store.commit('activarOverlay', true);
         this.Traslado.dialogoArchivo = false;
@@ -421,6 +403,24 @@
         }).catch((error)=>{
           this.$store.commit('activarOverlay', false);
         })
+      },
+      verificarCantidad(cant, salida,item){
+        if (salida > cant){
+          Swal.fire(
+            'Cantidad Excedida',
+            `La cantidad de salida es mayor a la cantidad en piso.`,
+            'warning'
+          );
+          item.cantidad_salida = 0;
+        }
+        if (salida > 1){
+          Swal.fire(
+            'Cantidad Excedida',
+            `La cantidad máxima de salida de este componente es 1.`,
+            'warning'
+          );
+          item.cantidad_salida = 1;
+        }
       }
     }
   }

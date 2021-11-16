@@ -4,8 +4,19 @@
         <template v-slot:activator value="true">
           <v-list-item-title>Inventario</v-list-item-title>
         </template>
-        <v-list-item class="itemOpciones" @click="go('/contabilidad/articulos/precio')">
+        <v-list-item dense class="itemOpciones" @click="go('/contabilidad/articulos/precio')">
           Asignación de Precios
+        </v-list-item>
+        <v-list-item dense class="itemOpciones" @click="go('/contabilidad/articulos/reingreso')">
+          <v-tooltip top>
+            <template v-slot:activator="{on, attrs}">
+              <span v-bind="attrs" v-on="on">Asig. Precio a Reingreso</span>
+            </template>
+            <span>Asignación de Precios a Artículos de Reingreso</span>
+          </v-tooltip>
+        </v-list-item>
+        <v-list-item dense class="itemOpciones" @click="go('/contabilidad/articulos/devoluciones/devolucion')">
+          Anulación de Cuenta
         </v-list-item>
       </v-list-group>
     </div>

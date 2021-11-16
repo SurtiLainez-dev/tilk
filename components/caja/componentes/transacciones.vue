@@ -12,6 +12,7 @@
       <v-chip dark x-small v-else-if="item.tipo_documento === 2" color="indigo">Recibo</v-chip>
       <v-chip dark x-small v-else-if="item.tipo_documento === 3" color="pink">DXC</v-chip>
       <v-chip dark x-small v-else-if="item.tipo_documento === 4" color="orange">Egreso</v-chip>
+      <v-chip dark x-small v-else-if="item.tipo_documento === 5" >Anticipos</v-chip>
     </template>
     <template v-slot:item.tipo="{item}">
       <v-chip dark x-small v-if="item.tipo === 0" color="success">Ingreso</v-chip>

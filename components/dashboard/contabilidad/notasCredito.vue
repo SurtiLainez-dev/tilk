@@ -7,11 +7,17 @@
           <template v-slot:activator="{on, attrs}"><v-list-item-title v-on="on" v-bind="attrs">NC</v-list-item-title></template>
         </v-tooltip>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/nuevo')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/nuevo')">
         Nueva NC Proveedor
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/')">
         NC Proveedores
+      </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/notas_credito/cliente/nueva')">
+        NC Cliente x Anticipo
+      </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/notas_credito/cliente/')">
+        NC Clientes
       </v-list-item>
     </v-list-group>
   </div>

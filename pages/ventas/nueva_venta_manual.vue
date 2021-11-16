@@ -159,8 +159,8 @@
           </v-text-field>
         </v-col>
         <v-col>
-          <v-text-field dense class="ma-1" v-model="data.articulo.serie" :rules="[rules.select.req]"
-                        outlined label="Serie del Fabricante">
+          <v-text-field dense class="ma-1" v-model="data.articulo.serie" :rules="[rules.select.req]" @keyup.enter="fabricarSerie"
+                        outlined label="Serie del Fabricante" hint="Para fabricar presione enter" persistent-hint>
           </v-text-field>
         </v-col>
         <v-col>
@@ -849,10 +849,14 @@ export default {
             this.data.cliente.apellidos    = res.data.cliente.apellidos;
             this.data.cliente.sexo         = res.data.cliente.sexo;
             this.data.cliente.nacionalidad = res.data.cliente.nacionalidad;
-            this.data.direcciones          = JSON.parse(res.data.cliente.direcciones);
-            this.data.telefonos            = JSON.parse(res.data.cliente.telefonos);
-            this.logns.direcciones         = this.data.direcciones.length;
-            this.logns.telefonos           = this.data.telefonos.length;
+            if (res.data.cliente.direcciones) {
+              this.data.direcciones = JSON.parse(res.data.cliente.direcciones);
+              this.logns.direcciones = this.data.direcciones.length;
+            }
+            if (res.data.cliente.telefonos) {
+              this.data.telefonos = JSON.parse(res.data.cliente.telefonos);
+              this.logns.telefonos           = this.data.telefonos.length;
+            }
             this.distribuirDirecciones();
             this.load.identidad = false;
             this.notificacion('Se cargaron las direcciones del cliente','success');
@@ -955,6 +959,14 @@ export default {
         this.cargarMunicipio(i);
         this.cargarCiudades(i);
         this.cargarColonias(i);
+      })
+    },
+    fabricarSerie(){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.get('/2.0/fabricar_serie').then((res)=>{
+        this.data.articulo.serie = res.data.serie;
+        this.$store.commit('activarOverlay', false);
+        this.$store.commit('notificacion',{texto:'Se fabricó una serie', color:'success'});
       })
     },
     formatDate (date, tipo) {
@@ -1066,7 +1078,7 @@ export default {
 
         fecha_vencimiento: this.data.cuenta.fecha_vencimiento,
         fecha_prima:       this.data.cuenta.fecha_prima,
-        tasa_anual:        0.0,
+        tasa_anual:        0.5,
         cuota:             this.data.cuenta.couta,
         forma_pago:        this.data.cuenta.forma_pago,
         prima:             this.data.cuenta.prima,

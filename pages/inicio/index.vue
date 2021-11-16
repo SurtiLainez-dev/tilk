@@ -76,6 +76,7 @@
       this.$store.commit('activarOverlay', false);
       this.$store.commit('guardarTitulo', 'Inicio')
       this.$store.commit('valorDialogo', false);
+      this.$store.commit('col/cargar_COLABORADORES')
     },
     methods:{
       taraa(){

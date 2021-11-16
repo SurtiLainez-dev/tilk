@@ -163,8 +163,8 @@ export default {
         this.notificacion('Cargando datos de la caja','success');
         this.dialogoIngreso = false;
         this.$store.commit('caja/agregar_CAJA_ID', this.Caja.id);
-        this.$store.commit('anadirCaja');
-        this.$store.commit('cambiarTab', 1);
+        this.$store.commit('anadirCaja', {titulo:'Caja', key: 1});
+        this.$store.commit('cambiarTab', {val:1, tipo:false});
       }).catch((error)=>{
         if (error.response.status === 422)
           this.notificacion(error.response.data.error, 'error');

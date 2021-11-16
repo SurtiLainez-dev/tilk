@@ -9,7 +9,7 @@
 
     <v-row no-gutters class="pa-3">
       <v-col cols="3">
-        <v-card height="600" width="256" class="mx-auto">
+        <v-card height="650" width="256" class="mx-auto">
           <v-navigation-drawer permanent>
             <v-list-item>
               <v-list-item-content>
@@ -48,7 +48,9 @@
           <facturas_hoy  v-else-if="VISTA === 5"/>
           <transacciones v-else-if="VISTA === 7"/>
           <egreso        v-else-if="VISTA === 8"/>
-          <cierre        v-else-if="VISTA === 10"/>
+          <caja_chica    v-else-if="VISTA === 9"/>
+          <anticipos     v-else-if="VISTA === 10"/>
+          <cierre        v-else-if="VISTA === 11"/>
         </v-card>
       </v-col>
     </v-row>
@@ -67,6 +69,8 @@ import recibos_hoy from "./componentes/recibos_hoy";
 import egreso from "@/components/caja/componentes/egreso";
 import transacciones from "@/components/caja/componentes/transacciones";
 import cierre from "@/components/caja/componentes/cierre";
+import caja_chica from "@/components/caja/componentes/caja_chica";
+import anticipos from "@/components/caja/componentes/anticipos";
 
 export default {
   components:{
@@ -77,7 +81,9 @@ export default {
     recibos_hoy,
     egreso,
     transacciones,
-    cierre
+    cierre,
+    caja_chica,
+    anticipos
   },
   name: "index",
   data(){
@@ -93,7 +99,8 @@ export default {
         { title: 'Transacciones', icon: 'fa fa-history', val:7 },
         { title: 'Egreso', icon: 'fa fa-file-invoice-dollar', val:8 },
         { title: 'Caja Chica', icon: 'fa fa-wallet', val:9},
-        { title: 'Cierre de Caja', icon: 'fa fa-sign-out-alt', val:10 },
+        { title: 'Anticipos', icon: 'fa fa-file-invoice-dollar', val:10},
+        { title: 'Cierre de Caja', icon: 'fa fa-sign-out-alt', val:11 },
       ],
     }
   },

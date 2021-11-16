@@ -1,10 +1,11 @@
 export const state = () => ({
     CUENTAS: [],
-    CUENTA:  [],
+    CUENTA:  {},
     VISTA:   1,
     PAGOS_AGREGADOS: [],
     LOAD: true,
-    CUENTAS_ACEPTADAS: []
+    CUENTAS_ACEPTADAS: [],
+    LOADCUENTA: false
 })
 
 export const mutations = {
@@ -24,10 +25,17 @@ export const mutations = {
             state.LOAD = false;
         })
     },
+    cargar_CUENTA(state, venta){
+        state.LOADCUENTA = true;
+        this.$axios.get('cuentas/ventas/'+venta).then((res)=>{
+            state.CUENTA     = res.data.venta;
+            state.LOADCUENTA = false;
+        })
+    },
     cargar_CUENTAS_ACEPTADAS(state){
         state.LOAD = true;
         this.$axios.get('cuentas/ventas').then((res)=>{
-            state.CUENTAS_ACEPTADAS = res.data.ventas;
+            state.CUENTAS_ACEPTADAS = res.data.venta;
             state.LOAD = false;
         })
     }

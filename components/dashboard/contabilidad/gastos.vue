@@ -4,10 +4,10 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Gastos</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/gastos/')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/gastos/')">
         Ver Gastos
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/gastos/nuevo')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/gastos/nuevo')">
         Crear Gastos
       </v-list-item>
     </v-list-group>

@@ -214,10 +214,10 @@
               </thead>
               <tbody>
               <tr>
-                <td>L {{Venta.total}}</td>
-                <td>L {{Venta.contrato_cliente.prima}}</td>
-                <td>L {{Venta.contrato_cliente.saldo_financiar}}</td>
-                <td>L {{Venta.contrato_cliente.cuota}}</td>
+                <td>L {{int.format(Venta.total)}}</td>
+                <td>L {{int.format(Venta.contrato_cliente.prima)}}</td>
+                <td>L {{int.format(Venta.contrato_cliente.saldo_financiar)}}</td>
+                <td>L {{int.format(Venta.contrato_cliente.cuota)}}</td>
                 <td>{{Venta.num_cuotas}} Cuotas</td>
               </tr>
               </tbody>

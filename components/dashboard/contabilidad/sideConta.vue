@@ -4,25 +4,25 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Contabilidad</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/')">
         Catálogo
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/caja')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/caja')">
         Cajas Generales
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/caja_chicas')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/caja_chicas')">
         Cajas Chicas
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/banco')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/banco')">
         Bancos
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/colaborador/planillas/pagos')">
+      <v-list-item dense class="itemOpciones" @click="go('/colaborador/planillas/pagos')">
         Pago a Colaboradores
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/libro_diario')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/libro_diario')">
         Libro Díario
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/cheques')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/cheques')">
         Cheques
       </v-list-item>
     </v-list-group>
@@ -30,28 +30,28 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Facturas</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/')">
         Facturas
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pendientes')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pendientes')">
         Facturas Pendientes
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/registrar')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/registrar')">
         Registrar Factura
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/calendarios/contabilidad/pagos_proveedores')">
+      <v-list-item dense class="itemOpciones" @click="go('/calendarios/contabilidad/pagos_proveedores')">
         Calendario de Pagos Pendientes
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pagos/')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pagos/')">
         Pagos Realizados
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pagos/nuevo')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pagos/nuevo')">
         Realizar Pago a Proveedor
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pagos/lista')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pagos/lista')">
         Crear Lista de Pagos
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/ingreso_manual')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/ingreso_manual')">
         Ingreso Manual a CC
       </v-list-item>
     </v-list-group>

@@ -30,14 +30,23 @@
                   <tr>
                     <th>Sucursal</th>
                     <th class="text-center">Reingreso</th>
-                    <th class="text-center">Stock</th>
+                    <th class="text-center">Nuevo</th>
+                    <th class="text-center">Consignado</th>
                   </tr>
                   </thead>
                   <tbody>
                   <tr v-for="item in Stock">
-                    <td>{{item.sucursal.nombre}} ({{item.sucursal.abreviatura}})</td>
+                    <td>
+                      <v-tooltip top>
+                        <template v-slot:activator="{on, attrs}">
+                          <span v-on="on" v-bind="attrs">{{item.sucursal.abreviatura}}</span>
+                        </template>
+                        <span>{{item.sucursal.nombre}}</span>
+                      </v-tooltip>
+                    </td>
                     <td class="text-center">{{item.stock_reingreso}}</td>
                     <td class="text-center">{{item.stock_actual}}</td>
+                    <td class="text-center">{{item.stock_consignado}}</td>
                   </tr>
                   </tbody>
                 </template>

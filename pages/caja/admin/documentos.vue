@@ -20,9 +20,9 @@
       </v-tooltip>
     </template>
     <template v-slot:item.cai="{item}">
-      <v-tooltip top>
+      <v-tooltip top >
         <template v-slot:activator="{on, atts}">
-          <span v-on="on" v-bind="atts">{{item.cai.substr(0,2)}} ...</span>
+          <span v-if="item.cai" v-on="on" v-bind="atts">{{item.cai.substr(0,2)}} ...</span>
         </template>
         <span>{{item.cai}}</span>
       </v-tooltip>
@@ -45,7 +45,7 @@
         <v-row no-gutters>
           <v-col>
             <v-text-field dense label="Código Post Contador" v-model="Directriz.codigo_post_contado"
-                          class="ma-2" :rules="[rule.contadorI.req, rule.post.igual]" counter></v-text-field>
+                          class="ma-2" :rules="[rule.contadorI.req]" counter></v-text-field>
           </v-col>
           <v-col>
             <v-autocomplete dense label="Sucursal" :items="Sucursales" :loading="loadSucursales"
@@ -71,7 +71,7 @@
                       width="290px" v-model="dialogoFechaInicial">
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field v-model="Directriz.fecha_emision" label="Fecha de Emisión"
-                              prepend-icon="mdi-calendar" :rules="[rule.contadorI.req]"
+                              prepend-icon="mdi-calendar"
                               readonly v-bind="attrs" v-on="on"></v-text-field>
               </template>
               <v-date-picker v-model="Directriz.fecha_emision" scrollable>
@@ -87,7 +87,7 @@
                       width="290px" v-model="dialogoFechaFinal">
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field v-model="Directriz.fecha_final" label="Fecha de Finalización"
-                              prepend-icon="mdi-calendar" :rules="[rule.contadorI.req]"
+                              prepend-icon="mdi-calendar"
                               readonly v-bind="attrs" v-on="on"></v-text-field>
               </template>
               <v-date-picker v-model="Directriz.fecha_final" scrollable>
@@ -113,9 +113,7 @@
         </v-row>
         <v-row no-gutters>
           <v-col>
-            <v-text-field dense class="ma-2" label="CAI" counter
-                          :rules="[rule.contadorI.req, rule.cai.igual]"
-                          v-model="Directriz.cai"></v-text-field>
+            <v-text-field dense class="ma-2" label="CAI" counter v-model="Directriz.cai"></v-text-field>
           </v-col>
         </v-row>
       </v-form>
@@ -168,9 +166,6 @@ export default {
         post:{
           igual: v => (v && v.length === 11) || 'Tiene que ser igual a 11 carácteres.',
         },
-        cai:{
-          igual: v => (v && v.length === 37) || 'Tiene que ser mayor a 37 carácteres.',
-        }
       },
       dialogoFechaInicial: false,
       dialogoFechaFinal:   false,
@@ -183,7 +178,7 @@ export default {
         fecha_emision:         '',
         fecha_final:           '',
         cai:                   '',
-        tipo:                  '',
+        tipo:                  0,
         inicio_contador:       '',
       }
     }
@@ -259,7 +254,15 @@ export default {
     },
     validarForm(){
       if (this.$refs.FormDirectrices.validate())
-        this.storeDirectriz();
+        if (this.Directriz.tipo === 2){
+          if (this.Directriz.cai.length === 37 && this.Directriz.fecha_emision && this.Directriz.fecha_final){
+            this.storeDirectriz();
+          }else{
+            this.notificacion('Hay datos faltantes.','error');
+          }
+        }else{
+          this.storeDirectriz();
+        }
       else
         this.notificacion('Hay datos faltantes.','error');
     }

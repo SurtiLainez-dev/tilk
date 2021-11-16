@@ -151,6 +151,10 @@
       }
     },
     methods:{
+      abrirDialogo(data){
+        this.Devolucion.id      = data.id;
+        this.Devolucion.dialogo = true;
+      },
       cargarOrdenes(){
         this.$axios.get('/orden_entradas/sucursal/'+this.sucursal,{
           headers: {
@@ -159,27 +163,6 @@
         }).then((res)=>{
           this.Ordenes = res.data.ordenes
         })
-      },
-      verDocumento(dir){
-        this.$store.commit('activarOverlay', true);
-        this.$axios.post('leer_documento/',{
-          ubicacion: dir
-        },{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            ipcRenderer.send('open-nav', res.data.url);
-            this.$store.commit('activarOverlay', false);
-          }
-        }).catch((error)=>{
-          this.$store.commit('activarOverlay', false);
-        })
-      },
-      abrirDialogo(data){
-        this.Devolucion.id      = data.id;
-        this.Devolucion.dialogo = true;
       },
       subirDocumento(){
         if (this.$refs.FormSubirDocumentoFirmadoDevolucionesProveedor.validate()){
@@ -201,15 +184,32 @@
             this.$store.commit('activarOverlay', false);
             this.Devolucion.file = null;
             Swal.fire(
-              'Registro Exitoso',
-              `Se ha registrado exitosamente el documento fírmado.`,
-              'warning'
+                'Registro Exitoso',
+                `Se ha registrado exitosamente el documento fírmado.`,
+                'warning'
             );
           }).catch((error)=>{
             this.Devolucion.dialogo = true;
             this.$store.commit('activarOverlay', false);
           })
         }
+      },
+      verDocumento(dir){
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('leer_documento/',{
+          ubicacion: dir
+        },{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            ipcRenderer.send('open-nav', res.data.url);
+            this.$store.commit('activarOverlay', false);
+          }
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+        })
       }
     }
   }

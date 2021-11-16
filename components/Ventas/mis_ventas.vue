@@ -477,7 +477,7 @@
         </v-list-item-content>
       </v-list-item>
       <v-card-actions class="d-flex justify-end">
-        <v-btn tile color="warning" small dark >Cerrar</v-btn>
+        <v-btn tile color="warning" small dark @click="Enviado = false">Cerrar</v-btn>
         <v-btn tile
                color="success"
                small

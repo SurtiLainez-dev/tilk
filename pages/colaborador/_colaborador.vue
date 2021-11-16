@@ -53,7 +53,7 @@
                 <v-col cols="2"><v-icon>fa fa-briefcase</v-icon></v-col>
               </v-row>
               <v-row>
-                <v-col class="d-flex justify-center">{{datosColaborador.puesto_colaborador.nombre}}</v-col>
+                <v-col class="d-flex justify-center">{{datosColaborador.puesto_colaborador.nombre}} {{datosColaborador.codigo}}</v-col>
               </v-row>
             </v-card>
           </v-col>

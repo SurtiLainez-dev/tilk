@@ -28,15 +28,15 @@
       </tr>
       <tr>
         <th>Total del Crédito</th>
-        <td><strong>L </strong>{{CUENTA.total}}</td>
+        <td><strong>L </strong>{{int.format(CUENTA.total)}}</td>
       </tr>
       <tr v-if="CUENTA.contrato_cliente">
         <th>Saldo en Mora</th>
-        <td><strong>L </strong>{{CUENTA.contrato_cliente.saldo_mora}}</td>
+        <td><strong>L </strong>{{int.format(CUENTA.contrato_cliente.saldo_mora)}}</td>
       </tr>
       <tr>
         <th>Saldo Actual</th>
-        <td><strong>L </strong>{{CUENTA.saldo_actual}}</td>
+        <td><strong>L </strong>{{int.format(CUENTA.saldo_actual)}}</td>
       </tr>
       <tr>
         <th>Estado</th>
@@ -72,6 +72,11 @@ export default {
     CUENTA(){
       return this.$store.state.cuentas.CUENTA;
     },
+  },
+  data(){
+    return{
+      int: Intl.NumberFormat()
+    }
   }
 }
 </script>

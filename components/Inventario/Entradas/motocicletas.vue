@@ -6,7 +6,7 @@
         <div class="pl-3 pr-3 bordes">
           <v-row>
             <v-col md="2">
-              <v-select :items="tipoEntrada" label="Tipo de Entrada" :rules="[rules.nombre.req]"
+              <v-select :items="tipoEntrada" label="Tipo de Entrada" :rules="[rules.nombre.cero]"
                         v-model="Ingreso.tipoConsignacion" @change="cambiarTipo"></v-select>
             </v-col>
             <v-col md="3">
@@ -67,7 +67,7 @@
                 <td width="6%"><v-text-field dense v-model="item.cc" :rules="[rules.nombre.req]"></v-text-field></td>
                 <td width="15%"><v-text-field dense v-model="item.color" :rules="[rules.nombre.req]"></v-text-field></td>
                 <td width="7%">
-                  <v-text-field @keyup.enter="addFila" :rules="[rules.nombre.req]" dense v-model="item.anio"></v-text-field>
+                  <v-text-field @keyup.enter="addFila"  :rules="[rules.nombre.req, rules.anio.anio]" dense v-model="item.anio"></v-text-field>
                 </td>
                 <td>
                   <v-btn width="25px"  @click="abrirPopupVerificar(item)" height="25px" fab color="green" dark>
@@ -152,12 +152,16 @@
           nombre: {
             verdad: v => v === true || 'Falta Revisión',
             req: v => !!v || 'Campo requerido',
+            cero: v => v >= 0 || 'Campo requerido'
           },
+          anio:{
+            anio: v => v > 2020 || 'Tiene que ser un año'
+          }
         },
         isLoadCol: false,
         tipoEntrada:[
+          {text:'CONSIGNADA', value:0},
           {text:'FACTURADA', value:1},
-          {text:'CONSIGNADA', value:2},
         ],
         popupSuburFile: false,
         popupVeri: false,
@@ -169,24 +173,9 @@
           colaborador: '',
           numero: '',
           estado:'',
-          tipoConsignacion: '',
+          tipoConsignacion: 0,
           observacion: 'Sin Observaciones',
-          articulo:[
-            {
-              is: false, revisado:false,
-              articulo: '', requiredArticulo: false,
-              marca:    '', requiredMarca: false,
-              chasis:   '', requiredChasis:false,
-              cantidad: 1,
-              motor:    '', requiredMotor: false,
-              estado:   1,
-              cc:       '', requiredCc:false,
-              fila:     0,
-              color:    '', requiredColor: false,
-              anio:     '', requiredAnio: false,
-              isCompuesto: false, rCompuestos: []
-            }
-          ]
+          articulo:[]
         },
         Colaboradores: null,
         Marcas: null,
@@ -226,9 +215,9 @@
       addFila(){
         let fila = this.Ingreso.articulo.length;
         let estado = 0;
-        if (this.Ingreso.tipoConsignacion === 1)
+        if (this.Ingreso.tipoConsignacion === 0)
           estado = 2;
-        else if (this.Ingreso.tipoConsignacion === 2)
+        else if (this.Ingreso.tipoConsignacion === 1)
           estado = 1;
         this.Ingreso.articulo.push({
           "is":       false,"revisado": false,
@@ -379,7 +368,7 @@
         }
       },
       verificarForm(){
-        if (this.$refs.FormNuevaEntradaMotocicletas.validate())
+        if (this.$refs.FormNuevaEntradaMotocicletas.validate() && this.Ingreso.articulo.length > 0)
           this.registrarOrden()
       },
     }

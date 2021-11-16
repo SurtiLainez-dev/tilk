@@ -200,9 +200,20 @@
                      dark
                      width="25px"
                      height="25px"
-                     @click="agregarArticulo(item, true)"
+                     @click="agregarArticulo(item, 2)"
                      color="success">
                 {{item.stock_actual}}
+              </v-btn>
+            </template>
+            <template v-slot:item.stock_consignado="{item}">
+              <v-btn fab
+                     x-small
+                     dark
+                     width="25px"
+                     height="25px"
+                     @click="agregarArticulo(item, 3)"
+                     color="success">
+                {{item.stock_consignado}}
               </v-btn>
             </template>
             <template v-slot:item.stock_reingreso="{item}">
@@ -211,7 +222,7 @@
                      dark
                      width="25px"
                      height="25px"
-                     @click="agregarArticulo(item, false)"
+                     @click="agregarArticulo(item, 1)"
                      color="orange">
                 {{item.stock_reingreso}}
               </v-btn>
@@ -221,7 +232,7 @@
             <v-btn class="ma-2"
                    color="orange"
                    dark
-                   @click="Traslado.dialogo = false"
+                   @click="Traslado.dialogo = 2"
                    small>Cerrar</v-btn>
           </v-card-actions>
         </v-card>
@@ -258,6 +269,7 @@
           {text:'Cód. Sístema',   value:'articulo.codigo_sistema'},
           {text:'Stock',          value:'stock_actual',    align:'center'},
           {text:'Stock R.',       value:'stock_reingreso', align:'center'},
+          {text:'Stock Cons.',       value:'stock_consignado', align:'center'},
         ],
         Traslado:{
           fila: null,
@@ -320,32 +332,11 @@
       }
     },
     methods:{
-      verificarArticulosTraslados(){
-        if (this.$refs.FormVerificarIngresoArticuloTraslado.validate()) {
-          this.Traslado.fila = null;
-          this.$store.commit('cambiarVista', 2);
-        }
-      },
-      verificarCantidad(data){
-        if (data.cantidad > data.cantidadStock){
-          Swal.fire(
-            'Error',
-            `Se ha excedido la cantidad de stock actual. Elige un valor igual o menor a ${data.cantidadStock}`,
-            'error'
-          );
-          data.cantidad = data.cantidadStock;
-        }
-      },
-      removeFila(fila){
-        if (this.Traslado.articulos.length < 2){
-          alert("No puedes eliminar esta fila")
-        }else{
-          this.Traslado.articulos.splice((fila - 1), 1)
-          for (let item in this.Traslado.articulos){
-            let back = item % 2 == 0 ? true : false;
-            this.Traslado.articulos[item].fila = parseInt(item) + parseInt(1);
-            this.Traslado.articulos[item].back = back;
-          }
+      abrirDialogoArticulo(item){
+        if (this.Traslado.sucursalOrigen.length > 0 || this.Traslado.sucursalOrigen > 0){
+          this.Traslado.fila = item;
+          item.cantidad = 0;
+          this.Traslado.dialogo = true;
         }
       },
       addFila(){
@@ -374,12 +365,80 @@
           "estadoArticulo":''
         })
       },
-      abrirDialogoArticulo(item){
-        if (this.Traslado.sucursalOrigen.length > 0 || this.Traslado.sucursalOrigen > 0){
-          this.Traslado.fila = item;
-          item.cantidad = 0;
-          this.Traslado.dialogo = true;
+      agregarArticulo(data, val){
+        this.Traslado.fila.articulo_id = data.articulo.id;
+        this.Traslado.fila.cod         = data.articulo.codigo_sistema;
+        this.Traslado.fila.articulo    = data.articulo.nombre_articulo +' '+data.articulo.descripcion_corta;
+        if (val === 1) {
+          this.Traslado.fila.cantidadStock = data.stock_reingreso;
+          this.Traslado.fila.estadoS = 'Reingreso';
+        }else if (val === 2) {
+          this.Traslado.fila.cantidadStock = data.stock_actual;
+          this.Traslado.fila.estadoS = 'Nuevo';
+        }else if (val === 3){
+          this.Traslado.fila.cantidadStock = data.stock_consignado;
+          this.Traslado.fila.estadoS = 'Consignado';
         }
+        if (val === 1 || val === 3)
+          this.Traslado.fila.remision = 1;
+        else
+          this.Traslado.fila.remision = 0;
+
+        if (data.articulo.is_motocicleta === 1){
+          this.Traslado.fila.remision = 1;
+          this.Traslado.fila.motocicleta = true
+        }else{
+          this.Traslado.fila.motocicleta = false
+        }
+        this.Traslado.fila.compuesto        = data.articulo.is_compuesto;
+        this.Traslado.fila.dataCompuestos   = data.articulo.articulo_compuestos;
+        this.Traslado.fila.dataRemision     = data.articulo.remision_articulos;
+        this.Traslado.dialogo               = false
+      },
+      cargarInventario2(){
+        this.Loads.inventario = true;
+        this.Inventario = [];
+        this.$axios.get('inventario_sucursal/'+this.Traslado.sucursalOrigen,{
+          headers:{
+            'Authorization': 'Bearer ' + this.$store.state.token,
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.Inventario = res.data.inventario;
+            this.Loads.inventario = false;
+          }
+        })
+      },
+      cargarInventario(){
+        this.Loads.inventario = true;
+        this.Inventario = [];
+        this.Traslado.articulos = [
+          {articulo_id:'', articulo:'', observacion: '', compuestos: [],cantidad: 0, data: null, cod:'', back: false,
+            remision: 0, compuesto: 0, fila:1, estado:false, motocicleta:
+                false, estadoS: '', cantidadStock: 0, estadoArticulo: ''}
+        ]
+        this.$axios.get('inventario_sucursal/'+this.Traslado.sucursalOrigen,{
+          headers:{
+            'Authorization': 'Bearer ' + this.$store.state.token,
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.Inventario = res.data.inventario;
+            this.Loads.inventario = false;
+          }
+        })
+      },
+      cargarMotivos(){
+        this.$axios.get('motivos_traslados',{
+          headers:{
+            'Authorization': 'Bearer ' + this.$store.state.token,
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.Motivos.data = res.data.motivos;
+            this.Loads.motivos = false
+          }
+        })
       },
       cargarSucursales(){
         this.$axios.get('/sucursales',{
@@ -390,6 +449,18 @@
           this.Sucursales = res.data.suc
           this.Loads.sucursales = false
         })
+      },
+      removeFila(fila){
+        if (this.Traslado.articulos.length < 2){
+          alert("No puedes eliminar esta fila")
+        }else{
+          this.Traslado.articulos.splice((fila - 1), 1)
+          for (let item in this.Traslado.articulos){
+            let back = item % 2 == 0 ? true : false;
+            this.Traslado.articulos[item].fila = parseInt(item) + parseInt(1);
+            this.Traslado.articulos[item].back = back;
+          }
+        }
       },
       registrarMotivos(){
         if (this.$refs.FormNuevoMotivoTraslado.validate()){
@@ -407,9 +478,9 @@
               this.$store.commit('valorDialogo', true)
               this.$store.commit('valorDialogo2', true)
               Swal.fire(
-                'Registro Exitoso',
-                `Se registro exitosamente el motivo de traslado ${this.Motivos.motivo}.`,
-                'success'
+                  'Registro Exitoso',
+                  `Se registro exitosamente el motivo de traslado ${this.Motivos.motivo}.`,
+                  'success'
               );
               this.Motivos.motivo = '';
               this.$store.commit('activarOverlay', false);
@@ -417,76 +488,21 @@
           })
         }
       },
-      cargarMotivos(){
-        this.$axios.get('motivos_traslados',{
-          headers:{
-            'Authorization': 'Bearer ' + this.$store.state.token,
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.Motivos.data = res.data.motivos;
-            this.Loads.motivos = false
-          }
-        })
-      },
-      cargarInventario(){
-        this.Loads.inventario = true;
-        this.Inventario = [];
-        this.Traslado.articulos = [
-          {articulo_id:'', articulo:'', observacion: '', compuestos: [],cantidad: 0, data: null, cod:'', back: false,
-            remision: 0, compuesto: 0, fila:1, estado:false, motocicleta:
-              false, estadoS: '', cantidadStock: 0, estadoArticulo: ''}
-        ]
-        this.$axios.get('inventario_sucursal/'+this.Traslado.sucursalOrigen,{
-          headers:{
-            'Authorization': 'Bearer ' + this.$store.state.token,
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.Inventario = res.data.inventario;
-            this.Loads.inventario = false;
-          }
-        })
-      },
-      cargarInventario2(){
-        this.Loads.inventario = true;
-        this.Inventario = [];
-        this.$axios.get('inventario_sucursal/'+this.Traslado.sucursalOrigen,{
-          headers:{
-            'Authorization': 'Bearer ' + this.$store.state.token,
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.Inventario = res.data.inventario;
-            this.Loads.inventario = false;
-          }
-        })
-      },
-      agregarArticulo(data, val){
-        this.Traslado.fila.articulo_id = data.articulo.id;
-        this.Traslado.fila.cod         = data.articulo.codigo_sistema;
-        this.Traslado.fila.articulo    = data.articulo.nombre_articulo +' '+data.articulo.descripcion_corta;
-        if (val === false) {
-          this.Traslado.fila.cantidadStock = data.stock_reingreso;
-          this.Traslado.fila.estadoS = 'Reingreso';
-        }else if (val === true) {
-          this.Traslado.fila.cantidadStock = data.stock_actual;
-          this.Traslado.fila.estadoS = 'Nuevo';
+      verificarArticulosTraslados(){
+        if (this.$refs.FormVerificarIngresoArticuloTraslado.validate()) {
+          this.Traslado.fila = null;
+          this.$store.commit('cambiarVista', 2);
         }
-        if (val === false)
-          this.Traslado.fila.remision = 1;
-        else
-          this.Traslado.fila.remision = 0;
-        if (data.articulo.is_motocicleta === 1){
-          this.Traslado.fila.remision = 1;
-          this.Traslado.fila.motocicleta = true
-        }else{
-          this.Traslado.fila.motocicleta = false
+      },
+      verificarCantidad(data){
+        if (data.cantidad > data.cantidadStock){
+          Swal.fire(
+            'Error',
+            `Se ha excedido la cantidad de stock actual. Elige un valor igual o menor a ${data.cantidadStock}`,
+            'error'
+          );
+          data.cantidad = data.cantidadStock;
         }
-        this.Traslado.fila.compuesto        = data.articulo.is_compuesto;
-        this.Traslado.fila.dataCompuestos   = data.articulo.articulo_compuestos;
-        this.Traslado.fila.dataRemision     = data.articulo.remision_articulos;
-        this.Traslado.dialogo               = false
       }
     },
   }

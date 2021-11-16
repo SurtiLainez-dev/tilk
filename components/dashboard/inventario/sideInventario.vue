@@ -4,42 +4,53 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Inventario</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/inventario/')">
+      <v-list-item dense class="itemOpciones" @click="go('/inventario/')">
         Inventario
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/inventario/articulos/nuevo')">
+      <v-list-item dense class="itemOpciones" @click="go('/inventario/articulos/nuevo')">
         Crear Artículo
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/inventario/traslados/traslados_externos')">
+      <v-list-item dense class="itemOpciones" @click="go('/inventario/traslados/traslados_externos')">
         Transferencias Externas
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/inventario/traslados/externas')">
+      <v-list-item dense class="itemOpciones" @click="go('/inventario/traslados/externas')">
         Crear Transferencia Externa
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/devoluciones')">
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/devoluciones')">
         Devoluciones a Proveedores
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/ventas/contado/nueva')">
+      <v-list-item dense class="itemOpciones" @click="go('/ventas/contado/nueva')">
         Crear Venta de Contado
+      </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/ventas/venta_reingreso')">
+        <v-tooltip top>
+          <template v-slot:activator="{on, attrs}">
+            <span v-on="on" v-bind="attrs">Crear Venta de A.R.</span>
+          </template>
+          <span>Crear Venta de Artículos de Reingreso</span>
+        </v-tooltip>
+      </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/inventario/peps')">
+        Movimientos
       </v-list-item>
     </v-list-group>
     <v-list-group>
       <template v-slot:activator value="true">
         <v-list-item-title>Ordenes</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/inventario/ordenes-compra/nueva')">
+      <v-list-item dense class="itemOpciones" @click="go('/inventario/ordenes-compra/nueva')">
         Crear Orden de Compra
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/inventario/ordenes-compra/')">
+      <v-list-item  dense class="itemOpciones" @click="go('/inventario/ordenes-compra/')">
         Ver Ordenes de de Compra
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/inventario/ordenes-compra/orden_sucursal')">
+      <v-list-item  dense class="itemOpciones" @click="go('/inventario/ordenes-compra/orden_sucursal')">
         Ordenes de Compra x Sucursal
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/inventario/ingresos/nuevo')">
+      <v-list-item  dense class="itemOpciones" @click="go('/inventario/ingresos/nuevo')">
         Crear Orden en Entrada
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/inventario/ingresos/')">
+      <v-list-item  dense class="itemOpciones" @click="go('/inventario/ingresos/')">
         Ver Ordenes en Entrada
       </v-list-item>
     </v-list-group>

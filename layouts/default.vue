@@ -2,11 +2,12 @@
   <v-app>
     <side/>
     <v-app-bar height="35" app>
+
       <v-tabs height="35" v-model="tab" align-with-title hide-slider>
         <v-tab v-for="item in Pes" :key="item.key" class="blue-grey lighten-5">
           <small>{{ item.titulo }}</small>
           <div class="pl-5">
-            <v-btn width="15px" height="15px" @click="$store.commit('quitar_pestania')"
+            <v-btn width="15px" height="15px" @click="$store.commit('quitar_pestania', item.valor)"
                    fab color="indigo" dark v-if="item.key > 0"> <small>x</small>
             </v-btn>
           </div>
@@ -19,6 +20,7 @@
         <v-tab-item v-for="i in Pes" :key="i.key" >
           <nuxt v-if="i.key === 0"/>
           <caja v-if="i.key === 1"/>
+          <cobros v-if="i.key === 2"/>
         </v-tab-item>
       </v-tabs-items>
 
@@ -38,6 +40,7 @@ import side from "../components/dashboard/side";
 import NuxtLoading from "../.nuxt/components/nuxt-loading";
 import Cuerpo from "../components/Pestanas/Cuerpo";
 import caja from "../components/caja/index"
+import inicio from "@/components/cobros/inicio";
 export default {
   watch: {
     over (val) {
@@ -45,7 +48,7 @@ export default {
       }, 500)
     },
   },
-  components:{NuxtLoading, side, Cuerpo, caja},
+  components:{NuxtLoading, side, Cuerpo, caja, cobros: inicio},
   data(){
     return{
       refe: null,
@@ -55,6 +58,7 @@ export default {
     }
   },
   created() {
+    console.log(this.Pes)
     this.$store.commit('direcciones/cargar_COLONIAS');
     this.$store.commit('direcciones/cargar_DISTRITOS');
     this.$store.commit('direcciones/cargar_MUNICIPIOS');
@@ -62,12 +66,20 @@ export default {
     this.calcularFecha()
   },
   computed:{
+    ESTADOMENU:{
+      get: function (){
+        return this.$store.state.MENU;
+      },
+      set: function (val){
+        this.$store.commit('cambiar_MENU');
+      }
+    },
     tab:{
       get: function (){
         return this.$store.state.tab;
       },
       set: function (val){
-        this.$store.commit('cambiarTab', val)
+        this.$store.commit('cambiarTab', {val:val, tipo:true})
       }
     },
     titulo(){
