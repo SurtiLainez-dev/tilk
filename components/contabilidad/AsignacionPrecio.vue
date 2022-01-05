@@ -88,43 +88,71 @@
                 <small>Rellenar datos para determinar el precio</small>
                 <v-form ref="FormVerificarImpuestoAsignacionPrecio">
                   <v-row>
-                    <v-col cols="2">
+                    <v-col>
                       <v-select v-model="Precio.imp" @change="leerImpuesto" :rules="[rules.impuesto.req]"
                                 :items="Impuestos" label="Impuesto"></v-select>
                     </v-col>
-                    <v-col cols="4">
+                    <v-col>
                       <v-text-field label="Precio de Costo sin Impuesto"
                                     v-model="Precio.precio_s_i" suffix="lps"></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <v-text-field label="Margen de Utilidad" @keyup="calcularPrecioContado"
                                     :suffix="Precio.margenUtilidaReal+'%'"
                                     v-model="Precio.margenUtilidad"
                                     :rules="[rules.impuesto.req, rules.impuesto.menor]"></v-text-field>
                     </v-col>
-                    <v-col cols="3">
-                      <v-text-field label="Precio de Contado" v-model="Precio.precioContado"
-                                    disabled suffix="lps"></v-text-field>
-                    </v-col>
                   </v-row>
                 </v-form>
                 <v-form ref="FormVerificarMargenUtilidadAnual">
                   <v-row>
-                    <v-col cols="3">
+                    <v-col>
+                      <v-text-field label="Precio de Contado" v-model="Precio.precioContado"
+                                    disabled suffix="lps"></v-text-field>
+                    </v-col>
+                    <v-col>
                       <v-text-field v-model="Precio.financiamientoAnual" :suffix="Precio.financiamientoMensual+'%'"
                                     @keyup="sacarFinanciamientoMensual" :rules="[rules.impuesto.req,rules.impuesto.m]"
                                     label="Financiamiento Anual"></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <v-text-field v-model="Precio.margenPrima" :suffix="Precio.margenPrima+'%'"
                                     @keyup="calcularPrima" label="Margen de Prima"
                                     :rules="[rules.impuesto.req,rules.impuesto.m]"></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                  </v-row>
+                  <v-row>
+                    <v-col>
                       <v-text-field label="Prima" disabled v-model="Precio.prima" suffix="lps"></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <v-text-field label="Descuento en LPS" suffix="lps" v-model="Precio.descuento"></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-text-field label="Maximo de meses a financiar" suffix="meses" :rules="[rules.impuesto.req,rules.impuesto.m]"
+                                    v-model="Precio.maximo_meses"></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col>
+                      <v-checkbox v-model="Precio.sin_prima" hide-details label="Aceptar venta sin prima"></v-checkbox>
+                      <v-checkbox v-model="data.precio_contado_pagos" hide-details label="Agregar promoción de precio al contado con mas de un pago"></v-checkbox>
+                      <v-container v-if="data.precio_contado_pagos">
+                        <v-row no-gutters>
+                          <v-col>
+                            <v-text-field dense label="Precio de contado" class="ma-2"
+                                          disabled  v-model="Precio.precioContado" suffix="lps"></v-text-field>
+                          </v-col>
+                          <v-col>
+                            <v-text-field dense label="Cantidad de pagos" class="ma-2" @keyup="calcularCuotaPagosContado"
+                                          v-model="Precio.pcp_pagos" suffix="pagos"></v-text-field>
+                          </v-col>
+                          <v-col>
+                            <v-text-field dense label="Cuota" class="ma-2" disabled
+                                          v-model="Precio.pcp_cuota" suffix="lps"></v-text-field>
+                          </v-col>
+                        </v-row>
+                      </v-container>
                     </v-col>
                   </v-row>
                 </v-form>
@@ -325,7 +353,7 @@
           impuesto:{
             req: v => !!v || 'Campo Requerido',
             menor: v => v > 0 || 'Tiene que ser mayor a 0',
-            m: v =>  v >= 0 || 'Dato Invalido'
+            m: v =>  v >= 0 || 'Dato Invalido',
           }
         },
         Peps:[],
@@ -345,7 +373,12 @@
           margenPrima:'',
           prima:'',
           meses: '',
-          descuento: 0
+          descuento: 0,
+          sin_prima: false,
+          precio_contado_pagos: false,
+          pcp_pagos: 2,
+          pcp_cuota: 0,
+          maximo_meses: 1
         },
         Precio2:{
           margenGanancia: 0,
@@ -360,6 +393,10 @@
       }
     },
     methods:{
+      calcularCuotaPagosContado(){
+        if (this.Precio.precioContado > 0 && this.Precio.pcp_pagos > 1)
+          this.Precio.pcp_cuota = (this.Precio.precioContado/this.Precio.pcp_pagos).toFixed(2);
+      },
       calcularInteres(){
         let MESES  = this.Precio.meses;
         if (MESES > 0){
@@ -503,7 +540,10 @@
             margen_ganancia:      this.Precio.margenUtilidad,
             financiamiento_anual: this.Precio.financiamientoAnual,
             impuesto:             this.Precio.impuesto_id,
-            descuento:            this.Precio.descuento
+            descuento:            this.Precio.descuento,
+            venta_sin_prima:      this.Precio.sin_prima,
+            pagos_contado:        this.Precio.pcp_pagos,
+            maximo_financiacion:  this.Precio.maximo_meses
           },{
             headers: {
               'Authorization': 'Bearer ' + this.$store.state.token

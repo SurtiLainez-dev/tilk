@@ -285,139 +285,165 @@
             </v-col>
             <v-col cols="11" class="d-flex justify-center align-center"><h4>Cotizador de {{data.nombre_articulo}} [{{data.descripcion_corta}}]</h4></v-col>
           </v-row>
+
           <v-row no-gutters>
-            <v-col cols="8">
-              <v-alert v-if="Precios.S_contado" dense border="left" type="warning" text>
-                Este artículo solo se puede vender al contado.
-              </v-alert>
+            <v-col>
+              <v-card class="ma-2 pa-2" >
+                <v-row no-gutters>
+                  <v-col cols="8">
+                    <v-alert v-if="Precios.S_contado" dense border="left" type="warning" text>
+                      Este artículo solo se puede vender al contado.
+                    </v-alert>
+                  </v-col>
+                  <v-col cols="4" class="d-flex justify-end align-center">
+                    <v-tooltip top>
+                      <template v-slot:activator="{on , attrs}">
+                        <v-btn class="ma-2" v-bind="attrs" v-on="on" color="green" x-small fab dark>
+                          <v-icon>fa fa-cart-arrow-down</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Realizar Venta de Contado</span>
+                    </v-tooltip>
+                    <v-tooltip top>
+                      <template v-slot:activator="{on, attrs}">
+                        <v-btn fab x-small color="pink" v-bind="attrs" :disabled="!calcularP"
+                               v-on="on" class="ma-2" @click="sideSolicitud = true">
+                          <v-icon color="white">fa fa-clipboard-list</v-icon></v-btn>
+                      </template>
+                      <span>Crear Solicitúd de Crédito</span>
+                    </v-tooltip>
+                    <v-tooltip top v-if="Precios.meses > 0">
+                      <template v-slot:activator="{on, attrs}">
+                        <v-btn fab x-small color="indigo" v-bind="attrs"
+                               v-on="on" dark class="ma-2" @click="sideSeguimiento = true">
+                          <v-icon>fa fa-tasks</v-icon></v-btn>
+                      </template>
+                      <span>Crear Seguimiento</span>
+                    </v-tooltip>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.contado"
+                                  label="Precio de Contado"></v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.min_prima"
+                                  label="Mínimo de Prima"></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col >
+                    <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.saldo"
+                                  label="Saldo"></v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-text-field class="ma-2" suffix="lps" v-model="Precios.prima" :disabled="Precios.S_contado"
+                                  :rules="[rules.precios.prima]" @keyup="calcularSaldoNuevo"
+                                  label="*Prima propuesta por el cliente" dense></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field class="ma-2" suffix="lps" disabled dense
+                                  label="Saldo a financiar" v-model="Precios.saldo_nuevo"></v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-select dense label="*Forma de pagos" v-model="Precios.forma_pago"
+                              class="ma-2" :items="formaPagos" :disabled="Precios.S_contado"></v-select>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field dense label="*Cantidad de meses" class="ma-2"
+                                  @keyup.enter="calcularPagos"
+                                  :disabled="Precios.S_contado"
+                                  v-model="Precios.meses" suffix="meses"></v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-text-field dense
+                                  class="ma-2"
+                                  disabled
+                                  suffix="meses"
+                                  v-model="Precios.maximo_financiamiento"
+                                  label="Maximo de meses a financiar"></v-text-field>
+                  </v-col>
+
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field dense
+                                  class="ma-2"
+                                  disabled
+                                  suffix="lps"
+                                  v-model="Precios.cuota"
+                                  label="Cuota por pago"></v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-text-field dense
+                                  class="ma-2"
+                                  disabled
+                                  suffix="lps"
+                                  v-model="Precios.total_credito"
+                                  label="Total del Crédito"></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-divider></v-divider>
+                <v-card-subtitle>Forma de calcular los pagos</v-card-subtitle>
+                <v-card-actions class="d-flex justify-end">
+                  <v-btn class="ma-2" @click="calcularPagosContadoPagos" small tile dark :disabled="Precios.S_contado"
+                         color="blue">Contado para {{Precios.prom_cant_cuotas}} pagos</v-btn>
+                  <v-btn class="ma-2" @click="calcularPagosSinPrima" small tile dark :disabled="Precios.S_contado"
+                         color="green">Sin Prima</v-btn>
+                  <v-btn class="ma-2" @click="calcularPagos" small tile dark :disabled="Precios.S_contado"
+                         color="indigo">Financiado</v-btn>
+                </v-card-actions>
+              </v-card>
             </v-col>
-            <v-col cols="4" class="d-flex justify-end align-center">
-              <v-tooltip top>
-                <template v-slot:activator="{on , attrs}">
-                  <v-btn class="ma-2" v-bind="attrs" v-on="on" color="green" x-small fab dark>
-                    <v-icon>fa fa-cart-arrow-down</v-icon>
-                  </v-btn>
-                </template>
-                <span>Realizar Venta de Contado</span>
-              </v-tooltip>
-              <v-tooltip top>
-                <template v-slot:activator="{on, attrs}">
-                  <v-btn fab x-small color="pink" v-bind="attrs" :disabled="!calcularP"
-                         v-on="on" class="ma-2" @click="sideSolicitud = true">
-                    <v-icon color="white">fa fa-clipboard-list</v-icon></v-btn>
-                </template>
-                <span>Crear Solicitúd de Crédito</span>
-              </v-tooltip>
-              <v-tooltip top v-if="Precios.meses > 0">
-                <template v-slot:activator="{on, attrs}">
-                  <v-btn fab x-small color="indigo" v-bind="attrs"
-                         v-on="on" dark class="ma-2" @click="sideSeguimiento = true">
-                    <v-icon>fa fa-tasks</v-icon></v-btn>
-                </template>
-                <span>Crear Seguimiento</span>
-              </v-tooltip>
-            </v-col>
-          </v-row>
-          <hr>
-          <v-row no-gutters>
-            <v-col cols="4">
-              <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.contado"
-                            label="Precio de Contado" filled></v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.min_prima"
-                            label="Mínimo de Prima" filled></v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.saldo"
-                            label="Saldo" filled></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col cols="4">
-              <v-text-field class="ma-2" suffix="lps" v-model="Precios.prima" filled :disabled="Precios.S_contado"
-                            :rules="[rules.precios.prima]" @keyup="calcularSaldoNuevo"
-                            label="Prima propuesta por el cliente" dense></v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-text-field class="ma-2" suffix="lps" disabled dense
-                            label="Saldo a financiar" filled
-                            v-model="Precios.saldo_nuevo"></v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-select dense label="Forma de pagos" v-model="Precios.forma_pago"
-                        filled class="ma-2" :items="formaPagos" :disabled="Precios.S_contado"></v-select>
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col cols="3">
-              <v-text-field dense label="Cantidad de meses" class="ma-2" filled
-                            @keyup.enter="calcularPagos"
-                            :disabled="Precios.S_contado"
-                            v-model="Precios.meses" suffix="lps"></v-text-field>
-            </v-col>
-            <v-col cols="3">
-              <v-text-field dense
-                            class="ma-2"
-                            filled
-                            disabled
-                            suffix="lps"
-                            v-model="Precios.cuota"
-                            label="Cuota por pago"></v-text-field>
-            </v-col>
-            <v-col cols="3">
-              <v-text-field dense
-                            class="ma-2"
-                            filled
-                            disabled
-                            suffix="lps"
-                            v-model="Precios.total_credito"
-                            label="Total del Crédito"></v-text-field>
-            </v-col>
-            <v-col cols="3" class="d-flex align-center justify-end">
-              <v-btn class="ma-2" @click="calcularPagos" dark :disabled="Precios.S_contado"
-                     color="indigo">Calcular Pagos</v-btn>
+            <v-col>
+              <v-card class="ma-2 pa-2" flat>
+                <b-table :current-page="currentPage"
+                         :per-page="perPage"
+                         bordered
+                         hover
+                         striped
+                         class="rowsTable"
+                         :fields="fieldsPagos"
+                         :items="Precios.pagos"
+                         caption-top
+                         small>
+                  <template v-slot:table-caption>Pagos del crédito</template>
+                  <template v-slot:head(num)>#</template>
+                  <template v-slot:head(fecha)>Fecha de Pago</template>
+                  <template v-slot:head(saldo)>Saldo</template>
+                  <template v-slot:head(cuota)>Cuota</template>
+                  <template v-slot:head(saldo_a)>Saldo Restante</template>
+                  <template v-slot:cell(saldo)="scope">
+                    L {{scope.item.saldo}}
+                  </template>
+                  <template v-slot:cell(cuota)="scope">
+                    L {{scope.item.cuota}}
+                  </template>
+                  <template v-slot:cell(saldo_a)="scope">
+                    L {{scope.item.saldo_a}}
+                  </template>
+                </b-table>
+                <v-row>
+                  <v-col class="d-flex justify-center">
+                    <b-pagination :disabled="Precios.S_contado"
+                                  v-model="currentPage"
+                                  :total-rows="totalRows"
+                                  :per-page="perPage"
+                                  align="fill"
+                                  size="sm"
+                                  class="my-0"
+                    ></b-pagination>
+                  </v-col>
+                </v-row>
+              </v-card>
             </v-col>
           </v-row>
 
-          <b-table :current-page="currentPage"
-                   :per-page="perPage"
-                   bordered
-                   hover
-                   striped
-                   class="rowsTable"
-                   :fields="fieldsPagos"
-                   :items="Precios.pagos"
-                   caption-top
-                   small>
-            <template v-slot:table-caption>Pagos del crédito</template>
-            <template v-slot:head(num)>#</template>
-            <template v-slot:head(fecha)>Fecha de Pago</template>
-            <template v-slot:head(saldo)>Saldo</template>
-            <template v-slot:head(cuota)>Cuota</template>
-            <template v-slot:head(saldo_a)>Saldo Restante</template>
-            <template v-slot:cell(saldo)="scope">
-              L {{scope.item.saldo}}
-            </template>
-            <template v-slot:cell(cuota)="scope">
-              L {{scope.item.cuota}}
-            </template>
-            <template v-slot:cell(saldo_a)="scope">
-              L {{scope.item.saldo_a}}
-            </template>
-          </b-table>
-          <v-row>
-            <v-col class="d-flex justify-center">
-              <b-pagination :disabled="Precios.S_contado"
-                      v-model="currentPage"
-                      :total-rows="totalRows"
-                      :per-page="perPage"
-                      align="fill"
-                      size="sm"
-                      class="my-0"
-              ></b-pagination>
-            </v-col>
-          </v-row>
         </v-container>
       </v-navigation-drawer>
 
@@ -535,7 +561,11 @@
           cuota: 0,
           forma_pago: 3,
           total_financiamiento: 0,
-          total_credito: 0
+          total_credito: 0,
+          maximo_financiamiento: 0,
+          venta_sin_prima: false,
+          prom_precio_contado: false,
+          prom_cant_cuotas: 0
         },
         sideMotos: false,
         sidePrecio: false,
@@ -588,44 +618,94 @@
         this.calcularP = true;
         let MESES = this.Precios.meses, FIN = this.Precios.financiamiento;
         let SALDO_F = this.Precios.saldo_nuevo;
-        if (MESES){
-          this.Precios.cuota = 0
-          this.calcularSaldoNuevo();
-          this.Precios.pagos = [];
-          let TASA_M = (FIN / 12).toFixed(4);
-          let TASA = Math.pow(parseInt(1) + parseFloat(TASA_M), -MESES);
-          TASA = TASA - 1;
-          TASA = TASA / TASA_M;
-          let pagos = 0;
-          if (this.Precios.forma_pago === 1) {
-            pagos = this.Precios.meses * 4;
-            this.Precios.cuota = (-SALDO_F / TASA).toFixed(2);
-            this.Precios.cuota = (this.Precios.cuota / 4).toFixed(2)
-          }else if (this.Precios.forma_pago === 2) {
-            pagos = this.Precios.meses * 2;
-            this.Precios.cuota = (-SALDO_F / TASA).toFixed(2);
-            this.Precios.cuota = (this.Precios.cuota / 2).toFixed(2)
-          }else if (this.Precios.forma_pago === 3) {
-            pagos = this.Precios.meses;
-            this.Precios.cuota = (-SALDO_F / TASA).toFixed(2);
+        this.calcularSaldoNuevo();
+        if (MESES <= this.Precios.maximo_financiamiento){
+          if (MESES){
+            this.Precios.cuota = 0
+            this.Precios.pagos = [];
+            let TASA_M = (FIN / 12).toFixed(4);
+            let TASA = Math.pow(parseInt(1) + parseFloat(TASA_M), -MESES);
+            TASA = TASA - 1;
+            TASA = TASA / TASA_M;
+            let pagos = 0;
+            if (this.Precios.forma_pago === 1) {
+              pagos = this.Precios.meses * 4;
+              this.Precios.cuota = (-SALDO_F / TASA).toFixed(2);
+              this.Precios.cuota = (this.Precios.cuota / 4).toFixed(2)
+            }else if (this.Precios.forma_pago === 2) {
+              pagos = this.Precios.meses * 2;
+              this.Precios.cuota = (-SALDO_F / TASA).toFixed(2);
+              this.Precios.cuota = (this.Precios.cuota / 2).toFixed(2)
+            }else if (this.Precios.forma_pago === 3) {
+              pagos = this.Precios.meses;
+              this.Precios.cuota = (-SALDO_F / TASA).toFixed(2);
+            }
+            this.Precios.total_credito = 0;
+            this.Precios.total_credito = (this.Precios.cuota * pagos).toFixed(2);
+            this.crearPagos(pagos, this.Precios.forma_pago, TASA_M)
           }
-          this.Precios.total_credito = 0;
-          this.Precios.total_credito = (this.Precios.cuota * pagos).toFixed(2);
-          this.crearPagos(pagos, this.Precios.forma_pago, TASA_M)
-        }
+        }else
+          this.$store.commit('notificacion',{texto:'No es valida la cantidad de meses', color:'warning'})
+      },
+      calcularPagosSinPrima(){
+        this.calcularP = true;
+        let MESES = this.Precios.meses, FIN = this.Precios.financiamiento;
+        this.Precios.saldo_nuevo =this.Precios.contado;
+        this.Precios.prima = 0;
+        let SALDO_F = this.Precios.saldo_nuevo;
+        if (MESES <= this.Precios.maximo_financiamiento){
+          if (MESES){
+            this.Precios.cuota = 0
+            this.Precios.pagos = [];
+            let TASA_M = (FIN / 12).toFixed(4);
+            let TASA = Math.pow(parseInt(1) + parseFloat(TASA_M), -MESES);
+            TASA = TASA - 1;
+            TASA = TASA / TASA_M;
+            let pagos = 0;
+            if (this.Precios.forma_pago === 1) {
+              pagos = this.Precios.meses * 4;
+              this.Precios.cuota = (-SALDO_F / TASA).toFixed(2);
+              this.Precios.cuota = (this.Precios.cuota / 4).toFixed(2)
+            }else if (this.Precios.forma_pago === 2) {
+              pagos = this.Precios.meses * 2;
+              this.Precios.cuota = (-SALDO_F / TASA).toFixed(2);
+              this.Precios.cuota = (this.Precios.cuota / 2).toFixed(2)
+            }else if (this.Precios.forma_pago === 3) {
+              pagos = this.Precios.meses;
+              this.Precios.cuota = (-SALDO_F / TASA).toFixed(2);
+            }
+            this.Precios.total_credito = 0;
+            this.Precios.total_credito = (this.Precios.cuota * pagos).toFixed(2);
+            this.crearPagos(pagos, this.Precios.forma_pago, TASA_M)
+          }
+        }else
+          this.$store.commit('notificacion',{texto:'No es valida la cantidad de meses', color:'warning'})
+      },
+      calcularPagosContadoPagos(){
+        this.calcularP = true;
+        this.Precios.meses = this.Precios.prom_cant_cuotas;
+        this.Precios.saldo_nuevo =this.Precios.contado;
+        this.Precios.prima = 0;
+        this.Precios.cuota = 0
+        this.Precios.pagos = [];
+        this.Precios.cuota = (this.Precios.contado / this.Precios.prom_cant_cuotas).toFixed(2);
+        this.crearPagos();
+
       },
       crearPagos(pagos, tipo){
         this.totalRows = 1;
         let dias= 0, saldo = this.Precios.total_credito;
         let ANTES = new Date(), cuota = this.Precios.cuota;
 
-        this.Precios.pagos.push({
-          "num": 'prima',
-          "fecha": ANTES.getDate()+'/'+(ANTES.getMonth() + 1)+'/'+ANTES.getFullYear(),
-          "saldo": (parseFloat(saldo) + parseFloat(this.Precios.prima)).toFixed(2),
-          "cuota": this.Precios.prima,
-          "saldo_a": saldo
-        });
+        if(this.Precios.prima > 0){
+          this.Precios.pagos.push({
+            "num": 'prima',
+            "fecha": ANTES.getDate()+'/'+(ANTES.getMonth() + 1)+'/'+ANTES.getFullYear(),
+            "saldo": (parseFloat(saldo) + parseFloat(this.Precios.prima)).toFixed(2),
+            "cuota": this.Precios.prima,
+            "saldo_a": saldo
+          });
+        }
         this.totalRows++;
         if (tipo === 1 || tipo === 2){
           if (tipo === 1){
@@ -714,11 +794,13 @@
             this.Precios.saldo = (parseFloat(this.Precios.contado) - parseFloat(this.Precios.min_prima)).toFixed(2)
             this.Precios.prima = this.Precios.min_prima;
             this.Precios.financiamiento = this.PrecioArticulo.financiamiento_anual / 100
+            this.Precios.maximo_financiamiento = this.PrecioArticulo.maximo_financiacion;
+            this.Precios.prom_precio_contado = this.PrecioArticulo.cant_pagos_contado > 0;
+            this.Precios.prom_cant_cuotas = this.PrecioArticulo.cant_pagos_contado;
+            this.Precios.venta_sin_prima  = this.PrecioArticulo.venta_sin_prima > 0;
+            this.perPage = parseInt(this.Precios.maximo_financiamiento) + parseInt(2);
             this.calcularSaldoNuevo();
-            if (this.Precios.min_prima === 0 && this.Precios.financiamiento === 0)
-              this.Precios.S_contado = true;
-            else
-              this.Precios.S_contado = false;
+            this.Precios.S_contado = this.Precios.min_prima === 0 && this.Precios.financiamiento === 0;
           }
         })
       },

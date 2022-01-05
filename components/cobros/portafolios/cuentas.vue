@@ -127,7 +127,8 @@
           <v-btn class="mt-3 text-white" tile block small color="black"
                  @click="VISTAPORTAFOLIO = 2" :disabled="LOADPORTAFOLIO"> Gestiones de Hoy</v-btn>
           <v-btn class="mt-3" tile block small dark @click="VISTAPORTAFOLIO = 3"> Historial</v-btn>
-          <v-btn class="mt-3" tile block small dark @click="VISTAPORTAFOLIO = 4">Reportes</v-btn>
+          <v-btn tile block small class="mt-3 text-white" color="black"
+                 @click="VISTAPORTAFOLIO = 4" :disabled="LOADPORTAFOLIO">Reportes</v-btn>
           <v-btn class="mt-3" tile block small dark v-if="PORTAFOLIO.gerencial === 1" @click="VISTAPORTAFOLIO = 5">Portafolios</v-btn>
           <v-btn class="mt-3" tile block small dark v-if="PORTAFOLIO.gerencial === 1" @click="VISTAPORTAFOLIO = 6">Transferir</v-btn>
           <v-btn class="mt-3" tile block small dark @click="VISTAPORTAFOLIO = 7">Editar</v-btn>

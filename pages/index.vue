@@ -4,14 +4,17 @@
       cargando.............
     </div>
     <div v-else class="containerP" >
+
       <div v-if="primeraVez" class="d-flex justify-center" width="80%">
         <inicio/>
       </div>
       <div v-else>
         <v-card class="mx-auto pt-2 pl-2 pr-2" width="500px">
           <v-row>
-            <v-col cols="6" ><h2>TILK</h2></v-col>
-            <v-col cols="6" class="d-flex justify-end align-self-center"><h4>Surtidora Laínez</h4></v-col>
+            <v-col cols="6" class="d-flex align-self-center"><h2>TILK</h2></v-col>
+            <v-col cols="6" class="d-flex justify-end align-self-center">
+              <img :src="require('~/assets/img/logo8.png')" alt="" width="100" height="50">
+            </v-col>
           </v-row>
           <v-divider></v-divider>
           <v-row>
@@ -126,6 +129,7 @@
         </template>
       </v-snackbar>
     </div>
+
   </div>
 </template>
 

@@ -261,7 +261,7 @@
           </v-tooltip>
         </template>
         <template v-slot:item.articulo.precio_activo.precio_contado="{item}">
-          <span v-if="item.articulo.precio_activo"> <strong>L {{item.articulo.precio_activo.precio_contado}}</strong></span>
+          <span v-if="item.articulo.precio_activo"> <strong>L </strong></span>
           <span v-else>Sin precio</span>
         </template>
       </v-data-table>
@@ -337,7 +337,7 @@ export default {
         articulo_id: data.articulo_id,
         articulo:    data.articulo.nombre_articulo + ' - '+ data.articulo.descripcion_corta,
         marca:       data.articulo.marca.nombre,
-        precio:      data.articulo.precio_activo.precio_contado,
+        // precio:      data.articulo.precio_activo.precio_contado,
         estado:      1,
         codigo:      data.articulo.codigo_sistema,
         key:         this.Regalias.length,
@@ -370,7 +370,7 @@ export default {
           id:          item.id,
           articulo:    item.articulo.nombre_articulo + ' - '+ item.articulo.descripcion_corta,
           marca:       item.articulo.marca.nombre,
-          precio:      item.articulo.precio_articulos[0].precio_contado,
+          // precio:      item.articulo.precio_articulos[0].precio_contado,
           estado:      item.estado,
           codigo:      item.articulo.codigo_sistema,
           key:         i,

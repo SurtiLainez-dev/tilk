@@ -12,10 +12,19 @@ export const state = () => ({
     VISTAGESTION:    1,
     VISTAEXPANDIR:   1,
     VISTAPORTAFOLIO_GESTION: 1,
-    VISTAPORTAFOLIO: 1
+    VISTAPORTAFOLIO: 1,
+    LOADREPORTE:     false,
+    REPORTE:         []
 })
 
 export const mutations = {
+    cargar_REPORTE(state){
+        state.LOADREPORTE = true;
+        this.$axios.get(`cobros/portafolio/${state.PORTAFOLIO.id}/reportes`).then((res)=>{
+            state.REPORTE = res.data.reporte;
+            state.LOADREPORTE = false;
+        })
+    },
     cambiar_VISTAPORTAFOLIO(state, val){
         state.VISTAPORTAFOLIO = val
     },

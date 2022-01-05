@@ -114,6 +114,11 @@
               <side-caja/>
             </v-list>
           </v-col>
+          <v-col cols="9" v-if="select === 11">
+            <v-list>
+              <side-reportes/>
+            </v-list>
+          </v-col>
         </v-row>
     </v-navigation-drawer>
 </template>
@@ -134,6 +139,7 @@
   import sideCaja from "./sideCaja";
   import mobiliario from "./contabilidad/mobiliario";
   import gastos from "@/components/dashboard/contabilidad/gastos";
+  import sideReportes from "@/components/dashboard/sideReportes";
 
   export default {
     components:{
@@ -151,7 +157,8 @@
       sideCuentas,
       sideCaja,
       mobiliario,
-      gastos
+      gastos,
+      sideReportes
     },
     name: "side",
     data(){

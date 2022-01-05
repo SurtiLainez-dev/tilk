@@ -10,6 +10,9 @@
       <v-list-item class="itemOpciones" @click="go('/colaborador/contratos')">
         Contratos
       </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/colaborador/nuevo')">
+        Crear Colaborador
+      </v-list-item>
     </v-list-group>
   </div>
 </template>

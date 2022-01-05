@@ -30,12 +30,7 @@ const electron = require('electron');
 const {BrowserWindow} = require('electron');
 const path = require('path');
 const app = electron.app;
-const { autoUpdater } = require('electron-updater');
-require('update-electron-app')({
-	repo: 'https://github.com/surtiLainezDev/adn-frinted',
-	updateInterval: '5 minutes',
-	logger: require('electron-log')
-})
+
 const newWin = () => {
 	win = new BrowserWindow({
 		// fullscreen: true,
@@ -45,9 +40,6 @@ const newWin = () => {
 	});
 	win.maximize();
 	win.on('closed', () => win = null);
-	// win.once('ready-to-show', () => {
-	// 	win.show();
-	// });
 
 	if (config.dev) {
 		// Install vue dev tool and open chrome dev tools
@@ -67,23 +59,11 @@ const newWin = () => {
 
 };
 
-electron.ipcMain.on('restart_app', () => {
-	log.info('se va actualizar')
-	autoUpdater.quitAndInstall();
-});
-
 electron.ipcMain.on('app_version', (event) => {
 	event.sender.send('app_version', { version: app.getVersion() });
 });
 app.on('ready', newWin);
-// try{
-// 	autoUpdater.checkForUpdatesAndNotify()
-// 	log.info('se busco exitosamente')
-// 	setTimeout(buscar, 20000)
-// }catch (e) {
-// 	log.error(e)
-// 	log.error('error al buscar app')
-// }
+
 app.on('window-all-closed', () => app.quit());
 app.on('activate', () => win === null && newWin());
 
@@ -93,23 +73,4 @@ db.crear_db_usuarios();
 db.crear_db_conexiones();
 db.crear_db_articulos();
 
-autoUpdater.on('checking-for-update', ()=>{
-	console.log("check")
-	log.info("check")
-})
-autoUpdater.on('error', (err)=>{
-	log.error('error');
-	log.error(err)
-})
-autoUpdater.on('update-not-available', () => {
-	log.info('No hay actualizaciones')
-})
-autoUpdater.on('update-available', () => {
-	log.info('actualizando')
-	const win = BrowserWindow.getFocusedWindow()
-	win.webContents.send('update_available');
-});
-autoUpdater.on('checking-for-update', ()=>{
-	console.log("check")
-	log.info("check")
-})
+

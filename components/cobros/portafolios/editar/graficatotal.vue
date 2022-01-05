@@ -8,11 +8,10 @@
 </template>
 
 <script>
-import { GChart} from 'vue-google-charts';
+
 
 export default {
   name: "graficatotal",
-  components:{GChart},
   created() {
     this.$store.commit('graficas/cobros/gestiones/cargar_TOTALES_SEGMENTOS', this.$store.state.cobros.portafolios.PORTAFOLIO.id);
   },

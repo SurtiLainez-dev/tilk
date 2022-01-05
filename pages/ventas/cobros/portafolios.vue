@@ -19,6 +19,7 @@
       <h6>{{titulo}}</h6>
     </v-toolbar>
     <porta v-if="VISTA === 2"/>
+    <portafilion :usuarios="usuarios.data" :load="usuarios.load" v-else-if="VISTA === 3"/>
   </v-card>
 </v-card>
 </template>
@@ -51,6 +52,7 @@ export default {
     this.titulo = 'Portafolios';
     this.$store.commit('cobros/cartera/cargar_PORTAFOLIOS');
     this.$store.commit('guardarTitulo', 'Cobros > Portafolios');
+    this.cargarUsuarios();
   },
   computed:{
     PORTAFOLIOS(){
@@ -84,6 +86,20 @@ export default {
         this.titulo = 'Editando Portafolio'
 
       this.VISTA = val;
+    },
+    cargarUsuarios(){
+      if (this.usuarios.data.length === 0){
+        this.usuarios.load = true;
+        this.$axios.get('/usuarios').then((res)=>{
+          res.data.usuarios.forEach((item)=>{
+            this.usuarios.data.push({
+              text: item.nombres+' '+item.apellidos+' - '+item.usuario,
+              value: item.user
+            });
+          });
+          this.usuarios.load = false;
+        });
+      }
     },
     vistaPortafolio(val){
       this.titulo = val.nombre
