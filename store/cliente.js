@@ -4,7 +4,8 @@ export const state = () =>({
     CLIENTE: [],
     CUENTAS: [],
     SOLICITUDES: [],
-    LOAD_CLIENTE: false
+    LOAD_CLIENTE: false,
+    SOLICITUDES_AVAL: []
 })
 
 export const mutations = {
@@ -28,5 +29,8 @@ export const mutations = {
     },
     agregar_SOLICITUDES(state, solicitudes){
         state.SOLICITUDES = solicitudes;
+    },
+    agregar_SOLICITUDES_AVAL(state, solicitudes){
+        state.SOLICITUDES_AVAL = solicitudes
     }
 }

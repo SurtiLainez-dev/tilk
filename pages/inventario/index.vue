@@ -21,6 +21,14 @@
       </v-row>
       <v-divider></v-divider>
       <v-row class="d-flex justify-end">
+        <v-col class="d-flex align-self-center justify-start">
+          <v-tooltip top>
+            <template v-slot:activator="{on, attrs}">
+              <v-btn v-on="on" v-bind="attrs" fab x-small dark @click="solicitarClave"><v-icon>fa fa-print</v-icon></v-btn>
+            </template>
+            <span>Imprimir inventario</span>
+          </v-tooltip>
+        </v-col>
         <v-col md="4">
           <v-text-field v-model="search" append-icon="mdi-magnify"
                         label="Buscar artículo" single-line hide-details></v-text-field>
@@ -49,6 +57,7 @@
 
 <script>
   import info from "../../components/Inventario/info";
+  import {ipcRenderer} from "electron";
   export default {
     components:{
       info
@@ -108,6 +117,9 @@
           return this.$store.commit('inventario/cambiarValorSegundaPeticion', val);
         }
       },
+      Sucursal(){
+        return this.$store.state.sucursal;
+      },
       primeraPeticion:{
         get:function () {
           return this.$store.state.inventario.valor_peticion;
@@ -115,23 +127,20 @@
         set: function (val) {
           return this.$store.commit('inventario/cambiarValorPeticion', val);
         }
+      },
+      user(){
+        return this.$store.state.usuario;
       }
     },
     methods:{
-      verInfo(data){
-        this.data = data;
-        this.$store.commit('cambiarVistaPRecioArticulo', 2)
-      },
-      cargarProveedor(){
-        this.$axios.get('proveedores',{
+      cargarFamilias(){
+        this.$axios.get('familias',{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token
           }
         }).then((res)=>{
-          if (res.status == 200){
-            this.Proveedores = res.data.proveedores
-            this.buscadorProveedor = res.data.proveedores
-            this.cargarMarcasP()
+          if (res.status === 200){
+            this.Familias = res.data.familias
           }
         })
       },
@@ -147,16 +156,37 @@
           }
         }
       },
-      cargarFamilias(){
-        this.$axios.get('familias',{
+      cargarProveedor(){
+        this.$axios.get('proveedores',{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token
           }
         }).then((res)=>{
-          if (res.status === 200){
-            this.Familias = res.data.familias
+          if (res.status == 200){
+            this.Proveedores = res.data.proveedores
+            this.buscadorProveedor = res.data.proveedores
+            this.cargarMarcasP()
           }
         })
+      },
+      imprimirInventario(clave){
+        let url = this.$axios.defaults.baseURL+'documentos/inventario_x_sucursal/usuario='+this.user+'/sucursal='+this.Sucursal+'/'+clave;
+        ipcRenderer.send('pint_navegador', url);
+        this.$store.commit('activarOverlay', false);
+      },
+      solicitarClave(){
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+          this.$store.commit('notificacion',{texto:'Cargando inventario', color:'success'});
+          this.imprimirInventario(res.data.clave);
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'danger'});
+        })
+      },
+      verInfo(data){
+        this.data = data;
+        this.$store.commit('cambiarVistaPRecioArticulo', 2)
       }
     },
     async fetch(){

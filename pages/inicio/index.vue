@@ -9,9 +9,9 @@
         </v-card>
       </v-col>
       <v-col  lg="2" cols="6">
-        <v-card>
+        <v-card @click="vista =2">
           <v-card-title>
-            Motocicletas
+            Prospectos
           </v-card-title>
         </v-card>
       </v-col>
@@ -22,27 +22,7 @@
           </v-card-title>
         </v-card>
       </v-col>
-      <v-col lg="2" cols="6">
-        <v-card :disabled="true">
-          <v-card-title>
-            Notificaciones
-          </v-card-title>
-        </v-card>
-      </v-col>
-      <v-col lg="2" cols="6">
-        <v-card :disabled="true">
-          <v-card-title>
-            Reuniones
-          </v-card-title>
-        </v-card>
-      </v-col>
-      <v-col lg="2" cols="6">
-        <v-card :disabled="true">
-          <v-card-title>
-            Referidos
-          </v-card-title>
-        </v-card>
-      </v-col>
+
     </v-row>
     <v-row v-if="vista === 1">
       <v-col md="6" cols="12">
@@ -54,8 +34,8 @@
       </v-col>
     </v-row>
 
-
-    <tareas v-if="vista === 3"/>
+    <x_sucursal v-if="vista === 2"/>
+    <tareas v-else-if="vista === 3"/>
   </div>
 </template>
 
@@ -64,8 +44,9 @@
   import view_transferencias from "../../components/Inicio/view_transferencias";
   import view_seguimientos from "../../components/Inicio/view_seguimientos";
   import index from "../../components/Tareas/index"
+  import x_sucursal from "@/components/Ventas/seguimientos/x_sucursal";
   export default {
-    components:{view_transferencias, view_seguimientos, seguimiento, tareas:index},
+    components:{view_transferencias, view_seguimientos, seguimiento, tareas:index, x_sucursal},
     name: "index",
     data(){
       return{

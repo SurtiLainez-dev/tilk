@@ -33,6 +33,9 @@
             <v-list-item class="itemOpciones" @click="go('/inicio/otras_gestiones/mi_perfil')">
               Mi perfil
             </v-list-item>
+          <v-list-item class="itemOpciones" @click="go('/inicio/otras_gestiones/ordenes_genericas')">
+            Ordenes Genéricas
+          </v-list-item>
         </v-list-group>
     </div>
 </template>

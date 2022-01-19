@@ -118,7 +118,7 @@
           </v-row>
           <v-row>
             <v-col class="d-flex flex-row-reverse">
-              <v-btn @click="validate" :disabled="isSubmit" color="warning" dark>Actualizar Sucursal</v-btn>
+              <v-btn @click="validate" :disabled="isSubmit" color="warning" dark small tile>Agregar Contrato</v-btn>
             </v-col>
           </v-row>
         </v-form>

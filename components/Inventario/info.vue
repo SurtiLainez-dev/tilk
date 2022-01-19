@@ -296,6 +296,14 @@
                     </v-alert>
                   </v-col>
                   <v-col cols="4" class="d-flex justify-end align-center">
+                    <v-tooltip v-if="Precios.meses > 0" top>
+                      <template v-slot:activator="{on , attrs}">
+                        <v-btn class="ma-2" v-bind="attrs" v-on="on" x-small fab dark @click="registrarCotizacion">
+                          <v-icon>fa fa-print</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Imprimir Cotización</span>
+                    </v-tooltip>
                     <v-tooltip top>
                       <template v-slot:activator="{on , attrs}">
                         <v-btn class="ma-2" v-bind="attrs" v-on="on" color="green" x-small fab dark>
@@ -392,9 +400,9 @@
                 <v-card-subtitle>Forma de calcular los pagos</v-card-subtitle>
                 <v-card-actions class="d-flex justify-end">
                   <v-btn class="ma-2" @click="calcularPagosContadoPagos" small tile dark :disabled="Precios.S_contado"
-                         color="blue">Contado para {{Precios.prom_cant_cuotas}} pagos</v-btn>
+                         color="blue" v-if="Precios.prom_cant_cuotas > 0">Contado para {{Precios.prom_cant_cuotas}} pagos</v-btn>
                   <v-btn class="ma-2" @click="calcularPagosSinPrima" small tile dark :disabled="Precios.S_contado"
-                         color="green">Sin Prima</v-btn>
+                         color="green" v-if="Precios.venta_sin_prima">Sin Prima</v-btn>
                   <v-btn class="ma-2" @click="calcularPagos" small tile dark :disabled="Precios.S_contado"
                          color="indigo">Financiado</v-btn>
                 </v-card-actions>
@@ -490,6 +498,7 @@
   import solicitud_credito from "../Ventas/solicitud_credito";
   import seguimiento from "./seguimiento";
   import Swal from "sweetalert2";
+  import {ipcRenderer} from "electron";
   export default {
     components:{seguimiento, solicitud: solicitud_credito},
     name: "info",
@@ -536,6 +545,7 @@
     props:{data: Object},
     data(){
       return{
+        observacion: '',
         currentPage: 1,
         totalRows: 1,
         perPage:10,
@@ -615,6 +625,7 @@
     },
     methods:{
       calcularPagos(){
+        this.observacion = 'VENTA FINANCIADA'
         this.calcularP = true;
         let MESES = this.Precios.meses, FIN = this.Precios.financiamiento;
         let SALDO_F = this.Precios.saldo_nuevo;
@@ -648,6 +659,7 @@
           this.$store.commit('notificacion',{texto:'No es valida la cantidad de meses', color:'warning'})
       },
       calcularPagosSinPrima(){
+        this.observacion = 'VENTA SIN PRIMA'
         this.calcularP = true;
         let MESES = this.Precios.meses, FIN = this.Precios.financiamiento;
         this.Precios.saldo_nuevo =this.Precios.contado;
@@ -682,14 +694,16 @@
           this.$store.commit('notificacion',{texto:'No es valida la cantidad de meses', color:'warning'})
       },
       calcularPagosContadoPagos(){
+        this.observacion = 'VENTA AL PRECIO DE CONTADO PARA '+this.Precios.prom_cant_cuotas+' PAGOS'
         this.calcularP = true;
         this.Precios.meses = this.Precios.prom_cant_cuotas;
         this.Precios.saldo_nuevo =this.Precios.contado;
+        this.Precios.total_credito = this.Precios.contado;
         this.Precios.prima = 0;
         this.Precios.cuota = 0
         this.Precios.pagos = [];
-        this.Precios.cuota = (this.Precios.contado / this.Precios.prom_cant_cuotas).toFixed(2);
-        this.crearPagos();
+        this.Precios.cuota = (this.Precios.contado / this.Precios.prom_cant_cuotas).toFixed(3);
+        this.crearPagos(3,this.Precios.forma_pago);
 
       },
       crearPagos(pagos, tipo){
@@ -813,6 +827,65 @@
           this.Remision = res.data.articulos
         })
       },
+      imprimirCotizacion(clave, cot){
+        let url = this.$axios.defaults.baseURL+'documentos/ventas/cotizacion/usuario='+this.user+'/cot='+cot+'/'+clave.token;
+        ipcRenderer.send('pint_navegador', url);
+        this.$store.commit('activarOverlay', false);
+      },
+      registrarCotizacion(){
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('venta/cotizacion_finanaciacion',{
+          articulo_id:     this.data.articulo,
+          sucursal_id: this.$store.state.sucursal,
+          precio_contado: this.Precios.contado,
+          minimo_prima:   this.Precios.min_prima,
+          saldo:          this.Precios.saldo,
+          prima_propuesta: this.Precios.prima,
+          saldo_financiar: this.Precios.saldo_nuevo,
+          forma_pago:      this.Precios.forma_pago,
+          cantidad_meses:  this.Precios.meses,
+          cuota:           this.Precios.cuota,
+          total_credito:   this.Precios.total_credito,
+          pagos:           JSON.stringify(this.Precios.pagos),
+          venta_sin_prima: this.Precios.venta_sin_prima,
+          observacion:     this.observacion
+        }).then((res)=>{
+          this.$store.commit('notificacion',{texto:'Se ha guardado exitosamente la cotización', color:'success'});
+          this.$store.commit('notificacion',{texto:'Creando cotización', color:'success'});
+          this.imprimirCotizacion(res.data.clave, res.data.cot);
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+        })
+      },
+      registrarSolicitud(){
+        this.Solicitar.dialogo = false;
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('peticion_traslado',{
+          origen:      this.Solicitar.origen,
+          motivo:      this.Solicitar.motivo,
+          destino:     this.Sucursal,
+          observacion: this.Solicitar.observacion,
+          estado:      this.Solicitar.estado,
+          cantidad:    this.Solicitar.cantidad,
+          articulo:    this.data.articulo
+        },{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          this.$store.commit('activarOverlay', false);
+          this.Solicitar.observacion = '';
+          this.Solicitar.cantidad    = 1;
+          this.Solicitar.motivo      = '';
+          this.Solicitar.estado      = '';
+          this.Solicitar.stock       = '';
+          Swal.fire(
+              'Solicitud Exitosa',
+              `Se ha realizado exitosamente la solicitus de transferencia.`,
+              'success'
+          );
+        })
+      },
       validarSolicitudEnvio(){
         if (this.Solicitar.origen != this.Sucursal){
           if (this.$refs.FormSolicitudTransferencia.validate())
@@ -851,35 +924,6 @@
             this.Solicitar.cantidad = 0
           }
         }
-      },
-      registrarSolicitud(){
-        this.Solicitar.dialogo = false;
-        this.$store.commit('activarOverlay', true);
-        this.$axios.post('peticion_traslado',{
-          origen:      this.Solicitar.origen,
-          motivo:      this.Solicitar.motivo,
-          destino:     this.Sucursal,
-          observacion: this.Solicitar.observacion,
-          estado:      this.Solicitar.estado,
-          cantidad:    this.Solicitar.cantidad,
-          articulo:    this.data.articulo
-        },{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          this.$store.commit('activarOverlay', false);
-          this.Solicitar.observacion = '';
-          this.Solicitar.cantidad    = 1;
-          this.Solicitar.motivo      = '';
-          this.Solicitar.estado      = '';
-          this.Solicitar.stock       = '';
-          Swal.fire(
-            'Solicitud Exitosa',
-            `Se ha realizado exitosamente la solicitus de transferencia.`,
-            'success'
-          );
-        })
       }
     }
   }

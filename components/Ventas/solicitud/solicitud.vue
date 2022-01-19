@@ -477,6 +477,7 @@
                         <tr>
                             <th>Identidad</th>
                             <th>Nombre Completo</th>
+                            <th>Solicitúd</th>
                             <th class="d-flex justify-center">Documentos</th>
                             <th>Rechazar</th>
                         </tr>
@@ -485,23 +486,28 @@
                             <tr v-if="Avales" v-for="item in Avales">
                                 <td>{{item.cliente.identidad}}</td>
                                 <td>{{item.cliente.nombres}} {{item.cliente.apellidos}}</td>
-                                <td class="d-flex justify-center">
-                                    <v-btn width="22px" height="22px" @click="abrirDialogoArchivos(item.cliente)" text fab color="red">
-                                        <v-icon size="15">fa fa-file-pdf</v-icon>
-                                    </v-btn>
-                                </td>
                                 <td>
-                                  <v-tooltip top>
-                                    <template v-slot:activator="{on, attrs}">
-                                      <v-btn v-if="item.estado === 1" height="25" width="25" color="red" v-on="on" v-bind="attrs" text
-                                             dark fab @click="declinarAval(item)"><v-icon size="10">fa fa-times</v-icon></v-btn>
-                                      <v-btn v-if="item.estado === 0" height="25" width="25" color="success" v-on="on" v-bind="attrs" text
-                                             dark fab @click="declinarAval(item)"><v-icon size="10">fa fa-check</v-icon></v-btn>
-                                    </template>
-                                    <span v-if="item.estado === 0">Si este aval fue declinado, lo puedes aceptar nuevamente.</span>
-                                    <span v-else-if="item.estado === 1">Declinar aval.</span>
-                                  </v-tooltip>
+                                    <b-link v-if="item.documento" @click="verDoucumeto(item.documento, 1)">Ver Solicitúd</b-link>
+                                    <span v-else>No hay documento aún</span>
                                 </td>
+                              <td class="d-flex justify-center">
+                                <v-btn width="22px" height="22px" @click="abrirDialogoArchivos(item.cliente)" text fab color="red">
+                                  <v-icon size="15">fa fa-file-pdf</v-icon>
+                                </v-btn>
+                              </td>
+                              <td>
+                                <v-tooltip top>
+                                  <template v-slot:activator="{on, attrs}">
+                                    <v-btn v-if="item.estado === 1" height="25" width="25" color="red" v-on="on" v-bind="attrs" text
+                                           dark fab @click="declinarAval(item)"><v-icon size="10">fa fa-times</v-icon></v-btn>
+                                    <v-btn v-if="item.estado === 0" height="25" width="25" color="success" v-on="on" v-bind="attrs" text
+                                           dark fab @click="declinarAval(item)"><v-icon size="10">fa fa-check</v-icon></v-btn>
+                                  </template>
+                                  <span v-if="item.estado === 0">Si este aval fue declinado, lo puedes aceptar nuevamente.</span>
+                                  <span v-else-if="item.estado === 1">Declinar aval.</span>
+                                </v-tooltip>
+                              </td>
+
                             </tr>
                         </tbody>
                     </table>
