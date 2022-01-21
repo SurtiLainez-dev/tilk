@@ -145,7 +145,7 @@ export default {
         observacion: this.orden.observacion,
         titulo:      this.orden.titulo,
         detalle:     this.orden.detalle,
-        usuario_enlace: this.orden.user
+        colaborador: this.orden.user
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
@@ -167,7 +167,7 @@ export default {
     },
     selectColaborador(item){
       this.orden.destino = item.nombres+' '+item.apellidos;
-      this.orden.user    = item.usuarios.id;
+      this.orden.user    = item.id;
       this.dialogoCol    = false;
     },
     validarForm(){

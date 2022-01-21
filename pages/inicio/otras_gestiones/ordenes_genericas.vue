@@ -21,6 +21,8 @@
       </template>
     </v-data-table>
 
+
+
     <v-dialog v-model="dialogo" width="45%">
       <v-card>
         <v-toolbar flat color="grey lighten-4">
