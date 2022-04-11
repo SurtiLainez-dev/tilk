@@ -4,10 +4,10 @@
         <template v-slot:activator value="true">
           <v-list-item-title>Inventario</v-list-item-title>
         </template>
-        <v-list-item dense class="itemOpciones" @click="go('/contabilidad/articulos/precio')">
+        <v-list-item v-if="PERMISOS.includes(413)" dense class="itemOpciones" @click="go('/contabilidad/articulos/precio')">
           Asignación de Precios
         </v-list-item>
-        <v-list-item dense class="itemOpciones" @click="go('/contabilidad/articulos/reingreso')">
+        <v-list-item v-if="PERMISOS.includes(414)" dense class="itemOpciones" @click="go('/contabilidad/articulos/reingreso')">
           <v-tooltip top>
             <template v-slot:activator="{on, attrs}">
               <span v-bind="attrs" v-on="on">Asig. Precio a Reingreso</span>
@@ -15,7 +15,7 @@
             <span>Asignación de Precios a Artículos de Reingreso</span>
           </v-tooltip>
         </v-list-item>
-        <v-list-item dense class="itemOpciones" @click="go('/contabilidad/articulos/devoluciones/devolucion')">
+        <v-list-item v-if="PERMISOS.includes(415)" dense class="itemOpciones" @click="go('/contabilidad/articulos/devoluciones/devolucion')">
           Anulación de Cuenta
         </v-list-item>
       </v-list-group>
@@ -29,6 +29,19 @@
       go(url){
         this.$router.push(url)
       }
+    },
+    computed:{
+      PERMISOS(){
+        let permisos = this.$store.state.permisosUser.split(',');
+        let per = [];
+        if (permisos.length > 1){
+          permisos.forEach((item)=>{
+            per.push(parseInt(item))
+          })
+          return per;
+        }else
+          return [];
+      },
     }
   }
 </script>

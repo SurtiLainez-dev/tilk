@@ -703,7 +703,7 @@
         this.Precios.cuota = 0
         this.Precios.pagos = [];
         this.Precios.cuota = (this.Precios.contado / this.Precios.prom_cant_cuotas).toFixed(3);
-        this.crearPagos(3,this.Precios.forma_pago);
+        this.crearPagos(this.Precios.prom_cant_cuotas,this.Precios.forma_pago);
 
       },
       crearPagos(pagos, tipo){

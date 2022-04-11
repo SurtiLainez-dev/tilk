@@ -38,7 +38,7 @@
                       <span>{{item.titulo}}</span>
                     </v-tooltip>
                   </v-col>
-                  <v-col v-else-if="item.id === 3 && tipoUser == 2 || tipoUser == 1 || PERMISOS.includes(1)" class="d-flex justify-center">
+                  <v-col v-else-if="item.id === 3 && (tipoUser == 2 || tipoUser == 1)" class="d-flex justify-center">
                     <v-tooltip right>
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn @click="go(item.url, item.id, item.accion)" v-on="on" v-bind="attrs"
@@ -49,10 +49,27 @@
                       <span>{{item.titulo}}</span>
                     </v-tooltip>
                   </v-col>
-                  <v-col v-else-if="item.id > 3" class="d-flex justify-center px-2">
+                  <v-col
+                      v-else-if="(item.id > 3 && item.id < 10 && PERMISOS.length > 0) && (
+                          (item.id === 6 && PERMISOS.includes(2)) || (item.id === 5 && PERMISOS.includes(3)) ||
+                          (item.id === 4 && PERMISOS.includes(4) || (item.id === 7 && (PERMISOS.includes(6) || PERMISOS.includes(8))) ||
+                          (item.id === 8 && (PERMISOS.includes(7) || PERMISOS.includes(14))))
+                          )"
+                      class="d-flex justify-center px-2">
                     <v-tooltip right>
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn @click="itemsMenu(item.id)" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
+                          <v-icon>{{item.icono}}</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>{{item.titulo}}</span>
+                    </v-tooltip>
+                  </v-col>
+                  <v-col v-else-if="item.id === 10" class="d-flex justify-center">
+                    <v-tooltip right>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn @click="go(item.url, item.id, item.accion)" v-on="on" v-bind="attrs"
+                               :color="item.color" fab x-small dark>
                           <v-icon>{{item.icono}}</v-icon>
                         </v-btn>
                       </template>
@@ -66,55 +83,58 @@
               <v-container class="px-2" style="color: #FFF">
                 <strong>Inicio</strong>
               </v-container>
-              <side-seguimientos/>
+              <side-seguimientos :permisos="PERMISOS"/>
             </v-col>
             <v-col cols="9" v-if="select === 2">
                 <v-list>
-                  <admin/>
+                  <admin :permisos="PERMISOS"/>
                   <side-sucursal/>
                 </v-list>
             </v-col>
             <v-col cols="9" v-if="select === 3">
             <v-list>
               <side-colaboradores/>
-              <side-planilla/>
-            </v-list>
-          </v-col>
-            <v-col cols="9" v-if="select === 4">
-            <v-list>
-              <side-conta/>
-              <articulos-conta/>
-              <notas-credito/>
+              <side-planilla v-if="PERMISOS.includes(1)"/>
               <mobiliario/>
-              <gastos/>
             </v-list>
           </v-col>
-            <v-col cols="9" v-if="select === 5">
+            <v-col cols="9" v-if="select === 4 && PERMISOS.includes(4)">
+            <v-list>
+              <side-conta v-if="PERMISOS.includes(41) || PERMISOS.includes(42) || PERMISOS.includes(43) ||
+                PERMISOS.includes(48) ||PERMISOS.includes(44) || PERMISOS.includes(46) ||
+                PERMISOS.includes(47) || PERMISOS.includes(49) || PERMISOS.includes(410) ||
+                PERMISOS.includes(411) || PERMISOS.includes(412)"/>
+              <articulos-conta v-if="PERMISOS.includes(413) || PERMISOS.includes(414) || PERMISOS.includes(415)"/>
+              <notas-credito v-if="PERMISOS.includes(416) || PERMISOS.includes(417)"/>
+              <gastos v-if="PERMISOS.includes(418)"/>
+            </v-list>
+          </v-col>
+            <v-col cols="9" v-if="select === 5 && PERMISOS.includes(3)">
             <v-list>
               <side-inventario/>
             </v-list>
           </v-col>
-            <v-col cols="9" v-if="select === 6">
+            <v-col cols="9" v-if="select === 6 && PERMISOS.includes(2)">
             <v-list>
               <side-proveedores/>
             </v-list>
           </v-col>
-            <v-col cols="9" v-if="select === 7">
+            <v-col cols="9" v-if="select === 7 && (PERMISOS.includes(6) || PERMISOS.includes(8))">
             <v-list>
               <side-facturacion/>
             </v-list>
           </v-col>
-            <v-col cols="9" v-if="select === 8">
-            <v-list>
-              <side-cuentas/>
-            </v-list>
+            <v-col cols="9" v-if="select === 8 && (PERMISOS.includes(7) || PERMISOS.includes(14))">
+              <v-list>
+                <side-cuentas/>
+              </v-list>
           </v-col>
-            <v-col cols="9" v-if="select === 9">
+            <v-col cols="9" v-if="select === 9 && (PERMISOS.includes(15))">
             <v-list>
               <side-caja/>
             </v-list>
           </v-col>
-          <v-col cols="9" v-if="select === 11">
+            <v-col cols="9" v-if="select === 11">
             <v-list>
               <side-reportes/>
             </v-list>
@@ -197,6 +217,9 @@
         ]
     }
     },
+    created() {
+      console.log(this.PERMISOS.length)
+    },
     methods:{
       cerrarSesion(){
         this.$store.commit('activarOverlay', true);
@@ -235,10 +258,13 @@
       PERMISOS(){
         let permisos = this.$store.state.permisosUser.split(',');
         let per = [];
-        permisos.forEach((item)=>{
-          per.push(parseInt(item))
-        })
-        return per;
+        if (permisos.length > 1){
+          permisos.forEach((item)=>{
+            per.push(parseInt(item))
+          })
+          return per;
+        }else
+          return [];
       },
       ESTADOMENU:{
         get: function (){

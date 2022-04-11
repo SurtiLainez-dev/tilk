@@ -4,13 +4,13 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Planillas</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/colaborador/planillas/nueva')">
+      <v-list-item v-if="PERMISOS.includes(11)" class="itemOpciones" @click="go('/colaborador/planillas/nueva')">
         Crear Planilla
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/colaborador/planillas/')">
+      <v-list-item v-if="PERMISOS.includes(12)" class="itemOpciones" @click="go('/colaborador/planillas/')">
         Ver Planillas
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/colaborador/planillas/pendientes')">
+      <v-list-item v-if="PERMISOS.includes(13)" class="itemOpciones" @click="go('/colaborador/planillas/pendientes')">
         Planillas Pendientes
       </v-list-item>
     </v-list-group>
@@ -24,6 +24,19 @@
         go(url){
           this.$router.push(url)
         }
+      },
+      computed:{
+        PERMISOS(){
+          let permisos = this.$store.state.permisosUser.split(',');
+          let per = [];
+          if (permisos.length > 1){
+            permisos.forEach((item)=>{
+              per.push(parseInt(item))
+            })
+            return per;
+          }else
+            return [];
+        },
       }
     }
 </script>

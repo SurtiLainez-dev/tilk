@@ -10,7 +10,7 @@
       <v-list-item class="itemOpciones" @click="go('/colaborador/contratos')">
         Contratos
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/colaborador/nuevo')">
+      <v-list-item v-if="PERMISOS.includes(131)" class="itemOpciones" @click="go('/colaborador/nuevo')">
         Crear Colaborador
       </v-list-item>
     </v-list-group>
@@ -24,6 +24,19 @@
         go(url){
           this.$router.push(url)
         }
+      },
+      computed:{
+        PERMISOS(){
+          let permisos = this.$store.state.permisosUser.split(',');
+          let per = [];
+          if (permisos.length > 1){
+            permisos.forEach((item)=>{
+              per.push(parseInt(item))
+            })
+            return per;
+          }else
+            return [];
+        },
       }
     }
 </script>

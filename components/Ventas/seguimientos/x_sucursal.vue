@@ -1,10 +1,12 @@
 <template>
   <v-card flat>
     <v-card flat v-if="vista === 1">
-      <v-toolbar dense color="grey lighten-3" flat>
+      <v-toolbar  color="grey lighten-3" flat>
         <v-card-title>Prospectos por sucursal</v-card-title>
         <v-spacer></v-spacer>
-        <v-spacer></v-spacer>
+        <v-autocomplete :items="SUCURSALES" :loading="LOAD_SUCURSALES" :item-value="'id'" :item-text="'nombre'"
+                        label="Sucursal" class="ma-2" dense v-model="suc" @change="cargar_Seg"></v-autocomplete>
+
         <v-spacer></v-spacer>
         <v-text-field dense label="Buscar..." v-model="search"></v-text-field>
 
@@ -13,7 +15,7 @@
                     :headers="header" :items="SEGUIMIENTOS" @click:row="goSeguimiento">
         <template v-slot:item.estado="{item}">
           <v-chip x-small color="red" dark v-if="item.estado === 0">Cerrado sin exito</v-chip>
-          <v-chip x-small color="green lighten-1" dar v-else-if="item.estado === 1" k>Abierto</v-chip>
+          <v-chip x-small color="green lighten-1" dark v-else-if="item.estado === 1">Abierto</v-chip>
           <v-chip x-small color="green darken-3" dark v-else-if="item.estado === 2">Vendido</v-chip>
         </template>
         <template v-slot:item.fecha_inicio="{item}">
@@ -39,6 +41,7 @@ export default {
   components:{seguimiento},
   data(){
     return{
+      suc: 0,
       vista: 1,
       search: '',
       header:[
@@ -59,15 +62,26 @@ export default {
     },
     LOAD_SEGUIMIENTOS(){
       return this.$store.state.seguimientos.LOAD_SEGUIMIENTOS;
+    },
+    SUCURSALES(){
+      return this.$store.state.suc.SUCURSALES;
+    },
+    LOAD_SUCURSALES(){
+      return this.$store.state.suc.LOAD_SUCURSALES;
     }
   },
   created() {
     this.$store.commit('seguimientos/cargar_SEGUIMIENTOS_X_SUCURSAL', this.SUCURSAL);
+    this.$store.commit('suc/cargar_SUCURSALES');
+    this.suc = this.SUCURSAL;
   },
   methods:{
     goSeguimiento(item){
       this.$store.commit('asignarDatosSeguimiento', item);
       this.vista = 2;
+    },
+    cargar_Seg(){
+      this.$store.commit('seguimientos/cargar_SEGUIMIENTOS_X_SUCURSAL', this.suc);
     }
   }
 }

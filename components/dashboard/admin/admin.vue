@@ -21,6 +21,7 @@
 <script>
     export default {
       name: "admin",
+      props:{permisos: Array},
       methods:{
           go(url){
             this.$router.push(url)

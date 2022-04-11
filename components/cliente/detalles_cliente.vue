@@ -18,7 +18,7 @@
     </v-simple-table>
     <v-divider></v-divider>
     <v-card-actions class="d-flex justify-end">
-      <v-btn color="success" dark small tile @click="enviarDetalles">Editar Detalles</v-btn>
+      <v-btn color="success" class="text-white" :disabled="!permiso.includes(143)" small tile @click="enviarDetalles">Editar Detalles</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -28,6 +28,7 @@ import Vue from "vue";
 
 export default {
   name: "detalles_cliente",
+  props:{permiso:Array},
   computed:{
     CLIENTE: function (){
       get: {

@@ -51,7 +51,7 @@
           <div class="pa-1">
             <v-container style="max-height: 620px; min-height: 200px" class="overflow-y-auto pa-1">
               <datos_personales v-if="vistaMenu === 1"/>
-              <detalles_cliente v-if="vistaMenu === 2"/>
+              <detalles_cliente :permiso="PERMISOS"  v-if="vistaMenu === 2"/>
               <telefonos_cliente v-if="vistaMenu === 3"/>
               <direcciones_cliente v-if="vistaMenu === 4"/>
               <documentos_cliente v-if="vistaMenu === 5"/>
@@ -154,6 +154,17 @@ export default {
     },
     LOAD_CLIENTE(){
       return this.$store.state.cliente.LOAD_CLIENTE;
+    },
+    PERMISOS(){
+      let permisos = this.$store.state.permisosUser.split(',');
+      let per = [];
+      if (permisos.length > 1){
+        permisos.forEach((item)=>{
+          per.push(parseInt(item))
+        })
+        return per;
+      }else
+        return [];
     },
   },
   methods:{

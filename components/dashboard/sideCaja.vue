@@ -3,7 +3,7 @@
     <v-container style="color: #FFF">
       <strong>Caja</strong>
     </v-container>
-    <v-list-group>
+    <v-list-group v-if="PERMISOS.includes(152)">
 
 
       <template v-slot:activator value="true">
@@ -15,19 +15,19 @@
     </v-list-group>
 
 
-    <v-list-group>
+    <v-list-group v-if="PERMISOS.includes(153)">
       <template v-slot:activator value="true">
         <v-list-item-title>Facturas</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/caja/facturas/pendientes')">
-        Pendientes
-      </v-list-item>
+<!--      <v-list-item class="itemOpciones" @click="go('/caja/facturas/pendientes')">-->
+<!--        Pendientes-->
+<!--      </v-list-item>-->
       <v-list-item class="itemOpciones" @click="go('/caja/facturas/')">
         Facturas
       </v-list-item>
     </v-list-group>
 
-    <v-list-group>
+    <v-list-group v-if="PERMISOS.includes(154)">
       <template v-slot:activator value="true">
         <v-list-item-title>Calendario</v-list-item-title>
       </template>
@@ -42,23 +42,20 @@
       </v-list-item>
     </v-list-group>
 
-    <v-list-group>
+    <v-list-group v-if="PERMISOS.includes(155) || PERMISOS.includes(156) || PERMISOS.includes(157) || PERMISOS.includes(158)">
       <template v-slot:activator value="true">
         <v-list-item-title>Administrador</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/caja/admin/historial')">
+      <v-list-item v-if="PERMISOS.includes(155)" class="itemOpciones" @click="go('/caja/admin/historial')">
         Historial de Cierres
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/caja/admin/recibos')">
-        Recibos
-      </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/caja/admin/cajas')">
+      <v-list-item v-if="PERMISOS.includes(156)" class="itemOpciones" @click="go('/caja/admin/cajas')">
         Cajas Hoy
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/caja/admin/configuracion')">
+      <v-list-item v-if="PERMISOS.includes(157)" class="itemOpciones" @click="go('/caja/admin/configuracion')">
         Configuración
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/caja/admin/documentos')">
+      <v-list-item  v-if="PERMISOS.includes(158)" class="itemOpciones" @click="go('/caja/admin/documentos')">
         Configuración de Impresión
       </v-list-item>
     </v-list-group>
@@ -72,6 +69,19 @@ export default {
     go(url){
       this.$router.push(url)
     }
+  },
+  computed:{
+    PERMISOS(){
+      let permisos = this.$store.state.permisosUser.split(',');
+      let per = [];
+      if (permisos.length > 1){
+        permisos.forEach((item)=>{
+          per.push(parseInt(item))
+        })
+        return per;
+      }else
+        return [];
+    },
   }
 }
 </script>

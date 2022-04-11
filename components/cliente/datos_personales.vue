@@ -79,7 +79,7 @@
     </v-form>
     <v-divider></v-divider>
     <v-card-actions class="d-flex justify-end">
-      <v-btn small color="success" @click="validarDatos" tile dark>Guardar Edición</v-btn>
+      <v-btn small color="success" @click="validarDatos" tile class="text-white" :disabled="!PERMISOS.includes(142)">Guardar Edición</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -95,7 +95,19 @@ export default {
         return this.$store.state.cliente.CLIENTE;
       }
     },
+    PERMISOS(){
+      let permisos = this.$store.state.permisosUser.split(',');
+      let per = [];
+      if (permisos.length > 1){
+        permisos.forEach((item)=>{
+          per.push(parseInt(item))
+        })
+        return per;
+      }else
+        return [];
+    },
   },
+
   data(){
     return{
       Datos:{

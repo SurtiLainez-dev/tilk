@@ -1,19 +1,19 @@
 <template>
     <div>
-        <v-list-group>
+        <v-list-group v-if="permisos.includes(121) || permisos.includes(122) || permisos.includes(123)">
             <template v-slot:activator value="true">
                 <v-tooltip top>
                     <span>Seguimientos de Prospectos</span>
                     <template v-slot:activator="{on, attrs}"><v-list-item-title v-on="on" v-bind="attrs">Seguimientos de Prospectos</v-list-item-title></template>
                 </v-tooltip>
             </template>
-            <v-list-item class="itemOpciones" @click="go('/inicio/seguimientos/')">
+            <v-list-item  v-if="permisos.includes(121)" class="itemOpciones" @click="go('/inicio/seguimientos/')">
                 Todos los Seguimientos
             </v-list-item>
-            <v-list-item class="itemOpciones" @click="go('/inicio/seguimientos/abiertos')">
+            <v-list-item v-if="permisos.includes(122)" class="itemOpciones" @click="go('/inicio/seguimientos/abiertos')">
                 Seguimientos Abiertos
             </v-list-item>
-            <v-list-item class="itemOpciones" @click="go('/inicio/seguimientos/cerrados')">
+            <v-list-item v-if="permisos.includes(123)" class="itemOpciones" @click="go('/inicio/seguimientos/cerrados')">
                 Seguimientos Cerrados
             </v-list-item>
         </v-list-group>
@@ -43,6 +43,7 @@
 <script>
     export default {
         name: "sideSeguimientos",
+        props:{permisos: Array},
         methods:{
             go(url){
                 this.$router.push(url)

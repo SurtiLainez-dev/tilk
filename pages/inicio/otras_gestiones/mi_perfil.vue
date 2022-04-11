@@ -75,6 +75,16 @@
                     </v-list-item-content>
                   </v-list-item>
 
+                  <v-list-item :disabled="LOAD_USER" @click="VISTA = 7">
+                    <v-list-item-icon>
+                      <v-icon >fa fa-file-invoice</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                      <v-list-item-title v-text="'Ordenes de Entrega'"></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+
                 </v-list-item-group>
               </v-list>
             </v-navigation-drawer>
@@ -82,9 +92,10 @@
         </v-col>
         <v-col>
           <inicio     v-if="VISTA === 1" />
-          <contratos  v-if="VISTA === 2" />
-          <planillas  v-if="VISTA === 3" />
-          <contrasena v-if="VISTA === 6" />
+          <contratos  v-else-if="VISTA === 2" />
+          <planillas  v-else-if="VISTA === 3" />
+          <contrasena v-else-if="VISTA === 6" />
+          <ordenes v-else-if="VISTA === 7"/>
         </v-col>
       </v-row>
     </v-card>
@@ -97,13 +108,15 @@ import inicio from "../../../components/mi_perfil/inicio";
 import contratos from "../../../components/mi_perfil/contratos";
 import planillas from "../../../components/mi_perfil/planillas";
 import contrasena from "../../../components/mi_perfil/contrasena";
+import ordenes from "@/components/mi_perfil/ordenes";
 export default {
   name: "mi_perfil",
   components:{
     inicio,
     contratos,
     planillas,
-    contrasena
+    contrasena,
+    ordenes
   },
   computed:{
     USER(){

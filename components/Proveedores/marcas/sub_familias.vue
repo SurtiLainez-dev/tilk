@@ -3,7 +3,7 @@
       <v-row>
         <v-col cols="8"><v-card-title>Sub-familias Existentes</v-card-title></v-col>
         <v-col cols="4" class="d-flex align-center justify-end">
-          <v-btn color="orange" dark small @click="nuevaSub">Agregar Sub-familia</v-btn>
+          <v-btn color="orange" class="text-white" small @click="nuevaSub" :disabled="!PERMISOS.includes(36)">Agregar Sub-familia</v-btn>
         </v-col>
       </v-row>
       <v-divider></v-divider>
@@ -54,6 +54,19 @@
   import Swal from 'sweetalert2'
   export default {
     name: "sub-familias",
+    computed:{
+      PERMISOS(){
+        let permisos = this.$store.state.permisosUser.split(',');
+        let per = [];
+        if (permisos.length > 1){
+          permisos.forEach((item)=>{
+            per.push(parseInt(item))
+          })
+          return per;
+        }else
+          return [];
+      },
+    },
     data(){
       return{
         search: '',

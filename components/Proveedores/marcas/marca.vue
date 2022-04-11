@@ -3,7 +3,7 @@
       <v-row>
         <v-col cols="8"><v-card-title>Marcas Existentes</v-card-title></v-col>
         <v-col cols="4" class="d-flex align-center justify-end">
-          <v-btn color="orange" @click="nuevaMarca" dark small>Agregar Marca</v-btn>
+          <v-btn color="orange" @click="nuevaMarca" class="text-white" small :disabled="!PERMISOS.includes(35)">Agregar Marca</v-btn>
         </v-col>
       </v-row>
       <v-divider></v-divider>
@@ -175,6 +175,19 @@
     },
     mounted() {
       this.cargarProveedores()
+    },
+    computed:{
+      PERMISOS(){
+        let permisos = this.$store.state.permisosUser.split(',');
+        let per = [];
+        if (permisos.length > 1){
+          permisos.forEach((item)=>{
+            per.push(parseInt(item))
+          })
+          return per;
+        }else
+          return [];
+      },
     },
     async fetch (){
       this.Marcas  =(await this.$axios.get('marcas_proveedor', {

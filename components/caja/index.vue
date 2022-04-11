@@ -2,7 +2,7 @@
 <v-card flat>
   <v-card flat v-if="ESTADO">
     <v-toolbar flat color="grey lighten-2">
-      <h5>Caja General del {{SUCURSAL}}</h5>
+      <h5>Caja General de {{SUCURSAL}}</h5>
       <v-spacer></v-spacer>
       {{FECHA}}
     </v-toolbar>

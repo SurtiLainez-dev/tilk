@@ -7,16 +7,16 @@
           <template v-slot:activator="{on, attrs}"><v-list-item-title v-on="on" v-bind="attrs">NC</v-list-item-title></template>
         </v-tooltip>
       </template>
-      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/nuevo')">
+      <v-list-item v-if="PERMISOS.includes(416)" dense class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/nuevo')">
         Nueva NC Proveedor
       </v-list-item>
-      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/')">
+      <v-list-item v-if="PERMISOS.includes(416)" dense class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/')">
         NC Proveedores
       </v-list-item>
-      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/notas_credito/cliente/nueva')">
+      <v-list-item v-if="PERMISOS.includes(417)" dense class="itemOpciones" @click="go('/contabilidad/notas_credito/cliente/nueva')">
         NC Cliente x Anticipo
       </v-list-item>
-      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/notas_credito/cliente/')">
+      <v-list-item v-if="PERMISOS.includes(417)" dense class="itemOpciones" @click="go('/contabilidad/notas_credito/cliente/')">
         NC Clientes
       </v-list-item>
     </v-list-group>
@@ -30,6 +30,19 @@
       go(url){
         this.$router.push(url)
       }
+    },
+    computed:{
+      PERMISOS(){
+        let permisos = this.$store.state.permisosUser.split(',');
+        let per = [];
+        if (permisos.length > 1){
+          permisos.forEach((item)=>{
+            per.push(parseInt(item))
+          })
+          return per;
+        }else
+          return [];
+      },
     }
   }
 </script>

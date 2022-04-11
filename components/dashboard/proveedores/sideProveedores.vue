@@ -4,27 +4,27 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Proveedores</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/proveedores/')">
+      <v-list-item v-if="PERMISOS.includes(23)" class="itemOpciones" @click="go('/proveedores/')">
         Ver Proveedores
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/proveedores/nuevo')">
+      <v-list-item v-if="PERMISOS.includes(21)" class="itemOpciones" @click="go('/proveedores/nuevo')">
         Crear Proveedor
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/proveedores/contactos')">
+      <v-list-item v-if="PERMISOS.includes(22)" class="itemOpciones" @click="go('/proveedores/contactos')">
         Contactos
       </v-list-item>
       <v-list-item class="itemOpciones" @click="go('/proveedores/marcas')">
         Marcas
       </v-list-item>
     </v-list-group>
-    <v-list-group>
+    <v-list-group v-if="PERMISOS.includes(24) || PERMISOS.includes(25)">
       <template v-slot:activator value="true">
         <v-list-item-title>Cotizaciones</v-list-item-title>
       </template>
-      <v-list-item class="itemOpciones" @click="go('/proveedores/cotizaciones')">
+      <v-list-item v-if="PERMISOS.includes(25)" class="itemOpciones" @click="go('/proveedores/cotizaciones')">
         Ver Cotizaciones
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/proveedores/cotizaciones/nueva')">
+      <v-list-item v-if="PERMISOS.includes(24)" class="itemOpciones" @click="go('/proveedores/cotizaciones/nueva')">
         Crear Cotizacion
       </v-list-item>
     </v-list-group>
@@ -38,6 +38,19 @@
       go(url){
         this.$router.push(url)
       }
+    },
+    computed:{
+      PERMISOS(){
+        let permisos = this.$store.state.permisosUser.split(',');
+        let per = [];
+        if (permisos.length > 1){
+          permisos.forEach((item)=>{
+            per.push(parseInt(item))
+          })
+          return per;
+        }else
+          return [];
+      },
     }
   }
 </script>

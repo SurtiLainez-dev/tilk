@@ -75,36 +75,38 @@
               <v-col class="d-flex align-center justify-end"><v-checkbox dense label="Habilitar Formulario" v-model="visible"></v-checkbox></v-col>
             </v-row>
             <v-divider></v-divider>
-            <v-form ref="FormNuevaAsignacionCajaChica" :disabled="!visible">
-              <v-text-field label="Observación" :rules="[rule.pago.req, rule.pago.max]"
-                            counter dense class="ma-2" v-model="caja.observacionn"></v-text-field>
-              <v-row no-gutters>
-                <v-col>
-                  <v-text-field label="Total que se Asígnara" :rules="[rule.pago.req]"
-                                suffix="lps" dense class="ma-2" v-model="caja.total_asignado"></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-dialog ref="dialogFechaLimte" v-model="dialogoFecha" :return-value.sync="caja.fecha_limite"
-                            persistent width="290px">
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field :rules="[rule.pago.req]" v-model="caja.fecha_limite" label="Fecha de Cierre"
-                                    v-bind="attrs" v-on="on" class="ma-2" dense></v-text-field>
-                    </template>
-                    <v-date-picker v-model="caja.fecha_limite" scrollable>
-                      <v-spacer></v-spacer>
-                      <v-btn text color="primary" @click="dialogoFecha = false">Cancelar</v-btn>
-                      <v-btn text color="primary" @click="$refs.dialogFechaLimte.save(caja.fecha_limite)">OK</v-btn>
-                    </v-date-picker>
-                  </v-dialog>
-                </v-col>
-              </v-row>
-              <v-select class="ma-2" :items="ccCajas" label="Seleccionar una Caja" :loading="loadCCCaja"
-                        :item-text="'nombre'" :item-value="'id'" :rules="[rule.pago.req]" v-model="caja.cc_caja_salida"></v-select>
-              <v-divider></v-divider>
-              <v-card-actions class="d-flex justify-end">
-                <v-btn color="success" @click="validarForm" dark tile small>Asignar caja chica</v-btn>
-              </v-card-actions>
-            </v-form>
+            <v-card :disabled="!PERMISOS.includes(45)">
+              <v-form ref="FormNuevaAsignacionCajaChica" :disabled="!visible">
+                <v-text-field label="Observación" :rules="[rule.pago.req, rule.pago.max]"
+                              counter dense class="ma-2" v-model="caja.observacionn"></v-text-field>
+                <v-row no-gutters>
+                  <v-col>
+                    <v-text-field label="Total que se Asígnara" :rules="[rule.pago.req]"
+                                  suffix="lps" dense class="ma-2" v-model="caja.total_asignado"></v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-dialog ref="dialogFechaLimte" v-model="dialogoFecha" :return-value.sync="caja.fecha_limite"
+                              persistent width="290px">
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-text-field :rules="[rule.pago.req]" v-model="caja.fecha_limite" label="Fecha de Cierre"
+                                      v-bind="attrs" v-on="on" class="ma-2" dense></v-text-field>
+                      </template>
+                      <v-date-picker v-model="caja.fecha_limite" scrollable>
+                        <v-spacer></v-spacer>
+                        <v-btn text color="primary" @click="dialogoFecha = false">Cancelar</v-btn>
+                        <v-btn text color="primary" @click="$refs.dialogFechaLimte.save(caja.fecha_limite)">OK</v-btn>
+                      </v-date-picker>
+                    </v-dialog>
+                  </v-col>
+                </v-row>
+                <v-select class="ma-2" :items="ccCajas" label="Seleccionar una Caja" :loading="loadCCCaja"
+                          :item-text="'nombre'" :item-value="'id'" :rules="[rule.pago.req]" v-model="caja.cc_caja_salida"></v-select>
+                <v-divider></v-divider>
+                <v-card-actions class="d-flex justify-end">
+                  <v-btn color="success" @click="validarForm" dark tile small>Asignar caja chica</v-btn>
+                </v-card-actions>
+              </v-form>
+            </v-card>
           </v-col>
           <v-col class="ma-2">
             <v-card-title>Historial</v-card-title>
@@ -210,6 +212,19 @@
         if (this.$refs.FormNuevaAsignacionCajaChica.validate())
           this.registrarAsignacion();
       }
+    },
+    computed:{
+      PERMISOS(){
+        let permisos = this.$store.state.permisosUser.split(',');
+        let per = [];
+        if (permisos.length > 1){
+          permisos.forEach((item)=>{
+            per.push(parseInt(item))
+          })
+          return per;
+        }else
+          return [];
+      },
     }
   }
 </script>

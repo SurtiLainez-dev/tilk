@@ -6,39 +6,41 @@
         <h5>Cajas Generales de {{SUCURSAL}}</h5>
         <v-spacer></v-spacer>
       </v-toolbar>
-      <v-simple-table dense class="rowsTable">
-        <thead>
-        <tr>
-          <th>Sucursal</th>
-          <th>#</th>
-          <th>Código</th>
-          <th>Usuario Responsable</th>
-          <th>Estado de Horario</th>
-          <th>Estado Actual</th>
-          <th>Estado Configuración</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="item in CAJAS" @click="abrirDialogoIngreso(item)">
-          <td>{{item.sucursal.nombre}}</td>
-          <td>{{item.num_caja}}</td>
-          <td>{{item.codigo}}</td>
-          <td>{{item.user.usuario}}</td>
-          <td>
-            <v-chip x-small dark v-if="item.estado_cierre === 1" color="orange">Abierta a cualquier hora</v-chip>
-            <v-chip x-small dark v-else-if="item.estado_cierre === 0" color="indiigo">Con horarios</v-chip>
-          </td>
-          <td>
-            <v-chip x-small dark v-if="item.estado === 1" color="success">Abierta</v-chip>
-            <v-chip x-small dark v-else-if="item.estado === 0" color="orange">Cerrada</v-chip>
-          </td>
-          <td>
-            <v-chip x-small dark v-if="item.activa === 1" color="success">Disponible</v-chip>
-            <v-chip x-small dark v-else-if="item.activa === 0" color="orange">No disponible</v-chip>
-          </td>
-        </tr>
-        </tbody>
-      </v-simple-table>
+      <v-card flat :disabled="PERMISOS.includes(151)">
+        <v-simple-table dense class="rowsTable">
+          <thead>
+          <tr>
+            <th>Sucursal</th>
+            <th>#</th>
+            <th>Código</th>
+            <th>Usuario Responsable</th>
+            <th>Estado de Horario</th>
+            <th>Estado Actual</th>
+            <th>Estado Configuración</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="item in CAJAS" @click="abrirDialogoIngreso(item)">
+            <td>{{item.sucursal.nombre}}</td>
+            <td>{{item.num_caja}}</td>
+            <td>{{item.codigo}}</td>
+            <td>{{item.user.usuario}}</td>
+            <td>
+              <v-chip x-small dark v-if="item.estado_cierre === 1" color="orange">Abierta a cualquier hora</v-chip>
+              <v-chip x-small dark v-else-if="item.estado_cierre === 0" color="indiigo">Con horarios</v-chip>
+            </td>
+            <td>
+              <v-chip x-small dark v-if="item.estado === 1" color="success">Abierta</v-chip>
+              <v-chip x-small dark v-else-if="item.estado === 0" color="orange">Cerrada</v-chip>
+            </td>
+            <td>
+              <v-chip x-small dark v-if="item.activa === 1" color="success">Disponible</v-chip>
+              <v-chip x-small dark v-else-if="item.activa === 0" color="orange">No disponible</v-chip>
+            </td>
+          </tr>
+          </tbody>
+        </v-simple-table>
+      </v-card>
     </v-card>
   </v-card>
 
@@ -92,6 +94,17 @@ export default {
     }
   },
   computed:{
+    PERMISOS(){
+      let permisos = this.$store.state.permisosUser.split(',');
+      let per = [];
+      if (permisos.length > 1){
+        permisos.forEach((item)=>{
+          per.push(parseInt(item))
+        })
+        return per;
+      }else
+        return [];
+    },
     CAJAS(){
       return this.$store.state.caja.CAJAS_X_SUCURSAL;
     },

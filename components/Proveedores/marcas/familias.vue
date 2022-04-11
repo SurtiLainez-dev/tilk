@@ -3,7 +3,7 @@
       <v-row>
         <v-col cols="8"><v-card-title>Familias Existentes</v-card-title></v-col>
         <v-col cols="4" class="d-flex align-center justify-end">
-          <v-btn color="orange" @click="nuevaFamilia" dark small>Agregar Familia</v-btn>
+          <v-btn color="orange" @click="nuevaFamilia" class="text-white" small :disabled="!PERMISOS.includes(36)">Agregar Familia</v-btn>
         </v-col>
       </v-row>
       <v-divider></v-divider>
@@ -54,6 +54,19 @@
     name: "familias",
     components:{
       Errores422
+    },
+    computed:{
+      PERMISOS(){
+        let permisos = this.$store.state.permisosUser.split(',');
+        let per = [];
+        if (permisos.length > 1){
+          permisos.forEach((item)=>{
+            per.push(parseInt(item))
+          })
+          return per;
+        }else
+          return [];
+      },
     },
     data(){
       return{

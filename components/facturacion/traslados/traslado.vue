@@ -184,10 +184,12 @@
           <h3 class="text-center">Decisión de Transferencia</h3>
           <br>
           <hr>
-          <v-card-actions class="d-flex align-center justify-center">
-            <v-btn class="ma-2" color="success" dark small @click="$store.commit('valorDialogo2', true)">Aceptar Transferencia</v-btn>
-            <v-btn class="ma-2" color="red" dark small @click="declinarTraslado">Declinar Transferencia</v-btn>
-          </v-card-actions>
+          <v-card flat :disabled="!PERMISOS.includes(85)">
+            <v-card-actions class="d-flex align-center justify-center">
+              <v-btn class="ma-2" color="success" dark small @click="$store.commit('valorDialogo2', true)">Aceptar Transferencia</v-btn>
+              <v-btn class="ma-2" color="red" dark small @click="declinarTraslado">Declinar Transferencia</v-btn>
+            </v-card-actions>
+          </v-card>
           <hr>
           <v-card-actions class="d-flex justify-end">
             <v-btn color="orange" dark small @click="$store.commit('valorDialogo', false)">Cerrar</v-btn>
@@ -384,6 +386,17 @@ import Vue from "vue";
       }
     },
     computed:{
+      PERMISOS(){
+        let permisos = this.$store.state.permisosUser.split(',');
+        let per = [];
+        if (permisos.length > 1){
+          permisos.forEach((item)=>{
+            per.push(parseInt(item))
+          })
+          return per;
+        }else
+          return [];
+      },
       dialogo:{
         get: function () {
           return this.$store.state.dialogo;
