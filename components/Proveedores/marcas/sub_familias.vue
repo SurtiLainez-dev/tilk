@@ -34,7 +34,7 @@
             <v-select v-model="SubFamilia.familia" :disabled="sideSubFamilia" :items="Familias" :item-text="'nombre'"
                       :item-value="'id'" label="Familia" :rules="[rule.required]"></v-select>
             <v-text-field v-model="SubFamilia.nombre" :rules="[rule.required, rule.min, rule.max]"
-                          label="Nombre de la Marca" required :counter="60"></v-text-field>
+                          label="Nombre de la Sub-familia" required :counter="60"></v-text-field>
             <v-row>
               <v-col class="d-flex justify-end">
                 <v-btn v-if="sideSubFamilia" color="orange"  @click="editandoSubFamilia" dark small>Registrar Cambios </v-btn>

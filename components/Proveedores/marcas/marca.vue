@@ -40,8 +40,8 @@
                             label="Nombre de la Marca" required :counter="60"></v-text-field>
               <v-row>
                 <v-col class="d-flex justify-end">
-                  <v-btn v-if="usoSide === 1" color="orange" @click="registrarMarca" dark small>Crear Marca</v-btn>
-                  <v-btn v-if="usoSide === 2" @click="editandoMarca" color="orange" dark small>Registrar Cambios </v-btn>
+                  <v-btn v-if="usoSide === 1" :disabled="disbaleSubmit" color="orange" @click="registrarMarca" class="text-white" small>Crear Marca</v-btn>
+                  <v-btn v-if="usoSide === 2" :disabled="disbaleSubmit" @click="editandoMarca" color="orange" class="text-white" small>Registrar Cambios </v-btn>
                 </v-col>
               </v-row>
             </v-form>
@@ -72,6 +72,7 @@
           min: v => (v && v.length >= 2) || 'Debe ingresar mínimo 2 carácteres',
           max: v => (v && v.length <= 60) || 'Ingresar máximo 60 carácteres',
         },
+        disbaleSubmit: false,
         overlay: false,
         search: '',
         header:[
@@ -99,6 +100,7 @@
         if (this.$refs.FormMarca.validate()){
           this.overlay = true
           this.sideModelo = false
+          this.disbaleSubmit = true;
           this.$axios.put('marcas_proveedor/'+this.marca.marca,{
             nombre: this.marca.nombre,
             proveedor: this.marca.proveedor
@@ -107,6 +109,7 @@
               'Authorization': 'Bearer ' + this.$store.state.token
             }
           }).then((res)=>{
+            this.disbaleSubmit = false;
             if (res.status === 200){
               this.$fetch()
               this.overlay = false
@@ -138,6 +141,7 @@
         if (this.$refs.FormMarca.validate()){
           this.sideModelo = false
           this.overlay = true
+          this.disbaleSubmit = true;
           this.$axios.post('marcas_proveedor',{
             nombre: this.marca.nombre,
             proveedor: this.marca.proveedor
@@ -146,6 +150,7 @@
               'Authorization': 'Bearer ' + this.$store.state.token
             }
           }).then((res)=>{
+            this.disbaleSubmit = false;
             if (res.status === 200){
               this.$fetch()
               this.marca.proveedor = null

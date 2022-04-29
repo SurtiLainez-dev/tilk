@@ -87,7 +87,7 @@ export default {
     envioArchivos(){
       let data = new FormData();
       for (let i in this.EnvioArchivos){
-        data.append(`file_cliente[${i}]`, this.EnvioArchivos[i].file);
+        data.append(`files[${i}]`, this.EnvioArchivos[i].file);
       }
 
       data.append('id', this.CLIENTE.id);

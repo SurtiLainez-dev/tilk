@@ -11,6 +11,9 @@
       <v-list-item v-if="PERMISOS.includes(310)"  dense class="itemOpciones" @click="go('/inventario/articulos/nuevo')">
         Crear Artículo
       </v-list-item>
+      <v-list-item v-if="PERMISOS.includes(310)"  dense class="itemOpciones" @click="go('/inventario/articulos/editar')">
+        Editar Artículo
+      </v-list-item>
       <v-list-item v-if="PERMISOS.includes(38)" dense class="itemOpciones" @click="go('/inventario/traslados/traslados_externos')">
         Transferencias Externas
       </v-list-item>

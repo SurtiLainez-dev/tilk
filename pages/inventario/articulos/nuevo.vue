@@ -4,109 +4,103 @@
       <v-row>
         <v-col cols="6"><v-card-title>Artículo Nuevo</v-card-title></v-col>
         <v-col cols="6" class="d-flex justify-end align-center">
-          <v-btn small dark color="orange" class="ma-2" @click="abrirSide(1)">Crear Familia</v-btn>
-          <v-btn small dark color="pink" class="ma-2" @click="abrirSide(2)">Crear Sub-familia</v-btn>
-          <v-btn small dark color="success" class="ma-2" @click="verificarForm">Registrar Artículo</v-btn>
+          <v-btn small dark tile color="orange" class="ma-2" @click="abrirSide(1)">Crear Familia</v-btn>
+          <v-btn small dark tile color="pink" class="ma-2" @click="abrirSide(2)">Crear Sub-familia</v-btn>
         </v-col>
       </v-row>
       <v-divider></v-divider>
       <v-form class="pl-2 pr-2 d-flex justify-center" ref="FormNuevoArticulo">
         <v-row class="d-flex justify-center">
-          <v-col class="pt-6" md="6">
-            <v-card class="pl-3 pr-3" elevation="5">
-              <h3 class="text-center">Información del Artículo</h3>
-              <v-divider></v-divider>
-              <small><strong>Detalles de la Familia</strong></small>
-              <v-row>
-                <v-col>
-                  <v-autocomplete v-model="Articulo.subfamilia" label="Seleccionar Sub-familia"
-                                  :item-value="'id'" :loading="isPeticionPrincipal" :items="SubFamilias"
-                                  :item-text="'nombre'" :rules="[rules.nombre.req]">
-                  </v-autocomplete>
-                </v-col>
-              </v-row>
-              <small><strong>Detalles del Proveedor</strong></small>
-              <v-row>
-                <v-col md="7">
-                  <v-autocomplete v-model="Articulo.marca" :items="Marcas" :item-value="'id'"
-                                  label="Seleccionar Marca/Proveedor" :rules="[rules.nombre.req]"
-                                  :item-text="'nombre'"></v-autocomplete>
-                </v-col>
-                <v-col md="5">
-                  <v-text-field v-model="Articulo.modelo" label="Módelo" :counter="50"
-                                :rules="[rules.nombre.req, rules.modelo.min, rules.modelo.max]">
-                  </v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col md="4">
-                  <v-text-field v-model="Articulo.codigoProveedor" label="Código del Proveedor"
-                                :counter="50" :rules="[rules.pro.max]"></v-text-field>
-                </v-col>
-                <v-col md="4">
-                  <v-text-field v-model="Articulo.fabricante" label="Referencia del Fabricante"
-                                :counter="50" :rules="[rules.pro.max]"></v-text-field>
-                </v-col>
-                <v-col md="4">
-                  <v-text-field label="Código de Barras" v-model="Articulo.barras"
-                                :counter="13" :rules="[rules.barras.max]"></v-text-field>
-                </v-col>
-              </v-row>
-              <small><strong>Detalles Generales</strong></small>
-              <v-row>
-                <v-col md="9">
-                  <v-text-field label="Nombre del Artículo" v-model="Articulo.nombre"
-                                :rules="[rules.nombre.req, rules.nombre.min, rules.nombre.max]"
-                                :counter="30" @keyup="agregarModelo"></v-text-field>
-                </v-col>
-                <v-col md="3">
-                  <v-text-field suffix="lps" label="Precio de Costo" v-model="Articulo.precio"
-                  :rules="[rules.nombre.req]"></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col md="12">
-                  <v-text-field :rules="[rules.desc.max, rules.desc.min, rules.nombre.req]"
-                    label="Descripción del Artículo" v-model="Articulo.descripcion" :counter="100"></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col md="12">
-                  <v-file-input accept="image/*" v-model="Articulo.file" :rules="[rules.nombre.req]"
-                                label="Foto del Principal del Artículo"></v-file-input>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col md="auto">
-                  <v-text-field type="number" v-model="Articulo.stockMinimo"
-                                :rules="[rules.nombre.req, rules.stockM.min]"
-                                min="1" label="Stock Mínimo por sucursal"></v-text-field>
-                </v-col>
-                <v-col md="auto">
-                  <v-text-field type="number" :min="1 + Articulo.stockMinimo" v-model="Articulo.stockMaximo"
-                                :rules="[rules.nombre.req, rules.stockM.minMax]"
-                                label="Stock Máximo por sucursal"></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col md="4"><v-switch v-model="Articulo.isCompuesto" label="Artículo compuesto"></v-switch></v-col>
-                <v-col md="4"><v-switch v-model="Articulo.isMotocicleta" label="El artículo es un vehículo"></v-switch></v-col>
-                <v-col md="4"><v-switch v-model="Articulo.isDetalles" label="Detalles técnicos"></v-switch></v-col>
-              </v-row>
-            </v-card>
-          </v-col>
-          <v-col md="5">
-            <v-row v-if="Articulo.isCompuesto">
-              <v-col md="12">
-                <v-card class="pl-2 pr-2" elevation="5">
-                  <v-row>
-                    <v-col md="10"><h3 class="text-center">Detalles Compuesto</h3></v-col>
+          <v-col>
+            <v-row>
+              <v-col>
+                <v-autocomplete dense v-model="Articulo.subfamilia" label="Seleccionar Sub-familia"
+                                :item-value="'id'" :loading="isPeticionPrincipal" :items="SubFamilias"
+                                :item-text="'nombre'" :rules="[rules.nombre.req]" @change="cargarDetallesTecnicos">
+                </v-autocomplete>
+              </v-col>
+              <v-col>
+                <v-autocomplete dense v-model="Articulo.marca" :items="Marcas" :item-value="'id'"
+                                label="Seleccionar Marca/Proveedor" :rules="[rules.nombre.req]"
+                                :item-text="'nombre'"></v-autocomplete>
+              </v-col>
+              <v-col>
+                <v-text-field dense v-model="Articulo.modelo" label="Módelo" :counter="50"
+                              :rules="[rules.nombre.req, rules.modelo.min, rules.modelo.max]">
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field dense v-model="Articulo.codigoProveedor" label="Código del Proveedor">
+                                                  :counter="50" :rules="[rules.pro.max]"></v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field dense v-model="Articulo.fabricante" label="Referencia del Fabricante"
+                              :counter="50" :rules="[rules.pro.max]"></v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field dense label="Código de Barras" v-model="Articulo.barras"
+                              :counter="13" :rules="[rules.barras.max]"></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="6">
+                <v-text-field dense label="Nombre del Artículo" v-model="Articulo.nombre"
+                              :rules="[rules.nombre.req, rules.nombre.min, rules.nombre.max]"
+                              :counter="30" @keyup="agregarModelo"></v-text-field>
+              </v-col>
+              <v-col cols="2">
+                <v-text-field suffix="lps" dense label="Precio de Costo" v-model="Articulo.precio"
+                              :rules="[rules.nombre.req]"></v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-file-input dense accept="image/*" v-model="Articulo.file" :rules="[rules.nombre.req]"
+                              label="Foto del Principal del Artículo"></v-file-input>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="8">
+                <v-text-field dense :rules="[rules.desc.max, rules.desc.min, rules.nombre.req]"
+                              label="Descripción del Artículo" v-model="Articulo.descripcion" :counter="100"></v-text-field>
+              </v-col>
+              <v-col cols="2">
+                <v-text-field type="number" v-model="Articulo.stockMinimo"
+                              :rules="[rules.nombre.req, rules.stockM.min]" dense
+                              min="1" label="Stock Mínimo por sucursal"></v-text-field>
+              </v-col>
+              <v-col cols="2">
+                <v-text-field type="number" :min="1 + Articulo.stockMinimo" v-model="Articulo.stockMaximo"
+                              :rules="[rules.nombre.req, rules.stockM.minMax]" dense
+                              label="Stock Máximo por sucursal"></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-checkbox v-model="Articulo.isCompuesto" label="Artículo compuesto"></v-checkbox>
+              </v-col>
+              <v-col>
+                <v-checkbox v-model="Articulo.isMotocicleta" label="El artículo es un vehículo"></v-checkbox>
+              </v-col>
+              <v-col>
+                <v-checkbox v-model="Articulo.isDetalles" label="Detalles técnicos"></v-checkbox>
+              </v-col>
+            </v-row>
+
+            <v-divider></v-divider>
+            <v-row no-gutters>
+              <v-col cols="4">
+                <v-card class="pa-2" flat :disabled="!Articulo.isCompuesto">
+                  <v-row no-gutters>
+                    <v-col>
+                      <v-card-subtitle>Agregar Componentes</v-card-subtitle>
+                    </v-col>
                     <v-col class="d-flex justify-end">
                       <v-btn x-small fab color="success" @click="addFilaCompuesto"><v-icon>fa fa-plus</v-icon></v-btn>
                     </v-col>
                   </v-row>
                   <v-divider></v-divider>
-                  <v-simple-table dense>
+                  <v-simple-table :height="380" dense>
                     <template v-slot:default>
                       <thead>
                       <tr>
@@ -120,7 +114,7 @@
                       <tr v-for="item in Articulo.componentes">
                         <td>
                           <v-text-field :rules="[rules.nombre.req, rules.stockM.min]"
-                            dense type="number" min="1" v-model="item.cantidad"></v-text-field>
+                                        dense type="number" min="1" v-model="item.cantidad"></v-text-field>
                         </td>
                         <td width="85%">
                           <v-text-field :rules="[rules.nombre.req, rules.modelo.min, rules.nombre.maxDet]" dense
@@ -147,45 +141,76 @@
                   </v-simple-table>
                 </v-card>
               </v-col>
-            </v-row>
-            <v-row v-if="Articulo.isDetalles">
-              <v-col md="12">
-                <v-card class="pl-2 pr-2" elevation="5">
-                  <v-row>
-                    <v-col md="10"><h3 class="text-center">Detalles del Artículo</h3></v-col>
-                    <v-col md="2">
-                      <v-btn x-small dark @click="addFilaDetalles" color="success" fab>
-                        <v-icon>fa fa-plus</v-icon>
-                      </v-btn>
+              <v-divider vertical></v-divider>
+              <v-col>
+                <v-card class="pa-2" flat :disabled="!Articulo.isDetalles">
+                  <v-card-subtitle>Detalles Técnicos de {{Articulo.nombre}}</v-card-subtitle>
+                  <v-row no-gutters>
+                    <v-col >
+                      <v-row no-gutters>
+                        <v-col cols="8"><v-card-subtitle>Detalles técnicos</v-card-subtitle></v-col>
+                        <v-col class="d-flex justify-end">
+                          <v-btn x-small dark @click="addFilaDetalles" color="success" class="ma-2" fab>
+                            <v-icon>fa fa-plus</v-icon>
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                      <v-card flat>
+                        <v-simple-table dense :height="380">
+                          <template v-slot:default>
+                            <thead>
+                            <tr>
+                              <th>Detalle</th>
+                              <th>Quitar</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="(item, index) in Articulo.detalles">
+                              <td width="90%">
+                                <v-text-field :rules="[rules.nombre.req, rules.modelo.min, rules.nombre.maxDet]"
+                                              v-model="item.detalle" dense :counter="250"></v-text-field>
+                              </td>
+                              <td>
+                                <v-btn color="red" @click="removeFilaDetalles(item.fila)" fab width="25px" height="25px" dark>
+                                  <v-icon size="15px">fa fa-times</v-icon>
+                                </v-btn>
+                              </td>
+                            </tr>
+                            </tbody>
+                          </template>
+                        </v-simple-table>
+                      </v-card>
+                    </v-col>
+                    <v-divider vertical></v-divider>
+                    <v-col >
+                      <v-card flat :loading="loadDetallesTecnicos">
+                        <v-card-subtitle>Detalles técnicos similares</v-card-subtitle>
+                        <v-simple-table dense :height="380">
+                          <template v-slot:default>
+                            <thead>
+                            <tr>
+                              <th>#</th>
+                              <th>Detalle</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="(i, item) in detallesTecnicos" @click="addDetalleTecnico(i.detalle)">
+                              <td>{{item+1}}</td>
+                              <td>{{i.detalle}}</td>
+                            </tr>
+                            </tbody>
+                          </template>
+                        </v-simple-table>
+                      </v-card>
                     </v-col>
                   </v-row>
-                  <v-divider></v-divider>
-                  <v-simple-table dense>
-                    <template v-slot:default>
-                      <thead>
-                      <tr>
-                        <th>Detalle</th>
-                        <th>Quitar</th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      <tr v-for="(item, index) in Articulo.detalles">
-                        <td width="90%">
-                          <v-text-field :rules="[rules.nombre.req, rules.modelo.min, rules.nombre.maxDet]"
-                                        v-model="item.detalle" dense :counter="250"></v-text-field>
-                        </td>
-                        <td>
-                          <v-btn color="red" @click="removeFilaDetalles(item.fila)" fab width="25px" height="25px" dark>
-                            <v-icon size="15px">fa fa-times</v-icon>
-                          </v-btn>
-                        </td>
-                      </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
                 </v-card>
               </v-col>
             </v-row>
+            <v-divider></v-divider>
+            <v-card-actions class="d-flex justify-end">
+              <v-btn small dark color="success" class="ma-2" @click="verificarForm" tile>Registrar Artículo</v-btn>
+            </v-card-actions>
           </v-col>
         </v-row>
       </v-form>
@@ -247,6 +272,8 @@
     },
     data(){
       return{
+        loadDetallesTecnicos: false,
+        detallesTecnicos: [],
         overlay: false,
         rules: {
           nombre: {
@@ -334,60 +361,95 @@
           this.cuerpoForm = 2;
         this.side = true;
       },
-      registrarSubFamilia(){
-        if (this.$refs.FormSubfamiliaArticuloNuevoArticulo.validate()){
-          this.overlay = true
-          this.$axios.post('sub_familias',{
-            familia: this.SubFamilia.familia,
-            nombre: this.SubFamilia.nombre
-          },{
-            headers: {
-              'Authorization': 'Bearer ' + this.$store.state.token
-            }
-          }).then((res)=>{
-            if (res.status === 200){
-              this.cargarFamilias()
-              this.overlay = false
-              this.side = false
-              Swal.fire(
-                'Registro Exitoso',
-                `Se registro exitosamente la sub-familia ${this.SubFamilia.nombre}.`,
-                'success'
-              )
-              this.SubFamilia.nombre = ''
-              this.SubFamilia.familia = null
-            }
+      addDetalleTecnico(item){
+        let fila = this.Articulo.detalles.length
+        this.Articulo.detalles.push({
+          "fila": fila,
+          "detalle": item,
+          "required": false
+        })
+      },
+      addFilaCompuesto(){
+        let fila = this.Articulo.componentes.length
+        this.Articulo.componentes.push({
+          "fila": fila ,
+          "cantidad": 1,
+          "detalle": '',
+          "cantidad_detalle": null,
+          "required": false
+        })
+      },
+      addFilaDetalles(){
+        let fila = this.Articulo.detalles.length
+        this.Articulo.detalles.push({
+          "fila": fila,
+          "detalle": '',
+          "required": false
+        })
+      },
+      agregarModelo(){
+        this.Articulo.descripcion = this.Articulo.nombre
+      },
+      cargarDetallesTecnicos(){
+        if (this.Articulo.subfamilia > 0){
+          this.loadDetallesTecnicos = true;
+          this.$axios.get('detalles_tecnicos/'+this.Articulo.subfamilia).then((res)=>{
+            this.detallesTecnicos = res.data.detalles;
+            this.loadDetallesTecnicos = false;
+          }).catch((error)=>{
+            this.loadDetallesTecnicos = false;
           })
         }
       },
-      registrarFamilia(){
-        if (this.$refs.FormFamiliaArticuloNuevoArticulo.validate()){
-          this.overlay = true
-          this.$axios.post('familias',{
-            nombre: this.Familia.nombre,
-          },{
-            headers: {
-              'Authorization': 'Bearer ' + this.$store.state.token
-            }
-          }).then((res)=>{
-            if (res.status === 200){
-              this.cargarFamilias()
-              this.overlay = false
-              Swal.fire(
-                'Registro Exitoso',
-                `Se registro exitosamente la familia ${this.Familia.nombre}.`,
-                'success'
-              )
-              this.side = false
-              this.Familia.nombre = ''
-            }
-          })
+      cargarFamilias(){
+        this.$axios.get('familias',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status === 200){
+            this.Familias = res.data.familias
+            this.cargarSubFamilias()
+          }
+        })
+      },
+      cargarMarcasP(){
+        for (let i in this.Proveedores){
+          for (let e in this.Proveedores[i].marcas){
+            this.Marcas.push({
+              "proveedor_id" : this.Proveedores[i].id,
+              "nombre": this.Proveedores[i].nombre + ' - '+this.Proveedores[i].marcas[e].nombre,
+              "id": this.Proveedores[i].marcas[e].id,
+            })
+          }
         }
       },
-      verificarForm(){
-        this.erroresServidor = {};
-        if (this.$refs.FormNuevoArticulo.validate())
-          this.registrarArticulo()
+      cargarProveedor(){
+        this.isPeticon = true
+        this.$axios.get('proveedores',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          if (res.status == 200){
+            this.Proveedores = res.data.proveedores
+            this.cargarMarcasP()
+            this.isPeticon = false
+          }
+        })
+      },
+      cargarSubFamilias(){
+        this.SubFamilias = []
+        for (let i in this.Familias){
+          for (let e in this.Familias[i].sub_familia_articulos){
+            this.SubFamilias.push({
+              "familia_id": this.Familias[i].id,
+              "nombre": this.Familias[i].nombre + ' - '+this.Familias[i].sub_familia_articulos[e].nombre,
+              "id": this.Familias[i].sub_familia_articulos[e].id
+            })
+          }
+        }
+        this.isPeticionPrincipal = false
       },
       registrarArticulo(){
         let componentes = this.Articulo.componentes.length
@@ -451,41 +513,64 @@
             if (res.status === 200){
               this.overlay = false
               Swal.fire(
-                'Registro Exitoso',
-                `Se registro exitosamente el artículo ${this.Articulo.nombre}.`,
-                'success'
+                  'Registro Exitoso',
+                  `Se registro exitosamente el artículo ${this.Articulo.nombre}.`,
+                  'success'
               )
               this.$router.replace({path:'/inventario/'})
             }
           })
         }
       },
-      agregarModelo(){
-        this.Articulo.descripcion = this.Articulo.nombre
-      },
-      addFilaDetalles(){
-        let fila = this.Articulo.detalles.length
-        this.Articulo.detalles.push({
-          "fila": fila,
-          "detalle": '',
-          "required": false
-        })
-      },
-      removeFilaDetalles(fila){
-        this.Articulo.detalles.splice(fila, 1)
-        for (let item in this.Articulo.detalles){
-          this.Articulo.detalles[item].fila = item
+      registrarFamilia(){
+        if (this.$refs.FormFamiliaArticuloNuevoArticulo.validate()){
+          this.overlay = true
+          this.$axios.post('familias',{
+            nombre: this.Familia.nombre,
+          },{
+            headers: {
+              'Authorization': 'Bearer ' + this.$store.state.token
+            }
+          }).then((res)=>{
+            if (res.status === 200){
+              this.cargarFamilias()
+              this.overlay = false
+              Swal.fire(
+                  'Registro Exitoso',
+                  `Se registro exitosamente la familia ${this.Familia.nombre}.`,
+                  'success'
+              )
+              this.side = false
+              this.Familia.nombre = ''
+            }
+          })
         }
       },
-      addFilaCompuesto(){
-        let fila = this.Articulo.componentes.length
-        this.Articulo.componentes.push({
-          "fila": fila ,
-          "cantidad": 1,
-          "detalle": '',
-          "cantidad_detalle": null,
-          "required": false
-        })
+      registrarSubFamilia(){
+        if (this.$refs.FormSubfamiliaArticuloNuevoArticulo.validate()){
+          this.overlay = true
+          this.$axios.post('sub_familias',{
+            familia: this.SubFamilia.familia,
+            nombre: this.SubFamilia.nombre
+          },{
+            headers: {
+              'Authorization': 'Bearer ' + this.$store.state.token
+            }
+          }).then((res)=>{
+            if (res.status === 200){
+              this.cargarFamilias()
+              this.overlay = false
+              this.side = false
+              Swal.fire(
+                  'Registro Exitoso',
+                  `Se registro exitosamente la sub-familia ${this.SubFamilia.nombre}.`,
+                  'success'
+              )
+              this.SubFamilia.nombre = ''
+              this.SubFamilia.familia = null
+            }
+          })
+        }
       },
       removeFilaCompuestos(fila){
         this.Articulo.componentes.splice(fila, 1)
@@ -493,55 +578,16 @@
           this.Articulo.componentes[item].fila = item
         }
       },
-      cargarProveedor(){
-        this.isPeticon = true
-        this.$axios.get('proveedores',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status == 200){
-            this.Proveedores = res.data.proveedores
-            this.cargarMarcasP()
-            this.isPeticon = false
-          }
-        })
-      },
-      cargarMarcasP(){
-        for (let i in this.Proveedores){
-          for (let e in this.Proveedores[i].marcas){
-            this.Marcas.push({
-              "proveedor_id" : this.Proveedores[i].id,
-              "nombre": this.Proveedores[i].nombre + ' - '+this.Proveedores[i].marcas[e].nombre,
-              "id": this.Proveedores[i].marcas[e].id,
-            })
-          }
+      removeFilaDetalles(fila){
+        this.Articulo.detalles.splice(fila, 1)
+        for (let item in this.Articulo.detalles){
+          this.Articulo.detalles[item].fila = item
         }
       },
-      cargarFamilias(){
-        this.$axios.get('familias',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
-          }
-        }).then((res)=>{
-          if (res.status === 200){
-            this.Familias = res.data.familias
-            this.cargarSubFamilias()
-          }
-        })
-      },
-      cargarSubFamilias(){
-        this.SubFamilias = []
-        for (let i in this.Familias){
-          for (let e in this.Familias[i].sub_familia_articulos){
-            this.SubFamilias.push({
-              "familia_id": this.Familias[i].id,
-              "nombre": this.Familias[i].nombre + ' - '+this.Familias[i].sub_familia_articulos[e].nombre,
-              "id": this.Familias[i].sub_familia_articulos[e].id
-            })
-          }
-        }
-        this.isPeticionPrincipal = false
+      verificarForm(){
+        this.erroresServidor = {};
+        if (this.$refs.FormNuevoArticulo.validate())
+          this.registrarArticulo()
       }
     },
     name: "nuevo"
