@@ -546,10 +546,10 @@ export default {
   },
   computed:{
     isPeticon(){
-      return this.$store.state.inventario.load;
+      return this.$store.state.LOAD_ARTICULOS_EDIT;
     },
     Inventario(){
-      return this.$store.state.inventario.data;
+      return this.$store.state.ARTICULOS_EDIT;
     },
   },
   methods:{
@@ -751,7 +751,7 @@ export default {
     }
   },
   created() {
-    this.$store.commit('inventario/cargarInventario');
+    this.$store.commit('cargar_ARTICULOS_EDIT');
     this.$store.commit('guardarTitulo', 'Inventario > Artículo > Editar');
     this.$store.commit('activarOverlay', false);
   }

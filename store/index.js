@@ -41,10 +41,19 @@ export const state = () =>({
   Seguimientos: [],
   loadSeguimiento: false,
   tab: 1,
-  MENU: false
+  MENU: false,
+  ARTICULOS_EDIT: [],
+  LOAD_ARTICULOS_EDIT: false
 });
 
 export const mutations = {
+  cargar_ARTICULOS_EDIT(state){
+    state.LOAD_ARTICULOS_EDIT = true;
+    this.$axios.get('articulos').then((res)=>{
+      state.ARTICULOS_EDIT = res.data.inventario;
+      state.LOAD_ARTICULOS_EDIT = false;
+    })
+  },
   cambiar_MENU(state){
     state.MENU = !state.MENU;
   },
