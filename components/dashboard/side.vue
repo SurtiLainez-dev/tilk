@@ -53,12 +53,16 @@
                       v-else-if="(item.id > 3 && item.id < 10 && PERMISOS.length > 0) && (
                           (item.id === 6 && PERMISOS.includes(2)) || (item.id === 5 && PERMISOS.includes(3)) ||
                           (item.id === 4 && PERMISOS.includes(4) || (item.id === 7 && (PERMISOS.includes(6) || PERMISOS.includes(8))) ||
-                          (item.id === 8 && (PERMISOS.includes(7) || PERMISOS.includes(14))))
+                          (item.id === 8 && (PERMISOS.includes(7) || PERMISOS.includes(14)))
+                          || (item.id === 9 && (PERMISOS.includes(15))))
                           )"
                       class="d-flex justify-center px-2">
                     <v-tooltip right>
                       <template v-slot:activator="{ on, attrs }">
-                        <v-btn @click="itemsMenu(item.id)" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
+                        <v-btn v-if="item.id !== 9" @click="itemsMenu(item.id)" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
+                          <v-icon>{{item.icono}}</v-icon>
+                        </v-btn>
+                        <v-btn v-else @click="go(item.url, item.id, item.accion)" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
                           <v-icon>{{item.icono}}</v-icon>
                         </v-btn>
                       </template>
@@ -79,18 +83,21 @@
                 </v-row>
             </v-col>
 
+<!--          INICIO-->
             <v-col cols="9" v-if="select === 1">
               <v-container class="px-2" style="color: #FFF">
                 <strong>Inicio</strong>
               </v-container>
               <side-seguimientos :permisos="PERMISOS"/>
             </v-col>
+<!--          aDMINISTRADOR-->
             <v-col cols="9" v-if="select === 2">
                 <v-list>
                   <admin :permisos="PERMISOS"/>
                   <side-sucursal/>
                 </v-list>
             </v-col>
+<!--          COLABORADORES-->
             <v-col cols="9" v-if="select === 3">
             <v-list>
               <side-colaboradores/>
@@ -98,6 +105,7 @@
               <mobiliario/>
             </v-list>
           </v-col>
+<!--          CONTABILIDAD-->
             <v-col cols="9" v-if="select === 4 && PERMISOS.includes(4)">
             <v-list>
               <side-conta v-if="PERMISOS.includes(41) || PERMISOS.includes(42) || PERMISOS.includes(43) ||
@@ -109,31 +117,37 @@
               <gastos v-if="PERMISOS.includes(418)"/>
             </v-list>
           </v-col>
+<!--          INVENTARIO-->
             <v-col cols="9" v-if="select === 5 && PERMISOS.includes(3)">
             <v-list>
               <side-inventario/>
             </v-list>
           </v-col>
+<!--          PROVEEDORES-->
             <v-col cols="9" v-if="select === 6 && PERMISOS.includes(2)">
             <v-list>
               <side-proveedores/>
             </v-list>
           </v-col>
+<!--          FACTURACI[ON-->
             <v-col cols="9" v-if="select === 7 && (PERMISOS.includes(6) || PERMISOS.includes(8))">
             <v-list>
               <side-facturacion/>
             </v-list>
           </v-col>
+<!--          CUENTAS-->
             <v-col cols="9" v-if="select === 8 && (PERMISOS.includes(7) || PERMISOS.includes(14))">
               <v-list>
                 <side-cuentas/>
               </v-list>
           </v-col>
+<!--          CAJA-->
             <v-col cols="9" v-if="select === 9 && (PERMISOS.includes(15))">
             <v-list>
               <side-caja/>
             </v-list>
           </v-col>
+<!--          REPORTES-->
             <v-col cols="9" v-if="select === 11">
             <v-list>
               <side-reportes/>

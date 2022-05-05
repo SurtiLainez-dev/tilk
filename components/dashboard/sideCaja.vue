@@ -49,13 +49,13 @@
       <v-list-item v-if="PERMISOS.includes(155)" class="itemOpciones" @click="go('/caja/admin/historial')">
         Historial de Cierres
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(156)" class="itemOpciones" @click="go('/caja/admin/cajas')">
+      <v-list-item  class="itemOpciones" @click="go('/caja/admin/cajas')">
         Cajas Hoy
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(157)" class="itemOpciones" @click="go('/caja/admin/configuracion')">
+      <v-list-item  class="itemOpciones" @click="go('/caja/admin/configuracion')">
         Configuración
       </v-list-item>
-      <v-list-item  v-if="PERMISOS.includes(158)" class="itemOpciones" @click="go('/caja/admin/documentos')">
+      <v-list-item   class="itemOpciones" @click="go('/caja/admin/documentos')">
         Configuración de Impresión
       </v-list-item>
     </v-list-group>

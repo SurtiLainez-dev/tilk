@@ -27,8 +27,12 @@
         <td>{{CUENTA.colaborador.nombres+' '+CUENTA.colaborador.apellidos}}</td>
       </tr>
       <tr>
-        <th>Total del Crédito</th>
+        <th>Saldo Inicial del Crédito</th>
         <td><strong>L </strong>{{int.format(CUENTA.total)}}</td>
+      </tr>
+      <tr>
+        <th>Total Abonado</th>
+        <td><strong>L </strong>{{int.format(CUENTA.contrato_cliente.saldo_abonado)}}</td>
       </tr>
       <tr v-if="CUENTA.contrato_cliente">
         <th>Saldo en Mora</th>
