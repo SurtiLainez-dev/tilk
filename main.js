@@ -36,7 +36,7 @@ const newWin = () => {
 		// fullscreen: true,
 		// show: false,
 		paintWhenInitiallyHidden: false,
-		icon: path.join(__dirname, 'static/icon.png')
+		icon: path.join(__dirname, 'static/logo.png')
 	});
 	win.maximize();
 	win.on('closed', () => win = null);

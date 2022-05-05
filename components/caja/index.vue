@@ -7,40 +7,23 @@
       {{FECHA}}
     </v-toolbar>
 
-    <v-row no-gutters class="pa-3">
-      <v-col cols="3">
-        <v-card height="650" width="256" class="mx-auto">
-          <v-navigation-drawer permanent>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title class="title">
-                  {{tituloMenu}}
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
+    <v-card flat>
+      <v-card class="mx-auto" width="100%">
+        <v-bottom-navigation>
+          <v-tooltip bottom v-for="item in items" :key="item.title" >
+            <template v-slot:activator="{on, attrs}">
+              <v-btn value="recent" v-on="on" v-bind="attrs" @click="cambiarDatosMenu(item)">
+                <v-icon>{{item.icon}}</v-icon>
+              </v-btn>
+            </template>
+            <span>{{item.title}}</span>
+          </v-tooltip>
 
-            <v-divider></v-divider>
+        </v-bottom-navigation>
 
-            <v-list dense nav>
-              <v-list-item v-for="item in items" :key="item.title" link @click="cambiarDatosMenu(item)">
-                <v-list-item-icon>
-                  <v-icon>{{ item.icon }}</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>{{ item.title }}</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-            <v-divider></v-divider>
-          </v-navigation-drawer>
-        </v-card>
-      </v-col>
-      <v-col cols="9">
-        <v-card>
-          <v-toolbar flat class="grey lighten-3">
-            <h6>{{TITULO}}</h6>
-          </v-toolbar>
-
+        <v-card flat>
+          <v-card-title>{{TITULO}}</v-card-title>
+          <v-divider></v-divider>
           <inicio        v-if="VISTA === 1"/>
           <postear       v-else-if="VISTA === 2"/>
           <venta         v-else-if="VISTA === 3"/>
@@ -52,8 +35,8 @@
           <anticipos     v-else-if="VISTA === 10"/>
           <cierre        v-else-if="VISTA === 11"/>
         </v-card>
-      </v-col>
-    </v-row>
+      </v-card>
+    </v-card>
 
   </v-card>
 </v-card>
@@ -102,6 +85,7 @@ export default {
         { title: 'Anticipos', icon: 'fa fa-file-invoice-dollar', val:10},
         { title: 'Cierre de Caja', icon: 'fa fa-sign-out-alt', val:11 },
       ],
+      value:1
     }
   },
   computed:{
@@ -167,6 +151,7 @@ export default {
       this.tituloMenu = val.title
       this.VISTA = val.val;
       this.TITULO = val.title;
+      this.value = val.val
     },
     notificacion(text, color){
       Vue.$toast.open({

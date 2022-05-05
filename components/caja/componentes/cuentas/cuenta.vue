@@ -2,7 +2,7 @@
 <v-card flat :loading="show">
   <div v-if="!vistaInfoPago">
     <v-row no-gutters>
-      <v-col cols="4">
+      <v-col cols="3">
         <v-card class="ma-2">
           <v-simple-table class="rowsTable" dense>
             <template v-slot:default>
@@ -99,7 +99,7 @@
           </v-simple-table>
         </v-card>
       </v-col>
-      <v-col cols="8">
+      <v-col cols="9">
         <v-card class="ma-2 pa-4">
           <v-row no-gutters>
             <v-col cols="4">
@@ -159,12 +159,7 @@
               <tr v-for="item in PagosDistrubuidos">
                 <td>{{item.tipo}}</td>
                 <td>
-                  <v-tooltip top>
-                    <template v-slot:activator="{on, attrs}">
-                      <span v-on="on" v-bind="attrs">{{item.detalle.substr(0,8)}} ...</span>
-                    </template>
-                    <span>{{item.detalle}}</span>
-                  </v-tooltip>
+                  {{item.detalle}}
                 </td>
                 <td><strong>L. </strong>{{item.pendiente}}</td>
                 <td><strong>L. </strong>{{item.pagara}}</td>

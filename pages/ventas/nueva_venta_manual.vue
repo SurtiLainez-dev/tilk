@@ -789,7 +789,7 @@ export default {
         dialogo:       false,
         key:           this.data.pagos.length,
         dialogoMora:   false,
-        saldo_cap:     0
+        saldo_cap:     p_i
       })
     },
     calcularCuota(){
