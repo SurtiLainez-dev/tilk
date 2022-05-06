@@ -63,6 +63,14 @@
           <v-chip color="orange" x-small v-else-if="CUENTA.is_aceptado === 3" dark>Pendiente</v-chip>
         </td>
       </tr>
+      <tr>
+        <th>Cuenta registrada en portafolio</th>
+        <td>
+          <v-chip color="success" x-small v-if="verificar === 1" dark>Sí</v-chip>
+          <v-chip color="red" x-small v-else-if="verificar === 0" dark>No</v-chip>
+          <v-btn v-if="verificar === 0" color="indigo" x-small dark @click="registrarCuentaPortafolio" tile>Registrar en portafolio</v-btn>
+        </td>
+      </tr>
       </tbody>
     </template>
   </v-simple-table>
@@ -79,7 +87,33 @@ export default {
   },
   data(){
     return{
-      int: Intl.NumberFormat()
+      int: Intl.NumberFormat(),
+      loadVerificas: true,
+      verificar: 2
+    }
+  },
+  mounted() {
+    this.verificarPortafolio();
+  },
+  methods:{
+    registrarCuentaPortafolio(){
+      if (this.verificar === 0){
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('cobros/verificar_cuenta/portafolio',{id: this.CUENTA.id}).then((res)=>{
+          this.$store.commit('cuentas/cambiar_VISTA', 2);
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('notificacion',{texto:res.data.msj, color:'success'})
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('notificacion',{texto:'Hubo un error', color:'success'})
+        })
+      }
+    },
+    verificarPortafolio(){
+      this.$axios.get('cobros/verificar_cuenta/'+this.CUENTA.id).then((res)=>{
+        this.verificar = res.data.val;
+        this.$store.commit('notificacion',{texto:res.data.msj, color:'warning'})
+      })
     }
   }
 }
