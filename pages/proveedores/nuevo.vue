@@ -1,4 +1,4 @@
-import Swal from "sweetalert2";
+
 <template>
   <v-container class="pl-2 pr-2 d-flex justify-center">
     <v-card :elevation="3" class="pl-2 pr-2" width="70%">

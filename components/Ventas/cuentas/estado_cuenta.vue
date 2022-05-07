@@ -1,31 +1,11 @@
 <template>
   <v-card>
-    <v-simple-table height="500" fixed-header dense class="rowsTable pa-5">
-      <template v-slot:default>
-        <thead style="font-size: 13px !important;">
-        <tr>
-          <th>#</th>
-          <th>Fecha</th>
-          <th>Descripción</th>
-          <th>Referencia</th>
-          <th>Debito</th>
-          <th>Crédito</th>
-          <th>Total</th>
-        </tr>
-        </thead>
-        <tbody style="font-size: 12px !important;" v-if="CUENTA.estado_cuenta">
-        <tr v-for="(item, i) in JSON.parse(CUENTA.estado_cuenta)">
-          <th>{{i+1}}</th>
-          <td>{{item.fecha}}</td>
-          <td>{{item.descripcion}}</td>
-          <td>{{item.referencia}}</td>
-          <td>L {{int.format(item.debito)}}</td>
-          <td>L {{int.format(item.credito)}}</td>
-          <td>L {{int.format(item.saldo)}}</td>
-        </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
+    <v-data-table :headers="header" dense :items-per-page="20"
+                  :items="JSON.parse(CUENTA.estado_cuenta)">
+      <template v-slot:item.debito="{item}">{{int.format(item.debito)}}</template>
+      <template v-slot:item.credito="{item}">{{int.format(item.credito)}}</template>
+      <template v-slot:item.saldo="{item}">{{int.format(item.saldo)}}</template>
+    </v-data-table>
   </v-card>
 </template>
 
@@ -39,6 +19,14 @@ export default {
   },
   data(){
     return{
+      header:[
+        {text: 'Fecha', value:'fecha'},
+        {text: 'Descripción', value:'descripcion'},
+        {text: 'Referencia', value:'referencia'},
+        {text: 'Debito', value:'debito'},
+        {text: 'Crédito', value:'credito'},
+        {text: 'Saldo', value:'saldo'},
+      ],
       int: Intl.NumberFormat()
     }
   }

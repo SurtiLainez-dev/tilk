@@ -232,12 +232,17 @@ export default {
       this.loadIdentidad = true;
       this.$axios.get('cliente_segumiento/'+this.nc.identidad)
           .then((res)=>{
-            this.cliente = res.data.cliente;
-            this.$store.commit('notificacion',{texto:'Se cargó la información del cliente', color:'success'});
-            this.$store.commit('notificacion',{texto:'Cargando anticipos del cliente', color:'warning'});
-            this.loadIdentidad = false;
-            this.cargarAnticipos();
-            this.cargarCuentas();
+            if (res.data.cliente){
+              this.cliente = res.data.cliente;
+              this.$store.commit('notificacion',{texto:'Se cargó la información del cliente', color:'success'});
+              this.$store.commit('notificacion',{texto:'Cargando anticipos del cliente', color:'warning'});
+              this.loadIdentidad = false;
+              this.cargarAnticipos();
+              this.cargarCuentas();
+            }else{
+              this.$store.commit('notificacion',{texto:'El cliente no existe',color:'warning'});
+              this.loadIdentidad = false;
+            }
           }).catch((error)=>{
         this.notificacion('Hubo error al cargar los datos. Presiona ENTER nuevamente','error');
         this.loadIdentidad = false;

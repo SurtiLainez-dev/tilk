@@ -84,7 +84,7 @@ export default {
         'fecha_pago',
         'estado',
         'saldo_antes',
-        'saldo_despues'
+        'saldo_despues',
       ]
     }
   },
