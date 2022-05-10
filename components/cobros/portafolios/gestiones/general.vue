@@ -22,6 +22,8 @@
         <v-card class="pa-5 ma-2" height="100%" :loading="LOAD_VENTA">
           <h6 class="grey--text text-center">Saldo de la Venta</h6>
           <h6 class="grey--text text-center" v-if="VENTA.contrato_cliente">L {{int.format((VENTA.saldo_actual - VENTA.contrato_cliente.saldo_mora))}}</h6>
+          <small v-if="VENTA.contrato_cliente && VENTA.contrato_cliente.saldo_mora > 0">
+            Saldo de la cuenta con mora {{int.format(VENTA.saldo_actual)}}</small>
         </v-card>
       </v-col>
       <v-col>

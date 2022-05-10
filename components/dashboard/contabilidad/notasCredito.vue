@@ -19,6 +19,9 @@
       <v-list-item v-if="PERMISOS.includes(417)" dense class="itemOpciones" @click="go('/contabilidad/notas_credito/cliente/')">
         NC Clientes
       </v-list-item>
+      <v-list-item v-if="PERMISOS.includes(419)" dense class="itemOpciones" @click="go('/contabilidad/notas_credito/validar_depositos')">
+        Validar Depósitos
+      </v-list-item>
     </v-list-group>
   </div>
 </template>

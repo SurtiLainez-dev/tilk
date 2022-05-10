@@ -33,7 +33,8 @@
           <egreso        v-else-if="VISTA === 8"/>
           <caja_chica    v-else-if="VISTA === 9"/>
           <anticipos     v-else-if="VISTA === 10"/>
-          <cierre        v-else-if="VISTA === 11"/>
+          <deposito      v-else-if="VISTA === 11"/>
+          <cierre        v-else-if="VISTA === 12"/>
         </v-card>
       </v-card>
     </v-card>
@@ -54,6 +55,7 @@ import transacciones from "@/components/caja/componentes/transacciones";
 import cierre from "@/components/caja/componentes/cierre";
 import caja_chica from "@/components/caja/componentes/caja_chica";
 import anticipos from "@/components/caja/componentes/anticipos";
+import deposito from "@/components/caja/componentes/deposito";
 
 export default {
   components:{
@@ -66,7 +68,8 @@ export default {
     transacciones,
     cierre,
     caja_chica,
-    anticipos
+    anticipos,
+    deposito
   },
   name: "index",
   data(){
@@ -83,7 +86,8 @@ export default {
         { title: 'Egreso', icon: 'fa fa-file-invoice-dollar', val:8 },
         { title: 'Caja Chica', icon: 'fa fa-wallet', val:9},
         { title: 'Anticipos', icon: 'fa fa-file-invoice-dollar', val:10},
-        { title: 'Cierre de Caja', icon: 'fa fa-sign-out-alt', val:11 },
+        { title: 'Depósitos a Clientes', icon: 'fa fa-file-invoice-dollar', val:11},
+        { title: 'Cierre de Caja', icon: 'fa fa-sign-out-alt', val:12},
       ],
       value:1
     }

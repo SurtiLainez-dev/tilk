@@ -123,8 +123,8 @@ export default {
   created() {
     let     f = new Date();
     let fecha = f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate();
-    this.$store.commit('caja/cargar_DOCUMENTOS',{fecha: fecha, caja: this.CAJA.id, tipo: 3});
-    this.$store.commit('caja/cargar_HISTORIAL', fecha);
+    this.$store.commit('caja/cargar_DOCUMENTOS',{fecha: '2022-05-08', caja: this.CAJA.id, tipo: 3});
+    this.$store.commit('caja/cargar_HISTORIAL', '2022-05-08');
     this.$store.commit('activarOverlay', false);
   },
   methods:{

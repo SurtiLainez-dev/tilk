@@ -437,6 +437,8 @@ export default {
     if (this.CUENTA.pagos_extras_ventas.length > 0)
       this.notificacion('Esta cuenta tiene documentos por cobrar pendientes','warning');
 
+  },
+  mounted() {
     this.cargarFormaPago();
   },
   methods:{
@@ -496,7 +498,7 @@ export default {
     },
     cargarFormaPago(){
       this.$axios.get('forma_pagos').then((res)=>{
-        this.FormasPago = res.data.formas
+        this.FormasPago = res.data.formas;
       })
     },
     cerrarCalculadora(){

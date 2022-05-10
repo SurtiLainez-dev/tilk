@@ -10,6 +10,7 @@
     <v-data-table :items="CUENTAS"
                   :search="search"
                   dense
+                  :items-per-page="50"
                   :loading="Load"
                   loading-text="Cargando Cuentas"
                   @click:row="goCuenta"

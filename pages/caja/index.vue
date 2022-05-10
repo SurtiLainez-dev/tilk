@@ -6,7 +6,7 @@
         <h5>Cajas Generales de {{SUCURSAL}}</h5>
         <v-spacer></v-spacer>
       </v-toolbar>
-      <v-card flat :disabled="PERMISOS.includes(151)">
+      <v-card flat >
         <v-simple-table dense class="rowsTable">
           <thead>
           <tr>

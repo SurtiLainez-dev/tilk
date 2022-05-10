@@ -113,7 +113,7 @@
                 PERMISOS.includes(47) || PERMISOS.includes(49) || PERMISOS.includes(410) ||
                 PERMISOS.includes(411) || PERMISOS.includes(412)"/>
               <articulos-conta v-if="PERMISOS.includes(413) || PERMISOS.includes(414) || PERMISOS.includes(415)"/>
-              <notas-credito v-if="PERMISOS.includes(416) || PERMISOS.includes(417)"/>
+              <notas-credito v-if="PERMISOS.includes(416) || PERMISOS.includes(417) || PERMISOS.includes(419)"/>
               <gastos v-if="PERMISOS.includes(418)"/>
             </v-list>
           </v-col>
