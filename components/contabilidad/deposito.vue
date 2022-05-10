@@ -145,7 +145,10 @@ export default {
   computed:{
     DEPOSITO(){
       return this.$store.state.contabilidad.depositos.DEPOSITO;
-    }
+    },
+    CUENTA(){
+      return this.$store.state.cuentas.CUENTA;
+    },
   },
   created() {
     this.$axios.get('venta/pagos/'+this.DEPOSITO.venta.id).then((res)=>{
@@ -165,17 +168,21 @@ export default {
       let mora = 0;
       let sa   = 0;
       let saa  = 0;
+      let sar  = 0;
       if (this.DEPOSITO.monto_actual > 0){
         this.pagosSelect.forEach((i)=>{
           saa =  this.DEPOSITO.monto_actual;
+          sar = 0;
           if (i.saldo_actual > 0 && this.DEPOSITO.monto_actual > 0){
             //verifica si el pago esta en moRA
             if (i.mora > 0 && i.estado === 2){
               mora = i.mora;
               if (this.DEPOSITO.monto_actual >= i.mora) {
+                sar = (parseFloat(i.mora) + parseFloat(sar)).toFixed(2)
                 i.mora = 0;
                 this.DEPOSITO.monto_actual = (parseFloat(this.DEPOSITO.monto_actual) - parseFloat(mora)).toFixed(2);
               }else if (this.DEPOSITO.monto_actual < i.mora) {
+                sar = (parseFloat(this.DEPOSITO.monto_actual) + parseFloat(sar)).toFixed(2)
                 i.mora = (parseFloat(i.mora) - parseFloat(this.DEPOSITO.monto_actual)).toFixed(2);
                 this.DEPOSITO.monto_actual = (parseFloat(this.DEPOSITO.monto_actual) - (parseFloat(mora) - parseFloat(i.mora))).toFixed(2)
               }
@@ -189,9 +196,11 @@ export default {
             if (this.DEPOSITO.monto_actual > 0){
               sa = i.saldo_actual;
               if (this.DEPOSITO.monto_actual >= i.saldo_actual) {
+                sar = (parseFloat(i.saldo_actual) + parseFloat(sar)).toFixed(2)
                 i.saldo_actual = 0;
                 this.DEPOSITO.monto_actual = (parseFloat(this.DEPOSITO.monto_actual) - parseFloat(sa)).toFixed(2);
               }if (this.DEPOSITO.monto_actual < i.saldo_actual) {
+                sar = (parseFloat(this.DEPOSITO.monto_actual) + parseFloat(sar)).toFixed(2)
                 i.saldo_actual = (parseFloat(i.saldo_actual) - parseFloat(this.DEPOSITO.monto_actual)).toFixed(2);
                 this.DEPOSITO.monto_actual = (parseFloat(this.DEPOSITO.monto_actual) - (parseFloat(sa) - parseFloat(i.saldo_actual))).toFixed(2);
               }
@@ -205,7 +214,15 @@ export default {
 
             this.saldo_abonado = (parseFloat(this.saldo_abonado) + (parseFloat(saa) - parseFloat(this.DEPOSITO.monto_actual))).toFixed(2)
 
-            this.pagosSi.push(i)
+            this.pagosSi.push({
+              pago_id: i.id,
+              saldo_actual: i.saldo_actual,
+              is_mora: i.is_mora,
+              mora:    i.mora,
+              estado:  i.estado,
+              abonado: sar,
+              detalle: detalle,
+            })
           }
         })
       }
@@ -231,7 +248,12 @@ export default {
         saldo_abonado: this.saldo_abonado,
         saldo_actual:  this.DEPOSITO.monto_actual,
         observacion:   this.DEPOSITO.observacion,
-        mora_abonado:  this.mora_abonado
+        mora_abonado:  this.mora_abonado,
+        pagos_json: JSON.stringify(this.pagosSi),
+
+        total:         this.saldo_abonado,
+        sucursal_id:   this.CUENTA.sucursal_id,
+        caja_id:       this.DEPOSITO.caja_id,
       }).then((res)=>{
         this.$store.commit('activarOverlay', false)
       })
