@@ -318,6 +318,7 @@ export default {
       }).then((res)=>{
         this.$store.commit('contabilidad/depositos/cargar_DEPOSITOS')
         this.abrirNavegador(res.data.clave, res.data.codigo);
+        this.$store.commit('notificacion',{texto:'Deposito Validado', color:'success'})
         this.enviado = true;
       }).catch((error)=>{
         this.$store.commit('activarOverlay', false);

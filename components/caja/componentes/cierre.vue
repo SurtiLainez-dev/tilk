@@ -67,7 +67,7 @@
         </v-col>
         <v-col>
           <v-text-field class="ma-2" dense label="Total de efectivo declarado" @keyup="cuadrarSaldo"
-                        v-model="cierre.declarado" suffix="lps" :rules="[rules.req.req]"></v-text-field>
+                        v-model="cierre.declarado" suffix="lps" :rules="[rules.req.dec, rules.req.tel]"></v-text-field>
         </v-col>
         <v-col>
           <v-text-field class="ma-2" dense label="Descuadre"
@@ -142,6 +142,8 @@ export default {
       rules: {
         req: {
           req: v => !!v || 'Campo requerido',
+          dec: v => v >= 0 || 'Tiene que ser igual o mayor a 0',
+          tel: v => (v === 0 || /^[+]?([0-9]+(?:[\.][0-9]*)?|\.[0-9]+)$/.test(v)) || 'Tienes datos diferentes a números'
         },
       },
       int: new Intl.NumberFormat(),

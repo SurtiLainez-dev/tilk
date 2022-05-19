@@ -152,6 +152,12 @@
                       <b-link @click="printPartida">Ver Documento</b-link>
                     </td>
                   </tr>
+                  <tr>
+                    <th>Editar Partida:</th>
+                    <td>
+                      <v-btn x-small tile dark color="success">Editar Partida</v-btn>
+                    </td>
+                  </tr>
                   </tbody>
                 </template>
               </v-simple-table>

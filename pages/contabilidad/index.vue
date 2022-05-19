@@ -173,6 +173,8 @@
               </v-data-table>
             </v-card>
 
+            <vista_editar_registros v-if="vista === 3" :data="registros.datos"/>
+
             <v-card flat v-if="vista === 4" class="d-flex justify-center ma-5">
               <v-card width="70%" class="ma-5">
                 <v-card-title>Creando una Obligación Nueva</v-card-title>
@@ -280,9 +282,10 @@
 
 <script>
   import {ipcRenderer} from "electron";
-
+  import vista_editar_registros from "@/components/contabilidad/vista_editar_registros";
   export default {
     name: "index",
+    components:{vista_editar_registros},
     computed:{
       LOAD(){
         return this.$store.state.contabilidad.catalogo.LOADCUENTAS;
@@ -356,7 +359,7 @@
         btns:[
           {color:'pink darken-1',        text: 'Ver Historial',    icon: 'fa fa-history',      val: 1},
           {color:'indigo darken-1',      text: 'Ver Sub-cuentas',  icon: 'fa fa-sitemap',      val: 2},
-          {color:'teal darken-1',        text: 'Ver Información',  icon: 'fa fa-info',         val: 3},
+          {color:'teal darken-1',        text: 'Crear Registro',  icon: 'fa-solid fa-pen',    val: 3},
           {color:'deep-orange darken-1', text: 'Crear Obligación',  icon: 'fa fa-sign-out-alt', val: 4},
           {color:'blue-grey darken-1',   text: 'Crear Sub-cuenta', icon: 'fa fa-plus',         val: 5},
         ],
@@ -475,12 +478,20 @@
           total:      this.ccCredito.totalObl,
           ccDebito:   this.registros.datos.id,
           ccCredito:  this.ccCredito.id,
+        },{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
         }).then((res)=>{
           this.$store.commit('contabilidad/catalogo/cargar_CUENTAS');
           this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
           setTimeout(()=>{
             this.$store.commit('activarOverlay', false);
           }, 2500)
+        }).catch((error)=>{
+          this.registros.dialogo = true;
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
         })
       },
       validarForm(){
