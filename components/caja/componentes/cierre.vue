@@ -276,10 +276,13 @@ export default {
     culminarCierre(){
       if (this.cierre.file){
         let data = new FormData();
+        let     f = new Date();
+        let fecha = f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate();
         data.append('caja_id', this.CAJA);
         data.append('cierre_id',this.cierre.cierre);
         data.append('file', this.cierre.file);
         data.append('ccBanco', this.cierre.cc_banco);
+        data.append('fecha', fecha);
         this.$store.commit('activarOverlay', true);
         this.$axios({
           method: 'post',
@@ -341,8 +344,9 @@ export default {
       })
     },
     validarForm(){
-      if (this.$refs.FormCajaCierre.validate())
+      if (this.$refs.FormCajaCierre.validate()){
         this.registrarCierre();
+      }
     }
   }
 }

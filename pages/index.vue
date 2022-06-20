@@ -156,6 +156,7 @@ export default {
     }
   },
   created() {
+    this.dialogoServidor = false;
     ipcRenderer.send('traer-usuarios', 'w')
     ipcRenderer.on('usuarios', (e, data)=>{
       this.usuarios = data

@@ -173,7 +173,7 @@
               </v-data-table>
             </v-card>
 
-            <vista_editar_registros v-if="vista === 3" :data="registros.datos"/>
+            <vista_editar_registros v-if="vista === 3 && PERMISOS.includes(414)" :data="registros.datos"/>
 
             <v-card flat v-if="vista === 4" class="d-flex justify-center ma-5">
               <v-card width="70%" class="ma-5">
@@ -298,7 +298,18 @@
       },
       USUARIO(){
         return this.$store.state.usuario;
-      }
+      },
+      PERMISOS(){
+        let permisos = this.$store.state.permisosUser.split(',');
+        let per = [];
+        if (permisos.length > 1){
+          permisos.forEach((item)=>{
+            per.push(parseInt(item))
+          })
+          return per;
+        }else
+          return [];
+      },
     },
     data(){
       return{

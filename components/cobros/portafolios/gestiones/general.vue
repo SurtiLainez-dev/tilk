@@ -78,10 +78,10 @@
 
     <v-dialog v-model="rebaja.modal" width="30%">
       <v-card>
-        <v-toolbar dense color="grey lighten-4">Rebajando Monto de la Gestión</v-toolbar>
+        <v-toolbar flat dense color="grey lighten-4">Rebajando Monto de la Gestión</v-toolbar>
         <v-form class="pa-5">
-          <v-card-text>Monto disponible para rebajar L {{montoDisponibleRebajar}}</v-card-text>
-          <v-text-field class="ma-2" label="Monto a rebajar" suffix="lps" v-model="rebaja.monto" dense></v-text-field>
+          <v-text-field class="ma-2" label="Nuevo Saldo de la Gestión" suffix="lps" v-model="rebaja.monto" dense></v-text-field>
+          <v-select dense class="ma-2" label="Tipo de Acción" :items="selectTipo" v-model="rebaja.tipo"></v-select>
           <v-textarea class="ma-2" label="Comentario" dense v-model="rebaja.comentario"></v-textarea>
           <v-card-actions class="d-flex justify-end">
             <v-btn color="orange" dark small tile @click="rebaja.modal = false">Cerrar</v-btn>
@@ -107,17 +107,22 @@ export default {
         {text:'Total Abonado', value:'total_abonado'},
         {text:'Fecha de Pago', value:'fecha_pago'},
       ],
+      selectTipo:[
+        {text:'Crédito -', value:0},
+        {text:'Dédito +', value:1},
+      ],
       rebaja:{
         modal: false,
         monto: 0,
-        comentario: ''
+        comentario: '',
+        tipo: 0
       }
     }
   },
   computed:{
     alert(){
       if (this.VENTA.contrato_cliente){
-        return this.GESTION.saldo_actual !== (this.VENTA.saldo_actual - this.VENTA.contrato_cliente.saldo_mora);
+        return (this.GESTION.saldo_actual).toFixed(2) !== (this.VENTA.saldo_actual - this.VENTA.contrato_cliente.saldo_mora).toFixed(2);
       }else
         return false;
     },
@@ -150,27 +155,25 @@ export default {
   methods:{
     rebajarGestion(){
       let saldo = this.GESTION.saldo_actual - this.rebaja.monto;
-      if (saldo < this.VENTA.saldo_actual - this.VENTA.contrato_cliente.saldo_mora){
-        this.$store.commit('notificacion',{texto:'El saldo de la gestión no puede ser menor al saldo de la Venta', color:'warning'});
-      }else{
-        this.$store.commit('activarOverlay', true);
-        this.rebaja.modal = false;
-        this.$axios.post('cobros/gestion/deduccion_manual',{
-          venta:this.VENTA.id,
-          monto: this.rebaja.monto,
-          comentario: this.rebaja.comentario
-        }).then((res)=>{
-          this.$store.commit('cobros/portafolios/cargar_GESTION');
-          this.$store.commit('cobros/portafolios/cargar_PORTAFOLIO');
-          this.$store.commit('activarOverlay', false);
-          this.$store.commit('notificacion',{texto:'Se realizó la gestión exitosamente', color:'success'});
-          this.$store.commit('cobros/portafolios/cargar_GESTIONES', this.$store.state.cobros.portafolios.PORTAFOLIO.id);
-        }).catch((error)=>{
-          this.rebaja.modal = true;
-          this.$store.commit('activarOverlay', false);
-          this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
-        })
-      }
+
+      this.$store.commit('activarOverlay', true);
+      this.rebaja.modal = false;
+      this.$axios.post('cobros/gestion/deduccion_manual',{
+        venta:this.VENTA.id,
+        monto: this.rebaja.monto,
+        comentario: this.rebaja.comentario,
+        tipo:       this.rebaja.tipo
+      }).then((res)=>{
+        this.$store.commit('cobros/portafolios/cargar_GESTION');
+        this.$store.commit('cobros/portafolios/cargar_PORTAFOLIO');
+        this.$store.commit('activarOverlay', false);
+        this.$store.commit('notificacion',{texto:'Se realizó la gestión exitosamente', color:'success'});
+        this.$store.commit('cobros/portafolios/cargar_GESTIONES', this.$store.state.cobros.portafolios.PORTAFOLIO.id);
+      }).catch((error)=>{
+        this.rebaja.modal = true;
+        this.$store.commit('activarOverlay', false);
+        this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
+      })
     },
     validoarFormRebaja(){
       if (this.rebaja.monto > 0 && this.rebaja.comentario)

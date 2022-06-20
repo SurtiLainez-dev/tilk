@@ -34,10 +34,6 @@
         <th>Total Abonado</th>
         <td><strong>L </strong>{{int.format(CUENTA.contrato_cliente.saldo_abonado)}}</td>
       </tr>
-      <tr>
-        <th>Saldo Capital</th>
-        <td><strong>L </strong>{{int.format(CUENTA.total - CUENTA.contrato_cliente.saldo_abonado)}}</td>
-      </tr>
       <tr v-if="CUENTA.contrato_cliente">
         <th>Saldo en Mora</th>
         <td><strong>L </strong>{{int.format(CUENTA.contrato_cliente.saldo_mora)}}</td>

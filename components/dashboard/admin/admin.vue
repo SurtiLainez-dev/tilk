@@ -15,6 +15,17 @@
         </v-list-item>
 
       </v-list-group>
+      <v-list-group>
+        <template v-slot:activator value="true">
+          <v-list-item-title>Cuentas</v-list-item-title>
+        </template>
+        <v-list-item class="itemOpciones" @click="go('/admin/cuentas')">
+          Editar Cuenta
+        </v-list-item>
+        <v-list-item class="itemOpciones" @click="go('/admin/editar_recibos')">
+          Editar Recibo
+        </v-list-item>
+      </v-list-group>
     </div>
 </template>
 

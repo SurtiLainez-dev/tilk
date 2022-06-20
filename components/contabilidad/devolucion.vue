@@ -48,15 +48,15 @@
     <v-card-text>Datos del Artículo</v-card-text>
     <v-row no-gutters>
       <v-col cols="3">
-        <v-text-field label="Código del Artículo" class="ma-4"
+        <v-text-field label="Código del Artículo" class="ma-4" v-if="CUENTA.contrato_cliente.remision_articulo"
                       :value="CUENTA.contrato_cliente.remision_articulo.articulo.codigo_sistema" dense disabled></v-text-field>
       </v-col>
       <v-col cols="6">
-        <v-text-field label="Artículo" dense :value="CUENTA.contrato_cliente.remision_articulo.articulo.descripcion_corta"
+        <v-text-field label="Artículo" dense v-if="CUENTA.contrato_cliente.remision_articulo" :value="CUENTA.contrato_cliente.remision_articulo.articulo.descripcion_corta"
                       disabled class="ma-4"></v-text-field>
       </v-col>
       <v-col cols="3">
-        <v-text-field label="Serie del Sistema" dense :value="CUENTA.contrato_cliente.remision_articulo.serie_sistema"
+        <v-text-field label="Serie del Sistema" dense v-if="CUENTA.contrato_cliente.remision_articulo" :value="CUENTA.contrato_cliente.remision_articulo.serie_sistema"
                       disabled class="ma-4"></v-text-field>
       </v-col>
     </v-row>

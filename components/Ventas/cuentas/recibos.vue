@@ -15,7 +15,7 @@
           <th>{{i+1}}</th>
           <td>{{item.fecha}}</td>
           <td>
-            <b-link @click="verDocumento(item.file)">{{item.codigo}}</b-link>
+            <b-link @click="solicitarClave(item.codigo)">{{item.codigo}}</b-link>
           </td>
           <td>L {{item.total}}</td>
         </tr>
@@ -33,22 +33,28 @@ export default {
   computed:{
     CUENTA(){
       return this.$store.state.cuentas.CUENTA;
+    },
+    USUARIO(){
+      return this.$store.state.usuario;
     }
   },
   methods:{
-    verDocumento(URL){
-      this.$store.commit('activarOverlay',  true);
-      this.$axios.post('leer_documento/',
-          {ubicacion: URL}).then((res)=>{
-        if (res.status === 200){
-          ipcRenderer.send('pint_navegador', res.data.url);
-          this.$store.commit('activarOverlay', false);
-        }
+    abrirNavegador(clave, recibo){
+      let url = '';
+      url = this.$axios.defaults.baseURL + 'documentos/cajas/recibos/usuario=' + this.USUARIO + '/recibo=' + recibo + '/' + clave;
+
+      ipcRenderer.send('pint_navegador', url);
+      this.$store.commit('activarOverlay', false);
+    },
+    solicitarClave(recibo){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+        this.abrirNavegador(res.data.clave, recibo);
       }).catch((error)=>{
-        this.$store.commit('notificacion',{texto:'Hubo un error al cargar el documento',color:'error'})
+        this.$store.commit('notificacion',{texto:'Ocurrio un error', color:'error'});
         this.$store.commit('activarOverlay', false);
       })
-    }
+    },
   }
 }
 </script>
