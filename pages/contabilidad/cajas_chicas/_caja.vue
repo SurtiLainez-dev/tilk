@@ -119,6 +119,8 @@
 </template>
 
 <script>
+  import {ipcRenderer} from "electron";
+
   export default {
     data(){
       return{
@@ -202,6 +204,8 @@
           this.caja.fecha_limite   = '';
           this.caja.observacionn   = '';
           this.caja.total_asignado = 0;
+          let url = this.$axios.defaults.baseURL+res.data.url;
+          ipcRenderer.send('pint_navegador', url);
           this.cargarCaja();
         }).catch((error)=>{
           this.$store.commit('activarOverlay', false);

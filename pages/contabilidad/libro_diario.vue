@@ -155,7 +155,7 @@
                   <tr>
                     <th>Editar Partida:</th>
                     <td>
-                      <v-btn x-small tile dark color="success">Editar Partida</v-btn>
+                      <v-btn x-small tile dark color="success" @click="dialogoReversion = true">Hacer Reversón</v-btn>
                     </td>
                   </tr>
                   </tbody>
@@ -209,6 +209,24 @@
         </v-row>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialogoReversion" width="40%">
+      <v-card>
+        <v-toolbar color="grey lighten-3" flat dense>
+          <v-card-title>Reversión</v-card-title>
+        </v-toolbar>
+
+        <v-container>
+          <v-textarea dense rows="2" label="Comentario" counter v-model="comentarioReversion"></v-textarea>
+          <v-card-text>* Reversiones de cajas generales disponibles</v-card-text>
+        </v-container>
+        <v-divider></v-divider>
+        <v-card-actions class="d-flex justify-end">
+          <v-btn color="orange" dark small tile @click="dialogoReversion = false">Cerrar</v-btn>
+          <v-btn color="success" dark small tile @click="realizarReversion">Realizar Reversión</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -239,7 +257,9 @@ export default {
       partida: {},
       dialogoPartida: false,
       totalDebito: 0,
-      totalCredito: 0
+      totalCredito: 0,
+      dialogoReversion: false,
+      comentarioReversion: ''
     }
   },
   created() {
@@ -306,6 +326,27 @@ export default {
         this.dialogoPartida = true;
         this.$store.commit('activarOverlay', false);
       });
+    },
+    realizarReversion(){
+      if (this.comentarioReversion.length > 0){
+        this.dialogoReversion = false;
+        this.dialogoPartida   = false;
+        this.$store.commit('activarOverlay', true);
+        this.$axios.put('contabilidad/2.0/libro_diario/reversion/'+this.partida.id,{
+          comentario: this.comentario
+        }).then((res)=>{
+          this.cargarPartidad();
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
+        }).catch((error)=>{
+          this.dialogoReversion = true;
+          this.dialogoPartida   = true;
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
+        })
+      }else{
+        this.$store.commit('notificacion',{texto:'El comentario no puede quedar vacio', color:'warning'});
+      }
     },
     verDocumento(URL){
       this.dialogoPartida = false;
