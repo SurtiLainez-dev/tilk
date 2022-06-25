@@ -35,6 +35,10 @@
         <th>Serie del sistema</th>
         <td>{{CUENTA.contrato_cliente.remision_articulo.serie_sistema}}</td>
       </tr>
+      <tr>
+        <th>Serie del fabricante</th>
+        <td>{{CUENTA.contrato_cliente.remision_articulo.serie_fabricante}}</td>
+      </tr>
       </tbody>
     </template>
   </v-simple-table>

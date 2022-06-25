@@ -13,14 +13,18 @@ export const mutations = {
             state.CUENTAS     = res.data.cuentas;
             state.LOADCUENTAS = false;
             let cont          = 0;
+            let cc            = [];
             res.data.cuentas.forEach(i=>{
-                if (i.cod_d){
-                    state.CC.push({
-                        texto: i.cod+'-'+i.id+'-'+i.nombre+'-'+i.total,
-                        text:  '['+i.cod_d.cod+' '+i.cod_d.nombre+'] - '+i.cod+' '+i.nombre+' L. '+state.INT.format(i.total),
-                        value: cont
-                    });
-                    cont++;
+                if (i.cod > 10){
+                    cc = res.data.cuentas.filter(item => item.cod === i.cod_dep);
+                    if (cc.length > 0){
+                        state.CC.push({
+                            texto: i.cod+'-'+i.id+'-'+i.nombre+'-'+i.total,
+                            text:  '['+cc[0].cod+' '+cc[0].nombre+'] - '+i.cod+' '+i.nombre+' L. '+state.INT.format(i.total),
+                            value: cont
+                        });
+                        cont++;
+                    }
                 }
             });
         })
