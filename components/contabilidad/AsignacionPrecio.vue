@@ -558,6 +558,9 @@
               );
               this.$store.commit('cambiarVistaPRecioArticulo', 1);
             }
+          }).catch((error)=>{
+            this.$store.commit('activarOverlay', false);
+            this.$store.commit('notificacion',{texto:'Ha ocurrido un error en el servidor', color:'error'})
           })
         }
       },

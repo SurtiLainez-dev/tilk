@@ -71,10 +71,10 @@
         <v-card-actions class="d-flex justify-end">
           <v-tooltip top>
             <template v-slot:activator="{on, attrs}">
-              <v-btn class="ma-2" color="orange" v-on="on" text
-                     v-bind="attrs" x-small dark fab><v-icon>fa fa-plus</v-icon></v-btn>
+              <v-btn class="ma-2" color="orange" v-on="on" text @click="cambiarVista(6)"
+                     v-bind="attrs" x-small dark fab><v-icon>fa fa-minus-square</v-icon></v-btn>
             </template>
-            <span>Agregar Extensiones de Caja Chica</span>
+            <span>Hacer cierre de la caja chica</span>
           </v-tooltip>
           <v-tooltip top>
             <template v-slot:activator="{on, attrs}">
@@ -85,10 +85,10 @@
           </v-tooltip>
           <v-tooltip top>
             <template v-slot:activator="{on, attrs}">
-              <v-btn class="ma-2" color="red" v-on="on" text
+              <v-btn class="ma-2" color="red" v-on="on" text @click="solicitarClave('pdf')"
                      v-bind="attrs" x-small dark fab><v-icon>fa fa-file-pdf</v-icon></v-btn>
             </template>
-            <span>Informe semanal exportado a PDF</span>
+            <span>Informe exportado a PDF</span>
           </v-tooltip>
           <v-tooltip top>
             <template v-slot:activator="{on, attrs}">
@@ -96,6 +96,13 @@
                      v-bind="attrs" x-small dark fab><v-icon>fa fa-plus</v-icon></v-btn>
             </template>
             <span>Incrementar Saldo Actual</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{on, attrs}">
+              <v-btn class="ma-2" color="indigo" v-on="on" text
+                     v-bind="attrs" x-small dark fab @click="cambiarVista(5)"><v-icon>fa fa-history</v-icon></v-btn>
+            </template>
+            <span>Historial de completo de movimientos</span>
           </v-tooltip>
           <v-tooltip top>
             <template v-slot:activator="{on, attrs}">
@@ -121,7 +128,7 @@
         </v-card-actions>
         <v-divider></v-divider>
         <v-card flat :loading="loadHistorial">
-          <v-card v-if="vista === 1 || vista === 4" flat>
+          <v-card v-if="vista === 1 || vista >= 4" flat>
             <v-toolbar color="grey lighten-3" flat>
               <v-card-title>{{tituloVista}}</v-card-title>
               <v-spacer></v-spacer>
@@ -129,7 +136,7 @@
               <v-dialog ref="dialogFechaInicio" v-model="dialogoFechaInicio" :return-value.sync="fecha_inicio"
                         persistent width="290px">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-text-field dense class="ma-2" label="Fecha de inicio" v-bind="attrs" v-on="on"
+                  <v-text-field dense class="ma-2" label="Fecha de inicio" v-bind="attrs" v-on="on" :disabled="vista === 6"
                                 :rules="[rule.pago.req]" v-model="fecha_inicio"></v-text-field>
                 </template>
                 <v-date-picker v-model="fecha_inicio" scrollable>
@@ -141,7 +148,7 @@
               <v-dialog ref="dialogFechaFinal" v-model="dialogoFechaFinal" :return-value.sync="fecha_final"
                         persistent width="290px">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-text-field dense class="ma-2" label="Fecha de inicio" v-bind="attrs" v-on="on"
+                  <v-text-field dense class="ma-2" label="Fecha de inicio" v-bind="attrs" v-on="on" :disabled="vista === 6"
                                 :rules="[rule.pago.req]" v-model="fecha_final"></v-text-field>
                 </template>
                 <v-date-picker v-model="fecha_final" scrollable>
@@ -151,10 +158,13 @@
                 </v-date-picker>
               </v-dialog>
               <v-spacer></v-spacer>
-              <v-btn small tile dark @click="consultarHistorialFecha" color="success">Consultar</v-btn>
+              <v-btn small tile @click="consultarHistorialFecha" color="success" class="text-white" :disabled="vista === 6">Consultar</v-btn>
             </v-toolbar>
             <historial v-if="vista === 1" :historial="Historial"/>
             <historial_cuentas v-else-if="vista === 4" :historial="HistorialCuentas"/>
+            <cierre_caja_chica v-else-if="vista === 6" :sucursales="ccCajas" :data="Caja" :gastado="gastado"
+                               :historial="HistorialCuentas" :loading_caja="loadCCCaja" :cc_caja_chica="cc_caja.id"/>
+            <movimientos v-else-if="vista === 5" :historial="Movimientos"/>
           </v-card>
 
           <v-card flat class="d-flex justify-center" v-else-if="vista === 2" :disabled="!PERMISOS.includes(45)">
@@ -197,7 +207,7 @@
 
           <v-card flat class="d-flex justify-center" v-else-if="vista === 3" :disabled="!PERMISOS.includes(45)">
 
-            <v-card width="40%">
+          <v-card width="40%">
               <v-card-title>Aumentar saldo a la caja chica</v-card-title>
               <v-divider></v-divider>
               <v-form ref="FormAumentarCajaChica">
@@ -229,8 +239,10 @@
   import {ipcRenderer} from "electron";
   import historial from "@/components/caja/caja_chica/historial";
   import historial_cuentas from "@/components/caja/caja_chica/historial_cuentas";
+  import cierre_caja_chica from "@/components/caja/caja_chica/cierre_caja_chica";
+  import movimientos from "@/components/caja/caja_chica/movimientos";
   export default {
-    components:{historial, historial_cuentas},
+    components:{historial, historial_cuentas, cierre_caja_chica, movimientos},
     data(){
       return{
         tituloVista: '',
@@ -266,22 +278,43 @@
         saldoCajaGeneral: 0,
         fecha_final: '',
         fecha_inicio: '',
-        HistorialCuentas: []
+        HistorialCuentas: [],
+        primeraVezVistaHistorialCuenta: false,
+        primeraVezVistaCierre: false,
+        gastado: 0,
+        primevaVezVistaHistorialCompleto: false,
+        Movimientos: []
       }
     },
     created() {
       this.cargarCaja();
     },
     methods:{
+      abrirNavegador(clave){
+        let url = this.$axios.defaults.baseURL + 'documentos/reporte_caja_chica/tipo=pdf&usuario=' + this.USUARIO + '&caja=' + this.Caja.id + '&f_i=' + this.fecha_inicio + '&f_f=' + this.fecha_final + '/'+clave;
+        ipcRenderer.send('pint_navegador', url);
+        this.$store.commit('activarOverlay', false);
+      },
       cambiarVista(val){
         this.vista = val;
 
         if (this.vista === 1) {
-          this.tituloVista = 'Historial de Transacciones';
+          this.tituloVista = 'Historial de Gastos';
           this.cargarFecha();
-        }else if (this.vista === 4){
+        }else if (this.vista === 4) {
           this.tituloVista = 'Historial de Cuentas de Gastos';
-          this.consultarHistorialCuentas();
+          if (!this.primeraVezVistaHistorialCuenta)
+            this.consultarHistorialCuentas();
+        }else if (this.vista === 6) {
+          this.fecha_inicio = this.Caja.fecha_asignacion;
+          this.fecha_final = this.Caja.fecha_finalizacion;
+          this.tituloVista = 'Cierre de Caja Chica'
+          if (!this.primeraVezVistaCierre)
+            this.consultarHistorialCuentas();
+        }else if (this.vista === 5) {
+          this.tituloVista = 'Historial Completo de Movimientos';
+          if (!this.primevaVezVistaHistorialCompleto)
+            this.consultarMovimientos()
         }
       },
       cargarCCCajaChica(){
@@ -327,20 +360,21 @@
       },
       cargarFecha(){
         if (this.Historial.length === 0){
-          this.tituloVista = 'Historial de Transacciones';
+          this.tituloVista = 'Historial de Gastos';
           this.consultarHistorialFecha();
         }
       },
       consultarHistorialFecha(){
         this.loadHistorial = true;
         if (this.vista === 1){
-          this.Historial = [];
           this.$axios.get('contabilidad/caja_chica/'+this.Caja.id+'/historial/fecha_inicio='+this.fecha_inicio+'/fecha_final='+this.fecha_final).then((res)=>{
             this.Historial = res.data.historial;
             this.loadHistorial = false;
           })
         }else if (this.vista === 4){
           this.consultarHistorialCuentas();
+        }else if (this.vista === 5){
+          this.consultarMovimientos();
         }
       },
       consultarHistorialCuentas(){
@@ -348,6 +382,16 @@
         this.$axios.get('contabilidad/caja_chica/'+this.Caja.id+'/historial_cuentas/fecha_inicio='+this.fecha_inicio+'/fecha_final='+this.fecha_final).then((res)=>{
           this.HistorialCuentas = res.data.historial;
           this.loadHistorial = false;
+          this.primeraVezVistaHistorialCuenta = true;
+          this.gastado = res.data.total;
+        })
+      },
+      consultarMovimientos(){
+        this.loadHistorial = true;
+        this.$axios.get('contabilidad/caja_chica/'+this.Caja.id+'/movimiento/fecha_inicio='+this.fecha_inicio+'&fecha_final='+this.fecha_final).then((res)=>{
+          this.Movimientos = res.data.historial;
+          this.loadHistorial = false;
+          this.primevaVezVistaHistorialCompleto = true;
         })
       },
       registrarAsignacion(){
@@ -398,6 +442,18 @@
         let caja = this.ccCajas.filter(item => item.id === this.caja.cc_caja_salida)
         this.saldoCajaGeneral = parseFloat(caja[0].total)
       },
+      solicitarClave(tipo){
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+           console.log(tipo)
+          if (tipo == 'pdf')
+            this.abrirNavegador(res.data.clave)
+          else
+            alert("modulo pendiente")
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+        });
+      },
       validarForm(){
         if (this.$refs.FormNuevaAsignacionCajaChica.validate())
           this.registrarAsignacion();
@@ -418,6 +474,9 @@
           return per;
         }else
           return [];
+      },
+      USUARIO(){
+        return this.$store.state.usuario;
       },
     }
   }
