@@ -1,16 +1,20 @@
 export const state = () => ({
     CUENTAS: [],
+    CUENTAS_CANCELADAS: [],
     CUENTA:  {},
     VISTA:   1,
     PAGOS_AGREGADOS: [],
     LOAD: true,
     CUENTAS_ACEPTADAS: [],
-    LOADCUENTA: false
+    LOADCUENTA: false,
 })
 
 export const mutations = {
     agregar_CUENTAS(state, cuentas) {
        state.CUENTAS = cuentas;
+    },
+    agregar_CUENTAS_CANCELADAS(state,cuentas){
+        state.CUENTAS_CANCELADAS = cuentas;
     },
     agregar_CUENTA(state, cuenta){
        state.CUENTA = cuenta;

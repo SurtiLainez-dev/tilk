@@ -24,6 +24,9 @@
       <v-list-item v-if="PERMISOS.includes(146)" dense class="itemOpciones" @click="go('/ventas/nueva_venta_manual')">
         Agregar Venta Manual
       </v-list-item>
+      <v-list-item v-if="PERMISOS.includes(149)" dense class="itemOpciones" @click="go('/ventas/canceladas')">
+        Ventas Canceladas
+      </v-list-item>
     </v-list-group>
 
     <v-list-group v-if="PERMISOS.includes(147)">

@@ -1,6 +1,6 @@
 <template>
   <v-card flat :loading="LOADGESTION || LOAD_VENTA">
-    <v-card-title>{{GESTION.venta.cod}} - {{GESTION.venta.cliente.nombres}} {{GESTION.venta.cliente.nombres}}</v-card-title>
+    <v-card-title>{{GESTION.venta.cod}} - {{GESTION.venta.cliente.nombres}} {{GESTION.venta.cliente.apellidos}}</v-card-title>
 
     <v-tabs dark color="orange" fixed-tabs v-model="tab">
       <v-tab>Datos de la Gestión</v-tab>

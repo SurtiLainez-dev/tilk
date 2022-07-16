@@ -433,7 +433,6 @@
         </v-card>
       </v-dialog>
 
-      <pre>{{CC}}</pre>
     </v-card>
   </v-container>
 </template>

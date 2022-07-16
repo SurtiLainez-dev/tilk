@@ -11,8 +11,8 @@
                   {{datosColaborador.nombres}} {{datosColaborador.apellidos}}
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
-                      <v-icon color="success" v-if="datosColaborador.estado">fa fa-check</v-icon>
-                      <v-icon color="red" v-else>fa fa-times</v-icon>
+                      <v-icon v-on="on" v-bind="attrs" color="success" v-if="datosColaborador.estado">fa fa-check</v-icon>
+                      <v-icon v-on="on" v-bind="attrs" color="red" v-else>fa fa-times</v-icon>
                     </template>
                     <span>Ver Colaborador</span>
                   </v-tooltip>
@@ -23,6 +23,14 @@
           </v-col>
           <v-col cols="2" class="d-flex justify-end align-center">
             <div class="pr-2">
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn @click="referencia.dialogo = true" v-on="on" v-bind="attrs" color="pink" fab x-small dark>
+                    <v-icon >fa fa-file</v-icon>
+                  </v-btn>
+                </template>
+                <span>Crear referencia de trabajo</span>
+              </v-tooltip>
               <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn @click="popupActivo = true"  v-on="on" v-bind="attrs" color="warning" fab x-small dark>
@@ -232,11 +240,94 @@
         </v-form>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="referencia.dialogo" width="35%">
+      <v-card>
+        <v-toolbar dense flat color="grey lighten-4">
+          <v-card-title>Creando Referencia Laboral</v-card-title>
+        </v-toolbar>
+        <v-container>
+          <v-card-text>*Las fechas de los siguientes campos, solo se usan cuando se autoriza que la referencia laboral sea con rango de fecha.</v-card-text>
+          <v-row>
+            <v-col>
+              <v-dialog ref="dialogoFechaInicio" v-model="referencia.dialogoI" :return-value.sync="referencia.fecha_inicial"
+                        persistent width="290px">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field dense class="ma-2" label="Fecha de inicio" v-bind="attrs" v-on="on"
+                                v-model="referencia.fecha_inicial"></v-text-field>
+                </template>
+                <v-date-picker v-model="referencia.fecha_inicial" scrollable>
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="referencia.dialogoI = false">Cancelar</v-btn>
+                  <v-btn text color="primary" @click="$refs.dialogoFechaInicio.save(referencia.fecha_inicial)">OK</v-btn>
+                </v-date-picker>
+              </v-dialog>
+            </v-col>
+            <v-col>
+              <v-dialog ref="dialogoFechaFinal" v-model="referencia.dialogoF" :return-value.sync="referencia.fecha_final"
+                        persistent width="290px">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field dense class="ma-2" label="Fecha de inicio" v-bind="attrs" v-on="on"
+                                v-model="referencia.fecha_final"></v-text-field>
+                </template>
+                <v-date-picker v-model="referencia.fecha_final" scrollable>
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="referencia.dialogoF = false">Cancelar</v-btn>
+                  <v-btn text color="primary" @click="$refs.dialogoFechaFinal.save(referencia.fecha_final)">OK</v-btn>
+                </v-date-picker>
+              </v-dialog>
+            </v-col>
+          </v-row>
+
+          <v-row no-gutters>
+            <v-col>
+              <v-card-text>Items de la Referencia</v-card-text>
+            </v-col>
+          </v-row>
+          <v-row no-gutters>
+            <v-col class="d-flex justify-end">
+              <v-btn color="success" small tile dark text @click="addItem">Añadir item</v-btn>
+            </v-col>
+          </v-row>
+
+          <v-divider></v-divider>
+
+          <v-simple-table dense height="200px" fixed-header>
+            <template v-slot:default>
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Nombre del Item</th>
+                <th>Quitar</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(item, i) in referencia.items">
+                <td>{{i + 1}}</td>
+                <td>
+                  <v-text-field dense v-model="item.nombre"></v-text-field>
+                </td>
+                <td>
+                  <v-btn @click="removeItem(i)" color="red" x-small fab text dark><v-icon>fa fa-times</v-icon></v-btn>
+                </td>
+              </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-container>
+        <v-divider></v-divider>
+        <v-card-actions class="d-flex justify-end">
+          <v-btn color="orange" @click="referencia.dialogo = false" dark tile small>Cerrar</v-btn>
+          <v-btn color="success" dark tile small @click="solicitarClave">Crear Documento</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script>
   import Swal from 'sweetalert2'
+  import {ipcRenderer} from "electron";
   export default {
     data(){
       return{
@@ -288,7 +379,19 @@
         popupBanco: false,
         isUsuario:        0,
         activePrompt:     false,
-        isPeticion:       false,
+        isPeticion:       true,
+        referencia:{
+          fecha_inicial: null,
+          fecha_final: null,
+          items: [
+            {key: 0,  nombre: 'Responsablidad'},
+            {key: 1,  nombre: 'Honestidad'},
+            {key: 2,  nombre: 'Eficacia'},
+          ],
+          dialogo: false,
+          dialogoF: false,
+          dialogoI: false
+        },
         isPeticionPrincipal: false,
         erroresServidor:  [],
         sucursales:       null,
@@ -305,14 +408,16 @@
           id:        null
         },
         popupActivo:      false,
-        isPeticion:       true,
         datosColaborador: null,
       }
     },
     computed:{
       tipoUser: function () {
         return this.$store.state.tipoUsuario
-      }
+      },
+      USUARIO(){
+        return this.$store.state.usuario;
+      },
     },
     created() {
       this.cargarColaboradores()
@@ -321,42 +426,23 @@
       this.cargarSucursales();
     },
     methods:{
-      validateEdit(){
-        if (this.$refs.FormEditarColaborador.validate())
-          this.cambiosColaborador()
+      abrirNavegador(clave){
+        let url1 = this.$axios.defaults.baseURL + 'documentos/colaboradores/referencia_laboral/usuario=' + this.USUARIO;
+        let url2 = '/colaborador=' + this.datosColaborador.id + '/'+clave
+        let url3 = '/fecha_inicio='+this.referencia.fecha_inicial+'&fecha_final='+this.referencia.fecha_final;
+        let url4 = '&items='+JSON.stringify(this.referencia.items)
+        let url = url1+url2+url3+url4
+        ipcRenderer.send('pint_navegador', url);
+        this.$store.commit('activarOverlay', false);
+        this.referencia.fecha_final   = null;
+        this.referencia.fecha_inicial = null;
       },
-      validate(){
-        if (this.$refs.FormNuevaCuentaBancoColaborador.validate())
-          this.registrarCuentaBanco()
-      },
-      registrarCuentaBanco(){
-        if (this.cuentaB.cuenta && this.cuentaB.banco){
-          this.cuentaB.load = true
-          this.$axios.post('cuenta_banco', {
-            col: this.datosColaborador.id,
-            cuenta: this.cuentaB.cuenta,
-            banco: this.cuentaB.banco
-          },{
-            headers: {
-              'Authorization': 'Bearer ' + this.$store.state.token
-            }
-          }).then((res)=>{
-            if (res.status === 200){
-              this.cuentaB.load = false
-              this.popupBanco = false
-              Swal.fire(
-                'Registro Exitoso',
-                `Se registro exitosamente la cuenta de banco ${this.cuentaB.cuenta}.`,
-                'success'
-              )
-              this.cuentaB.cuenta = ''
-              this.cargarColaboradores()
-            }
-          })
-        }
-      },
-      redirecUser(){
-        this.$router.replace({path:'/admin/user/nuevo'})
+      addItem(){
+        let long = this.referencia.items.length;
+        this.referencia.items.push({
+          key: long,
+          nombre: '',
+        })
       },
       cambiosColaborador: function(){
         this.isPeticionPrincipal = true
@@ -377,10 +463,10 @@
           this.isPeticionPrincipal = false
           if (res.status === 200){
             Swal.fire(
-              'Registro de Cambio Exitoso',
-              `Se registraron los cambios exitosamente del
+                'Registro de Cambio Exitoso',
+                `Se registraron los cambios exitosamente del
               colaborador ${this.datosColaborador.nombres} ${this.datosColaborador.apellidos}.`,
-              'success'
+                'success'
             )
             this.popupActivo = false
           }
@@ -389,22 +475,15 @@
           this.erroresServidor = error.response.data.error
         })
       },
-      cargarSucursales: function () {
-        this.$axios.get('/sucursales',{
+      cargarBancos(){
+        this.$axios.get('bancos',{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token
           }
         }).then((res)=>{
-          this.sucursales = res.data.suc;
-        })
-      },
-      cargarPuestosColaborador: function () {
-        this.$axios.get('/puestos_colaborador',{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
+          if (res.status === 200){
+            this.Bancos = res.data.bancos
           }
-        }).then((res)=>{
-          this.puestos = res.data.puestos;
         })
       },
       cargarColaboradores(){
@@ -427,17 +506,82 @@
           }
         })
       },
-      cargarBancos(){
-        this.$axios.get('bancos',{
+      cargarPuestosColaborador: function () {
+        this.$axios.get('/puestos_colaborador',{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token
           }
         }).then((res)=>{
-          if (res.status === 200){
-            this.Bancos = res.data.bancos
-          }
+          this.puestos = res.data.puestos;
         })
-      }
+      },
+      cargarSucursales: function () {
+        this.$axios.get('/sucursales',{
+          headers: {
+            'Authorization': 'Bearer ' + this.$store.state.token
+          }
+        }).then((res)=>{
+          this.sucursales = res.data.suc;
+        })
+      },
+      solicitarClave(){
+        this.referencia.dialogo = false;
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+          this.abrirNavegador(res.data.clave)
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+        });
+      },
+      registrarCuentaBanco(){
+        if (this.cuentaB.cuenta && this.cuentaB.banco){
+          this.cuentaB.load = true
+          this.$axios.post('cuenta_banco', {
+            col: this.datosColaborador.id,
+            cuenta: this.cuentaB.cuenta,
+            banco: this.cuentaB.banco
+          },{
+            headers: {
+              'Authorization': 'Bearer ' + this.$store.state.token
+            }
+          }).then((res)=>{
+            if (res.status === 200){
+              this.cuentaB.load = false
+              this.popupBanco = false
+              Swal.fire(
+                  'Registro Exitoso',
+                  `Se registro exitosamente la cuenta de banco ${this.cuentaB.cuenta}.`,
+                  'success'
+              )
+              this.cuentaB.cuenta = ''
+              this.cargarColaboradores()
+            }
+          })
+        }
+      },
+      redirecUser(){
+        this.$router.replace({path:'/admin/user/nuevo'})
+      },
+      removeItem(fila){
+        let cont = 0;
+        if (this.referencia.items.length > 2){
+          this.referencia.items.splice(fila, 1);
+          this.referencia.items.forEach( (i) => {
+            i.key = cont;
+            cont++;
+          })
+        }else{
+          this.$store.commit('notificacion',{texto:'Tienen que ir mínimo 2 items', color:'warning'})
+        }
+      },
+      validate(){
+        if (this.$refs.FormNuevaCuentaBancoColaborador.validate())
+          this.registrarCuentaBanco()
+      },
+      validateEdit(){
+        if (this.$refs.FormEditarColaborador.validate())
+          this.cambiosColaborador()
+      },
     },
   }
 </script>

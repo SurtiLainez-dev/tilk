@@ -209,14 +209,14 @@ import Swal from "sweetalert2";
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(item, i) in dataPlanilla[index].acciones" @change="selectTipoAccion(i)">
+            <tr v-for="(item,i) in dataPlanilla[index].acciones" @change="selectTipoAccion(i)">
               <td>
                 <select class="input" v-model="dataPlanilla[index].tipoAccion[i]">
                   <option v-for="item in tipoAcciones" :value="item.id+'-'+item.tipo">{{item.nombre}}</option>
                 </select>
               </td>
               <td>
-                <v-text-field v-model="dataPlanilla[index].totalAccion[i]">
+                <v-text-field :value="0" :rules="[num.rule.tel]"  v-model="dataPlanilla[index].totalAccion[i]">
                 </v-text-field>
               </td>
               <td>
@@ -306,6 +306,11 @@ import Swal from "sweetalert2";
     },
     data(){
       return{
+        num:{
+          rule:{
+            tel: v => (v.length === 0 || /^[+]?([0-9]+(?:[\.][0-9]*)?|\.[0-9]+)$/.test(v)) || 'Telefono no válido, tienes datos diferentes a números'
+          },
+        },
         overlay: false,
         rulesPalnilla:{
           min: v => v > 0 || 'Mayor a 0'
@@ -386,7 +391,8 @@ import Swal from "sweetalert2";
     },
     methods:{
       addAccion: function(){
-        this.dataPlanilla[this.index].acciones++
+        this.dataPlanilla[this.index].acciones++;
+        this.dataPlanilla[this.index].totalAccion[this.dataPlanilla[this.index].acciones - 1] = 0
       },
       addAcciones: function(){
         if (this.$refs.FormNuevoTipoAccionPlanilla.validate()){

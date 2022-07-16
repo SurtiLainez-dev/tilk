@@ -33,7 +33,7 @@
           <estado_cuenta          v-else-if="VISTA === 7"/>
           <orden_entrega          v-else-if="VISTA === 8"/>
           <recibos                v-else-if="VISTA === 9"/>
-          <deducción_mora         v-else-if="VISTA === 10"/>
+          <deducción_mora         v-else-if="VISTA === 10 && PERMISOS.includes(148)"/>
         </v-card>
       </v-col>
     </v-row>
@@ -89,6 +89,17 @@ export default {
   computed:{
     CUENTA(){
       return this.$store.state.cuentas.CUENTA;
+    },
+    PERMISOS(){
+      let permisos = this.$store.state.permisosUser.split(',');
+      let per = [];
+      if (permisos.length > 1){
+        permisos.forEach((item)=>{
+          per.push(parseInt(item))
+        })
+        return per;
+      }else
+        return [];
     },
     VISTA:{
       get: function (){

@@ -12,7 +12,7 @@
             </v-list-item-content>
           </v-list-item>
         </v-col>
-        <v-col cols="2">
+        <v-col >
           <v-list-item three-line>
             <v-list-item-content>
               <v-list-item-title>Marca</v-list-item-title>
@@ -20,7 +20,7 @@
             </v-list-item-content>
           </v-list-item>
         </v-col>
-        <v-col cols="2">
+        <v-col>
           <v-list-item three-line>
             <v-list-item-content>
               <v-list-item-title>Módelo</v-list-item-title>
@@ -28,7 +28,7 @@
             </v-list-item-content>
           </v-list-item>
         </v-col>
-        <v-col cols="2">
+        <v-col>
           <v-list-item three-line>
             <v-list-item-content>
               <v-list-item-title>Código del Sístema</v-list-item-title>
@@ -36,7 +36,15 @@
             </v-list-item-content>
           </v-list-item>
         </v-col>
-        <v-col cols="2">
+        <v-col>
+          <v-list-item three-line>
+            <v-list-item-content>
+              <v-list-item-title>Referencia</v-list-item-title>
+              <v-list-item-subtitle>{{data.referencia_fabricante}}</v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </v-col>
+        <v-col>
           <v-list-item three-line>
             <v-list-item-content>
               <v-list-item-title>Código del Barras</v-list-item-title>
@@ -44,7 +52,7 @@
             </v-list-item-content>
           </v-list-item>
         </v-col>
-        <v-col cols="2">
+        <v-col>
           <v-list-item three-line>
             <v-list-item-content>
               <v-list-item-title>Familía</v-list-item-title>
@@ -270,12 +278,16 @@
                   <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio.precio_s_i)}}</strong></small></v-col>
                 </v-row>
                 <v-row>
-                  <v-col cols="8"><small>Margen de Ganancia:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.margenGanancia)}}</strong></small></v-col>
-                </v-row>
-                <v-row>
                   <v-col cols="8"><small>Total del Impuesto:</small></v-col>
                   <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.impuesto)}}</strong></small></v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="8"><small>Precio con Impuesto:</small></v-col>
+                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(parseFloat(Precio2.impuesto) + parseFloat(Precio.precio_s_i))}}</strong></small></v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="8"><small>Margen de Ganancia:</small></v-col>
+                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.margenGanancia)}}</strong></small></v-col>
                 </v-row>
                 <hr>
                 <v-row>
@@ -382,7 +394,7 @@
         },
         Precio2:{
           margenGanancia: 0,
-          impuesto: '',
+          impuesto: 0,
           precioConPrima: 0,
           cuota: 0,
           prueba: [],
