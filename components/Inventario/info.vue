@@ -17,6 +17,10 @@
           <span>Motocicletas</span>
           <v-icon>fa fa-motorcycle</v-icon>
         </v-btn>
+        <v-btn @click="dialogoEtiqueta = true">
+          <span>Etiqueta</span>
+          <v-icon>fa fa-tag</v-icon>
+        </v-btn>
       </v-bottom-navigation>
       <v-row>
         <v-col cols="5">
@@ -491,6 +495,20 @@
         </v-container>
       </v-navigation-drawer>
 
+      <v-dialog v-model="dialogoEtiqueta" width="25%">
+        <v-card>
+          <v-toolbar color="grey lighten-3" dense flat>
+            <v-card-title>Creando Etiqueta</v-card-title>
+          </v-toolbar>
+          <v-container>
+            <v-btn color="success" small tile dark block @click="imprimirEtiqueta">Crear Etiqueta</v-btn>
+          </v-container>
+          <v-divider></v-divider>
+          <v-card-actions class="d-flex justify-end">
+            <v-btn color="orange" small tile dark @click="dialogoEtiqueta = false">Cerrar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
 </template>
 
@@ -545,6 +563,7 @@
     props:{data: Object},
     data(){
       return{
+        dialogoEtiqueta: false,
         observacion: '',
         currentPage: 1,
         totalRows: 1,
@@ -635,9 +654,13 @@
             this.Precios.cuota = 0
             this.Precios.pagos = [];
             let TASA_M = (FIN / 12).toFixed(4);
+            console.log(TASA_M)
             let TASA = Math.pow(parseInt(1) + parseFloat(TASA_M), -MESES);
+            console.log(TASA)
             TASA = TASA - 1;
+            console.log(TASA)
             TASA = TASA / TASA_M;
+            console.log(TASA)
             let pagos = 0;
             if (this.Precios.forma_pago === 1) {
               pagos = this.Precios.meses * 4;
@@ -831,6 +854,11 @@
         let url = this.$axios.defaults.baseURL+'documentos/ventas/cotizacion/usuario='+this.user+'/cot='+cot+'/'+clave.token;
         ipcRenderer.send('pint_navegador', url);
         this.$store.commit('activarOverlay', false);
+      },
+      imprimirEtiqueta(){
+        let url = this.$axios.defaults.baseURL+'etiqueta_articulo/'+this.data.codigo_sistema+'/sucursal/'+this.Sucursal;
+        ipcRenderer.send('pint_navegador', url);
+        this.dialogoEtiqueta = false;
       },
       registrarCotizacion(){
         this.$store.commit('activarOverlay', true);
