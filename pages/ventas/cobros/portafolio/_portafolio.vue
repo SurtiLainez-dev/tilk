@@ -2,7 +2,9 @@
   <v-card flat>
     <v-progress-linear indeterminate v-if="LOADPORTAFOLIO"></v-progress-linear>
     <cuentas v-if="VISTA === 1"/>
+<!--    vies del portafolio-->
     <gestion v-else-if="VISTA === 2"/>
+<!--    gestion de la venta-->
   </v-card>
 </template>
 

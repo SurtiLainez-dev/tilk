@@ -1,11 +1,11 @@
 <template>
   <v-card flat :loading="LOADGESTION || LOAD_VENTA">
-    <v-card-title>{{GESTION.venta.cod}} - {{GESTION.venta.cliente.nombres}} {{GESTION.venta.cliente.apellidos}}</v-card-title>
+    <v-card-title>{{GESTION.cod}} - {{GESTION.cliente.nombres}} {{GESTION.cliente.apellidos}}</v-card-title>
 
     <v-tabs dark color="orange" fixed-tabs v-model="tab">
       <v-tab>Datos de la Gestión</v-tab>
       <v-tab :disabled="LOAD_VENTA" >Datos de la Venta</v-tab>
-      <v-tab @click="cliente">Datos del Cliente</v-tab>
+      <v-tab>Datos del Cliente</v-tab>
     </v-tabs>
 
     <v-tabs-items v-model="tab">
@@ -61,17 +61,15 @@ export default {
     },
     Venta(){
       return this.$store.state.cuentas.CUENTA;
-    }
+    },
   },
   created() {
     this.$route.params.gestion = this.GESTION.id;
     this.$store.commit('cobros/portafolios/cargar_GESTION');
-    this.$store.commit('cuentas/cargar_CUENTA', this.GESTION.venta_id);
+    this.$store.commit('cuentas/cargar_CUENTA', this.GESTION.id);
+    this.$route.params.cliente = this.GESTION.cliente_id;
   },
   methods:{
-    cliente(){
-      this.$route.params.cliente = this.Venta.cliente_id;
-    },
     goVista(val){
       this.vista = val;
     },

@@ -1,5 +1,5 @@
 <template>
-    <v-card>
+    <v-card flat>
         <div v-if="vista === 1">
             <v-card-title class="grey lighten-3">Solicitudes de Crédito</v-card-title>
             <v-data-table :headers="header"

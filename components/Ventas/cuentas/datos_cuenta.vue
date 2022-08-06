@@ -92,9 +92,6 @@ export default {
       verificar: 2
     }
   },
-  mounted() {
-    this.verificarPortafolio();
-  },
   methods:{
     registrarCuentaPortafolio(){
       if (this.verificar === 0){
@@ -109,12 +106,6 @@ export default {
         })
       }
     },
-    verificarPortafolio(){
-      this.$axios.get('cobros/verificar_cuenta/'+this.CUENTA.id).then((res)=>{
-        this.verificar = res.data.val;
-        this.$store.commit('notificacion',{texto:res.data.msj, color:'warning'})
-      })
-    }
   }
 }
 </script>

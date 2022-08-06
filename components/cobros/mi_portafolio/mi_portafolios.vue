@@ -18,7 +18,9 @@
         <h6>{{titulo}}</h6>
       </v-toolbar>
       <porta v-if="VISTA === 2"/>
-      <portafilion :usuarios="usuarios.data" v-if="VISTA === 3"/>
+<!--      cuentas-->
+      <portafilion :usuarios="usuarios.data" v-if="VISTA === 3"/>/
+<!--      formulario-->
     </v-card>
   </v-card>
 </template>

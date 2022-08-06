@@ -273,50 +273,56 @@
               <v-card class="pl-2 pb-2 pr-2" elevation="5">
                 <v-card-title>Resultados del Precio</v-card-title>
                 <hr>
-                <v-row>
-                  <v-col cols="8"><small>Precio de Costo:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio.precio_s_i)}}</strong></small></v-col>
-                </v-row>
-                <v-row>
-                  <v-col cols="8"><small>Total del Impuesto:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.impuesto)}}</strong></small></v-col>
-                </v-row>
-                <v-row>
-                  <v-col cols="8"><small>Precio con Impuesto:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(parseFloat(Precio2.impuesto) + parseFloat(Precio.precio_s_i))}}</strong></small></v-col>
-                </v-row>
-                <v-row>
-                  <v-col cols="8"><small>Margen de Ganancia:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.margenGanancia)}}</strong></small></v-col>
-                </v-row>
-                <hr>
-                <v-row>
-                  <v-col cols="8"><small>Precio de Contado:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format((parseFloat(Precio2.impuesto)+parseFloat(Precio2.margenGanancia)+parseFloat(Precio.precio_s_i)).toFixed(2))}}</strong></small></v-col>
-                </v-row>
-                <v-row>
-                  <v-col cols="8"><small>Mejor Precio de Contado:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format((parseFloat(Precio2.impuesto)+parseFloat(Precio2.margenGanancia)+parseFloat(Precio.precio_s_i)).toFixed(2) - Precio.descuento)}}</strong></small></v-col>
-                </v-row>
-                <v-row>
-                  <v-col cols="8"><small>Prima mínima:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio.prima)}}</strong></small></v-col>
-                </v-row>
-                <hr>
-                <v-row>
-                  <v-col cols="8"><small>Precio a Financiar:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.precioConPrima)}}</strong></small></v-col>
-                </v-row>
-                <v-row>
-                  <v-col cols="8"><small>Cuota Mensual:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.cuota)}}</strong></small></v-col>
-                </v-row>
-                <v-row>
-                  <v-col cols="8"><small>Total de Intereses:</small></v-col>
-                  <v-col cols="4"><small><strong>L. {{new Intl.NumberFormat().format(Precio2.totalInteres)}}</strong></small></v-col>
-                </v-row>
+
+
+                <v-simple-table>
+                  <template v-slot:default>
+                    <tr>
+                      <td>Precio de costo</td>
+                      <th>L. {{new Intl.NumberFormat().format(Precio.precio_s_i)}}</th>
+                    </tr>
+                    <tr>
+                      <td>Total del impuesto</td>
+                      <th>L. {{new Intl.NumberFormat().format(Precio2.impuesto)}}</th>
+                      <td>Precio con impuesto</td>
+                      <th>L. {{new Intl.NumberFormat().format(parseFloat(Precio2.impuesto) + parseFloat(Precio.precio_s_i))}}</th>
+                    </tr>
+                    <tr>
+                      <td>Margen de ganancia</td>
+                      <th>L. {{new Intl.NumberFormat().format(Precio2.margenGanancia)}}</th>
+                    </tr>
+                    <tr>
+                      <td>Precio de contado</td>
+                      <th>L. {{new Intl.NumberFormat().format((parseFloat(Precio2.impuesto)+parseFloat(Precio2.margenGanancia)+parseFloat(Precio.precio_s_i)).toFixed(2))}}</th>
+                      <td>Mejor precio de contado</td>
+                      <th>L. {{new Intl.NumberFormat().format((parseFloat(Precio2.impuesto)+parseFloat(Precio2.margenGanancia)+parseFloat(Precio.precio_s_i)).toFixed(2) - Precio.descuento)}}</th>
+                    </tr>
+                    <tr>
+                      <td>Prima mínima</td>
+                      <th>L. {{new Intl.NumberFormat().format(Precio.prima)}}</th>
+                    </tr>
+                    <tr>
+                      <td>Precio a financiar</td>
+                      <th>L. {{new Intl.NumberFormat().format(Precio2.precioConPrima)}}</th>
+                    </tr>
+                    <tr>
+                      <td>Cuota mensual</td>
+                      <th>L. {{new Intl.NumberFormat().format(Precio2.cuota)}}</th>
+                    </tr>
+                    <tr>
+                      <td>Total de intereses</td>
+                      <th>L. {{new Intl.NumberFormat().format(Precio2.totalInteres)}}</th>
+                    </tr>
+                    <tr>
+                      <td>Total del crédito</td>
+                      <th>L. {{new Intl.NumberFormat().format((Precio2.cuota * Precio.meses) + parseFloat(Precio.prima))}}</th>
+                    </tr>
+                  </template>
+                </v-simple-table>
+
+
                 <small>Reusltados de la prueba de financiación:</small>
-                <v-simple-table v-if="Precio2.prueba.length > 0" class="rowsTable" fixed-header height="400px">
+                <v-simple-table v-if="Precio2.prueba.length > 0" class="rowsTable" height="400px">
                   <template v-slot:default>
                     <thead>
                     <tr>

@@ -17,7 +17,7 @@
       </v-col>
 
       <v-col cols="10">
-        <v-card v-if="loadData">
+        <v-card height="100%" v-if="loadData">
           <v-toolbar flat>
             <v-card-title class="grey--text">{{tituloMenu}}</v-card-title>
             <v-spacer></v-spacer>

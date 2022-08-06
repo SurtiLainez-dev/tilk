@@ -40,169 +40,123 @@
 <!---->
                   <v-stepper-content step="1">
                     <v-card class="mb-12" flat>
-                      <v-card-title>Subida de documentos</v-card-title>
+                      <v-card-title>Ingreso de expediente</v-card-title>
                       <v-divider></v-divider>
-                      <v-row>
-                        <v-col>
-                          <v-tooltip top>
-                            <template v-slot:activator="{on, attrs}">
-                              <v-btn class="text-white" v-on="on" x-small
-                                     @click="mostrarPdf($axios.defaults.baseURL+'print_contrato_venta/'+DATA_VENTA.id)"
-                                     v-bind="attrs" tile color="success">
-                                <v-icon left>
-                                  fa fa-file-pdf
-                                </v-icon>
-                                Contrato
-                              </v-btn>
-                            </template>
-                            <span>Descargar contrato, Esto puede tardar 60 segundos en generarse.</span>
-                          </v-tooltip>
-                        </v-col>
-                        <v-col>
-                          <v-tooltip top>
-                            <template v-slot:activator="{on, attrs}">
-                              <v-btn x-small class="text-white" v-on="on"
-                                     @click="mostrarPdf($axios.defaults.baseURL+'print_pagare_venta/'+DATA_VENTA.id)"
-                                     v-bind="attrs" tile color="success">
-                                <v-icon left>
-                                  fa fa-file-pdf
-                                </v-icon>
-                                Pagaré
-                              </v-btn>
-                            </template>
-                            <span>Descargar pagaré, Esto puede tardar 40 segundos en generarse.</span>
-                          </v-tooltip>
-                        </v-col>
-                        <v-col>
-                          <v-tooltip top>
-                            <template v-slot:activator="{on, attrs}">
-                              <v-btn x-small class="text-white" v-on="on"
-                                     @click="mostrarPdf($axios.defaults.baseURL+'print_hoja_conocimientos_venta/'+DATA_VENTA.id)"
-                                     v-bind="attrs" tile color="success">
-                                <v-icon left>
-                                  fa fa-file-pdf
-                                </v-icon>
-                                Hoja de Conocimiento
-                              </v-btn>
-                            </template>
-                            <span>Descargar Hoja de Conocimiento de Trámites, Esto puede tardar 40 segundos en generarse.</span>
-                          </v-tooltip>
-                        </v-col>
-                        <v-col>
-                          <v-tooltip top>
-                            <template v-slot:activator="{on, attrs}">
-                              <v-btn x-small class="text-white" v-on="on"
-                                     @click="mostrarPdf($axios.defaults.baseURL+'print_traspaso_venta/'+DATA_VENTA.id)"
-                                     v-bind="attrs" tile color="success">
-                                <v-icon left>
-                                  fa fa-file-pdf
-                                </v-icon>
-                                Traspaso
-                              </v-btn>
-                            </template>
-                            <span>Descargar Traspaso Vehícular, Esto puede tardar 40 segundos en generarse.</span>
-                          </v-tooltip>
-                        </v-col>
-                        <v-col>
-                          <v-tooltip top>
-                            <template v-slot:activator="{on, attrs}">
-                              <v-btn x-small class="text-white" v-on="on"
-                                     @click="mostrarPdf($axios.defaults.baseURL+'print_carta_poder_venta/'+DATA_VENTA.id)"
-                                     v-bind="attrs" tile color="success">
-                                <v-icon left>
-                                  fa fa-file-pdf
-                                </v-icon>
-                                Carta Poder
-                              </v-btn>
-                            </template>
-                            <span>Descargar Carta Poder, Esto puede tardar 40 segundos en generarse.</span>
-                          </v-tooltip>
-                        </v-col>
-                      </v-row>
+                      <table>
+                        <caption>Documentos para descargar</caption>
+                        <thead>
+                        <tr>
+                          <th>Nombre del documento</th>
+                          <th>Link de descarga</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="item in documentos">
+                            <td>{{item.name}}</td>
+                            <td><b-link @click="mostrarPdf($axios.defaults.baseURL+item.ref+DATA_VENTA.id)">Descargar {{item.name}}</b-link></td>
+                          </tr>
+                        </tbody>
+                      </table>
+
                       <v-divider></v-divider>
-                      <div v-if="DATA_VENTA.documento_ventas">
-                        <small>Documentos cargados</small>
-                        <br>
-                        <b-link @click="verDocumento(DATA_VENTA.documento_ventas.contrato)"
-                                v-if="DATA_VENTA.documento_ventas.contrato">Contrato de la venta</b-link>
-                        <br>
-                        <b-link @click="verDocumento(DATA_VENTA.documento_ventas.garantia_prendaria)"
-                                v-if="DATA_VENTA.documento_ventas.garantia_prendaria">Pagaré</b-link>
-                        <br>
-                        <b-link @click="verDocumento(DATA_VENTA.documento_ventas.conocimiento_tramite)"
-                                v-if="DATA_VENTA.documento_ventas.conocimiento_tramite">
-                          Hoja de conocimiento de trámites</b-link>
-                        <br>
-                        <b-link @click="verDocumento(DATA_VENTA.documento_ventas.traspaso)"
-                                v-if="DATA_VENTA.documento_ventas.traspaso">Traspaso Vehícular</b-link>
-                        <br>
-                        <b-link @click="verDocumento(DATA_VENTA.documento_ventas.carta_poder)"
-                                v-if="DATA_VENTA.documento_ventas.carta_poder">Carta poder</b-link>
-                        <br>
-                        <b-link @click="verDocumento(DATA_VENTA.documento_ventas.garantia_articulo)"
-                                v-if="DATA_VENTA.documento_ventas.garantia_articulo">Garantía</b-link>
-                      </div>
-                      <div v-else>
-                        <v-row>
-                          <v-col>
-                            <vs-upload text="Cargar Contrato"
-                                       id="DocContrato"
-                                       @change="cargarDocumentos"
-                                       :automatic="false" limit="1"
-                                       :show-upload-button="false"
-                                       accept="application/pdf">
-                            </vs-upload>
-                          </v-col>
-                          <v-col>
-                            <vs-upload text="Cargar Pagaré"
-                                       id="DocPagare"
-                                       @change="cargarDocumentos"
-                                       :automatic="false" limit="1"
-                                       :show-upload-button="false"
-                                       accept="application/pdf">
-                            </vs-upload>
-                          </v-col>
-                          <v-col>
-                            <vs-upload text="Cargar Hoja de Conocimiento de Trámites"
-                                       @change="cargarDocumentos"
-                                       id="DocHojaConocimiento"
-                                       :automatic="false" limit="1"
-                                       :show-upload-button="false"
-                                       accept="application/pdf">
-                            </vs-upload>
-                          </v-col>
 
-                          <v-col>
-                            <vs-upload text="Cargar Traspaso Vehícular"
-                                       @change="cargarDocumentos"
-                                       id="DocTraspaso"
-                                       :automatic="false" limit="1"
-                                       :show-upload-button="false"
-                                       accept="application/pdf">
-                            </vs-upload>
-                          </v-col>
-                          <v-col>
-                            <vs-upload text="Cargar Carta Poder"
-                                       @change="cargarDocumentos"
-                                       id="DocCarta"
-                                       :automatic="false" limit="1"
-                                       :show-upload-button="false"
-                                       accept="application/pdf">
-                            </vs-upload>
-                          </v-col>
-                          <v-col>
-                            <vs-upload text="Cargar Hoja de Garantía"
-                                       @change="cargarDocumentos"
-                                       id="DocGarantia"
-                                       :automatic="false" limit="1"
-                                       :show-upload-button="false"
-                                       accept="application/pdf">
-                            </vs-upload>
-                          </v-col>
-                        </v-row>
-                      </div>
+                      <table>
+                        <caption>Documentos Cargados</caption>
+                        <thead>
+                        <tr>
+                          <th>Nombre del documento</th>
+                          <th>Link para ver</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr >
+                          <td>Contrato</td>
+                          <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.contrato">
+                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.contrato)">Ver contrato</b-link></td>
+                          <td v-else>No hay documento</td>
+                        </tr>
+                        <tr >
+                          <td>Pagaré</td>
+                          <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.garantia_prendaria">
+                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.garantia_prendaria)">Ver pagaré</b-link></td>
+                          <td v-else>No hay documento</td>
+                        </tr>
+                        <tr >
+                          <td>Hoja de conocimientos</td>
+                          <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.conocimiento_tramite">
+                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.conocimiento_tramite)">Ver hoja de conocimiento</b-link></td>
+                          <td v-else>No hay documento</td>
+                        </tr>
+                        <tr >
+                          <td>Traspaso Vehícular</td>
+                          <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.traspaso">
+                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.traspaso)">Ver hoja de conocimiento</b-link></td>
+                          <td v-else>No hay documento</td>
+                        </tr>
+                        <tr >
+                          <td>Carta poder</td>
+                          <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.carta_poder">
+                            <b-link @click="verDocumento(documento_ventas.carta_poder)">Ver hoja de conocimiento</b-link></td>
+                          <td v-else>No hay documento</td>
+                        </tr>
+                        <tr >
+                          <td>Garantía</td>
+                          <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.garantia_articulo">
+                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.garantia_articulo)">Ver hoja de conocimiento</b-link></td>
+                          <td v-else>No hay documento</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                      <v-divider></v-divider>
 
-
+                      <table>
+                        <caption>Cargando documentos</caption>
+                        <thead>
+                        <tr>
+                          <th>Nombre</th>
+                          <th>Cargar</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                          <td>Contrato</td>
+                          <td>
+                            <v-file-input v-model="doc.contrato" dense></v-file-input>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Pagaré</td>
+                          <td>
+                            <v-file-input v-model="doc.pagare" dense></v-file-input>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Hoja de conocimientos</td>
+                          <td>
+                            <v-file-input v-model="doc.hoja_conocimiento" dense></v-file-input>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Traspaso Vehícular</td>
+                          <td>
+                            <v-file-input v-model="doc.traspaso" dense></v-file-input>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Carta poder</td>
+                          <td>
+                            <v-file-input v-model="doc.carta_poder" dense></v-file-input>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Garantía</td>
+                          <td>
+                            <v-file-input v-model="doc.garantia" dense></v-file-input>
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
+                      <v-divider></v-divider>
                       <v-card-actions class="d-flex justify-end">
                         <v-btn tile color="warning" @click="cargarFiles" small>Cargar archivos</v-btn>
                         <v-btn tile v-if="DATA_VENTA.is_aceptado !== 3"
@@ -502,6 +456,14 @@ export default {
   name: "mis_ventas",
   data(){
     return{
+      documentos:[
+        {name:'Contrato', ref:'print_contrato_venta/'},
+        {name:'Pagaré', ref:'print_pagare_venta/'},
+        {name:'Hoja de conocimientos (vehículos)'},
+        {name:'Traspaso (vehículos)'},
+        {name:'Carta Poder (vehículos)'},
+        {name:'Garantía', ref:'print_carta_poder_venta/'},
+      ],
       vista: 1,
       doc:{
         carta_poder:       null,
@@ -657,6 +619,7 @@ export default {
       })
     },
     ValidarDatos(decision){
+      this.registrarVenta(decision);
       if (this.DATA_VENTA.is_aceptado === 1 && this.DATA_VENTA.estado === 4)
         if (this.Colaborador)
           if (this.Direccion)
@@ -665,8 +628,8 @@ export default {
             this.notificacion('Tienes que seleccionar una dirección de envio.','error');
         else
           this.notificacion('Tienes que seleccionar al colaborador que va a recibir la venta','error');
-      else
-        this.notificacion('Esta venta no se puede registrar de ninguna manera','error');
+      // else
+      //   this.notificacion('Esta venta no se puede registrar de ninguna manera','error');
     },
     validarFiles(){
       if (this.doc.contrato && this.doc.pagare)
@@ -694,5 +657,30 @@ export default {
 .rowsTable{
   cursor: pointer;
 }
-
+table{
+  font-family: 'Open Sans', sans-serif;
+  width: 100%;
+  padding: 2px;
+}
+table thead{
+  background: #e8e5e5;
+}
+table thead tr th{
+  font-size: 12px;
+}
+table tbody tr td{
+  font-size: 11px;
+}
+table tbody tr td:nth-child(even){
+  background-color: #f2f2f2;
+}
+table tbody tr:hover{
+  background: #f2f2f2;
+  border: 1px solid;
+  cursor: pointer;
+}
+table caption{
+  font-size: 13px;
+  caption-side: top;
+}
 </style>

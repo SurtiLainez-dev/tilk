@@ -223,6 +223,8 @@ export default {
             else
               item.mora = (parseFloat(item.mora) - parseFloat(item.mora_abonado)).toFixed(2)
 
+            item.saldo_cap = parseFloat(item.saldo_cap) - parseFloat(item.total_abonado)
+
             //hace la resta para determinar el saldo actual del pago
             item.saldo_actual = (parseFloat(item.total_pago) - parseFloat(total_abonado)).toFixed(2)
 

@@ -8,15 +8,11 @@
             <template v-slot:default>
               <tr>
                 <th>Intereses</th>
-                <td>L {{int.format(GESTION.intereses)}}</td>
+                <td>L {{int.format(mora)}}</td>
               </tr>
               <tr>
                 <th>Saldo Atrasado</th>
                 <td>L {{int.format(GESTION.pagando)}}</td>
-              </tr>
-              <tr>
-                <th>Saldo a Abonar</th>
-                <td>L {{int.format(GESTION.saldo_dia)}}</td>
               </tr>
             </template>
           </v-simple-table>
@@ -26,7 +22,7 @@
             <template v-slot:default>
               <tr>
                 <th>Nombre del Cliente</th>
-                <td>{{GESTION.venta.cliente.nombres}} {{GESTION.venta.cliente.apellidos}}</td>
+                <td>{{GESTION.cliente.nombres}} {{GESTION.cliente.apellidos}}</td>
               </tr>
               <tr>
                 <th>Descripción del Crédito</th>
@@ -334,6 +330,14 @@ export default {
     LOAD_VENTA(){
       return this.$store.state.cuentas.LOADCUENTA;
     },
+    mora(){
+      console.log(this.pagosAtrasados)
+      if ( this.pagosAtrasados.length > 0) {
+        let mora = this.pagosAtrasados.reduce((total, val)=> total + parseFloat(val.mora), 0)
+        return mora;
+      }else
+        return 0
+    },
     COLABORADORES(){
       let colaboradores = [];
       if (this.$store.state.col.COLABORADORES) {
@@ -412,7 +416,7 @@ export default {
     registrarGestion(){
       this.$store.commit('activarOverlay', true);
       this.$axios.post('cobros/gestion/agregar_recordatorio',{
-        gestion: this.GESTION.id,
+        venta_id: this.GESTION.id,
         colaborador: this.gestion.colaborador,
         fecha_gestion: this.gestion.fecha,
         forma:         this.gestion.forma,

@@ -310,6 +310,11 @@
                                         <input type="text" disabled :value="Solicitud.fecha_creado">
                                     </td>
                                 </tr>
+                                  <tr>
+                                    <th>Solicitúd firmada</th>
+                                    <td v-if="Solicitud.file" @click="verDoucumeto(Solicitud.file, 2)"><b-link>Ver solicitúd</b-link></td>
+                                    <td v-else>No se ha cargado</td>
+                                  </tr>
                                 </tbody>
                             </table>
                         </v-col>

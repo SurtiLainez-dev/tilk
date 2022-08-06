@@ -31,11 +31,11 @@
               </tr>
               <tr v-if="CUENTA.tipo_venta === 2">
                 <th>Saldo Mora:</th>
-                <td><strong>L </strong> {{CUENTA.contrato_cliente.saldo_mora}}</td>
+                <td v-if="CUENTA.contrato_cliente"><strong>L </strong> {{CUENTA.contrato_cliente.saldo_mora}}</td>
               </tr>
               <tr v-if="CUENTA.tipo_venta === 2">
                 <th>Saldo Abonado:</th>
-                <td><strong>L </strong> {{CUENTA.contrato_cliente.saldo_abonado}}</td>
+                <td v-if="CUENTA.contrato_cliente"><strong>L </strong> {{CUENTA.contrato_cliente.saldo_abonado}}</td>
               </tr>
               <tr>
                 <th>Saldo Actual</th>
@@ -43,12 +43,12 @@
               </tr>
               <tr>
                 <th>Cuota</th>
-                <td v-if="CUENTA.tipo_venta === 2"><strong>L </strong>{{CUENTA.contrato_cliente.cuota}}</td>
+                <td v-if="CUENTA.tipo_venta === 2 && CUENTA.contrato_cliente"><strong>L </strong>{{CUENTA.contrato_cliente.cuota}}</td>
                 <td v-else><strong>L </strong> {{CUENTA.total}}</td>
               </tr>
               <tr v-if="CUENTA.tipo_venta === 2">
                 <th>Forma de Pago</th>
-                <td>
+                <td v-if="CUENTA.contrato_cliente">
                   <v-chip x-small color="indigo" dark v-if="CUENTA.contrato_cliente.forma_pago === 1">Semanal</v-chip>
                   <v-chip x-small color="indigo" dark v-else-if="CUENTA.contrato_cliente.forma_pago === 2">Quincenal</v-chip>
                   <v-chip x-small color="indigo" dark v-if="CUENTA.contrato_cliente.forma_pago === 3">Mensual</v-chip>
@@ -78,15 +78,15 @@
               </tr>
               <tr v-if="CUENTA.tipo_venta === 2">
                 <th>Artículo:</th>
-                <td>{{CUENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo}}</td>
+                <td v-if="CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo}}</td>
               </tr>
               <tr v-if="CUENTA.tipo_venta === 2">
                 <th>Módelo:</th>
-                <td>{{CUENTA.contrato_cliente.remision_articulo.articulo.modelo}}</td>
+                <td v-if="CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.modelo}}</td>
               </tr>
               <tr v-if="CUENTA.tipo_venta === 2">
                 <th>Marca:</th>
-                <td>{{CUENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</td>
+                <td v-if="CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</td>
               </tr>
               <tr>
                 <th colspan="2">Documentos por Cobrar Pendientes</th>

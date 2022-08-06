@@ -33,6 +33,9 @@
       <v-list-item v-if="PERMISOS.includes(61)" class="itemOpciones" @click="go('/ventas/prospectos')">
         Prospectos
       </v-list-item>
+      <v-list-item v-if="PERMISOS.includes(61)" class="itemOpciones" @click="go('/ventas/revision_documentos')">
+        Revision de DOC.
+      </v-list-item>
     </v-list-group>
   </div>
 </template>

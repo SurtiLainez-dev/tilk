@@ -1,65 +1,67 @@
 <template>
 <v-card flat>
-  <b-table responsive small
-           class="rowsTable"
-           :current-page="currentPage"
-           :per-page="perPage"
-           :fields="header"
-           :items="PAGOS"
-           hover>
-    <template v-slot:head(venta_id)><div class="text-nowrap">Venta</div></template>
-    <template v-slot:head(pago_inicial)><div class="text-nowrap">Pago Inicial</div></template>
-    <template v-slot:head(total_pago)><div class="text-nowrap">Total a Pagar</div></template>
-    <template v-slot:head(total_abonado)><div class="text-nowrap">Total Abonado</div></template>
-    <template v-slot:head(saldo_actual)><div class="text-nowrap">Saldo Actual</div></template>
-    <template v-slot:head(detalle)><div class="text-nowrap">Detalle del Pago</div></template>
-    <template v-slot:head(is_mora)><div class="text-nowrap">Mora</div></template>
-    <template v-slot:head(mora)><div class="text-nowrap">Total de Mora</div></template>
-    <template v-slot:head(inicio_mora)><div class="text-nowrap">Inicio de Mora</div></template>
-    <template v-slot:head(fecha_pago)><div class="text-nowrap">Fecha de Pago</div></template>
-    <template v-slot:head(estado)><div class="text-nowrap">Estado del Pago</div></template>
-    <template v-slot:head(saldo_antes)><div class="text-nowrap">Saldo Antes (Capital)</div></template>
-    <template v-slot:head(saldo_despues)><div class="text-nowrap">Saldo Despues (Capital)</div></template>
 
-    <template v-slot:cell(venta_id)="scope">{{CUENTA.cod}}</template>
-    <template v-slot:cell(pago_inicial)="scope"><strong>L </strong>{{scope.item.pago_inicial}}</template>
-    <template v-slot:cell(total_pago)="scope"><strong>L </strong>{{scope.item.total_pago}}</template>
-    <template v-slot:cell(total_abonado)="scope"><strong>L </strong>{{scope.item.total_abonado}}</template>
-    <template v-slot:cell(saldo_actual)="scope"><strong>L </strong>{{scope.item.saldo_actual}}</template>
-    <template v-slot:cell(detalle)="scope">
-      <div class="text-nowrap">{{scope.item.detalle}}</div>
-    </template>
-    <template v-slot:cell(is_mora)="scope">
-      <v-chip v-if="scope.item.is_mora === 1" color="red" x-small dark>Sí</v-chip>
-      <v-chip v-else-if="scope.item.is_mora === 0" color="success" x-small dark>No</v-chip>
-    </template>
-    <template v-slot:cell(mora)="scope"><strong>L </strong>{{scope.item.mora}}</template>
-    <template v-slot:cell(inicio_mora)="scope">
-      <span v-if="scope.item.inicio_mora">{{scope.item.inicio_mora.split('-')[2]}}/{{scope.item.inicio_mora.split('-')[1]}}/{{scope.item.inicio_mora.split('-')[0]}}</span>
-      <span v-else>No hay</span>
-    </template>
-    <template v-slot:cell(fecha_pago)="scope">
-      {{scope.item.fecha_pago.split('-')[2]}}/{{scope.item.fecha_pago.split('-')[1]}}/{{scope.item.fecha_pago.split('-')[0]}}
-    </template>
-    <template v-slot:cell(estado)="scope">
-      <v-chip color="orange" x-small dark v-if="scope.item.estado === 1">Al día</v-chip>
-      <v-chip color="success" x-small dark v-else-if="scope.item.estado === 3">Cancelado</v-chip>
-      <v-chip color="red" x-small dark v-else-if="scope.item.estado === 2">En Mora</v-chip>
-    </template>
-    <template v-slot:cell(saldo_antes)="scope"><strong>L </strong>{{scope.item.saldo_antes}}</template>
-    <template v-slot:cell(saldo_despues)="scope"><strong>L </strong>{{scope.item.saldo_despues}}</template>
-  </b-table>
-  <v-row>
-    <v-col class="d-flex justify-center">
-      <b-pagination v-model="currentPage"
-                    :total-rows="totalRows"
-                    :per-page="perPage"
-                    align="fill"
-                    size="sm"
-                    class="my-0"
-      ></b-pagination>
-    </v-col>
-  </v-row>
+  <v-container>
+    <table>
+      <thead>
+      <tr>
+        <th>Detalle del pago</th>
+        <th>Pago inicial</th>
+        <th>Total a pagar</th>
+        <th>Total abonado</th>
+        <th>Saldo actual</th>
+        <th>Mora</th>
+        <th>Total de mora</th>
+        <th>Inicio de mora</th>
+        <th>Fecha de pago</th>
+        <th>Estado</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr v-for="item in PAGOS" class="rowsTable">
+        <td>{{item.detalle}}</td>
+        <td>L {{int.format(item.pago_inicial,2)}}</td>
+        <td>L {{int.format(item.total_pago,2)}}</td>
+        <td>L {{int.format(item.total_abonado,2)}}</td>
+        <td>L {{int.format(item.saldo_actual,2)}}</td>
+        <td style="text-align: center">
+          <v-badge v-if="item.is_mora === 1" dot color="red"></v-badge>
+          <v-badge v-else dot color="green"></v-badge>
+        </td>
+        <td>L {{int.format(item.mora,2)}}</td>
+        <td v-if="item.inicio_mora">
+          {{item.inicio_mora.split('-')[2]}}/{{item.inicio_mora.split('-')[1]}}/{{item.inicio_mora.split('-')[0]}}
+        </td>
+        <td v-else>No hay</td>
+        <td>
+          {{item.fecha_pago.split('-')[2]}}/{{item.fecha_pago.split('-')[1]}}/{{item.fecha_pago.split('-')[0]}}
+        </td>
+        <td style="text-align: center">
+          <v-badge v-if="item.estado === 1" dot color="orange"></v-badge>
+          <v-badge v-else-if="item.estado === 2" dot color="red"></v-badge>
+          <v-badge v-else-if="item.estado === 3" dot color="green"></v-badge>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td style="border-top: 1px solid">L. {{int.format(total_inicial,2)}}</td>
+        <td style="border-top: 1px solid">L. {{int.format(total_pago,2)}}</td>
+        <td style="border-top: 1px solid">L. {{int.format(total_abonado,2)}}</td>
+        <td style="border-top: 1px solid">L. {{int.format(total_saldo_actual,2)}}</td>
+        <td></td>
+        <td style="border-top: 1px solid">L. {{int.format(total_mora,2)}}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="10" class="text-center">----- Fín -----</td>
+      </tr>
+      <tr><td colspan="10">*Los pagos agregados no aparecen esta tabla</td></tr>
+      </tbody>
+    </table>
+  </v-container>
+
 </v-card>
 </template>
 
@@ -85,7 +87,8 @@ export default {
         'estado',
         'saldo_antes',
         'saldo_despues',
-      ]
+      ],
+      int: Intl.NumberFormat()
     }
   },
   created() {
@@ -97,13 +100,57 @@ export default {
     },
     PAGOS(){
       return this.$store.state.cuentas.CUENTA.pagos_contratos;
+    },
+    total_saldo_actual(){
+      if (this.PAGOS)
+        return this.PAGOS.reduce((num1, num2)=> num1 + parseFloat(num2.saldo_actual), 0);
+      else return 0;
+    },
+    total_mora(){
+      if (this.PAGOS)
+        return this.PAGOS.reduce((num1, num2)=> num1 + parseFloat(num2.mora), 0);
+      else return 0;
+    },
+    total_inicial(){
+      if (this.PAGOS)
+        return this.PAGOS.reduce((num1, num2)=> num1 + parseFloat(num2.pago_inicial), 0);
+      else return 0;
+    },
+    total_pago(){
+      if (this.PAGOS)
+        return this.PAGOS.reduce((num1, num2)=> num1 + parseFloat(num2.total_pago), 0);
+      else return 0;
+    },
+    total_abonado(){
+      if (this.PAGOS)
+        return this.PAGOS.reduce((num1, num2)=> num1 + parseFloat(num2.total_abonado), 0);
+      else return 0;
     }
   }
 }
 </script>
 
 <style scoped>
-.rowsTable{
+table{
+  font-family: 'Open Sans', sans-serif;
+  width: 100%;
+  padding: 2px;
+}
+table thead{
+  background: #e8e5e5;
+}
+table thead tr th{
+  font-size: 12px;
+}
+table tbody tr td{
+  font-size: 11px;
+}
+table tbody tr td:nth-child(even){
+  background-color: #f2f2f2;
+}
+table tbody tr:hover{
+  background: #f2f2f2;
+  border: 1px solid;
   cursor: pointer;
 }
 </style>
