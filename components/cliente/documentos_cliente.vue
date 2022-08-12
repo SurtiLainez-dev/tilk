@@ -42,7 +42,6 @@
              tile @click="validarArchivos">Guardar Archivos</v-btn>
     </v-card-actions>
 
-    <pre>{{Archivos}}</pre>
   </v-card>
 </template>
 
