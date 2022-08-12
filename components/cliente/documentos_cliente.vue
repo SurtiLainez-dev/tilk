@@ -38,9 +38,11 @@
         <v-icon left>fa fa-plus</v-icon>
         Agregar Archivo
       </v-btn>
-      <v-btn color="success" small class="text-white" :disabled="!habilitarBtnEnvio"
+      <v-btn color="success" small class="text-white"
              tile @click="validarArchivos">Guardar Archivos</v-btn>
     </v-card-actions>
+
+    <pre>{{Archivos}}</pre>
   </v-card>
 </template>
 
@@ -87,7 +89,7 @@ export default {
     envioArchivos(){
       let data = new FormData();
       for (let i in this.EnvioArchivos){
-        data.append(`files[${i}]`, this.EnvioArchivos[i].file);
+        data.append(`file_cliente[${i}]`, this.EnvioArchivos[i].file);
       }
 
       data.append('id', this.CLIENTE.id);
@@ -155,7 +157,7 @@ export default {
         }
       });
 
-      if (invalidos === bandera && invalidos === cont)
+      if (bandera === cont && bandera > 0 && cont > 0)
         this.envioArchivos();
       else
         this.notificacion('Hay filas de archivos invalidos.','error');

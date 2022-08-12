@@ -148,7 +148,7 @@
               <v-dialog ref="dialogFechaFinal" v-model="dialogoFechaFinal" :return-value.sync="fecha_final"
                         persistent width="290px">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-text-field dense class="ma-2" label="Fecha de inicio" v-bind="attrs" v-on="on" :disabled="vista === 6"
+                  <v-text-field dense class="ma-2" label="Fecha final" v-bind="attrs" v-on="on" :disabled="vista === 6"
                                 :rules="[rule.pago.req]" v-model="fecha_final"></v-text-field>
                 </template>
                 <v-date-picker v-model="fecha_final" scrollable>

@@ -50,11 +50,11 @@
                     </v-tooltip>
                   </v-col>
                   <v-col
-                      v-else-if="(item.id > 3 && item.id < 10 && PERMISOS.length > 0) && (
+                      v-else-if="(item.id > 3 && item.id < 11 && PERMISOS.length > 0) && (
                           (item.id === 6 && PERMISOS.includes(2)) || (item.id === 5 && PERMISOS.includes(3)) ||
                           (item.id === 4 && PERMISOS.includes(4) || (item.id === 7 && (PERMISOS.includes(6) || PERMISOS.includes(8))) ||
                           (item.id === 8 && (PERMISOS.includes(7) || PERMISOS.includes(14)))
-                          || (item.id === 9 && (PERMISOS.includes(15))))
+                          || (item.id === 9 && (PERMISOS.includes(15))) || (item.id === 10 && (PERMISOS.includes(16))))
                           )"
                       class="d-flex justify-center px-2">
                     <v-tooltip right>
@@ -69,7 +69,7 @@
                       <span>{{item.titulo}}</span>
                     </v-tooltip>
                   </v-col>
-                  <v-col v-else-if="item.id === 10" class="d-flex justify-center">
+                  <v-col v-else-if="item.id === 11" class="d-flex justify-center">
                     <v-tooltip right>
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn @click="go(item.url, item.id, item.accion)" v-on="on" v-bind="attrs"
@@ -148,7 +148,7 @@
             </v-list>
           </v-col>
 <!--          REPORTES-->
-            <v-col cols="9" v-if="select === 11">
+            <v-col cols="9" v-if="select === 10 && (PERMISOS.includes(16))">
             <v-list>
               <side-reportes/>
             </v-list>
@@ -225,9 +225,9 @@
           {'color':'pink darken-4', 'titulo':'Caja', 'icono':'fa fa-cash-register',
             'url': '/caja/', 'id': 9, 'modulo': 0, 'accion': true},
           {'color':'green darken-4', 'titulo':'Reportes', 'icono':'fa fa-file-contract',
-            'url': '', 'id': 11, 'modulo': 0, 'accion': false},
+            'url': '', 'id': 10, 'modulo': 0, 'accion': false},
           {'color':'light-blue darken-4', 'titulo':'Cerrar Sesión', 'icono':'fa fa-sign-in-alt',
-            'url': '', 'id': 10, 'modulo': 0, 'accion': false}
+            'url': '', 'id': 11, 'modulo': 0, 'accion': false}
         ]
     }
     },
@@ -254,7 +254,7 @@
         })
       },
       itemsMenu(val){
-        if (val !== 10)
+        if (val !== 11)
           this.select = val;
         else
           this.cerrarSesion();

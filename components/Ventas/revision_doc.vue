@@ -1,5 +1,5 @@
 <template>
-  <v-card flat>
+  <v-card flat :loading="LOAD">
     <v-container>
       <table>
         <caption>Documentos adjuntos al cliente</caption>
@@ -12,7 +12,7 @@
         <tbody v-if="!LOAD">
         <tr v-if="!LOAD && VENTA.cliente.archivos" v-for="item in JSON.parse(VENTA.cliente.archivos)">
           <td>{{item.detalle}}</td>
-          <td v-if="item.estado === 1"><b-link>Ver</b-link></td>
+          <td v-if="item.estado === 1"><b-link @click="verDocumento(item.dir)">Ver</b-link></td>
           <td v-else>No hay documentos</td>
         </tr>
         </tbody>
@@ -28,7 +28,7 @@
           <td>Estado</td>
         </tr>
         </thead>
-        <tbody v-if="!LOAD">
+        <tbody v-if="!LOAD && VENTA.documento_ventas">
         <tr>
           <td>Contrato</td>
           <td v-if="VENTA.documento_ventas.contrato"><b-link @click="verDocumento(VENTA.documento_ventas.contrato)">Ver</b-link></td>
@@ -87,8 +87,8 @@
         <tr v-if="VENTA.orden_entrega">
           <td>1</td>
           <td>{{VENTA.orden_entrega.cod}}</td>
-          <td v-if="VENTA.orden_entrega_estado === 1"><b-link @click="verDocumento(VENTA.orden_entrega.file)">Ver</b-link></td>
-          <td>No se ha cargado</td>
+          <td v-if="VENTA.orden_entrega.estado === 1"><b-link @click="verDocumento(VENTA.orden_entrega.file)">Ver</b-link></td>
+          <td v-else>No se ha cargado</td>
         </tr>
         <tr v-else>
           <td colspan="">No hay orden de entrega asociada a esta venta</td>

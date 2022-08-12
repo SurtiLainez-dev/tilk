@@ -14,6 +14,14 @@
         Saldos por Portafolio
       </v-list-item>
     </v-list-group>
+    <v-list-group>
+      <template v-slot:activator value="true">
+        <v-list-item-title>Ventas</v-list-item-title>
+      </template>
+      <v-list-item dense class="itemOpciones" @click="go('/reportes/ventas/global')">
+        Global
+      </v-list-item>
+    </v-list-group>
   </div>
 </template>
 
