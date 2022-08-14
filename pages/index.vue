@@ -91,7 +91,6 @@
               </v-card>
             </v-col>
           </v-row>
-          <v-btn color="indigo" block small tile dark @click="save">Save</v-btn>
         </v-card>
       </div>
 
@@ -260,12 +259,6 @@ export default {
     iniciarSesion(correo){
       this.dialogUsuario = true
       this.email = correo
-    },
-    save(){
-      let url = 'http://192.168.10.12/api/documentos/reportes/ventas/global/usuario=willySantos&sucursal=8&sb8LUx4iXjaaplo4I%3C6mu%3CYdB-B7QK3feAopZKQ%3CFhgQWVWBV7UvuyW_CgLM&file=EXCEL&fi=2022-08-01&ff=2022-08-31&colaborador=null';
-      let path = this.dir+'/documento.xlsx';
-
-      ipcRenderer.send('save_file',{path_remoto: url, path_local: path});
     }
   }
 }
