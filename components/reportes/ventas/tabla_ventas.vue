@@ -17,7 +17,7 @@
         <v-tooltip top>
           <template v-slot:activator="{on, atrr}">
             <v-btn v-on="on" v-bind="atrr" width="17" height="17" color="green"
-                   v-if="excel" @click="guardarExcel"
+                   v-if="excel" @click="solicitarClave(2)"
                    fab x-small dark text><v-icon size="12">fa fa-file-excel</v-icon></v-btn>
           </template>
           <span>Exportar a excel</span>
@@ -172,9 +172,8 @@ export default {
     guardarExcel(url){
       if (this.$store.state.DIR){
         let dir = this.$axios.defaults.baseURL+url
-        let nombre = this.$store.state.DIR+'/Reporte de venta  '+Math.floor(Math.random() * (10000 - 100000)) + 100000+'.xlsx';
+        let nombre = this.$store.state.DIR+'/Reporte de venta '+Math.floor(Math.random() * 10000)+'.xlsx';
         ipcRenderer.send('save_file',{path_remoto: dir, path_local: nombre});
-        console.log(this.$store.state.DIR)
       }else{
         this.$store.commit('notificacion',{texto:'No puedes crear reportes en excel sin haber seleccionado una ruta para almacenar', color:'error'});
       }

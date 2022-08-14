@@ -233,6 +233,3 @@ module.exports.crear_db_almacenamientoLocal = function (){
     db.createTable('almacenamientos', (succ, msg) => {
     })
 }
-
-
-

@@ -201,9 +201,10 @@ export default {
     });
 
     ipcRenderer.on('recuperar-almacenamiento',(e, data)=>{
-      if (data)
+      if (data) {
         this.dir = data;
-      else this.dir = null
+        this.$store.commit('agregar_DIR', this.dir)
+      }else this.dir = null
     });
 
     ipcRenderer.on('update_available', () => {
