@@ -60,6 +60,16 @@
                   <span>Historial de inicios de sesión</span>
                 </v-tooltip>
               </div>
+              <div class="pl-2 pr-2" @click="dialogo_dir = true">
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn  v-on="on" v-bind="attrs" color="red" fab x-small dark>
+                      <v-icon>fa fa-folder</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Ruta de almacenamiento de archivos local</span>
+                </v-tooltip>
+              </div>
             </v-col>
           </v-row>
           <v-divider></v-divider>
@@ -81,6 +91,7 @@
               </v-card>
             </v-col>
           </v-row>
+          <v-btn color="indigo" block small tile dark @click="save">Save</v-btn>
         </v-card>
       </div>
 
@@ -105,6 +116,17 @@
           <v-card-actions class="d-flex justify-end">
             <v-btn small dark color="orange" @click="cambioServidor">Cambiar de Servidor</v-btn>
           </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog v-model="dialogo_dir" width="30%">
+        <v-card>
+          <v-toolbar color="grey lighten-3" flat>Almacenamiento Local</v-toolbar>
+          <v-card-text>La ruta de almacenamiento local, es la ruta fisica del equipo donde se van almacenar
+          los documentos generados por el sistema.</v-card-text>
+          <v-card-text >Ruta actual: {{dir}}</v-card-text>
+          <v-btn color="success" @click="open" block tile small dark>Seleccionar Carpeta</v-btn>
+          <v-btn color="orange" @click="dialogo_dir = false" block tile small dark>Cerrar</v-btn>
         </v-card>
       </v-dialog>
 
@@ -152,7 +174,9 @@ export default {
       server: this.$axios.defaults.baseURL,
       actualizacion: false,
       updater: false,
-      version: ''
+      version: '',
+      dialogo_dir: false,
+      dir: ''
     }
   },
   created() {
@@ -177,6 +201,12 @@ export default {
       this.server = data.conexion
     });
 
+    ipcRenderer.on('recuperar-almacenamiento',(e, data)=>{
+      if (data)
+        this.dir = data;
+      else this.dir = null
+    });
+
     ipcRenderer.on('update_available', () => {
       console.log("")
       this.actualizacion = true;
@@ -190,11 +220,19 @@ export default {
 
     ipcRenderer.on('app_version', (event, arg) => {
       console.log('Version ' + arg.version)
-      this.version = arg.version;
+      console.log('dir' + arg.dir)
     });
 
   },
   methods:{
+    open(){
+      ipcRenderer.send('open__dialog_save_files');
+      ipcRenderer.on('recuperar-almacenamiento',(e, data)=>{
+        this.dir = data;
+        this.$store.commit('agregar_DIR', this.dir);
+
+      })
+    },
     reiniciarApp(){
       ipcRenderer.send('restart_app', () => {
 
@@ -222,6 +260,12 @@ export default {
     iniciarSesion(correo){
       this.dialogUsuario = true
       this.email = correo
+    },
+    save(){
+      let url = 'http://192.168.10.12/api/documentos/reportes/ventas/global/usuario=willySantos&sucursal=8&sb8LUx4iXjaaplo4I%3C6mu%3CYdB-B7QK3feAopZKQ%3CFhgQWVWBV7UvuyW_CgLM&file=EXCEL&fi=2022-08-01&ff=2022-08-31&colaborador=null';
+      let path = this.dir+'/documento.xlsx';
+
+      ipcRenderer.send('save_file',{path_remoto: url, path_local: path});
     }
   }
 }

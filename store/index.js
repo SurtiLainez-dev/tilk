@@ -43,10 +43,15 @@ export const state = () =>({
   tab: 1,
   MENU: false,
   ARTICULOS_EDIT: [],
-  LOAD_ARTICULOS_EDIT: false
+  LOAD_ARTICULOS_EDIT: false,
+  DIR: null
 });
 
 export const mutations = {
+  agregar_DIR(state, dir){
+    state.DIR = dir;
+    localStorage.setItem('dir', dir);
+  },
   cargar_ARTICULOS_EDIT(state){
     state.LOAD_ARTICULOS_EDIT = true;
     this.$axios.get('articulos').then((res)=>{

@@ -1,6 +1,47 @@
 <template>
   <v-card :loading="LOAD_DATATABLE" flat>
-    <table>
+    <v-row no-gutters>
+      <v-col>
+        <span id="tituloTabla">{{titulo}}</span>
+      </v-col>
+      <v-col class="d-flex justify-end align-end">
+        <v-tooltip top>
+          <template v-slot:activator="{on, atrr}">
+            <v-btn v-on="on" v-bind="atrr" width="17" height="17" color="indigo"
+                   v-if="img" @click="imprimirTabla"
+                   fab x-small dark text><v-icon size="12">fa fa-image</v-icon></v-btn>
+          </template>
+          <span>Convertir a imagen</span>
+        </v-tooltip>
+
+        <v-tooltip top>
+          <template v-slot:activator="{on, atrr}">
+            <v-btn v-on="on" v-bind="atrr" width="17" height="17" color="green"
+                   v-if="excel" @click="guardarExcel"
+                   fab x-small dark text><v-icon size="12">fa fa-file-excel</v-icon></v-btn>
+          </template>
+          <span>Exportar a excel</span>
+        </v-tooltip>
+
+        <v-tooltip top>
+          <template v-slot:activator="{on, atrr}">
+            <v-btn v-on="on" v-bind="atrr" width="17" height="17" color="red"
+                   v-if="pdf" @click="solicitarClave(1)"
+                   fab x-small dark text><v-icon size="12">fa fa-file-pdf</v-icon></v-btn>
+          </template>
+          <span>Exportar a pdf</span>
+        </v-tooltip>
+        <v-tooltip top>
+          <template v-slot:activator="{on, atrr}">
+            <v-btn v-on="on" v-bind="atrr" width="17" height="17" color="orange"
+                   v-if="email"
+                   fab x-small dark text><v-icon size="12">fa fa-share</v-icon></v-btn>
+          </template>
+          <span>Reenviar reporte por correo</span>
+        </v-tooltip>
+      </v-col>
+    </v-row>
+    <table id="TablaDatosReporte">
       <thead>
       <tr>
         <td v-for="item in headers">{{item}}</td>
@@ -46,10 +87,37 @@
 </template>
 
 <script>
+import html2canvas from 'html2canvas';
+import {ipcRenderer} from "electron";
 export default {
   name: "tabla_ventas",
+  props:{
+    titulo: {
+      type: String,
+      default: 'Datos del Reporte'
+    },
+    img: {
+      type: Boolean,
+      default: false
+    },
+    excel:{
+      type: Boolean,
+      default: false
+    },
+    pdf:{
+      type:Boolean,
+      default: false
+    },
+    email:{
+      type: Boolean,
+      default: false
+    },
+    url1File: String,
+    url2File: String,
+  },
   data(){
     return{
+      output: '',
       int: Intl.NumberFormat(),
       headers:[
         '#',
@@ -68,11 +136,11 @@ export default {
     }
   },
   computed:{
-    LOAD_DATATABLE(){
-      return this.$store.state.reportes.ventas.global.LOAD_DATATABLE;
-    },
     DATATABLE(){
       return this.$store.state.reportes.ventas.global.DATATABLE;
+    },
+    LOAD_DATATABLE(){
+      return this.$store.state.reportes.ventas.global.LOAD_DATATABLE;
     },
     TOTALSINIMPUESTO(){
       if (this.DATATABLE.length > 0)
@@ -88,8 +156,42 @@ export default {
       if (this.DATATABLE.length > 0)
         return this.DATATABLE.reduce((num1, num2)=> num1 + parseFloat(num2.venta.total),0)
       else return 0;
-    }
-  }
+    },
+  },
+  methods:{
+    async imprimirTabla(){
+      let canvas = (await html2canvas(document.querySelector('#TablaDatosReporte')))
+      const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+      const a = document.createElement("a");
+      let ran    = Math.floor(Math.random() * (100 - 200)) + 200;
+      let nombre = 'Reporte de ventas -'+ran+'.png'
+      a.setAttribute("download", nombre);
+      a.setAttribute("href", image);
+      a.click();
+    },
+    guardarExcel(url){
+      let dir = this.$axios.defaults.baseURL+url
+      let nombre = this.$store.state.DIR+'/Reporte de venta  '+Math.floor(Math.random() * (10000 - 100000)) + 100000+'.xlsx';
+      ipcRenderer.send('save_file',{path_remoto: dir, path_local: nombre});
+      console.log(this.$store.state.DIR)
+    },
+    solicitarClave(tipo){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+        let url = ''
+        if (tipo === 1) {
+          url = this.url1File + res.data.clave + '&file=PDF' + this.url2File;
+          ipcRenderer.send('pint_navegador', this.$axios.defaults.baseURL+url);
+        }else if (tipo === 2){
+          url = this.url1File + res.data.clave + '&file=EXCEL' + this.url2File;
+          this.guardarExcel(url)
+        }
+        this.$store.commit('activarOverlay', false);
+      }).catch((error)=>{
+        this.$store.commit('activarOverlay', false);
+      });
+    },
+  },
 }
 </script>
 
@@ -122,5 +224,9 @@ table caption{
 }
 table thead tr td{
   font-size: 12px;
+}
+#tituloTabla{
+  font-size: 14px;
+  color: #7F828B;
 }
 </style>

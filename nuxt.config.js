@@ -52,6 +52,7 @@ module.exports = {
 		'@nuxtjs/axios',
 		'@nuxtjs/vuetify',
 		'bootstrap-vue/nuxt',
-		'@nuxtjs/moment'
+		'@nuxtjs/moment',
+		'nuxt-html2canvas-proxy', /* default path is /_proxy */
 	],
 }

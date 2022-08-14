@@ -175,11 +175,7 @@
       },
     },
     async fetch (){
-      this.Familias  =(await this.$axios.get('/familias', {
-        headers: {
-          'Authorization': 'Bearer ' + this.$store.state.token
-        }
-      })).data.familias
+      this.Familias  =(await this.$axios.get('/familias')).data.familias
     }
   }
 </script>

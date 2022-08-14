@@ -46,10 +46,6 @@
             <v-autocomplete :loading="LOADCOLABORADORES" dense class="ma-2" :items="COLABORADORES"
                             label="Seleccione un colaborador" v-model="colaborador"></v-autocomplete>
           </v-col>
-          <v-col>
-            <v-autocomplete dense class="ma-2" :items="tipo"
-                            label="Tipo de Venta" v-model="tipo_venta"></v-autocomplete>
-          </v-col>
           <v-col class="d-flex justify-end align-center">
             <v-btn color="success" dark tile small @click="validarReporte">Crear Reporte</v-btn>
           </v-col>
@@ -58,34 +54,9 @@
     </v-toolbar>
     <v-divider></v-divider>
     <v-card flat>
-      <v-row>
-        <v-col cols="1">
-
-        </v-col>
-
-        <v-col cols="11">
-          <v-container>
-<!--            <v-card-actions class="d-flex justify-end">-->
-<!--              <v-tooltip top>-->
-<!--                <template v-slot:activator="{on, attrs}">-->
-<!--                  <v-btn v-on="on" v-bind="attrs" fab class="ma-2"-->
-<!--                         x-small dark color="green"><v-icon>fa fa-file-excel</v-icon></v-btn>-->
-<!--                </template>-->
-<!--                <span>Crear Excel</span>-->
-<!--              </v-tooltip>-->
-<!--              <v-tooltip top>-->
-<!--                <template v-slot:activator="{on, attrs}">-->
-<!--                  <v-btn v-on="on" v-bind="attrs" fab class="ma-2"-->
-<!--                         x-small dark color="red"><v-icon>fa fa-file-pdf</v-icon></v-btn>-->
-<!--                </template>-->
-<!--                <span>Crear pdf</span>-->
-<!--              </v-tooltip>-->
-<!--            </v-card-actions>-->
-
-            <tabla_ventas/>
-          </v-container>
-        </v-col>
-      </v-row>
+      <v-container>
+        <tabla_ventas :url1-file="url1Pdf" :url2-file="url2Pdf" pdf excel img email :titulo="'Datos de Reporte de Ventas'"/>
+      </v-container>
     </v-card>
 
   </v-card>
@@ -114,6 +85,15 @@ export default {
     },
     COLABORADORES(){
       return this.$store.state.suc.COLABORADORES;
+    },
+    USUARIO(){
+      return this.$store.state.usuario;
+    },
+    url1Pdf(){
+      return `documentos/reportes/ventas/global/usuario=${this.USUARIO}&sucursal=${this.sucursal?this.sucursal:null}&`;
+    },
+    url2Pdf(){
+      return `&fi=${this.fecha_inicio?this.fecha_inicio:null}&ff=${this.fecha_final?this.fecha_final:null}&colaborador=${this.colaborador}`;
     }
   },
   data(){
@@ -130,16 +110,11 @@ export default {
       sucursal: '',
       anio: '',
       colaborador: null,
-      tipo_venta: null,
-      tipo:[
-        {text:'Contado', value:1},
-        {text:'Crédito', value:2},
-        {text:'Todos', value:0},
-      ]
     }
   },
   created() {
     this.$store.commit('suc/cargar_SUCURSALES');
+    this.$store.commit('activarOverlay', false);
   },
   methods:{
     cargarColaboradores(){
@@ -152,7 +127,6 @@ export default {
         ff:   this.fecha_final,
         suc:  this.sucursal,
         col:  this.colaborador,
-        tipo: this.tipo_venta
       })
     },
     validarReporte(){
@@ -160,7 +134,8 @@ export default {
         this.crearReporte();
       else
         this.$store.commit('notificacion',{texto:'Hay datos incompletos', color:'error'});
-    }
+    },
+
   }
 }
 </script>

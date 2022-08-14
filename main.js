@@ -27,7 +27,7 @@ console.log(`Nuxt working on ${_NUXT_URL_}`)
 */
 let win = null // Current window
 const electron = require('electron');
-const {BrowserWindow} = require('electron');
+const {BrowserWindow, Notification} = require('electron');
 const path = require('path');
 const app = electron.app;
 
@@ -40,6 +40,8 @@ const newWin = () => {
 	});
 	win.maximize();
 	win.on('closed', () => win = null);
+
+	app.setAppUserModelId('Tilk')
 
 	if (config.dev) {
 		// Install vue dev tool and open chrome dev tools
@@ -67,10 +69,12 @@ app.on('ready', newWin);
 app.on('window-all-closed', () => app.quit());
 app.on('activate', () => win === null && newWin());
 
+
 const db = require('./db');
 db.crear_db_inicios();
 db.crear_db_usuarios();
 db.crear_db_conexiones();
 db.crear_db_articulos();
+db.crear_db_almacenamientoLocal();
 
 
