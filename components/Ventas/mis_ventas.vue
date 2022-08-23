@@ -105,6 +105,24 @@
                             <b-link @click="verDocumento(DATA_VENTA.documento_ventas.garantia_articulo)">Ver hoja de conocimiento</b-link></td>
                           <td v-else>No hay documento</td>
                         </tr>
+                        <tr >
+                          <td>Factura SAR</td>
+                          <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.factura_sar">
+                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.factura_Sar)">Ver hoja de conocimiento</b-link></td>
+                          <td v-else>No hay documento</td>
+                        </tr>
+                        <tr >
+                          <td>Tarjeta Fisica</td>
+                          <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.tarjeta_fisica">
+                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.tarjeta_fisica)">Ver hoja de conocimiento</b-link></td>
+                          <td v-else>No hay documento</td>
+                        </tr>
+                        <tr >
+                          <td>Expediente Completo</td>
+                          <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.expediente">
+                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.expediente)">Ver hoja de conocimiento</b-link></td>
+                          <td v-else>No hay documento</td>
+                        </tr>
                         </tbody>
                       </table>
                       <v-divider></v-divider>
@@ -121,38 +139,64 @@
                         <tr>
                           <td>Contrato</td>
                           <td>
-                            <v-file-input v-model="doc.contrato" dense></v-file-input>
+                            <v-file-input accept="application/pdf" v-model="doc.contrato" dense></v-file-input>
                           </td>
                         </tr>
                         <tr>
                           <td>Pagaré</td>
                           <td>
-                            <v-file-input v-model="doc.pagare" dense></v-file-input>
+                            <v-file-input accept="application/pdf" v-model="doc.pagare" dense></v-file-input>
                           </td>
                         </tr>
                         <tr>
                           <td>Hoja de conocimientos</td>
                           <td>
-                            <v-file-input v-model="doc.hoja_conocimiento" dense></v-file-input>
+                            <v-file-input accept="application/pdf" v-model="doc.hoja_conocimiento" dense></v-file-input>
                           </td>
                         </tr>
                         <tr>
                           <td>Traspaso Vehícular</td>
                           <td>
-                            <v-file-input v-model="doc.traspaso" dense></v-file-input>
+                            <v-file-input accept="application/pdf" v-model="doc.traspaso" dense></v-file-input>
                           </td>
                         </tr>
                         <tr>
                           <td>Carta poder</td>
                           <td>
-                            <v-file-input v-model="doc.carta_poder" dense></v-file-input>
+                            <v-file-input accept="application/pdf" v-model="doc.carta_poder" dense></v-file-input>
                           </td>
                         </tr>
                         <tr>
                           <td>Garantía</td>
                           <td>
-                            <v-file-input v-model="doc.garantia" dense></v-file-input>
+                            <v-file-input accept="application/pdf" v-model="doc.garantia" dense></v-file-input>
                           </td>
+                        </tr>
+                        <tr>
+                          <td>Factura SAR</td>
+                          <td>
+                            <v-file-input accept="application/pdf" v-model="doc.factura_sar" dense></v-file-input>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Tarjeta Fisica</td>
+                          <td>
+                            <v-file-input accept="application/pdf" v-model="doc.tarjeta_fisica" dense></v-file-input>
+                          </td>
+                        </tr>
+<!--                        <tr>-->
+<!--                          <td>Expediente Completo</td>-->
+<!--                          <td>-->
+<!--                            <v-file-input accept="application/pdf" v-model="doc.expediente" dense></v-file-input>-->
+<!--                          </td>-->
+<!--                        </tr>-->
+                        <tr v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.expediente">
+                          <td colspan="2">
+                            <v-btn small></v-btn>
+                          </td>
+<!--                          <td>-->
+<!--                            <b-link @click="verDocumentoExpedient(DATA_VENTA.documento_ventas.expediente)">Ver hoja de conocimiento</b-link>-->
+<!--                          </td>-->
                         </tr>
                         </tbody>
                       </table>
@@ -394,7 +438,7 @@
     </b-overlay>
 
 
-  <v-dialog v-model="Enviado" width="40%">
+    <v-dialog v-model="Enviado" width="40%">
     <v-card flat>
       <v-card-title>La venta ha concluido exitosamente</v-card-title>
       <v-divider></v-divider>
@@ -442,6 +486,18 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+    <v-dialog v-model="dialogopdf" width="50%">
+      <v-card>
+        <v-toolbar flat color="grey lighten-3" dense>
+          <v-card-title>Pdf del expediente completo</v-card-title>
+        </v-toolbar>
+        <v-container>
+
+        </v-container>
+      </v-card>
+    </v-dialog>
+
   </v-card>
 </template>
 
@@ -456,6 +512,8 @@ export default {
   name: "mis_ventas",
   data(){
     return{
+      url: 'https://ign-surti.nyc3.digitaloceanspaces.com/Venta/0209182178/1660458200-1-c05791314.pdf?X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=P43MQVMWSHE6CPPXLVN2%2F20220814%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20220814T065240Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Signature=05183e782673e874ad3ee563067240bf8459c9730a038caf94bfa58b949f7860',
+      dialogopdf: false,
       documentos:[
         {name:'Contrato', ref:'print_contrato_venta/'},
         {name:'Pagaré', ref:'print_pagare_venta/'},
@@ -471,7 +529,10 @@ export default {
         hoja_conocimiento: null,
         pagare:            null,
         garantia:          null,
-        traspaso:          null
+        traspaso:          null,
+        tarjeta_fisica:    null,
+        expediente:        null,
+        factura_sar:       null
       },
       is_moto: false,
       Componentes: [],
@@ -480,7 +541,8 @@ export default {
       Colaboradores: [],
       Colaborador:   '',
       Direccion: '',
-      OrdenEntrada_id: 0
+      OrdenEntrada_id: 0,
+      vistaPDf: false
     }
   },
   computed:{
@@ -504,7 +566,7 @@ export default {
     },
     IS_ACEPTADA(){
       return this.$store.state.ventas.IS_ACEPTADA;
-    }
+    },
   },
   created() {
     this.$store.commit('ventas/cargar_DATA_VENTA');
@@ -555,6 +617,9 @@ export default {
         data.append('garantia',     this.doc.garantia);
         data.append('traspaso',     this.doc.traspaso);
         data.append('conocimiento', this.doc.hoja_conocimiento);
+        data.append('factura_sar',  this.doc.factura_sar);
+        data.append('expediente',   this.doc.expediente);
+        data.append('tarjeta',      this.doc.tarjeta_fisica);
         data.append('id',           this.DATA_VENTA.id);
 
         this.$axios({
@@ -632,10 +697,20 @@ export default {
       //   this.notificacion('Esta venta no se puede registrar de ninguna manera','error');
     },
     validarFiles(){
-      if (this.doc.contrato && this.doc.pagare)
-        return true;
-      else
-        this.notificacion('Tienes que cargar archivos','error')
+      console.log(this.DATA_VENTA)
+      if (this.DATA_VENTA.is_aceptado === 1){
+        if (this.doc.tarjeta_fisica || this.doc.expediente || this.doc.factura_sar || this.doc.traspaso || this.doc.garantia
+          || this.doc.pagare || this.doc.hoja_conocimiento || this.doc.contrato || this.doc.carta_poder)
+            return true;
+        else
+          this.notificacion('Tienes que cargar archivos','error')
+      }else{
+        if (this.doc.contrato && this.doc.pagare)
+          return true;
+        else
+          this.notificacion('Tienes que cargar archivos','error')
+      }
+
     },
     verDocumento(url){
       this.$store.commit('activarOverlay', true);
@@ -649,6 +724,23 @@ export default {
         this.$store.commit('activarOverlay', false);
       })
     },
+    verDocumentoExpedient(url){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('leer_documento/',
+          {ubicacion: url}).then((res)=>{
+        if (res.status === 200){
+
+
+
+
+          this.$store.commit('activarOverlay', false);
+
+          this.dialogopdf = true;
+        }
+      }).catch((error)=>{
+        this.$store.commit('activarOverlay', false);
+      })
+    }
   }
 }
 </script>

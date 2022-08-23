@@ -10,6 +10,7 @@
             <v-tab @click="cambiarVista('Referencias/Avales')">Referencias</v-tab>
             <v-tab @click="cambiarVista('Comentarios')">Comentarios</v-tab>
             <v-tab @click="cambiarVista('Tareas')">Tareas</v-tab>
+            <v-tab >Perfil</v-tab>
 
             <v-tab-item>
                 <v-card class="pl-5 pr-5 pb-5">
@@ -321,6 +322,8 @@
                     </v-row>
                 </v-card>
             </v-tab-item>
+
+
             <v-tab-item>
                 <v-card class="pl-5 pr-5 pb-5">
                     <v-card flat :disabled="cardDisabled">
@@ -397,6 +400,8 @@
                         </v-col>
                     </v-row>
                     <br>
+                    <b-link v-if="Articulo.is_motocicleta === 0">Quitar traspaso de la prima</b-link>
+                    <br>
                     <small>Tabla de pagos</small>
                     <hr>
                     <table class="rowsTable">
@@ -421,6 +426,8 @@
                     </table>
                 </v-card>
             </v-tab-item>
+
+
             <v-tab-item>
                 <v-card class="pl-5 pr-5 pb-5">
                     <v-card flat :disabled="cardDisabled">
@@ -632,6 +639,10 @@
                     </v-container>
                 </v-container>
             </v-tab-item>
+
+            <v-tab-item>
+              <cliente/>
+            </v-tab-item>
         </v-tabs>
 
 
@@ -767,16 +778,37 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <v-dialog v-model="dialogoTraspaso">
+          <v-card>
+            <v-toolbar flat dense color="grey lighten-3">
+              <v-card-title>Monto del traspaso</v-card-title>
+            </v-toolbar>
+
+            <v-container>
+              <v-form ref="FormTraspaso" v-on:submit.prevent>
+                <v-text-field label="Monto del traspaso" dense v-model="traspaso"></v-text-field>
+              </v-form>
+              <v-card-actions class="d-flex justify-end">
+                <v-btn color="success" dark tile small >Registrar</v-btn>
+              </v-card-actions>
+            </v-container>
+          </v-card>
+        </v-dialog>
     </v-container>
 </template>
 
 <script>
     import {ipcRenderer} from "electron";
     import Vue from "vue";
+    import _cliente from "@/pages/clientes/_cliente";
     export default {
+        components:{cliente:_cliente},
         name: "solicitud",
         data(){
             return{
+                traspaso: 0,
+                dialogoTraspaso: false,
                 cardDisabled: false,
                 btnRegistro: true,
                 dialogoDecision: false,
@@ -808,7 +840,8 @@
                 return this.$store.state.solicitud_credito.Solicitud;
             },
             Cliente(){
-                return this.$store.state.solicitud_credito.Solicitud.cliente;
+              this.$route.params.cliente = this.$store.state.solicitud_credito.Solicitud.cliente.id
+              return this.$store.state.solicitud_credito.Solicitud.cliente;
             },
             Direcciones:{
                 get:function () {

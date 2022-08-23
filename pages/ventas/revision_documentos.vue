@@ -87,6 +87,7 @@ export default {
     goVenta(data){
       this.venta = data;
       this.vista = 2;
+      this.$store.commit('cuentas/agregar_CUENTA', data);
       this.$store.commit('cuentas/cargar_VENTA_REV_DOC', data.id);
     }
   }

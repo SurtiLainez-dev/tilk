@@ -15,7 +15,6 @@
       <v-tab-item :key="0"><pre>{{GESTION}}</pre></v-tab-item>
       <v-tab-item :key="1"><cuenta/></v-tab-item>
     </v-tabs-items>
-
   </v-card>
 </template>
 

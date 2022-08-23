@@ -55,57 +55,54 @@
           <v-btn small tile dark class="ma-1" color="orange" @click="dialogoRegalia = true">Agregar Regalia</v-btn>
           <v-btn small tile dark class="ma-1" @click="dialogoBusqueda = true" color="success">Agregar Artículo</v-btn>
         </v-toolbar>
-        <b-table responsive small
-                 style="font-size: 12px !important;"
-                 class="rowsTable"
-                 :fields="headerArticulos"
-                 :items="Venta.filas"
-                 hover
-                 striped>
-          <template v-slot:head(articulo)><div class="text-nowrap">Detalle del Artículo</div></template>
-          <template v-slot:head(cod_sistema)><div class="text-nowrap">Código del Sistema</div></template>
-          <template v-slot:head(cod_provee)><div class="text-nowrap">Código del Proveedor</div></template>
-          <template v-slot:head(is_serie)><div class="text-nowrap">Artículo con Seríe</div></template>
-          <template v-slot:head(is_moto)><div class="text-nowrap">Vehículo</div></template>
-          <template v-slot:head(serie)><div class="text-nowrap">Seríe del Fabricante</div></template>
-          <template v-slot:head(color)><div class="text-nowrap">Color</div></template>
-          <template v-slot:head(cantidad)><div class="text-nowrap">Cant.</div></template>
-          <template v-slot:head(precio)><div class="text-nowrap">Precio</div></template>
-          <template v-slot:head(totalFila)><div class="text-nowrap">Total</div></template>
-          <template v-slot:head(key)><div class="text-nowrap">Quitar</div></template>
-
-          <template v-slot:cell(#)="scope">{{scope.item.key + 1}}</template>
-          <template v-slot:cell(is_serie)="scope">
-            <b-form-select size="sm" :options="selectSerie" v-model="scope.item.is_serie"></b-form-select>
-          </template>
-          <template v-slot:cell(is_moto)="scope">
-            <b-form-select size="sm" disabled :options="selectSerie" v-model="scope.item.is_moto"></b-form-select>
-          </template>
-          <template v-slot:cell(cantidad)="scope">
-            <b-form-input type="number" size="sm" v-model="scope.item.cantidad" @change="multiplicarTotalFla(scope.item)"
-                          min="1" :max="scope.item.cantidadMax"></b-form-input>
-          </template>
-          <template v-slot:cell(precio)="scope">
-            L {{scope.item.precio}}
-          </template>
-          <template v-slot:cell(totalFila)="scope">
-            L {{scope.item.totalFila}}
-          </template>
-          <template v-slot:cell(serie)="scope">
-            <b-form-input size="sm" v-model="scope.item.serie" :disabled="!scope.item.is_serie"
-                          @keyup="validarSerie(scope.item)"
-                          placeholder="Número de Seríe" :state="scope.item.vali_serie">
-            </b-form-input>
-          </template>
-          <template v-slot:cell(color)="scope">
-            <b-form-input size="sm" :disabled="!scope.item.is_serie" :state="scope.item.vali_color"
-                          v-model="scope.item.color" @keyup="validarColor(scope.item)"></b-form-input>
-          </template>
-          <template v-slot:cell(key)="scope">
-            <v-btn tile fab text color="red" @click="deleteFila(scope.item.key)"
-                   width="25" height="25px" dark><v-icon>fa fa-times</v-icon></v-btn>
-          </template>
-        </b-table>
+        <table>
+          <thead>
+          <tr>
+            <th v-for="(item, i) in newHeaderArticulos">{{item}}</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="item in Venta.filas">
+            <td style="width: 2%">{{item.key + 1}}</td>
+            <td style="width: 17%">{{item.articulo}}</td>
+            <td style="width: 15%">{{item.cod_sistema}}</td>
+            <td style="width: 15%">{{item.cod_provee}}</td>
+            <td style="width: 6%">
+              <select class="select" v-model="item.is_serie">
+                <option v-for="val in selectSerie" :value="val.value">{{val.text}}</option>
+              </select>
+            </td>
+            <td style="width: 6%">
+              <select class="select" v-model="item.is_moto">
+                <option v-for="val in selectSerie" :value="val.value">{{val.text}}</option>
+              </select>
+            </td>
+            <td style="width: 11%">
+              <input type="text" v-model="item.serie" placeholder="Serie del fabricante">
+            </td>
+            <td style="width: 10%">
+              <input type="text" v-model="item.color" placeholder="Color">
+            </td>
+            <td style="width: 10px !important;">
+              <input type="number" v-model="item.cantidad">
+            </td>
+            <td style="width: 10%">L {{int.format(item.precio)}}</td>
+            <td style="width: 10%">L {{int.format(item.totalFila)}}</td>
+            <td style="width: 5%">
+              <v-btn fab text color="red" @click="deleteFila(scope.item.key)"
+                     width="18" height="19" dark><v-icon size="12">fa fa-times</v-icon></v-btn>
+            </td>
+          </tr>
+          <tr v-if="Venta.filas.length > 0">
+            <td class="text-center" colspan="12">----- Fin -----</td>
+          </tr>
+          <tr v-else>
+            <td colspan="12" class="text-center">POR FAVOR SELECCIONAR UN ARTICULO PARA FACTURAR</td>
+          </tr>
+          </tbody>
+        </table>
+        <pre>{{Venta.filas}}</pre>
+        <v-divider></v-divider>
         <v-card-text>Descuento que se puede aplicar L. {{descuento.inicial}}</v-card-text>
         <br>
         <v-alert dense type="warning" class="ma-2" border="left" outlined dismissible dark>Recuerda que solo puedes facturar <strong>un artículo</strong>, para cosas pequeñas, se debe facturar en caja.</v-alert>
@@ -319,6 +316,7 @@
               <v-spacer></v-spacer>
               <v-text-field dense label="Buscar Artículo" v-model="searchRemision"></v-text-field>
             </v-toolbar>
+
             <v-data-table :headers="headerRemision"
                           :loading="loadRemision"
                           loading-text="Cargando artículos del piso"
@@ -411,6 +409,7 @@ export default {
   },
   data(){
     return{
+      int: Intl.NumberFormat(),
       tipoVenta: 0,
       descuento:{
         inicial:  0,
@@ -437,7 +436,20 @@ export default {
           'precio',
           'totalFila',
           'key'
-
+      ],
+      newHeaderArticulos:[
+        '#',
+        'Artículo',
+        'Código del Sistema',
+        'Código del Proveedor',
+        'Serie',
+        'Vehículo',
+        'Serie del Fabricante',
+        'Color',
+        'Cant.',
+        'Precio',
+        'Total',
+        'Quitar',
       ],
       headerRemision: [
         {text:'Proveedor',value:'articulo.marca.proveedor.nombre'},
@@ -882,7 +894,86 @@ export default {
 </script>
 
 <style scoped>
-.rowsTable{
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+table{
+  font-family: 'Open Sans', sans-serif;
+  width: 100%;
+  padding: 2px;
+}
+table thead{
+  background: #e8e5e5;
+}
+table thead tr th{
+  font-size: 12px;
+}
+table tbody tr td{
+  font-size: 11px;
+}
+table tbody tr td:nth-child(even){
+  background-color: #f2f2f2;
+}
+table tbody tr:hover{
+  background: #f2f2f2;
+  border: 1px solid;
   cursor: pointer;
+}
+table caption{
+  font-size: 13px;
+  caption-side: top;
+}
+table thead tr td{
+  font-size: 12px;
+}
+
+select{
+/*// A reset of styles, including removing the default dropdown arrow*/
+  appearance: none;
+/*// Additional resets for further consistency*/
+  background-color: transparent;
+  border: none;
+  padding: 0 1em 0 0;
+  margin: 0;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: inherit;
+  line-height: inherit;
+  outline: none;
+}
+:root {
+  --select-border: #777;
+  --select-focus: blue;
+  --select-arrow: var(--select-border);
+}
+select::-ms-expand {
+  display: none;
+}
+.select {
+  width: 100%;
+  /*min-width: 15ch;*/
+  /*max-width: 30ch;*/
+  border: 1px solid var(--select-border);
+  border-radius: 0.25em;
+  padding: 0.25em 0.5em;
+  /*font-size: 1.25rem;*/
+  cursor: pointer;
+  line-height: 1.1;
+  background-color: #fff;
+  background-image: linear-gradient(to top, #f9f9f9, #fff 33%);
+}
+.select::after {
+  content: "";
+  width: 0.8em;
+  height: 0.5em;
+  background-color: var(--select-arrow);
+  clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+}
+input{
+  padding: 2px;
+  border: 0.5px solid #7F828B;
 }
 </style>

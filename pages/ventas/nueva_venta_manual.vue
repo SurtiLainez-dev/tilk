@@ -1176,7 +1176,33 @@ export default {
 </script>
 
 <style scoped>
-.rowsTable{
+table{
+  font-family: 'Open Sans', sans-serif;
+  width: 100%;
+  padding: 2px;
+}
+table thead{
+  background: #e8e5e5;
+}
+table thead tr th{
+  font-size: 12px;
+}
+table tbody tr td{
+  font-size: 11px;
+}
+table tbody tr td:nth-child(even){
+  background-color: #f2f2f2;
+}
+table tbody tr:hover{
+  background: #f2f2f2;
+  border: 1px solid;
   cursor: pointer;
+}
+table caption{
+  font-size: 13px;
+  caption-side: top;
+}
+table thead tr td{
+  font-size: 12px;
 }
 </style>
