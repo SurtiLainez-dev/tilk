@@ -87,9 +87,14 @@
       <v-dialog v-model="modalInventario" width="100%">
         <v-card class="pl-5 pr-5" >
           <v-card-title>Seleccionando Artículo para la fila {{modalId + 1}}</v-card-title>
-          <h6><strong>Artículos</strong></h6>
-          <v-divider></v-divider>
-          <v-data-table v-if="!cargaArticulo" :headers="header" :items="Inventario.articulos">
+          <v-toolbar flat color="gray lighten-3">
+            <v-card-title>Artículos</v-card-title>
+            <v-spacer></v-spacer>
+            <v-spacer></v-spacer>
+            <v-spacer></v-spacer>
+            <v-text-field label="Buscar ..." v-model="buscarA"></v-text-field>
+          </v-toolbar>
+          <v-data-table v-if="!cargaArticulo" :search="buscarA" :headers="header" :items="Inventario.articulos">
             <template v-slot:item.id="{item}">
               <v-btn color="orange" fab x-small dark @click="registrarFila(item)">
                 <v-icon>fa fa-arrow-right</v-icon>
@@ -141,6 +146,7 @@
     },
     data(){
       return{
+        buscarA: '',
         rules: {
           nombre: {
             verdad: v => v === true || 'Falta Revisión',

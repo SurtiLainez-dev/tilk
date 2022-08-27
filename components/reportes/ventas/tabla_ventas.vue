@@ -172,7 +172,9 @@ export default {
     guardarExcel(url){
       if (this.$store.state.DIR){
         let dir = this.$axios.defaults.baseURL+url
-        let nombre = this.$store.state.DIR+'/Reporte de venta '+Math.floor(Math.random() * 10000)+'.xlsx';
+        let fecha = new Date();
+        let f = fecha.getDate()+'-'+fecha.getMonth()+'-'+fecha.getFullYear();
+        let nombre = this.$store.state.DIR+'/Reporte de venta '+f+' - '+Math.floor(Math.random() * 10000)+'.xlsx';
         ipcRenderer.send('save_file',{path_remoto: dir, path_local: nombre});
       }else{
         this.$store.commit('notificacion',{texto:'No puedes crear reportes en excel sin haber seleccionado una ruta para almacenar', color:'error'});

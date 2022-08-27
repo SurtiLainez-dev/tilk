@@ -198,14 +198,24 @@ module.exports.recuperar_almacenamientoLocal = () =>{
 }
 module.exports.crear_almacenamientoLocal = (dir)=> {
     db.getRows('almacenamientos', {add: 1}, (succ, data) => {
-        if (data) {
+        console.log("succ")
+        console.log(succ);
+        console.log("data")
+        console.log(data)
+        if (data.length > 0) {
             this.actualizar_almacenamientoLocal(1,dir);
         }else{
             let obj = new Object();
             obj.ruta = dir;
             obj.add  = 1;
             db.insertTableContent('almacenamientos', obj, (succ, msg)=>{
-                new Notification({title:'Registro Exitoso', body:'Se ha guardado exitosamente la ruta de almacenamiento de archivos'}).show()
+                const notification = {
+                    title: 'Ruta Almacenada',
+                    body: 'La ruta para almacenar documentos se guardó exitosamente',
+                    silent : false
+                }
+                const Noty = new Notification(notification)
+                Noty.show();
             })
         }
     })

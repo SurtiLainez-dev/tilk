@@ -30,7 +30,7 @@
         <th>Saldo Inicial del Crédito</th>
         <td><strong>L </strong>{{int.format(CUENTA.total)}}</td>
       </tr>
-      <tr>
+      <tr v-if="CUENTA.contrato_cliente">
         <th>Total Abonado</th>
         <td><strong>L </strong>{{int.format(CUENTA.contrato_cliente.saldo_abonado)}}</td>
       </tr>
