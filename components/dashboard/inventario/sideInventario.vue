@@ -26,6 +26,9 @@
       <v-list-item dense class="itemOpciones" @click="go('/ventas/contado/nueva')">
         Crear Venta de Contado
       </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/inventario/salida_manual')">
+        Rebaja Manual
+      </v-list-item>
       <v-list-item v-if="PERMISOS.includes(33)" dense class="itemOpciones" @click="go('/ventas/venta_reingreso')">
         <v-tooltip top>
           <template v-slot:activator="{on, attrs}">

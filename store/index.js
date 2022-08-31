@@ -44,10 +44,14 @@ export const state = () =>({
   MENU: false,
   ARTICULOS_EDIT: [],
   LOAD_ARTICULOS_EDIT: false,
-  DIR: null
+  DIR: null,
+  IMPUESTO: {},
 });
 
 export const mutations = {
+  agregar_IMPUESTO(state, data){
+    state.IMPUESTO = data;
+  },
   agregar_DIR(state, dir){
     state.DIR = dir;
     localStorage.setItem('dir', dir);

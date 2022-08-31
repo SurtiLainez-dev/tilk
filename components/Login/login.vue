@@ -92,6 +92,7 @@
                 localStorage.setItem('estadoUsuario', res.data.user.estado);
                 localStorage.setItem('sucursal_id', res.data.user.colaborador.sucursal.nombre);
                 localStorage.setItem('colaborador', res.data.user.colaborador.nombres+' '+res.data.user.colaborador.apellidos)
+                localStorage.setItem('impuesto', res.data.impuesto);
                 for (let item in res.data.permisos){
                   if (!permisos.includes(res.data.permisos[item].mod)){
                     permisos.push(res.data.permisos[item].mod)
@@ -115,6 +116,7 @@
                 this.$store.commit("guardarMiniToken", localStorage.getItem('miniToken'));
                 this.$store.commit("asignarIdSucursal", localStorage.getItem('sucursal_id'));
                 this.$store.commit("guardarUsuarioId", localStorage.getItem('usuario_id'));
+                this.$store.commit("agregar_IMPUESTO", localStorage.getItem('impuesto'));
                 ipcRenderer.send('crear-usuario', this.Email)
                 this.$axios.setToken(this.$store.state.token, 'Bearer')
                 this.load = false;

@@ -48,26 +48,103 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(item, i) in DATATABLE">
+
+      <tr :class="{'borderContado': item.venta.facturas_contados.length > 1}"  v-for="(item, i) in DATATABLE">
         <td>{{i+1}}</td>
-        <td v-if="item.venta.tipo_venta === 1">Contado</td>
-        <td v-else-if="item.venta.tipo_venta === 2">Crédito</td>
+        <td style="text-align: center">
+          <v-badge v-if="item.venta.tipo_venta === 1" dot color="indigo"></v-badge>
+          <v-badge v-else-if="item.venta.tipo_venta === 2" dot color="pink"></v-badge>
+        </td>
         <td>{{item.fecha}}</td>
         <td>{{item.venta.cod}}</td>
         <td>{{item.venta.cliente.nombres}} {{item.venta.cliente.apellidos}}</td>
-        <td>L. {{int.format(item.sub_total)}}</td>
-        <td>L. {{int.format(item.total)}}</td>
-        <td>L. {{int.format(item.venta.total)}}</td>
-        <td>{{item.venta.colaborador.nombres}} {{item.venta.colaborador.apellidos}}</td>
-        <td>{{item.venta.facturas_contados[0].articulo.marca.nombre}} / {{item.venta.facturas_contados[0].articulo.modelo}}</td>
-        <td>{{item.venta.facturas_contados[0].articulo.nombre_articulo}}</td>
+        <td v-if="item.venta.facturas_contados.length > 1">
+          <table>
+            <tbody>
+            <tr v-for="value in item.venta.facturas_contados">
+              <td>{{value.cantidad}}</td>
+            </tr>
+            <tr>
+              <td class="text-center">-</td>
+            </tr>
+            </tbody>
+          </table>
+        </td>
+        <td v-else>1</td>
+
+        <td :class="{'borderDescuento': item.venta.facturas_contados[0].precio !== item.total}" v-if="item.venta.facturas_contados.length === 1">
+          L. {{item.venta.facturas_contados[0].precio}}
+        </td>
+        <td v-else>
+          <table>
+            <tbody>
+            <tr v-for="value in item.venta.facturas_contados">
+              <td>L. {{int.format(value.precio)}}</td>
+            </tr>
+            <tr>
+              <td class="text-center">-</td>
+            </tr>
+            </tbody>
+          </table>
+        </td>
+
+        <td>
+          <table v-if="item.venta.facturas_contados.length > 1">
+            <tbody>
+            <tr v-for="value in item.venta.facturas_contados">
+              <td>L. {{int.format(((value.precio/(1+parseFloat(IMPUESTO)))*value.cantidad).toFixed(2))}}</td>
+            </tr>
+            <tr>
+              <td style="border-top: 1px solid #000"></td>
+            </tr>
+            </tbody>
+          </table>
+
+          L. {{int.format(item.sub_total)}}
+        </td>
+        <td>
+          <table v-if="item.venta.facturas_contados.length > 1">
+            <tbody>
+            <tr v-for="value in item.venta.facturas_contados">
+              <td>L. {{int.format((value.precio * value.cantidad).toFixed(2))}}</td>
+            </tr>
+            <tr>
+              <td style="border-top: 1px solid #000"> </td>
+            </tr>
+            </tbody>
+          </table>
+          L. {{int.format(item.total)}}</td>
+
+        <td >L. {{int.format(item.venta.total)}}</td>
+        <td >{{item.venta.colaborador.nombres}} {{item.venta.colaborador.apellidos}}</td>
+        <td>
+          <table>
+            <tbody>
+              <tr v-for="value in item.venta.facturas_contados">
+                <td>{{value.articulo.marca.nombre}} / {{value.articulo.modelo}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td>
+          <table>
+            <tbody>
+            <tr v-for="value in item.venta.facturas_contados">
+              <td>{{value.articulo.descripcion_corta}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </td>
         <td style="text-align: center">
           <v-badge v-if="item.venta.tipo_venta === 1" dot color="success"></v-badge>
           <v-badge v-else-if="item.venta.revision_documentos === 1" dot color="success"></v-badge>
           <v-badge v-else-if="item.venta.revision_documentos === 0" dot color="red"></v-badge>
         </td>
+
       </tr>
       <tr>
+        <td></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -78,11 +155,14 @@
         <td style="border-top: 1px solid #000">L.{{int.format(TOTALFINAL)}}</td>
         <td></td>
         <td></td>
-        <td></td>
-        <td></td>
       </tr>
       </tbody>
     </table>
+    <br>
+    <br>
+    <v-divider></v-divider>
+    <br>
+    <br>
   </v-card>
 </template>
 
@@ -125,11 +205,13 @@ export default {
         'Fecha',
         'Cuenta',
         'Nombre Completo',
+        'Cant.',
+        'Precio',
         'Precio S/I',
         'Precio Contado',
         'Precio Final',
         'Vendedor',
-        'Marca/Modelo',
+        'Marca/Módelo',
         'Artículo',
         'Estado'
       ]
@@ -156,6 +238,9 @@ export default {
       if (this.DATATABLE.length > 0)
         return this.DATATABLE.reduce((num1, num2)=> num1 + parseFloat(num2.venta.total),0)
       else return 0;
+    },
+    IMPUESTO(){
+      return this.$store.state.IMPUESTO;
     },
   },
   methods:{
@@ -233,5 +318,11 @@ table thead tr td{
 #tituloTabla{
   font-size: 14px;
   color: #7F828B;
+}
+.borderContado{
+  border: 1px solid #00b786;
+}
+.borderDescuento{
+  border: 1px solid red;
 }
 </style>
