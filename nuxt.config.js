@@ -17,6 +17,7 @@ module.exports = {
 			{rel:'stylesheet', href:'https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap'},
 			{rel:'stylesheet', href:'https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=Roboto+Slab&display=swap'},
 			{rel:'stylesheet', href:'https://fonts.googleapis.com/css2?family=Open+Sans:wght@500&display=swap'},
+			{rel:'stylesheet', href:'https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,500;1,400&family=Roboto&family=Roboto+Mono&display=swap'},
 		],
 		title: 'TILK',
 	}, // Headers of the page

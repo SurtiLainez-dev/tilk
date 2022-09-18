@@ -12,12 +12,18 @@ export const mutations = {
     asignar_ARTICULO(state, data){
         state.ARTICULO = data;
     },
+    asignar_PEPS(state, data){
+      state.PEPS = data;
+    },
     cargartodo_INVENTARIO(state){
         state.LOAD_INVENTARIO = true;
         this.$axios.get('/2.0/articulos/').then((res)=>{
             state.INVENTARIO      = res.data.articulos;
             state.LOAD_INVENTARIO = false;
         });
+    },
+    cambiarEstado_LOADPEPS(state, val){
+        state.LOAD_PEPS = val;
     },
     cargar_PEPS(state){
         state.LOAD_PEPS = true;

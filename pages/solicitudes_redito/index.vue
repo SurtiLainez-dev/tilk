@@ -1,8 +1,15 @@
 <template>
     <v-card flat>
         <div v-if="vista === 1">
-            <v-card-title class="grey lighten-3">Solicitudes de Crédito</v-card-title>
+            <v-toolbar flat color="grey lighten-3" >
+              <v-card-title>Solicitudes de Crédito</v-card-title>
+              <v-spacer></v-spacer>
+              <v-spacer></v-spacer>
+              <v-spacer></v-spacer>
+              <v-text-field dense label="Buscar... " v-model="search"></v-text-field>
+            </v-toolbar>
             <v-data-table :headers="header"
+                          :search="search"
                           :items="Solicitudes"
                           dense
                           @click:row="SeleccionarSolicitud"
@@ -49,6 +56,7 @@
         components:{solicitud},
         data(){
             return{
+              search: '',
                 header:[
                     {text:'Referencia', value: 'codigo'},
                     {text:'Nombre del cliente', value: 'cliente.nombres'},

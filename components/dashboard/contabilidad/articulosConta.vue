@@ -7,6 +7,9 @@
         <v-list-item v-if="PERMISOS.includes(413)" dense class="itemOpciones" @click="go('/contabilidad/articulos/precio')">
           Asignación de Precios
         </v-list-item>
+        <v-list-item v-if="PERMISOS.includes(413)" dense class="itemOpciones" @click="go('/contabilidad/articulos/combos')">
+          Combos
+        </v-list-item>
         <v-list-item v-if="PERMISOS.includes(414)" dense class="itemOpciones" @click="go('/contabilidad/articulos/reingreso')">
           <v-tooltip top>
             <template v-slot:activator="{on, attrs}">
