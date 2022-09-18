@@ -279,7 +279,7 @@
           nombre: {
             req: v => !!v || 'Campo requerido',
             min: v => v.length >= 3 || 'Tiene que ser mayor a 3 carácteres.',
-            max: v => v.length <= 30 || 'Tiene que ser menor o igual a 30 carácteres.',
+            max: v => v.length <= 50 || 'Tiene que ser menor o igual a 50 carácteres.',
             maxDet: v => v.length <= 250 || 'Tiene que ser menor o igual a 250 carácteres.',
           },
           modelo:{
