@@ -58,7 +58,7 @@
         Crear Orden en Entrada
       </v-list-item>
       <v-list-item v-if="PERMISOS.includes(31)"  dense class="itemOpciones" @click="go('/inventario/ingresos/')">
-        Ver Ordenes en Entrada
+        Ver Ordenes en <Entrada></Entrada>
       </v-list-item>
     </v-list-group>
   </div>

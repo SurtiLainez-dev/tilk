@@ -48,7 +48,7 @@
               <v-col cols="6">
                 <v-text-field dense label="Nombre del Artículo" v-model="Articulo.nombre"
                               :rules="[rules.nombre.req, rules.nombre.min, rules.nombre.max]"
-                              :counter="30" @keyup="agregarModelo"></v-text-field>
+                              :counter="50" @keyup="agregarModelo"></v-text-field>
               </v-col>
               <v-col cols="2">
                 <v-text-field suffix="lps" dense label="Precio de Costo" v-model="Articulo.precio"
