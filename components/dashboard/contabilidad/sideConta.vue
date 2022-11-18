@@ -26,6 +26,9 @@
       <v-list-item v-if="PERMISOS.includes(48)" dense class="itemOpciones" @click="go('/contabilidad/cheques')">
         Cheques
       </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/precio_matricula')">
+        Precio de Matricula
+      </v-list-item>
     </v-list-group>
     <v-list-group v-if="PERMISOS.includes(49) || PERMISOS.includes(410) || PERMISOS.includes(411) || PERMISOS.includes(412)">
       <template v-slot:activator value="true">

@@ -22,6 +22,13 @@
           </v-card-title>
         </v-card>
       </v-col>
+      <v-col lg="2" cols="6">
+        <v-card @click="goTodo">
+          <v-card-title>
+            To-Do SL
+          </v-card-title>
+        </v-card>
+      </v-col>
 
     </v-row>
     <v-row v-if="vista === 1">
@@ -53,6 +60,11 @@
         vista: 1
       }
     },
+    computed:{
+      Pes(){
+        return this.$store.state.pestana
+      },
+    },
     created() {
       this.$store.commit('activarOverlay', false);
       this.$store.commit('guardarTitulo', 'Inicio')
@@ -62,6 +74,17 @@
     methods:{
       taraa(){
         this.$store.commit('tareas/cambiarTareas', 'esto es un cambio')
+      },
+      goTodo(){
+        let bandera = 0;
+        this.Pes.forEach((item)=>{
+          if (item.key === 3)
+            bandera++;
+        });
+        if (bandera === 0){
+          this.$store.commit('anadirCaja', {titulo:'To-Do SL', key: 3});
+          this.$store.commit('cambiarTab', {val:3, tipo:false});
+        }
       }
     }
   }

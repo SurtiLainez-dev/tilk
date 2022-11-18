@@ -77,8 +77,8 @@
       <v-row no-gutters>
         <v-col cols="4">
           <v-autocomplete :items="ccCuentasB" :item-value="'id'" :item-text="'nombre'" class="ma-2"
-                          :loading="loadccBancos" label="Seleccionar Cuenta"
-                          dense :rules="[rules.req.req]" v-model="cierre.cc_banco"></v-autocomplete>
+                          :loading="loadccBancos" label="Seleccionar Cuenta" disabled
+                          dense v-model="cierre.cc_banco"></v-autocomplete>
         </v-col>
         <v-col cols="8">
           <v-text-field class="ma-2" dense label="Observación" :rules="[rules.req.req]"

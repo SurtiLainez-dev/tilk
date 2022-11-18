@@ -4,8 +4,14 @@
     <v-divider></v-divider>
     <v-form ref="FormNuevoCombo1">
       <v-row no-gutters>
-        <v-col cols="9">
-          <v-text-field dense class="ma-2" label="Nombre del Combo" counter></v-text-field>
+        <v-col cols="6">
+          <v-text-field dense class="ma-2" label="Nombre del Combo"
+                        :rules="[rules.req]" v-model="combo.nombre" counter></v-text-field>
+        </v-col>
+        <v-col cols="3">
+          <v-autocomplete dense class="ma-2" label="Seleccione una Sub-familia"
+                          :items="subs" :loading="load_subs"
+                          v-model="combo.sub_familia" :rules="[rules.req]"></v-autocomplete>
         </v-col>
         <v-col cols="3">
           <v-dialog ref="dialogFechaFinal" v-model="dialogos.fecha_final" :return-value.sync="combo.fecha_final"
@@ -21,6 +27,20 @@
               <v-btn text color="primary" @click="$refs.dialogFechaFinal.save(combo.fecha_final)">OK</v-btn>
             </v-date-picker>
           </v-dialog>
+        </v-col>
+      </v-row>
+      <v-row no-gutters>
+        <v-col>
+          <v-text-field dense class="ma-2" label="Detalle del Combo" :rules="[rules.req]"
+          v-model="combo.detalle" counter="100"></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row no-gutters>
+        <v-col >
+          <v-autocomplete dense class="ma-2" :items="SUCURSALES" :rules="[rules.req]"
+                          :item-text="'nombre'" :item-value="'id'" multiple
+                          v-model="combo.sucursales" chips small-chips
+                          label="Seleccionar Sucursales" :loading="LOADSUCURSALES"></v-autocomplete>
         </v-col>
       </v-row>
     </v-form>
@@ -158,9 +178,9 @@
       </table>
     </v-card>
 
-    <br>
-    <br>
-    <br>
+    <v-card-actions class="d-flex justify-end">
+      <v-btn color="success" dark small tile class="ma-2" @click="registrarComobo">Registrar Combo</v-btn>
+    </v-card-actions>
     <v-divider></v-divider>
 
 
@@ -199,15 +219,15 @@
         </v-row>
         <v-divider></v-divider>
 
-        <v-simple-table v-if="combo.amortizacion.length > 0" class="grey lighten-3">
+        <v-simple-table v-if="combo.amortizacion.length > 0" class="grey lighten-5 ma-5">
           <template v-slot:default>
             <thead>
             <tr>
               <th>#</th>
               <th>Cuota</th>
-              <th>Saldo Antes</th>
               <th>Capital</th>
               <th>Intereses</th>
+              <th>Saldo Antes</th>
               <th>Saldo Despues</th>
             </tr>
             </thead>
@@ -215,9 +235,9 @@
             <tr v-for="item in combo.amortizacion">
               <td>{{item.pago}}</td>
               <td>L. {{new Intl.NumberFormat().format(item.cuota)}}</td>
-              <td>L. {{new Intl.NumberFormat().format(item.antes)}}</td>
               <td>L. {{new Intl.NumberFormat().format(item.capital)}}</td>
               <td>L. {{new Intl.NumberFormat().format(item.intereses)}}</td>
+              <td>L. {{new Intl.NumberFormat().format(item.antes)}}</td>
               <td>L. {{new Intl.NumberFormat().format(item.despues)}}</td>
             </tr>
             </tbody>
@@ -261,6 +281,8 @@ export default {
         {text:'Sub-familia',value:'fam'},
       ],
       combo:{
+        sucursales: [],
+        sub_familia: '',
         fecha_final: '',
         articulos: [],
         precio_costo: 0,
@@ -285,15 +307,21 @@ export default {
         meses_prueba: 1,
         total_credito: 0,
         amortizacion: [],
+        nombre: '',
+        detalle: ''
       },
       impuesto: '', //es el impuesto seleccionado por el cliente
-      Impuestos: [] //son los impuestos registrados en tilk
+      Impuestos: [], //son los impuestos registrados en tilk,
+      subs: [],
+      load_subs: true
     }
   },
   created() {
     this.$store.commit('guardarTitulo', 'Contabilidad > Combos > Nuevo Combo');
     this.$store.commit('cargar_ARTICULOS_EDIT');
+    this.$store.commit('suc/cargar_SUCURSALES');
     this.getImpuestos();
+    this.cargarSubs();
   },
   computed:{
     INVENTARIO(){
@@ -301,6 +329,12 @@ export default {
     },
     LOADINVENTARIO(){
       return this.$store.state.LOAD_ARTICULOS_EDIT;
+    },
+    LOADSUCURSALES(){
+      return this.$store.state.suc.LOAD_SUCURSALES;
+    },
+    SUCURSALES(){
+      return this.$store.state.suc.SUCURSALES;
     },
     TotalPrecioContado(){
       return this.combo.articulos.reduce((num1, num2)=> num1 + parseFloat(num2.precio_contado),0);
@@ -379,14 +413,25 @@ export default {
         this.calcularInteres()
       }
     },
+    cargarSubs(){
+      this.$axios.get('/2.0/carga_sub_familias/723').then((res)=>{
+        res.data.sub.forEach((item)=>{
+          this.subs.push({
+            text: item.nombre +' - '+ item.familia_articulo.nombre,
+            value: item.id
+          })
+        })
+        this.load_subs = false;
+      })
+    },
     deleteFila(data){
       this.combo.articulos.splice(data.key, 1)
       this.combo.articulos.forEach( (i, item) => {
         i.key = item;
       });
-      this.sumarTotalContado();
-      this.calcularPrecioContado();
       this.sumarPrecioCosto();
+      this.calcularPrecioContado();
+      this.sumarTotalContado();
       this.calcularPrima();
     },
     getImpuestos(){
@@ -460,6 +505,38 @@ export default {
         this.combo.intereses = (parseFloat(this.combo.intereses) + parseFloat(intereses)).toFixed(2);
       }
       this.combo.amortizacion = PAGOS;
+    },
+    registrarComobo(){
+      if (this.$refs.FormNuevoCombo1.validate() && this.$refs.FormNuevoCombo2.validate() && this.$refs.FormComboNuevo3){
+        let th = this.combo;
+        this.$store.commit('activarOverlay', true);
+
+        this.$axios.post('2.0/combos',{
+          nombre:              th.nombre,
+          detalle:             th.detalle,
+          subfamilia:          th.sub_familia,
+          fecha_final:         th.fecha_final,
+          sucursales:          JSON.stringify(th.sucursales),
+          total_precio_contado: this.TotalPrecioContado,
+          precio_contado:       th.precio_contado,
+          precio_costo:         th.precio_costo,
+          minimo_prima:         th.prima,
+          margen_ganancia:      th.margenUtilidad,
+          financiamiento_anual: th.financiamiento_anual,
+          impuesto_id:          th.impuesto_id,
+          meses:                th.maximo_meses,
+          articulos:            th.articulos
+        }).then((res)=>{
+          this.$store.commit('inventario/combos/cargar_COMBOS');
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('inventario/combos/cambiar_VISTA', 1)
+          this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
+        }).catch((error)=>{
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
+        })
+      } else
+        this.$store.commit('notificacion',{texto:'Formulario incompleto', color:'warning'})
     },
     sacarFinanciamientoMensual(){
       let margen = this.combo.financiamiento_anual

@@ -3,6 +3,8 @@ export const state = () => ({
     SUCURSAL:   {},
     LOADSUCURSALES: false,
     LOADSUCURSAL: {},
+    LOADCIERRE: false,
+    CIERRE: {}
 })
 
 export const mutations = {
@@ -15,5 +17,12 @@ export const mutations = {
     },
     asignar_HISTORIAL(state, sucursal){
         state.SUCURSAL = sucursal;
+    },
+    cargar_CIERRE(state, cierre){
+        state.LOADCIERRE = true;
+        this.$axios.get('cajas/historial_cierre/cierre/'+cierre).then((res)=>{
+            state.SUCURSAL = res.data.cierre;
+        });
+        state.LOADCIERRE = false;
     }
 }

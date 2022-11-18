@@ -101,7 +101,7 @@
           </tr>
           </tbody>
         </table>
-        <pre>{{Venta.filas}}</pre>
+
         <v-divider></v-divider>
         <v-card-text>Descuento que se puede aplicar L. {{descuento.inicial}}</v-card-text>
         <br>

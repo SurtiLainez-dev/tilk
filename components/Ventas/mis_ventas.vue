@@ -608,36 +608,34 @@ export default {
       console.log(this.doc)
     },
     cargarFiles(){
-      if (this.validarFiles()){
-        this.$store.commit('activarOverlay', true);
-        let data = new FormData();
-        data.append('contrato',     this.doc.contrato);
-        data.append('pagare',       this.doc.pagare);
-        data.append('carta_poder',  this.doc.carta_poder);
-        data.append('garantia',     this.doc.garantia);
-        data.append('traspaso',     this.doc.traspaso);
-        data.append('conocimiento', this.doc.hoja_conocimiento);
-        data.append('factura_sar',  this.doc.factura_sar);
-        data.append('expediente',   this.doc.expediente);
-        data.append('tarjeta',      this.doc.tarjeta_fisica);
-        data.append('id',           this.DATA_VENTA.id);
+      this.$store.commit('activarOverlay', true);
+      let data = new FormData();
+      data.append('contrato',     this.doc.contrato);
+      data.append('pagare',       this.doc.pagare);
+      data.append('carta_poder',  this.doc.carta_poder);
+      data.append('garantia',     this.doc.garantia);
+      data.append('traspaso',     this.doc.traspaso);
+      data.append('conocimiento', this.doc.hoja_conocimiento);
+      data.append('factura_sar',  this.doc.factura_sar);
+      data.append('expediente',   this.doc.expediente);
+      data.append('tarjeta',      this.doc.tarjeta_fisica);
+      data.append('id',           this.DATA_VENTA.id);
 
-        this.$axios({
-          method: 'post',
-          url:    'cargar_documentos_venta',
-          data:   data,
-          headers:{
-            'Authorization': 'Bearer ' + this.$store.state.token,
-            'Content-Type': "multipart/form-data"
-          }
-        }).then((res)=>{
-          this.$store.commit('activarOverlay', false);
-          this.notificacion(res.data.msg, 'success');
-          this.notificacion('Tienes que esperar a que facturación revise los documentos para avanzar', 'success')
-        }).catch((error)=>{
-          this.$store.commit('activarOverlay', false);
-        })
-      }
+      this.$axios({
+        method: 'post',
+        url:    'cargar_documentos_venta',
+        data:   data,
+        headers:{
+          'Authorization': 'Bearer ' + this.$store.state.token,
+          'Content-Type': "multipart/form-data"
+        }
+      }).then((res)=>{
+        this.$store.commit('activarOverlay', false);
+        this.notificacion(res.data.msg, 'success');
+        this.notificacion('Tienes que esperar a que facturación revise los documentos para avanzar', 'success')
+      }).catch((error)=>{
+        this.$store.commit('activarOverlay', false);
+      })
     },
     mostrarPdf(url){
       ipcRenderer.send('pint_navegador', url);
@@ -695,22 +693,6 @@ export default {
           this.notificacion('Tienes que seleccionar al colaborador que va a recibir la venta','error');
       // else
       //   this.notificacion('Esta venta no se puede registrar de ninguna manera','error');
-    },
-    validarFiles(){
-      console.log(this.DATA_VENTA)
-      if (this.DATA_VENTA.is_aceptado === 1){
-        if (this.doc.tarjeta_fisica || this.doc.expediente || this.doc.factura_sar || this.doc.traspaso || this.doc.garantia
-          || this.doc.pagare || this.doc.hoja_conocimiento || this.doc.contrato || this.doc.carta_poder)
-            return true;
-        else
-          this.notificacion('Tienes que cargar archivos','error')
-      }else{
-        if (this.doc.contrato && this.doc.pagare)
-          return true;
-        else
-          this.notificacion('Tienes que cargar archivos','error')
-      }
-
     },
     verDocumento(url){
       this.$store.commit('activarOverlay', true);

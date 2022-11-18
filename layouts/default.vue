@@ -21,6 +21,7 @@
           <nuxt v-if="i.key === 0"/>
           <caja v-if="i.key === 1"/>
           <cobros v-if="i.key === 2"/>
+          <to_do_inidex v-if="i.key === 3"/>
         </v-tab-item>
       </v-tabs-items>
 
@@ -41,6 +42,7 @@ import NuxtLoading from "../.nuxt/components/nuxt-loading";
 import Cuerpo from "../components/Pestanas/Cuerpo";
 import caja from "../components/caja/index"
 import inicio from "@/components/cobros/inicio";
+import to_do_inidex from "@/components/to_to/to_do_inidex";
 export default {
   watch: {
     over (val) {
@@ -48,7 +50,7 @@ export default {
       }, 500)
     },
   },
-  components:{NuxtLoading, side, Cuerpo, caja, cobros: inicio},
+  components:{NuxtLoading, side, Cuerpo, caja, cobros: inicio, to_do_inidex},
   data(){
     return{
       refe: null,
