@@ -5,7 +5,7 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Clientes</v-list-item-title>
       </template>
-      <v-list-item dense class="itemOpciones" @click="go('/clientes/')">
+      <v-list-item dense class="itemOpciones" @click="anadirPestana(4, 'Perfiles')">
         Perfiles
       </v-list-item>
     </v-list-group>
@@ -15,7 +15,7 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Ventas</v-list-item-title>
       </template>
-      <v-list-item v-if="PERMISOS.includes(144)" dense class="itemOpciones" @click="go('/ventas/')">
+      <v-list-item v-if="PERMISOS.includes(144)" dense class="itemOpciones" @click="anadirPestana(5,'Cuentas Activas')">
         Todas las Cuentas
       </v-list-item>
       <v-list-item v-if="PERMISOS.includes(145)" dense class="itemOpciones" @click="go('/ventas/agregar_pagos')">
@@ -50,7 +50,7 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Cobros</v-list-item-title>
       </template>
-      <v-list-item v-if="PERMISOS.includes(71)" dense class="itemOpciones" @click="anadirPestana">Cobros</v-list-item>
+      <v-list-item v-if="PERMISOS.includes(71)" dense class="itemOpciones" @click="anadirPestana(2, 'Cobros')">Cobros</v-list-item>
       <v-list-item v-if="PERMISOS.includes(72)" dense class="itemOpciones" @click="go('/ventas/cobros/segmentos')">Segmentos</v-list-item>
       <v-list-item v-if="PERMISOS.includes(73)" dense class="itemOpciones" @click="go('/ventas/cobros/portafolios')">Portafolios</v-list-item>
     </v-list-group>
@@ -77,15 +77,15 @@ name: "sideCuentas",
     },
   },
   methods:{
-    anadirPestana(){
+    anadirPestana(key, titulo){
       let bandera = 0;
       this.Pes.forEach((item)=>{
-        if (item.key === 2)
+        if (item.key === key)
           bandera++;
       });
       if (bandera === 0){
-        this.$store.commit('anadirCaja', {titulo:'Cobros', key: 2});
-        this.$store.commit('cambiarTab', {val:2, tipo:false});
+        this.$store.commit('anadirCaja', {titulo:titulo, key: key});
+        this.$store.commit('cambiarTab', {val:key, tipo:false});
       }
     },
     go(url){

@@ -5,7 +5,7 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Inventario</v-list-item-title>
       </template>
-      <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="go('/inventario/')">
+      <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="anadirPestana(6, 'Inventario')">
         Inventario
       </v-list-item>
       <v-list-item v-if="PERMISOS.includes(310)"  dense class="itemOpciones" @click="go('/inventario/articulos/nuevo')">
@@ -70,9 +70,23 @@
     methods:{
       go(url){
         this.$router.push(url)
-      }
+      },
+      anadirPestana(key, titulo){
+        let bandera = 0;
+        this.Pes.forEach((item)=>{
+          if (item.key === key)
+            bandera++;
+        });
+        if (bandera === 0){
+          this.$store.commit('anadirCaja', {titulo:titulo, key: key});
+          this.$store.commit('cambiarTab', {val:key, tipo:false});
+        }
+      },
     },
     computed:{
+      Pes(){
+        return this.$store.state.pestana
+      },
       PERMISOS(){
         let permisos = this.$store.state.permisosUser.split(',');
         let per = [];

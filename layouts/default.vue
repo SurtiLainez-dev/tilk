@@ -22,6 +22,9 @@
           <caja v-if="i.key === 1"/>
           <cobros v-if="i.key === 2"/>
           <to_do_inidex v-if="i.key === 3"/>
+          <perfiles v-if="i.key === 4"/>
+          <cuentas v-if="i.key === 5"/>
+          <inventario v-if="i.key === 6"/>
         </v-tab-item>
       </v-tabs-items>
 
@@ -43,6 +46,9 @@ import Cuerpo from "../components/Pestanas/Cuerpo";
 import caja from "../components/caja/index"
 import inicio from "@/components/cobros/inicio";
 import to_do_inidex from "@/components/to_to/to_do_inidex";
+import perfiles from "@/components/Ventas/pes/perfiles";
+import cuentas from "@/components/Ventas/pes/cuentas";
+import inventario from "@/components/Inventario/inventario"
 export default {
   watch: {
     over (val) {
@@ -50,7 +56,7 @@ export default {
       }, 500)
     },
   },
-  components:{NuxtLoading, side, Cuerpo, caja, cobros: inicio, to_do_inidex},
+  components:{NuxtLoading, side, Cuerpo, caja, cobros: inicio, to_do_inidex, perfiles, cuentas, inventario},
   data(){
     return{
       refe: null,

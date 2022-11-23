@@ -11,12 +11,22 @@
           {{TITULO}}
         </v-toolbar-title>
 
-        <v-spacer></v-spacer>
+        <template v-if="VISTA === 1 && VISTA_VIEW === 1" v-slot:extension>
+          <v-tabs v-model="VISTA_TAREA" fixed-tabs>
+            <v-tab :key="0">Tareas</v-tab>
+            <v-tab :key="1">Tareas Terminadas</v-tab>
+            <v-tab :key="2" disabled>Proximas Reuniones</v-tab>
+            <v-tab :key="3" disabled>Reuniones Finalizadas</v-tab>
+          </v-tabs>
+        </template>
 
+        <v-spacer></v-spacer>
         <v-btn icon>
           <v-icon>mdi-magnify</v-icon>
         </v-btn>
-
+        <v-btn icon small color="warning" v-if="VISTA_VIEW === 2" @click="goBack">
+          <v-icon small>fa fa-arrow-left</v-icon>
+        </v-btn>
         <v-menu right>
           <template v-slot:activator="{ on: menu, attrs }">
             <v-tooltip bottom>
@@ -30,13 +40,13 @@
           </template>
           <v-list>
             <v-list-item-group>
-              <v-list-item><v-list-item-title @click="goVista(4)">Añadir Estado</v-list-item-title></v-list-item>
+              <v-list-item><v-list-item-title @click="goVista(4)">Añadir Estado {{VISTA}}</v-list-item-title></v-list-item>
               <v-list-item><v-list-item-title @click="goVista(5)">Estados de Tarea</v-list-item-title></v-list-item>
               <v-list-item><v-list-item-title @click="goVista(2)">Añadir Grupo</v-list-item-title></v-list-item>
               <v-list-item><v-list-item-title @click="goVista(3)">Grupos de Tarea</v-list-item-title></v-list-item>
-              <v-list-item><v-list-item-title @click="goVista(6)">Crear Nueva Tarea</v-list-item-title></v-list-item>
+              <v-list-item><v-list-item-title @click="resetNuevaTarea">Crear Nueva Tarea</v-list-item-title></v-list-item>
               <v-list-item><v-list-item-title >Crear Nueva Reunión</v-list-item-title></v-list-item>
-              <v-list-item><v-list-item-title @click="goVista(1)">Inicio</v-list-item-title></v-list-item>
+              <v-list-item><v-list-item-title @click="goInicio">Inicio</v-list-item-title></v-list-item>
             </v-list-item-group>
           </v-list>
         </v-menu>
@@ -64,7 +74,6 @@ import to_do_grupo_nuevo from "@/components/to_to/to_do_grupo_nuevo";
 import to_do_inicio from "@/components/to_to/to_do_inicio";
 import to_do_estado from "@/components/to_to/to_do_estado";
 import to_do_estado_nuevo from "@/components/to_to/to_do_estado_nuevo";
-import to_do_tarea from "@/components/to_to/to_do_tarea";
 import to_do_tarea_nueva from "@/components/to_to/to_do_tarea_nueva";
 export default {
   name: "to_do_inidex",
@@ -97,17 +106,73 @@ export default {
       set: function (val){
         this.$store.commit('todo/cambiar_VISTA', val)
       }
+    },
+    VISTA_TAREA: {
+      get: function (){
+        return this.$store.state.todo.VISTA_TAREA;
+      },
+      set: function (vista){
+        return this.$store.commit('todo/asignar_VISTATAREA', vista);
+      }
+    },
+    VISTA_VIEW:{
+      get: function (){
+        return this.$store.state.todo.VISTA_VIEW;
+      },
+      set: function (vista){
+        this.$store.commit('todo/cambiar_VISTAVIEW', vista);
+      }
+    },
+    TAREA: {
+      get:function (){
+        return this.$store.state.todo.TAREA;
+      },
+      set: function (data){
+        this.$store.commit('todo/asignar_TAREA', data);
+      }
     }
   },
   created() {
-    this.TITULO = 'Tareas - Inicio'
+    this.TITULO = 'Tareas'
   },
   methods:{
     goVista(val){
-      console.log(this.VISTA)
-      console.log(val)
       this.VISTA  = val;
-      console.log(this.VISTA)
+    },
+    goInicio(){
+      this.$store.commit('todo/cambiar_VISTAVIEW', 1);
+      this.VISTA = 1;
+    },
+    goBack(){
+      if (this.VISTA_VIEW === 2 && this.$store.state.todo.TAREA.tipo === 1){
+        this.VISTA_VIEW = 1;
+        this.TITULO = 'Tareas'
+      }
+      else if (this.VISTA_VIEW === 2 && this.$store.state.todo.TAREA.tipo === 2){
+        this.VISTA = 1;
+        this.TITULO = this.$store.state.todo.INFO.titulo;
+        this.$store.state.todo.TAREA.tipo = 1;
+        this.resetTarea();
+      }
+    },
+    resetNuevaTarea(){
+      this.VISTA = 6;
+      this.resetTarea();
+      this.$store.commit('todo/cambiar_VISTAVIEW', 1);
+    },
+    resetTarea(){
+      this.TAREA.titulo = '';
+      this.TAREA.detalle = '';
+      this.TAREA.fecha_inicio = '';
+      this.TAREA.fecha_finalizacion = '';
+      this.TAREA.user    = [];
+      this.TAREA.grupo = '';
+      this.TAREA.estado = '';
+      this.TAREA.links     = [];
+      this.TAREA.archivos   = [];
+      this.TAREA.checklist = [];
+      this.TAREA.tipo      = 1;
+      this.TAREA.tarea     = 0;
     }
   }
 }
