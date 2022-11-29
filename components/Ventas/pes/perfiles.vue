@@ -58,7 +58,7 @@ export default {
   },
   methods:{
     goCliente(cliente){
-      this.$router.replace({path:'/clientes/'+cliente.id});
+      // this.$router.replace({path:'/clientes/'+cliente.id});
       this.notificacion('Cargando los datos del cliente','success');
     },
     notificacion(text, color){

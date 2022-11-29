@@ -8,10 +8,10 @@
       <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="anadirPestana(6, 'Inventario')">
         Inventario
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(310)"  dense class="itemOpciones" @click="go('/inventario/articulos/nuevo')">
+      <v-list-item v-if="PERMISOS.includes(310)"  dense class="itemOpciones" @click="anadirPestana(8, 'Crear Artículo')">
         Crear Artículo
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(310)"  dense class="itemOpciones" @click="go('/inventario/articulos/editar')">
+      <v-list-item v-if="PERMISOS.includes(310)"  dense class="itemOpciones" @click="anadirPestana(7, 'Editando Artículo')">
         Editar Artículo
       </v-list-item>
       <v-list-item v-if="PERMISOS.includes(38)" dense class="itemOpciones" @click="go('/inventario/traslados/traslados_externos')">

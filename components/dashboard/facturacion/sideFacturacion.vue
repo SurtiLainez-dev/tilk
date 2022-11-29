@@ -36,6 +36,9 @@
       <v-list-item v-if="PERMISOS.includes(61)" class="itemOpciones" @click="go('/ventas/revision_documentos')">
         Revision de DOC.
       </v-list-item>
+      <v-list-item  class="itemOpciones" @click="go('/ventas/motocicletas')">
+        Notificar Moto
+      </v-list-item>
     </v-list-group>
   </div>
 </template>

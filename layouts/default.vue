@@ -25,6 +25,8 @@
           <perfiles v-if="i.key === 4"/>
           <cuentas v-if="i.key === 5"/>
           <inventario v-if="i.key === 6"/>
+          <editar_inventario v-if="i.key === 7"/>
+          <articulo_nuevo v-if="i.key === 8"/>
         </v-tab-item>
       </v-tabs-items>
 
@@ -49,6 +51,8 @@ import to_do_inidex from "@/components/to_to/to_do_inidex";
 import perfiles from "@/components/Ventas/pes/perfiles";
 import cuentas from "@/components/Ventas/pes/cuentas";
 import inventario from "@/components/Inventario/inventario"
+import editar_inventario from "@/components/Inventario/editar_inventario";
+import articulo_nuevo from "@/components/Inventario/articulo_nuevo";
 export default {
   watch: {
     over (val) {
@@ -56,7 +60,8 @@ export default {
       }, 500)
     },
   },
-  components:{NuxtLoading, side, Cuerpo, caja, cobros: inicio, to_do_inidex, perfiles, cuentas, inventario},
+  components:{NuxtLoading, side, Cuerpo, caja, cobros: inicio,
+    to_do_inidex, perfiles, cuentas, inventario, editar_inventario, articulo_nuevo},
   data(){
     return{
       refe: null,

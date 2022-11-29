@@ -67,7 +67,7 @@
                                 </tr>
                                 <tr>
                                     <th>Fecha de nacimiento:</th>
-                                    <td>{{Cliente.fecha_nacimiento.split('-')[2]}}/{{Cliente.fecha_nacimiento.split('-')[1]}}/{{Cliente.fecha_nacimiento.split('-')[0]}}</td>
+                                    <td v-if="Cliente.fecha_nacimiento">{{Cliente.fecha_nacimiento.split('-')[2]}}/{{Cliente.fecha_nacimiento.split('-')[1]}}/{{Cliente.fecha_nacimiento.split('-')[0]}}</td>
                                 </tr>
                                 <tr>
                                     <th>Correo eléctronico:</th>

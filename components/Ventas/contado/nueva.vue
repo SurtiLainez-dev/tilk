@@ -194,8 +194,6 @@
       </v-card-actions>
     </v-form>
 
-
-
     <v-dialog v-model="Cliente.dialogo" width="25%">
       <v-card >
         <v-toolbar flat>
