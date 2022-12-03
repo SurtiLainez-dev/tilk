@@ -300,7 +300,7 @@ export default {
         this.$store.commit('caja/cambiar_VISTA', 1);
       }).catch((error)=>{
         if (error.response.status === 422)
-          this.$store.commit('notificacion',{texto:error.response.data.msj, color:'success'});
+          this.$store.commit('notificacion',{texto:error.response.data.msj, color:'error'});
 
         this.$store.commit('activarOverlay', false);
       });
