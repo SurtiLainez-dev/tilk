@@ -91,12 +91,12 @@
                      @click="VISTA_INFO = 1"
                      color="pink"><v-icon small>fa fa-user</v-icon></v-btn>
             </template>
-            <span>Información de Usuarios</span>
+            <span>Información de Usuarios {{TAREA.user_id}} - {{USUARIO}}</span>
           </v-tooltip>
           <v-tooltip top>
             <template v-slot:activator="{on, attrs}">
               <v-btn small tile dark text icon v-on="on" v-bind="attrs"
-                     @click="goEdit(TAREA)" v-if="USUARIO === TAREA.user_id"
+                     @click="goEdit(TAREA)" v-if="parseInt(USUARIO) === parseInt(TAREA.user_id)"
                      color="warning"><v-icon small>fa fa-edit</v-icon></v-btn>
             </template>
             <span>Editar Tarea</span>
@@ -243,8 +243,9 @@ export default {
       this.TAREAE.checklist    = JSON.parse(data.check_list);
       this.TAREAE.tipo      = 2;
       this.TAREAE.tarea     = data.id;
-      this.$store.commit('todo/asignar_TITULO', 'Editanto Tarea: #'+this.TAREA.titulo);
-      this.$store.commit('todo/cambiar_VISTA', 6);
+      // this.$store.commit('todo/asignar_TITULO', 'Editanto Tarea: #'+this.TAREA.titulo);
+      // this.$store.commit('todo/cambiar_VISTA', 6);
+      console.log(this.TAREA.todo_tarea_user)
 
     }
   }

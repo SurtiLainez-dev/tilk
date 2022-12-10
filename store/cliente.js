@@ -5,7 +5,8 @@ export const state = () =>({
     CUENTAS: [],
     SOLICITUDES: [],
     LOAD_CLIENTE: false,
-    SOLICITUDES_AVAL: []
+    SOLICITUDES_AVAL: [],
+    VISTA: 1
 })
 
 export const mutations = {
@@ -15,6 +16,9 @@ export const mutations = {
             state.CLIENTES = res.data.clientes;
             state.LOAD_CLIENTES = false;
         })
+    },
+    cambiar_VISTA(state, val){
+        state.VISTA = val;
     },
     cargar_CLIENTE(state, cliente){
         state.CLIENTE = [];

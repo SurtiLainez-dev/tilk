@@ -215,7 +215,7 @@
 
       <v-divider></v-divider>
       <v-card-actions class="d-flex justify-end">
-        <v-btn color="success" dark tile small class="ma-2" @click="registrarTarea">Registrar Tarea</v-btn>
+        <v-btn color="success" dark tile small class="ma-2" @click="validarForm">Registrar Tarea</v-btn>
       </v-card-actions>
 
 
@@ -404,7 +404,7 @@ export default {
         }
       }
       data.append('fecha_i', this.TAREA.fecha_inicio);
-      data.append('fecha_f', this.TAREA.fecha_finalizacion);
+      data.append('fecha_f', fecha_f);
       data.append('estado_id', this.TAREA.estado);
       data.append('grupo_id', this.TAREA.grupo);
       data.append('titulo', this.TAREA.titulo);
@@ -432,6 +432,7 @@ export default {
       })
     },
     updateTarea(){
+      let tareas = this.ordenarCheck();
       this.$store.commit('activarOverlay', true);
       let data = new FormData();
       let cont = 0;
@@ -441,15 +442,19 @@ export default {
           cont++;
         }
       }
+      let fecha_f = this.TAREA.fecha_finalizacion? this.TAREA.fecha_finalizacion : '';
+      console.log(fecha_f)
+      alert(fecha_f)
       data.append('habilitacion', this.TAREA.fecha_inicio);
-      data.append('finalizacion', this.TAREA.fecha_finalizacion);
+      data.append('finalizacion', fecha_f);
       data.append('estado', this.TAREA.estado);
       data.append('grupo', this.TAREA.grupo);
       data.append('titulo', this.TAREA.titulo);
       data.append('detalle', this.TAREA.detalle);
       data.append('links', JSON.stringify(this.TAREA.links));
       data.append('usuarios', JSON.stringify(this.TAREA.user));
-      data.append('checks', JSON.stringify(this.TAREA.checklist));
+      data.append('check_list', JSON.stringify(this.TAREA.checklist));
+      data.append('check_list_user', JSON.stringify(tareas));
 
       this.$axios({
         method: 'post',

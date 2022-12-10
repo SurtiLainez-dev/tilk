@@ -1,6 +1,6 @@
 {
   "name": "TILK",
-  "version": "2.0.54",
+  "version": "2.0.55",
   "description": "Sístema de Negocios - Surtidora Laínez",
   "author": "SurtiLainez-dev",
   "private": false,
@@ -35,6 +35,7 @@
     "electron-pdf-window": "1.0.10",
     "electron-updater": "^4.3.4",
     "html2canvas": "^1.4.1",
+    "jquery": "^1.9.1",
     "material-icons": "^0.5.5",
     "nuxt": "^2.14.0",
     "nuxt-html2canvas-proxy": "^1.0.1",
@@ -45,7 +46,7 @@
     "vue-html2canvas": "0.0.4",
     "vue-toast-notification": "^0.5.4",
     "vuesax": "^3.12.2",
-    "vuetify": "2.3.2"
+    "vuetify": "^2.3.2"
   },
   "devDependencies": {
     "@nuxtjs/moment": "^1.6.1",
@@ -53,7 +54,7 @@
     "autoprefixer": "^10.4.7",
     "cross-env": "^5.1.4",
     "deepmerge": "^4.2.2",
-    "electron": "2.0.0-beta.7",
+    "electron": "^2.0.0-beta.7",
     "electron-builder": "^20.8.1",
     "electron-devtools-installer": "^2.2.3",
     "fibers": "^5.0.0",
