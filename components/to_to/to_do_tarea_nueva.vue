@@ -23,7 +23,7 @@
           <v-dialog ref="dialogoFechaFinal" v-model="dialogoFechaF" :return-value.sync="TAREA.fecha_finalizacion"
                     persistent width="290px">
             <template v-slot:activator="{ on, attrs }">
-              <v-text-field dense class="ma-2" label="Fecha de inicio" v-bind="attrs" v-on="on"
+              <v-text-field dense class="ma-2" label="Fecha de cierre" v-bind="attrs" v-on="on"
                             hint="fecha en la que se le cierra la tarea al usuario asignado"
                             persistent-hint
                             v-model="TAREA.fecha_finalizacion"></v-text-field>
@@ -245,7 +245,6 @@
 export default {
   name: "to_do_tarea_nueva",
   created() {
-    this.$store.commit('todo/asignar_TITULO','Creando Nueva Tarea');
     this.$store.commit('todo/cargar_GRUPOS');
     this.$store.commit('todo/cargar_ESTADOS');
     this.cargar_usuarios();
@@ -300,7 +299,10 @@ export default {
       set: function (val){
         return this.$store.commit('todo/asignar_TAREA')
       }
-    }
+    },
+    USUARIO(){
+      return this.$store.state.usuario_id;
+    },
   },
   methods:{
     abrirDialogoUser(data){
@@ -365,30 +367,41 @@ export default {
       })
     },
     ordenarCheck(){
-      let tareas = [];
+      let tareas = [];//declramos la variable tarea
+      let tareaUser = [];
       let check  = [];
+      let estado = false;
       this.TAREA.checklist.forEach((item)=>{
           item.usuarios.forEach((i)=>{
             check = tareas.filter((val=>val.id === i.user));
             if (check.length > 0){
+              tareaUser = this.TAREA.tareasUsers.filter((val)=>val.id_tarea == item.key && i.user == val.user_id);
+              if (tareaUser.length > 0)
+                estado = tareaUser[0].estado;
+
               tareas[check[0].key].checks.push({
                 check: item.check,
-                estado: false,
+                estado: estado,
                 id_tarea: item.key
               });
             }else{
+              tareaUser = this.TAREA.tareasUsers.filter((val)=>val.id_tarea == item.key && i.user == val.user_id);
+              if (tareaUser.length > 0)
+                estado = tareaUser[0].estado;
+
               tareas.push({
                 id: i.user,
                 checks: [{
                   check: item.check,
-                  estado: false
+                  estado: estado,
+                  id_tarea: item.key
                 }],
                 key: tareas.length
               })
             }
+            estado = false;
           })
       })
-
       return tareas;
     },
     registrarTarea(){
@@ -404,7 +417,7 @@ export default {
         }
       }
       data.append('fecha_i', this.TAREA.fecha_inicio);
-      data.append('fecha_f', fecha_f);
+      data.append('fecha_f', this.TAREA.fecha_finalizacion);
       data.append('estado_id', this.TAREA.estado);
       data.append('grupo_id', this.TAREA.grupo);
       data.append('titulo', this.TAREA.titulo);
@@ -425,6 +438,7 @@ export default {
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion', {texto:res.data.msj, color:'success'});
+        this.$store.commit('todo/cargar_TAREAS', this.USUARIO);
         this.VISTA = 1;
       }).catch((error)=>{
         this.$store.commit('activarOverlay', false);
@@ -443,8 +457,7 @@ export default {
         }
       }
       let fecha_f = this.TAREA.fecha_finalizacion? this.TAREA.fecha_finalizacion : '';
-      console.log(fecha_f)
-      alert(fecha_f)
+
       data.append('habilitacion', this.TAREA.fecha_inicio);
       data.append('finalizacion', fecha_f);
       data.append('estado', this.TAREA.estado);

@@ -46,7 +46,7 @@
 <script>
 import to_do_tarea_info from "@/components/to_to/tarea/to_do_tarea_info";
 export default {
-  name: "to_do_tarea",
+  name: "to_to_tareas_terminadas",
   components:{to_do_tarea_info},
   data(){
     return{
@@ -65,7 +65,7 @@ export default {
       return this.$store.state.todo.LOAD_TAREAS;
     },
     TAREAS(){
-      return this.$store.state.todo.TAREAS;
+      return this.$store.state.todo.TAREAS_TERMINADAS;
     },
     USUARIO(){
       return this.$store.state.usuario_id;

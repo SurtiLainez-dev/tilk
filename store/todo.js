@@ -23,7 +23,8 @@ export const state = () => ({
       fecha_inicio: '',
       fecha_finalizacion: '',
       tarea: 0,
-      tipo: 1
+      tipo: 1,
+      tareasUsers: []
     },
     LOAD_ESTADOS: false,
     ESTADOS: [],
@@ -32,10 +33,13 @@ export const state = () => ({
     VISTA_TAREA: 0, //Maneja las vistas principales
     VISTA_VIEW: 1,  //Maneja la vista de mostrar las tareas y la informacion de la tareas
     VISTA_INFO: 1, //Maneja las vistas dentro de la informacion de tareas
-    INFO: {}
+    INFO: {},
+    TAREAS_INFO: {},
+    TAREAS_TERMINADAS: []
 });
 
 export const mutations = {
+
     asignar_GRUPO(state, data){
         state.GRUPO.color = data.color;
         state.GRUPO.nombre = data.nombre;
@@ -43,18 +47,21 @@ export const mutations = {
         state.GRUPO.id = data.id;
     },
     asignar_TAREA(state, data){
-        state.titulo = data.titulo;
-        state.detalle = data.detalle;
-        state.fecha_inicio = data.fecha_inicio;
+        state.titulo             = data.titulo;
+        state.detalle            = data.detalle;
+        state.fecha_inicio       = data.fecha_inicio;
         state.fecha_finalizacion = data.fecha_finalizacion;
-        state.user    = data.user;
-        state.grupo = data.grupo;
-        state.estado = data.estado;
-        state.links     = data.links;
-        state.archivos     = data.archivos;
-        state.checklist    = data.checklist;
-        state.tipo      = data.tipo;
-        state.tarea     = data.tarea;
+        state.user               = data.user;
+        state.grupo              = data.grupo;
+        state.estado             = data.estado;
+        state.links              = data.links;
+        state.archivos           = data.archivos;
+        state.checklist          = data.checklist;
+        state.tipo               = data.tipo;
+        state.tarea              = data.tarea;
+        state.comentarios        = data.comentarios;
+        state.comentario         = data.comentario;
+        state.tareasUsers        = data.tareasUsers;
 
     },
     asignar_VISTATAREA(state, vista){
@@ -93,11 +100,18 @@ export const mutations = {
         state.LOAD_TAREAS = true;
         this.$axios.get('to_do/tareas/user/'+$user).then((res)=>{
             state.TAREAS = [];
+            state.TAREAS_TERMINADAS = [];
             res.data.tareasP.forEach((item)=>{
                 state.TAREAS.push(item);
             })
             res.data.tareasA.forEach((item)=>{
                 state.TAREAS.push(item);
+            })
+            res.data.tareasAT.forEach((item)=>{
+                state.TAREAS_TERMINADAS.push(item)
+            })
+            res.data.tareasPT.forEach((item)=>{
+                state.TAREAS_TERMINADAS.push(item)
             })
             state.LOAD_TAREAS = false;
         })

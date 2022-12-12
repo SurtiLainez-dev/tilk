@@ -64,6 +64,9 @@
       Pes(){
         return this.$store.state.pestana
       },
+      USUARIO(){
+        return this.$store.state.usuario_id;
+      },
     },
     created() {
       this.$store.commit('activarOverlay', false);
@@ -76,6 +79,8 @@
         this.$store.commit('tareas/cambiarTareas', 'esto es un cambio')
       },
       goTodo(){
+        this.$store.commit('todo/asignar_TITULO', 'Tareas');
+        this.$store.commit('todo/cargar_TAREAS', this.USUARIO);
         let bandera = 0;
         this.Pes.forEach((item)=>{
           if (item.key === 3)

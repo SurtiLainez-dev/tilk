@@ -21,11 +21,17 @@
         </template>
 
         <v-spacer></v-spacer>
-        <v-btn icon>
-          <v-icon>mdi-magnify</v-icon>
-        </v-btn>
-        <v-btn icon small color="warning" v-if="VISTA_VIEW === 2" @click="goBack">
-          <v-icon small>fa fa-arrow-left</v-icon>
+        <v-tooltip top>
+          <template v-slot:activator="{on, attrs}">
+            <v-btn v-if="VISTA_VIEW === 1" icon v-on="on" v-bind="attrs"
+                   color="pink" @click="$store.commit('todo/cargar_TAREAS', USUARIO);">
+              <v-icon>mdi-reload</v-icon>
+            </v-btn>
+          </template>
+          <span>Recargar Tareas</span>
+        </v-tooltip>
+        <v-btn icon color="warning" v-if="VISTA_VIEW === 2" @click="goBack">
+          <v-icon>fa fa-arrow-left</v-icon>
         </v-btn>
         <v-menu right>
           <template v-slot:activator="{ on: menu, attrs }">
@@ -54,7 +60,7 @@
 
       <v-divider></v-divider>
 
-      <v-card-text style="height: 560px;"
+      <v-card-text style="height: 80vh ;"
                    class="overflow-y-auto">
         <to_do_inicio v-if="VISTA === 1"/>
         <to_do_grupo_nuevo v-else-if="VISTA === 2"/>
@@ -130,10 +136,15 @@ export default {
       set: function (data){
         this.$store.commit('todo/asignar_TAREA', data);
       }
-    }
+    },
+    USUARIO(){
+      return this.$store.state.usuario_id;
+    },
   },
   created() {
-    this.TITULO = 'Tareas'
+    this.TITULO = 'Tareas';
+    this.VISTA = 1;
+    this.VISTA_VIEW = 1;
   },
   methods:{
     goVista(val){
@@ -146,7 +157,8 @@ export default {
     goBack(){
       if (this.VISTA_VIEW === 2 && this.$store.state.todo.TAREA.tipo === 1){
         this.VISTA_VIEW = 1;
-        this.TITULO = 'Tareas'
+        this.TITULO = 'Tareas';
+        this.$store.commit('todo/cargar_TAREAS', this.USUARIO);
       }
       else if (this.VISTA_VIEW === 2 && this.$store.state.todo.TAREA.tipo === 2){
         this.VISTA = 1;
@@ -158,6 +170,7 @@ export default {
     resetNuevaTarea(){
       this.VISTA = 6;
       this.resetTarea();
+      this.$store.commit('todo/asignar_TITULO','Creando Nueva Tarea');
       this.$store.commit('todo/cambiar_VISTAVIEW', 1);
     },
     resetTarea(){
