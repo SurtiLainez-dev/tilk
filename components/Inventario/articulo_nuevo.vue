@@ -512,6 +512,7 @@ export default {
             'Content-Type': "multipart/form-data"
           }
         }).then((res)=>{
+          this.$store.commit('inventario/cargarInventario');
           if (res.status === 200){
             this.overlay = false
             Swal.fire(
@@ -519,6 +520,7 @@ export default {
                 `Se registro exitosamente el artículo ${this.Articulo.nombre}.`,
                 'success'
             )
+          this.$store.commit('quitarPestanaKey',8)
             // this.$router.replace({path:'/inventario/'})
             // this.$store.commit('quitar_pestania', 8)
           }

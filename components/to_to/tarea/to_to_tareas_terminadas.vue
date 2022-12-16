@@ -86,9 +86,6 @@ export default {
     goTarea(item){
       this.$store.commit('todo/asignar_TITULO', item.titulo);
       this.$store.commit('todo/asignar_TAREAINFO', item);
-      this.$axios.put(`to_do/tarea/${this.TAREA.id}/add_comentario`).then((res)=>{
-        this.$store.commit('todo/asignar_TAREAINFO', res.data.tarea);
-      });
       this.VISTA_VIEW = 2;
     }
   }

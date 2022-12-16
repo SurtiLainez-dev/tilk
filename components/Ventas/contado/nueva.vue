@@ -89,7 +89,7 @@
             <td style="width: 10%">L {{int.format(item.precio)}}</td>
             <td style="width: 10%">L {{int.format(item.totalFila)}}</td>
             <td style="width: 5%">
-              <v-btn fab text color="red" @click="deleteFila(scope.item.key)"
+              <v-btn fab text color="red" @click="deleteFila(item.key)"
                      width="18" height="19" dark><v-icon size="12">fa fa-times</v-icon></v-btn>
             </td>
           </tr>
@@ -151,37 +151,37 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col cols="8">
+              <v-col cols="7">
                 <v-row no-gutters style="border: solid 1px #000">
                   <v-col class="d-flex justify-end">
-                    <span class="ma-2"><strong>Sub-total:</strong></span>
+                    <span class="ma-2" style="font-size: 13px"><strong>Sub-total:</strong></span>
                   </v-col>
                 </v-row>
                 <v-row no-gutters style="border: solid 1px #000">
                   <v-col class="d-flex justify-end">
-                    <span class="ma-2"><strong>Impuesto:</strong></span>
+                    <span style="font-size: 13px" class="ma-2"><strong>Impuesto:</strong></span>
                   </v-col>
                 </v-row>
                 <v-row no-gutters style="border: solid 1px #000">
                   <v-col class="d-flex justify-end">
-                    <span class="ma-2"><strong>Total:</strong></span>
+                    <span class="ma-2" style="font-size: 13px"><strong>Total:</strong></span>
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="5">
                 <v-row no-gutters style="border: solid 1px #000">
                   <v-col class="d-flex justify-end">
-                    <span class="ma-2"><strong>L {{Venta.sub_total}}</strong></span>
+                    <span class="ma-2" style="font-size: 13px"><strong>L {{Venta.sub_total}}</strong></span>
                   </v-col>
                 </v-row>
                 <v-row no-gutters style="border: solid 1px #000">
                   <v-col class="d-flex justify-end">
-                    <span class="ma-2"><strong>L {{Venta.impuesto}}</strong></span>
+                    <span class="ma-2" style="font-size: 13px"><strong>L {{Venta.impuesto}}</strong></span>
                   </v-col>
                 </v-row>
                 <v-row no-gutters style="border: solid 1px #000">
                   <v-col class="d-flex justify-end">
-                    <span class="ma-2"><strong>L {{Venta.total}}</strong></span>
+                    <span class="ma-2" style="font-size: 13px"><strong>L {{Venta.total}}</strong></span>
                   </v-col>
                 </v-row>
               </v-col>

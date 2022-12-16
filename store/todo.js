@@ -96,6 +96,13 @@ export const mutations = {
             state.LOAD_GRUPOS = false;
         })
     },
+    cargar_TAREA(state, tarea){
+        state.LOAD_TAREAS = true;
+        this.$axios.get('to_do/tarea/'+tarea).then((res)=>{
+            state.INFO = res.data.tarea;
+            state.LOAD_TAREAS = false;
+        })
+    },
     cargar_TAREAS(state, $user){
         state.LOAD_TAREAS = true;
         this.$axios.get('to_do/tareas/user/'+$user).then((res)=>{
@@ -115,5 +122,5 @@ export const mutations = {
             })
             state.LOAD_TAREAS = false;
         })
-    }
+    },
 }

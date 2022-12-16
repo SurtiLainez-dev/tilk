@@ -1,5 +1,4 @@
 <template>
-<v-card flat>
   <v-card flat>
     <v-toolbar color="primary" dark extended flat>
       <v-toolbar-title>To-Do Surtidora Laínez</v-toolbar-title>
@@ -23,12 +22,17 @@
         <v-spacer></v-spacer>
         <v-tooltip top>
           <template v-slot:activator="{on, attrs}">
-            <v-btn v-if="VISTA_VIEW === 1" icon v-on="on" v-bind="attrs"
-                   color="pink" @click="$store.commit('todo/cargar_TAREAS', USUARIO);">
+            <v-btn v-if="VISTA_VIEW === 2" icon v-on="on" v-bind="attrs"
+                   color="pink" @click="$store.commit('todo/cargar_TAREA', INFOTAREA.id)">
+              <v-icon>mdi-reload</v-icon>
+            </v-btn>
+            <v-btn v-else-if="VISTA_VIEW === 1" icon v-on="on" v-bind="attrs"
+                   color="pink" @click="$store.commit('todo/cargar_TAREAS', USUARIO)">
               <v-icon>mdi-reload</v-icon>
             </v-btn>
           </template>
-          <span>Recargar Tareas</span>
+          <span v-if="VISTA_VIEW === 1">Recargar Tareas {{VISTA_VIEW}}</span>
+          <span v-else-if="VISTA_VIEW === 2">Recargar esta Tarea</span>
         </v-tooltip>
         <v-btn icon color="warning" v-if="VISTA_VIEW === 2" @click="goBack">
           <v-icon>fa fa-arrow-left</v-icon>
@@ -46,7 +50,7 @@
           </template>
           <v-list>
             <v-list-item-group>
-              <v-list-item><v-list-item-title @click="goVista(4)">Añadir Estado {{VISTA}}</v-list-item-title></v-list-item>
+              <v-list-item><v-list-item-title @click="goVista(4)">Añadir Estado</v-list-item-title></v-list-item>
               <v-list-item><v-list-item-title @click="goVista(5)">Estados de Tarea</v-list-item-title></v-list-item>
               <v-list-item><v-list-item-title @click="goVista(2)">Añadir Grupo</v-list-item-title></v-list-item>
               <v-list-item><v-list-item-title @click="goVista(3)">Grupos de Tarea</v-list-item-title></v-list-item>
@@ -71,7 +75,6 @@
       </v-card-text>
     </v-card>
   </v-card>
-</v-card>
 </template>
 
 <script>
@@ -136,6 +139,9 @@ export default {
       set: function (data){
         this.$store.commit('todo/asignar_TAREA', data);
       }
+    },
+    INFOTAREA(){
+      return this.$store.state.todo.INFO;
     },
     USUARIO(){
       return this.$store.state.usuario_id;

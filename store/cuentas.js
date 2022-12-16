@@ -20,6 +20,13 @@ export const mutations = {
             state.LOAD_CUENTAS_REV_DOC = false;
         })
     },
+    cargar_VENTAS_REV_DOC_OK(state, cuentas){
+        state.LOAD_CUENTAS_REV_DOC = true;
+        this.$axios.get('ventas/revision_documentos_ok').then((res)=>{
+            state.VENTAS_REV_DOC = res.data.ventas;
+            state.LOAD_CUENTAS_REV_DOC = false;
+        })
+    },
     cargar_VENTA_REV_DOC(state, id){
         state.LOAD_CUENTAS_REV_DOC = true;
         this.$axios.get('ventas/revision_documentos/'+id).then((res)=>{

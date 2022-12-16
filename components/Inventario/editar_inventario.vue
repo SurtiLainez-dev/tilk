@@ -739,6 +739,8 @@ name: "editar_inventario",
         this.load = false;
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion',{texto: res.data.msg,color:'success'});
+        this.$store.commit('quitarPestanaKey',7)
+        this.$store.commit('inventario/cargarInventario');
       }).catch((error)=>{
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion',{texto: 'Hubo un error en el servidor',color:'error'});

@@ -1,5 +1,5 @@
 <template>
-<v-card flat>
+<v-card flat  :loading="$store.state.todo.LOAD_TAREAS">
   <v-row no-gutters>
     <v-col cols="8">
       <v-card-text>{{TAREA.detalle}}</v-card-text>
@@ -24,27 +24,34 @@
               </template>
             </v-progress-linear>
             <table>
+              <thead>
+              <tr>
+                <td style="font-size: 12px">Tarea</td>
+                <td style="font-size: 12px">Usuario</td>
+                <td style="font-size: 12px"></td>
+              </tr>
+              </thead>
               <tbody>
               <tr v-if="USUARIO == TAREA.user_id && item.usuarios.length === 0 && item.usuariosInfo.length === 0"
                   v-for="(item, i) in checks">
-                <td style="width: 70%; font-size: 12px">{{item.check}}</td>
-                <td style="width: 20%; font-size: 12px">Propia </td>
+                <td style="width: 70%; font-size: 11px">{{item.check}}</td>
+                <td style="width: 20%; font-size: 11px">Propia </td>
                 <td style="width: 10%">
-                  <v-checkbox height="8" :disabled="item.disponible === 0"  dense v-model="item.estado"></v-checkbox>
+                  <v-checkbox height="1" :disabled="item.disponible === 0"  dense v-model="item.estado"></v-checkbox>
                 </td>
               </tr>
               <tr v-for="(item) in tareasNP" v-if="TAREA.user_id == USUARIO">
-                <td style="width: 70%; font-size: 12px">{{item.check}}</td>
-                <td style="width: 20%; font-size: 12px">{{item.user}}</td>
+                <td style="width: 70%; font-size: 11px">{{item.check}}</td>
+                <td style="width: 20%; font-size: 11px">{{item.user}}</td>
                 <td style="width: 10%">
-                  <v-checkbox height="8" disabled  dense v-model="item.estado"></v-checkbox>
+                  <v-checkbox height="1" disabled  dense v-model="item.estado"></v-checkbox>
                 </td>
               </tr>
               <tr v-for="(item) in tareasPropia">
-                <td style="width: 70%; font-size: 12px">{{item.check}}</td>
-                <td style="width: 20%; font-size: 12px">{{item.user}}</td>
+                <td style="width: 70%; font-size: 11px">{{item.check}}</td>
+                <td style="width: 20%; font-size: 11px">{{item.user}}</td>
                 <td style="width: 10%">
-                  <v-checkbox height="8"  dense v-model="item.estado"></v-checkbox>
+                  <v-checkbox height="1"  dense v-model="item.estado"></v-checkbox>
                 </td>
               </tr>
               </tbody>
@@ -56,22 +63,20 @@
           <v-card flat>
             <v-card-subtitle>Comentarios</v-card-subtitle>
             <v-divider></v-divider>
-            <v-simple-table>
-              <template >
-                <thead>
-                <tr>
-                  <td>Comentario</td>
-                  <td>Usuario</td>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-if="TAREA.comentarios" v-for="item in JSON.parse(TAREA.comentarios)">
-                  <td style="width: 85%; font-size: 11px">{{item.comentario}}</td>
-                  <td style="width: 15%; font-size: 10px">{{item.usuario}}</td>
-                </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
+            <table>
+              <thead>
+              <tr>
+                <td style="font-size: 12px">Comentario</td>
+                <td style="font-size: 12px">Usuario</td>
+              </tr>
+              </thead>
+              <tbody>
+              <tr class="pa-10 ma-2" v-if="TAREA.comentarios" v-for="item in JSON.parse(TAREA.comentarios)">
+                <td style="width: 85%; font-size: 11px">{{item.comentario}}</td>
+                <td style="width: 15%; font-size: 8px">{{item.usuario}}</td>
+              </tr>
+              </tbody>
+            </table>
           </v-card>
         </v-col>
       </v-row>
@@ -99,7 +104,7 @@
           <v-tooltip top>
             <template v-slot:activator="{on, attrs}">
               <v-btn small tile dark text icon v-on="on" v-bind="attrs"
-                     @click="goEdit(TAREA)" v-if="parseInt(USUARIO) === parseInt(TAREA.user_id)"
+                     @click="goEdit(TAREA)" v-if="TAREA && USUARIO == TAREA.user_id"
                      color="warning"><v-icon small>mdi-circle-edit-outline</v-icon></v-btn>
             </template>
             <span>Editar Tarea</span>
@@ -169,7 +174,7 @@
           <v-simple-table dense>
             <template>
               <tbody>
-              <tr v-for="(item, i) in TAREA.todo_tarea_user">
+              <tr v-if="TAREA.todo_tarea_user" v-for="(item, i) in TAREA.todo_tarea_user">
                 <th>{{i+1}}: {{item.user.usuario}} </th>
                 <th>
                   <v-chip x-small dark v-if="item.estado === 1" color="red">Pendiente</v-chip>
@@ -178,7 +183,7 @@
                 <th>
                   <v-tooltip top>
                     <template v-slot:activator="{on, attrs}">
-                      <v-btn v-if="item.estado === 0" small tile icon text @click="cambiarEstado(item.user_id)"
+                      <v-btn v-if="item.estado === 0 && USUARIO == TAREA.user_id" small tile icon text @click="cambiarEstado(item.user_id)"
                              color="success" v-on="on" v-bind="attrs">
                         <v-icon small>mdi-content-save</v-icon>
                       </v-btn>
@@ -209,10 +214,14 @@
         <v-card flat v-else-if="VISTA_INFO === 2">
           <v-card-subtitle>Historial de la Tarea</v-card-subtitle>
 
-          <v-data-table dense :headers="headerHistorial" :items="historial" >
+          <v-data-table hide-default-footer dense :page.sync="paginaHistorial" :items-per-page="10"
+                        :headers="headerHistorial" :items="historial" @page-count="lengthPageHistorial = $event">
             <template v-slot:item.comentario="{item}"><span style="font-size: 10px !important;">{{item.comentario}} - {{item.usuario}}</span></template>
             <template v-slot:item.fecha="{item}"><span style="font-size: 9px">{{item.fecha}}</span></template>
           </v-data-table>
+          <v-card flat class="d-flex justify-center">
+            <v-pagination v-model="paginaHistorial" :length="lengthPageHistorial"></v-pagination>
+          </v-card>
         </v-card>
         <v-card flat v-else-if="VISTA_INFO === 3">
           <v-card-subtitle>Archivos PDFs</v-card-subtitle>
@@ -334,14 +343,14 @@ export default {
     }
 
     this.$store.state.todo.TAREA.tipo = 1;
-    this.$store.commit('todo/cargar_ESTADOS');
+    if (this.TAREA.estado === 1)
+      this.$store.commit('todo/cargar_ESTADOS');
+
     this.estado = this.TAREA.todo_estado_id;
     this.cierre = this.TAREA.estado;
 
     if (this.TAREA.check_list)
       this.checks = JSON.parse(this.TAREA.check_list)
-
-    this.calcularPorcentajeTareas();
 
     if (this.USUARIO == this.TAREA.user_id)
       this.estadoSave = this.TAREA.estado;
@@ -350,12 +359,12 @@ export default {
       this.estadoSave = tareaUser[0].estado;
     }
 
-    if (this.estadoSave === 0)
-      this.$store.commit('notificacion',{texto:'Esta tarea esta cerrada para tí.', color:'warning'})
-
+    this.calcularPorcentajeTareas();
   },
   data(){
     return{
+      paginaHistorial: 1,
+      lengthPageHistorial: 0,
       porcentajeTarea: 0,
       totalTareas: 0,
       tareasHechas: 0,
@@ -612,5 +621,6 @@ export default {
 </script>
 
 <style scoped>
-
+table tbody tr:nth-child(even){background-color: #f2f2f2;}
+table tbody tr:hover {background-color: #ddd; cursor: pointer}
 </style>

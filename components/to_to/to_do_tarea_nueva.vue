@@ -478,6 +478,7 @@ export default {
           'Content-Type': "multipart/form-data"
         }
       }).then((res)=>{
+        this.$store.commit('todo/cargar_TAREA', this.TAREA.tarea)
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion', {texto:res.data.msj, color:'success'});
         this.VISTA = 1;

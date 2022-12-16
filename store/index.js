@@ -97,6 +97,15 @@ export const mutations = {
       item.valor = i;
     })
   },
+  quitarPestanaKey(state, key){
+    state.pestana.forEach((item, i)=>{
+      if (item.key === key)
+        state.pestana.splice(i,1);
+    });
+    state.pestana.forEach((item, i)=>{
+      item.valor = i;
+    })
+  },
   anadirCaja(state, data){
       state.pestana.push({
         titulo: data.titulo,
