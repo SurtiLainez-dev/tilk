@@ -55,6 +55,10 @@
                             <td>{{item.name}}</td>
                             <td><b-link @click="mostrarPdf($axios.defaults.baseURL+item.ref+DATA_VENTA.id)">Descargar {{item.name}}</b-link></td>
                           </tr>
+                        <tr v-if="DATA_VENTA.contrato_cliente.remision_articulo.articulo.is_motocicleta === 1 ||  DATA_VENTA.contrato_cliente.remision_articulo.articulo.is_motocicleta === true">
+                          <td>Permiso de Circulación</td>
+                          <td><b-link @click="solicitarClave">Descargar Permiso</b-link></td>
+                        </tr>
                         </tbody>
                       </table>
 
@@ -437,7 +441,6 @@
 
     </b-overlay>
 
-
     <v-dialog v-model="Enviado" width="40%">
     <v-card flat>
       <v-card-title>La venta ha concluido exitosamente</v-card-title>
@@ -517,10 +520,9 @@ export default {
       documentos:[
         {name:'Contrato', ref:'print_contrato_venta/'},
         {name:'Pagaré', ref:'print_pagare_venta/'},
-        {name:'Hoja de conocimientos (vehículos)'},
-        {name:'Traspaso (vehículos)'},
-        {name:'Carta Poder (vehículos)'},
-        {name:'Garantía', ref:'print_carta_poder_venta/'},
+        {name:'Hoja de conocimientos (vehículos)', ref: 'print_hoja_conocimientos_venta/'},
+        {name:'Traspaso (vehículos)', ref: 'print_traspaso_venta/'},
+        {name:'Carta Poder (vehículos)', ref: 'print_carta_poder_venta/'},
       ],
       vista: 1,
       doc:{
@@ -542,7 +544,8 @@ export default {
       Colaborador:   '',
       Direccion: '',
       OrdenEntrada_id: 0,
-      vistaPDf: false
+      vistaPDf: false,
+      urlA: this.$axios.defaults.baseURL
     }
   },
   computed:{
@@ -567,6 +570,9 @@ export default {
     IS_ACEPTADA(){
       return this.$store.state.ventas.IS_ACEPTADA;
     },
+    USUARIO(){
+      return this.$store.state.usuario;
+    },
   },
   created() {
     this.$store.commit('ventas/cargar_DATA_VENTA');
@@ -577,6 +583,10 @@ export default {
     this.cargarColaboradores();
   },
   methods:{
+    abrirNavegador(clave){
+      ipcRenderer.send('pint_navegador', this.urlA+'documentos/permiso_s_placa/usuario='+this.USUARIO+'&chasis='+this.DATA_VENTA.contrato_cliente.remision_articulo.serie_fabricante+'/'+clave);
+      this.$store.commit('activarOverlay', false);
+    },
     capturarDireccion(dir){
       this.Direccion = dir
     },
@@ -679,6 +689,15 @@ export default {
       }).catch((error)=>{
         this.$store.commit('activarOverlay', false);
         this.notificacion('Ha ocurrido un error, comunicate con el soporte técnico.','error');
+      })
+    },
+    solicitarClave(){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+        this.abrirNavegador(res.data.clave);
+      }).catch((error)=>{
+        this.$store.commit('notificacion',{texto:'Ocurrio un error', color:'error'});
+        this.$store.commit('activarOverlay', false);
       })
     },
     ValidarDatos(decision){

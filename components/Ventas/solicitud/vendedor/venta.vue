@@ -551,7 +551,7 @@
                     }).then((res)=>{
                     this.$store.commit('tareas/cambiarValorVista', true);
                     this.$store.commit('activarOverlay', false);
-                    this.notificacion('Se ha registró la venta exitosamente.','success')
+                    this.notificacion(res.data.msg,'success')
                     this.SECC = 2;
                     this.dialogo = true;
                     this.vistaVenta = true
@@ -560,8 +560,6 @@
                     this.$store.commit('tareas/cambiarValorVista', true);
                     this.$store.commit('activarOverlay', false);
                     this.notificacion('Hubo un error al ingresar la venta','error');
-                    if (error.response.status === 422)
-                      this.notificacion(error.response.data.msg,'success');
 
                     this.dialogo = true;
                 })
