@@ -7,6 +7,28 @@
           <v-divider></v-divider>
           <graficatotal />
 
+          <v-card>
+            <v-card-subtitle>Información de cada segmento</v-card-subtitle>
+            <v-simple-table dense>
+              <template>
+                <thead>
+                <tr>
+                  <th>Nombre del Segmento</th>
+                  <th>Total de Saldos</th>
+                  <th>Total de Pagos Pendientes</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in TOTALES" v-if="item.id > 1 && item.id < 17">
+                  <td>{{item.nombre}}</td>
+                  <td>L.{{int.format(item.saldo_actual.toFixed(2))}}</td>
+                  <td>L.{{int.format(item.valor_cuotas_segmento.toFixed(2))}}</td>
+                </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-card>
+
         </v-card>
       </v-col>
       <v-col cols="4">
@@ -58,6 +80,12 @@ export default {
     PORTAFOLIO(){
       return this.$store.state.cobros.portafolios.PORTAFOLIO;
     },
+    TOTALES(){
+      return this.$store.state.graficas.cobros.gestiones.G_SEGMENTOS;
+    },
+    LOAD(){
+      return this.$store.state.graficas.cobros.gestiones.G_LOADTOTALESSEGMENTOS;
+    }
   },
   data(){
     return{
@@ -67,6 +95,7 @@ export default {
         proyeccion: 0,
         valor_cuotas: 0
       },
+      int: Intl.NumberFormat(),
       rule: {
         req: v => !!v || 'Campo requerido',
       },

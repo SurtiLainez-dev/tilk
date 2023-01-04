@@ -563,7 +563,6 @@ export default {
           else{
             this.notificacion('Esta cuenta aún tiene pagos pendientes','warning');
           }
-          this.verDocumento(res.data.file)
         }).catch((error)=>{
           this.$store.commit('activarOverlay', false);
           if (error.response.data.status === 422)

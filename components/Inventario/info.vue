@@ -277,7 +277,6 @@
         </v-card>
       </v-dialog>
 
-
       <v-navigation-drawer v-model="sidePrecio" clipped right
                            absolute width="100%" class="side" >
         <v-container>
@@ -459,7 +458,6 @@
         </v-container>
       </v-navigation-drawer>
 
-
       <v-navigation-drawer v-model="sideSeguimiento" clipped right absolute width="100%" class="side">
         <v-container>
           <v-row no-gutters>
@@ -478,7 +476,6 @@
                        :precio="precio_enviar" :pagos="parseInt(Precios.meses)"/>
         </v-container>
       </v-navigation-drawer>
-
 
       <v-navigation-drawer v-model="sideSolicitud" clipped right absolute width="100%" class="side">
         <v-container>
@@ -647,6 +644,7 @@
         this.observacion = 'VENTA FINANCIADA'
         this.calcularP = true;
         let MESES = this.Precios.meses, FIN = this.Precios.financiamiento;
+        console.log(MESES)
         let SALDO_F = this.Precios.saldo_nuevo;
         this.calcularSaldoNuevo();
         if (MESES <= this.Precios.maximo_financiamiento){
@@ -676,6 +674,8 @@
             }
             this.Precios.total_credito = 0;
             this.Precios.total_credito = (this.Precios.cuota * pagos).toFixed(2);
+            console.log("saldo a financiar "+SALDO_F);
+            console.log("Tasa "+TASA_M);
             this.crearPagos(pagos, this.Precios.forma_pago, TASA_M)
           }
         }else

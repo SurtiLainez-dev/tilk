@@ -428,6 +428,9 @@
           TASA = TASA / TASA_MENSUAL;
           this.Precio2.cuota = (-SALDO_FINANCIAR/TASA).toFixed(2);
 
+          console.log("saldo a Finananciar "+SALDO_FINANCIAR);
+          console.log("Tasa "+TASA);
+
           this.probarFinanciamiento(TASA_MENSUAL, MESES);
         }
 

@@ -194,16 +194,17 @@ export default {
       })
     },
     registrarSalidaManual(){
+
       this.dialogoEnvio = false;
       this.$store.commit('activarOverlay', true);
       let articulo = [];
       articulo.push({
-        articulo: this.articulo.id,
+        articulo: this.articulo.articulo,
         estado: 1,
         isCompuesto: 0,
         cantidad: this.stockRebajar[this.i]
       });
-      this.$axios.post('registrar_entrada_manual',{
+      this.$axios.post('registrar_salida_manual',{
         stockId: this.item.id,
         stockNuevo: this.stockNuevo[this.i],
         proveedor: this.articulo.proveedor_id,

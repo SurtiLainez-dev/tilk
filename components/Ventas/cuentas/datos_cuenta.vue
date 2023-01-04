@@ -64,12 +64,12 @@
         </td>
       </tr>
       <tr>
-        <th>Cuenta registrada en portafolio</th>
-        <td>
-          <v-chip color="success" x-small v-if="verificar === 1" dark>Sí</v-chip>
-          <v-chip color="red" x-small v-else-if="verificar === 0" dark>No</v-chip>
-          <v-btn v-if="verificar === 0" color="indigo" x-small dark @click="registrarCuentaPortafolio" tile>Registrar en portafolio</v-btn>
-        </td>
+<!--        <th>Cuenta registrada en portafolio</th>-->
+<!--        <td>-->
+<!--          <v-chip color="success" x-small v-if="verificar === 1" dark>Sí</v-chip>-->
+<!--          <v-chip color="red" x-small v-else-if="verificar === 0" dark>No</v-chip>-->
+<!--          <v-btn v-if="verificar === 0" color="indigo" x-small dark @click="registrarCuentaPortafolio" tile>Registrar en portafolio</v-btn>-->
+<!--        </td>-->
       </tr>
       </tbody>
     </template>
@@ -89,7 +89,7 @@ export default {
     return{
       int: Intl.NumberFormat(),
       loadVerificas: true,
-      verificar: 2
+      verificar: 0
     }
   },
   methods:{

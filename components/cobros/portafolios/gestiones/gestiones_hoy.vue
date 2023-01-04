@@ -26,16 +26,16 @@
     </v-toolbar>
     <v-data-table dense :loading="LOADGESTIONES" :headers="header" :items="GESTIONES"
                   loading-text="Cargando gestiones ..." :search="filter" @click:row="goGestion">
-      <template v-slot:item.venta.cliente.apellidos="{item}">{{item.venta.cliente.nombres}} {{item.venta.cliente.apellidos}}</template>
-      <template v-slot:item.venta.saldo_actual="{item}">L {{int.format((item.venta.saldo_actual - item.venta.contrato.saldo_mora).toFixed(2))}}</template>
+      <template v-slot:item.cliente.apellidos="{item}">{{item.cliente.nombres}} {{item.cliente.apellidos}}</template>
+      <template v-slot:item.saldo_actual="{item}">L {{int.format((item.saldo_actual - item.contrato.saldo_mora).toFixed(2))}}</template>
       <template v-slot:item.saldo_actual="{item}">L {{int.format(item.saldo_actual)}}</template>
-      <template v-slot:item.venta.contrato.dias_mora="{item}">{{item.venta.contrato.dias_mora}}</template>
+      <template v-slot:item.contrato.dias_mora="{item}">{{item.contrato.dias_mora}}</template>
       <template v-slot:item.intereses="{item}">L {{int.format(item.intereses)}}</template>
       <template v-slot:item.saldo_abonado="{item}">L {{int.format(item.saldo_abonado)}}</template>
       <template v-slot:item.pagando="{item}">L {{int.format(item.pagando)}}</template>
       <template v-slot:item.saldo_dia="{item}">L {{int.format(item.saldo_dia)}}</template>
 
-      <template v-slot:header.venta.saldo_actual="{item}">
+      <template v-slot:header.saldo_actual="{item}">
         <v-tooltip top>
           <template v-slot:activator="{on, attrs}"><span v-on="on" v-bind="attrs">SAV</span></template>
           <span>Saldo Actual de la Venta</span>
@@ -47,7 +47,7 @@
           <span>Saldo Actual de la Gestión</span>
         </v-tooltip>
       </template>
-      <template v-slot:header.venta.contrato.dias_mora="{item}">
+      <template v-slot:header.contrato.dias_mora="{item}">
         <v-tooltip top>
           <template v-slot:activator="{on, attrs}"><span v-on="on" v-bind="attrs">DM</span></template>
           <span>Días en Mora</span>
@@ -89,27 +89,27 @@ export default {
       let header = [];
       if (this.VISTAEXPANDIR === 2){
         header = [
-          {text:'Venta', value:'venta.cod'},
-          {text:'Cliente', value:'venta.cliente.apellidos'},
-          {text:'SAV', value:'venta.saldo_actual'},
+          {text:'Venta', value:'cod'},
+          {text:'Cliente', value:'cliente.apellidos'},
+          {text:'SAV', value:'saldo_actual'},
           {text:'SAG', value:'saldo_actual'},
-          {text:'DM', value:'venta.contrato.dias_mora'},
+          {text:'DM', value:'contrato.dias_mora'},
           {text:'Mora Acu.', value:'intereses'},
           {text:'SCT', value:'pagando'},
           {text:'SPD', value:'saldo_dia'},
           {text:'Segmento', value:'cob_segmento.nombre'},
-          {text:'Fecha de Gestión', value:'fecha_gestion'},
+          {text:'Fecha de Gestión', value:'proxima_gestion'},
 
         ]
       }else if (this.VISTAEXPANDIR === 1){
         header = [
-          {text:'Venta', value:'venta.cod'},
-          {text:'Cliente', value:'venta.cliente.apellidos'},
-          {text:'Saldo Actual Venta', value:'venta.saldo_actual'},
+          {text:'Venta', value:'cod'},
+          {text:'Cliente', value:'cliente.apellidos'},
+          {text:'Saldo Actual Venta', value:'saldo_actual'},
           {text:'Saldo Actual Gestión', value:'saldo_actual'},
-          {text:'Días en Mora', value:'venta.contrato.dias_mora'},
+          {text:'Días en Mora', value:'contrato.dias_mora'},
           {text:'Segmento', value:'cob_segmento.nombre'},
-          {text:'Fecha de Gestión', value:'fecha_gestion'},
+          {text:'Fecha de Gestión', value:'proxima_gestion'},
         ]
       }
       return header;
@@ -119,9 +119,11 @@ export default {
       let fecha     = new Date();
       let fecha2    = new Date();
       this.$store.state.cobros.portafolios.GESTIONES.forEach((item)=>{
-        fecha2 = new Date(item.fecha_gestion)
-        if (fecha2.getTime() < fecha.getTime() && item.venta.contrato.dias_mora > 0){
-          gestiones.push(item);
+        if (item.proxima_gestion){
+          fecha2 = new Date(item.proxima_gestion);
+          if (fecha2.getTime() < fecha.getTime() && item.contrato.dias_mora > 0){
+            gestiones.push(item);
+          }
         }
       });
       return gestiones;
