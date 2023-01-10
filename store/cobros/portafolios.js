@@ -14,7 +14,8 @@ export const state = () => ({
     VISTAPORTAFOLIO_GESTION: 1,
     VISTAPORTAFOLIO: 1,
     LOADREPORTE:     false,
-    REPORTE:         []
+    REPORTE:         [],
+    AVANCES:         []
 })
 
 export const mutations = {
@@ -58,6 +59,7 @@ export const mutations = {
         state.LOADPORTAFOLIO = true;
         this.$axios.get('cobros/portafolio/'+state.PORTAFOLIO.id).then((res)=>{
             state.PORTAFOLIO = res.data.portafolio;
+            state.AVANCES    = res.data.avances;
             state.LOADPORTAFOLIO = false
         })
     },

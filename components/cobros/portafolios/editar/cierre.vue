@@ -2,31 +2,27 @@
   <v-card flat>
     <v-toolbar flat><v-card-title>Cerrando Semana de Cobros</v-card-title></v-toolbar>
     <v-divider></v-divider>
-    <v-row no-gutters>
-      <v-col cols="3">
-        <v-card class="ma-2">
-          <v-card-title class="grey--text">Fecha de Cierre</v-card-title>
-          <v-card-subtitle class="grey--text" v-if="PORTAFOLIO.fecha_cierre">{{PORTAFOLIO.fecha_cierre}}</v-card-subtitle>
-        </v-card>
-      </v-col>
-      <v-col cols="3">
-        <v-card class="ma-2">
-          <v-card-title class="grey--text" >Última Revisión</v-card-title>
-          <v-card-subtitle class="grey--text" v-if="PORTAFOLIO.ultima_fecha_revision">{{PORTAFOLIO.ultima_fecha_revision}}</v-card-subtitle>
-        </v-card>
-      </v-col>
-      <v-col cols="6">
-        <v-card class="ma-2">
-          <v-card-title class="grey--text">Total de Cuotas en Última Revisión</v-card-title>
-          <v-card-subtitle class="grey--text" v-if="PORTAFOLIO.valor_cuotas_proyeccion">L {{int.format(PORTAFOLIO.valor_cuotas_proyeccion)}}</v-card-subtitle>
-          <v-card-subtitle class="grey--text" v-else>L 0.00</v-card-subtitle>
-        </v-card>
-      </v-col>
-    </v-row>
+
+    <table>
+      <thead>
+      <tr>
+        <th>Fecha de Cierre</th>
+        <th>Última Revisión</th>
+        <th>Total Cuotas Últimas Revisión</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td v-if="PORTAFOLIO.fecha_cierre">{{PORTAFOLIO.fecha_cierre}}</td>
+        <td v-if="PORTAFOLIO.ultima_fecha_revision">{{PORTAFOLIO.ultima_fecha_revision}}</td>
+        <td v-if="PORTAFOLIO.ultima_fecha_revision">L {{int.format(PORTAFOLIO.valor_cuotas_proyeccion)}}</td>
+      </tr>
+      </tbody>
+    </table>
 
     <v-row no-gutters>
       <v-col>
-        <v-card height="100%" class="ma-1">
+        <v-card height="100%">
           <v-card-title class="grey--text">Datos de Saldo Recaudado</v-card-title>
           <v-divider></v-divider>
           <column-chart thousands="," :data="dataChart"></column-chart>
@@ -64,6 +60,28 @@
       </v-col>
     </v-row>
 
+    <v-card :loading="load_registros">
+      <table>
+        <thead>
+        <tr>
+          <th colspan="3">Total recuperado por segmento</th>
+        </tr>
+        <tr>
+          <th>Portafolio</th>
+          <th>Segmento</th>
+          <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="item in registros">
+          <td>{{item.cob_portafolio.nombre}}</td>
+          <td>{{item.cob_segmento.nombre}}</td>
+          <td>L. {{int.format(item.total)}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </v-card>
+
 
   </v-card>
 </template>
@@ -79,6 +97,8 @@ export default {
         req: v => !!v || 'Campo requerido',
         max: v => v.length < 200 || 'Tiene que ser menos a 200 carácteres'
       },
+      registros: [],
+      load_registros: true
     }
   },
   computed:{
@@ -99,7 +119,16 @@ export default {
       return this.$store.state.cobros.portafolios.PORTAFOLIO;
     },
   },
+  created() {
+    this.cargarRegistros();
+  },
   methods:{
+    cargarRegistros(){
+      this.$axios.get('cobros/cargar_ingresos_portafolios/'+this.PORTAFOLIO.id).then((res)=>{
+        this.registros      = res.data.registros;
+        this.load_registros = false;
+      })
+    },
     registrarCierre(){
       this.$store.commit('activarOverlay', true);
       this.$axios.post('cobros/portafolio/cierre',{
@@ -124,5 +153,20 @@ export default {
 </script>
 
 <style scoped>
-
+table{
+  width: 100%;
+  border: solid #b2b0b0 1px;
+}
+table thead tr{
+  border-bottom: solid #b2b0b0 1px;
+}
+table thead tr td{
+  border-right: solid #b2b0b0 1px;
+}
+table thead tr th{
+  border-left: solid #b2b0b0 1px;
+}
+table tbody tr td{
+  padding: 5px;
+}
 </style>

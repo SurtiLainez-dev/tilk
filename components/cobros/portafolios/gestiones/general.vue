@@ -2,62 +2,43 @@
   <v-card flat class="ma-5">
     <v-toolbar flat color="grey lighten-4"><v-card-title>Datos Generales</v-card-title></v-toolbar>
 
-    <v-row no-gutters class="mt-2">
-      <v-col>
-        <v-card class="pa-5 ma-2" height="100%" :loading="LOADGESTION">
-          <h6 class="grey--text text-center">Saldo</h6>
-          <h6 class="grey--text text-center">L {{int.format(GESTION.saldo_actual)}}</h6>
-        </v-card>
-      </v-col>
-      <v-col>
-        <v-card class="pa-5 ma-2" height="100%" :loading="LOADGESTION">
-          <h6 class="grey--text text-center">Saldo sin Mora</h6>
-          <h6 class="grey--text text-center">L {{int.format(GESTION.saldo_actual_cap)}}</h6>
-        </v-card>
-      </v-col>
-      <v-col>
-        <v-card class="pa-5 ma-2" height="100%" :loading="LOADGESTION">
-          <h6 class="grey--text text-center">Mora</h6>
-          <h6 class="grey--text text-center">L {{int.format(mora)}}</h6>
-        </v-card>
-      </v-col>
-      <v-col>
-        <v-card class="pa-5 ma-2" height="100%" :loading="LOADGESTION">
-          <h6 class="grey--text text-center">Saldo Atrasado</h6>
-          <h6 class="grey--text text-center">L {{int.format(GESTION.pagando)}}</h6>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="mt-2">
-      <v-col>
-        <v-card class="pa-5 ma-2" height="100%" :loading="LOADGESTION">
-          <h6 class="grey--text text-center">Saldo Abonado</h6>
-          <h6 class="grey--text text-center" v-if="VENTA.contrato_cliente">L {{int.format(VENTA.contrato_cliente.saldo_abonado)}}</h6>
-        </v-card>
-      </v-col>
-      <v-col>
-        <v-card class="pa-5 ma-2" height="100%" :loading="LOADGESTION || LOAD_VENTA">
-          <h6 class="grey--text text-center">Saldo de Inicial</h6>
-          <h6 class="grey--text text-center">L {{int.format(VENTA.total)}}</h6>
-        </v-card>
-      </v-col>
-      <v-col>
-        <v-card class="pa-5 ma-2" height="100%" :loading="LOADGESTION">
-          <h6 class="grey--text text-center">Segmento</h6>
-          <h6 class="grey--text text-center">{{GESTION.cob_segmento.nombre}}</h6>
-        </v-card>
-      </v-col>
-    </v-row>
 
-    <v-card class="mt-4 ma-2">
-      <v-toolbar flat dense><h6 class="grey--text">Pagos Atrasados</h6></v-toolbar>
-      <v-data-table dense :headers="header" :items="pagosAtrasados" :loading="LOAD_VENTA">
-        <template v-slot:item.pago_inicial="{item}">L {{item.pago_inicial}}</template>
-        <template v-slot:item.total_pago="{item}">L {{item.total_pago}}</template>
-        <template v-slot:item.mora="{item}">L {{item.mora}}</template>
-        <template v-slot:item.total_abonado="{item}">L {{item.total_abonado}}</template>
-        <template v-slot:item.saldo_actual="{item}">L {{item.saldo_actual}}</template>
-      </v-data-table>
+    <v-card>
+      <table>
+        <thead>
+        <tr>
+          <th>Saldo de la Cuenta</th>
+          <td>L {{int.format(GESTION.saldo_actual)}}</td>
+          <th>Saldo sin Mora</th>
+          <td>L {{int.format(GESTION.saldo_actual_cap)}}</td>
+          <th>Mora</th>
+          <td>L {{int.format(mora)}}</td>
+        </tr>
+        <tr>
+          <th>Saldo Atrasado</th>
+          <td>L {{int.format(GESTION.pagando)}}</td>
+          <th>Saldo Abonado</th>
+          <td>L {{int.format(VENTA.contrato_cliente.saldo_abonado)}}</td>
+          <th>Saldo Inicial de la Cuenta</th>
+          <td>L {{int.format(VENTA.total)}}</td>
+        </tr>
+        <tr>
+          <th>Nombre del segmento</th>
+          <td colspan="5">{{GESTION.cob_segmento.nombre}}</td>
+        </tr>
+        </thead>
+      </table>
+
+      <v-card class="mt-4" flat>
+        <v-toolbar flat dense><h6 class="grey--text">Pagos Atrasados</h6></v-toolbar>
+        <v-data-table dense :headers="header" :items="pagosAtrasados" :loading="LOAD_VENTA">
+          <template v-slot:item.pago_inicial="{item}">L {{item.pago_inicial}}</template>
+          <template v-slot:item.total_pago="{item}">L {{item.total_pago}}</template>
+          <template v-slot:item.mora="{item}">L {{item.mora}}</template>
+          <template v-slot:item.total_abonado="{item}">L {{item.total_abonado}}</template>
+          <template v-slot:item.saldo_actual="{item}">L {{item.saldo_actual}}</template>
+        </v-data-table>
+    </v-card>
     </v-card>
   </v-card>
 </template>
@@ -122,5 +103,16 @@ export default {
 </script>
 
 <style scoped>
-
+table{
+  width: 100%;
+}
+table thead tr{
+  border-bottom: solid #b2b0b0 1px;
+}
+table thead tr td{
+  border-right: solid #b2b0b0 1px;
+}
+table thead tr th{
+  border-left: solid #b2b0b0 1px;
+}
 </style>

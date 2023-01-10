@@ -103,12 +103,17 @@ export default {
   },
   methods:{
     registrarProyeccion(){
+      let totales = [];
+      if (this.TOTALES.length > 0)
+        totales = this.TOTALES;
+
       this.$store.commit('activarOverlay', true);
       this.$axios.post('cobros/gestion/cambiar_proyeccion',{
         portafolio:   this.$store.state.cobros.portafolios.PORTAFOLIO.id,
         fecha_cierre: this.editar.fecha_cierre,
         proyecccion:  this.editar.proyeccion,
-        valor_cuota:  this.PORTAFOLIO.valor_cuotas
+        valor_cuota:  this.PORTAFOLIO.valor_cuotas,
+        valores:      JSON.stringify(totales)
       }).then((res)=>{
         this.$store.commit('cobros/portafolios/cargar_PORTAFOLIO');
         this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});

@@ -1,41 +1,27 @@
 <template>
   <v-card flat class="ma-5">
     <v-toolbar flat color="grey lighten-4"><v-card-title>Gestiones</v-card-title></v-toolbar>
-    <v-card class="pa-5 ma-1">
-      <v-row no-gutters>
-        <v-col cols="4">
-          <v-simple-table dense class="">
-            <template v-slot:default>
-              <tr>
-                <th>Intereses</th>
-                <td>L {{int.format(mora)}}</td>
-              </tr>
-              <tr>
-                <th>Saldo Atrasado</th>
-                <td>L {{int.format(GESTION.pagando)}}</td>
-              </tr>
-            </template>
-          </v-simple-table>
-        </v-col>
-        <v-col cols="8">
-          <v-simple-table dense>
-            <template v-slot:default>
-              <tr>
-                <th>Nombre del Cliente</th>
-                <td>{{GESTION.cliente.nombres}} {{GESTION.cliente.apellidos}}</td>
-              </tr>
-              <tr>
-                <th>Descripción del Crédito</th>
-                <td>{{VENTA.contrato_cliente.remision_articulo.articulo.descripcion_corta}} - {{VENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</td>
-              </tr>
-              <tr>
-                <th>Días de Mora</th>
-                <td>{{VENTA.contrato_cliente.dias_mora}} días</td>
-              </tr>
-            </template>
-          </v-simple-table>
-        </v-col>
-      </v-row>
+    <v-card>
+      <table>
+        <thead>
+        <tr>
+          <th>Nombre del Cliente</th>
+          <td>{{GESTION.cliente.nombres}} {{GESTION.cliente.apellidos}}</td>
+          <th>Días de Mora</th>
+          <td>{{VENTA.contrato_cliente.dias_mora}} días</td>
+        </tr>
+        <tr>
+          <th>Descripción del Crédito</th>
+          <td colspan="3">{{VENTA.contrato_cliente.remision_articulo.articulo.descripcion_corta}} - {{VENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</td>
+        </tr>
+        <tr>
+          <th>Intereses</th>
+          <td>L {{int.format(mora)}}</td>
+          <th>Saldo Atrasado</th>
+          <td>L {{int.format(GESTION.pagando)}}</td>
+        </tr>
+        </thead>
+      </table>
     </v-card>
 
     <v-row>
@@ -142,62 +128,41 @@
 
           <v-card flat v-if="vista">
             <v-toolbar flat color="grey lighten-4">Datos de la Gestión</v-toolbar>
-            <v-row no-gutters>
-              <v-col cols="3">
-                <v-card class="ma-2">
-                  <v-card-subtitle>Fecha</v-card-subtitle>
-                  <v-card-subtitle>{{dataGestion.fecha_gestionado}}</v-card-subtitle>
-                </v-card>
-              </v-col>
-              <v-col cols="9">
-                <v-card class="ma-2">
-                  <v-card-subtitle>Responsable</v-card-subtitle>
-                  <v-card-subtitle>{{dataGestion.colaborador_responsable}}</v-card-subtitle>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-row no-gutters>
-              <v-col>
-                <v-card class="ma-2">
-                  <v-card-subtitle>Fecha Guardado</v-card-subtitle>
-                  <v-card-subtitle>{{dataGestion.fecha_guardado}}</v-card-subtitle>
-                </v-card>
-              </v-col>
-              <v-col>
-                <v-card class="ma-2">
-                  <v-card-subtitle>Forma de Gestión</v-card-subtitle>
-                  <v-card-subtitle>{{dataGestion.forma_contacto}}</v-card-subtitle>
-                </v-card>
-              </v-col>
-              <v-col>
-                <v-card class="ma-2">
-                  <v-card-subtitle>Proxima Gestión</v-card-subtitle>
-                  <v-card-subtitle><strong>{{dataGestion.fecha_recordatorio}}</strong></v-card-subtitle>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-row no-gutters>
-              <v-col>
-                <v-card class="ma-2">
-                  <v-card-subtitle>Usuario que guardó</v-card-subtitle>
-                  <v-card-subtitle>{{dataGestion.user}}</v-card-subtitle>
-                </v-card>
-              </v-col>
-              <v-col>
-                <v-card class="ma-2">
-                  <v-card-subtitle>Resultado</v-card-subtitle>
-                  <v-card-subtitle><strong>{{dataGestion.resultado_gestion}}</strong></v-card-subtitle>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-row no-gutters>
-              <v-col>
-                <v-card class="ma-2">
-                  <v-card-subtitle>Comentario de la Gestión</v-card-subtitle>
-                  <v-card-subtitle>{{dataGestion.comentario}}</v-card-subtitle>
-                </v-card>
-              </v-col>
-            </v-row>
+
+            <table>
+              <thead>
+              <tr>
+                <th>Fecha</th>
+                <td>{{dataGestion.fecha_gestionado}}</td>
+                <th>Fecha Guardado</th>
+                <td>{{dataGestion.fecha_guardado}}</td>
+              </tr>
+              <tr>
+                <th colspan="2">Responsable de la Gestión</th>
+                <td colspan="2">{{dataGestion.colaborador_responsable}}</td>
+              </tr>
+              <tr>
+                <th colspan="2">Forma de Gestión</th>
+                <td colspan="2">{{dataGestion.forma_contacto}}</td>
+              </tr>
+              <tr>
+                <th colspan="2">Proxima Gestión</th>
+                <td colspan="2">{{dataGestion.fecha_recordatorio}}</td>
+              </tr>
+              <tr>
+                <th>Usuario</th>
+                <td>{{dataGestion.user}}</td>
+                <th>Resultado</th>
+                <td>{{dataGestion.resultado_gestion}}</td>
+              </tr>
+              <tr>
+                <th style="border-right: solid #b2b0b0 1px; border-bottom: #FFFFFF !important;" colspan="4">Comentario:</th>
+              </tr>
+              <tr>
+                <td style="border-left: solid #b2b0b0 1px; padding: 5px; border-bottom: #FFFFFF !important;" colspan="4">{{dataGestion.comentario}}</td>
+              </tr>
+              </thead>
+            </table>
           </v-card>
 
 
@@ -446,5 +411,16 @@ export default {
 </script>
 
 <style scoped>
-
+table{
+  width: 100%;
+}
+table thead tr{
+  border-bottom: solid #b2b0b0 1px;
+}
+table thead tr td{
+  border-right: solid #b2b0b0 1px;
+}
+table thead tr th{
+  border-left: solid #b2b0b0 1px;
+}
 </style>

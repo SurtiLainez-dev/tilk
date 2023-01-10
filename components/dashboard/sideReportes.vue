@@ -19,7 +19,10 @@
         <v-list-item-title>Ventas</v-list-item-title>
       </template>
       <v-list-item dense class="itemOpciones" @click="go('/reportes/ventas/global')">
-        Global
+        Por Sucursal
+      </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/reportes/ventas/general')">
+        General
       </v-list-item>
     </v-list-group>
   </div>

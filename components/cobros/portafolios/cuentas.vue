@@ -123,16 +123,18 @@
             </v-col>
           </v-row>
 
+          <v-btn class="mt-3 text--white" tile block small @click="actualizar" text> Actualizar</v-btn>
           <v-btn class="mt-3" tile block small dark @click="VISTAPORTAFOLIO = 1"> Gestiones</v-btn>
           <v-btn class="mt-3 text-white" tile block small color="black"
                  @click="VISTAPORTAFOLIO = 2" :disabled="LOADPORTAFOLIO"> Gestiones de Hoy</v-btn>
           <v-btn class="mt-3" tile block small dark @click="VISTAPORTAFOLIO = 3"> Historial</v-btn>
+          <v-btn class="mt-3" tile block small dark @click="VISTAPORTAFOLIO = 9"> Avance</v-btn>
           <v-btn tile block small class="mt-3 text-white" color="black"
                  @click="VISTAPORTAFOLIO = 4" :disabled="LOADPORTAFOLIO">Reportes</v-btn>
           <v-btn class="mt-3" tile block small dark v-if="PORTAFOLIO.gerencial === 1" @click="VISTAPORTAFOLIO = 5">Portafolios</v-btn>
           <v-btn class="mt-3" tile block small dark v-if="PORTAFOLIO.gerencial === 1" @click="VISTAPORTAFOLIO = 6">Transferir</v-btn>
-          <v-btn class="mt-3" tile block small dark @click="VISTAPORTAFOLIO = 7">Editar</v-btn>
-          <v-btn class="mt-3" tile block small dark @click="VISTAPORTAFOLIO = 8">Crear Cierre</v-btn>
+          <v-btn class="mt-3" tile block small dark @click="VISTAPORTAFOLIO = 7" v-if="PERMISOS.includes(75)">Editar</v-btn>
+          <v-btn class="mt-3" tile block small dark @click="VISTAPORTAFOLIO = 8" v-if="PERMISOS.includes(76)">Crear Cierre</v-btn>
         </v-col>
 
 
@@ -146,11 +148,11 @@
             <transferencia v-else-if="VISTAPORTAFOLIO === 6"/>
             <editar_ortafolio v-else-if="VISTAPORTAFOLIO === 7"/>
             <cierre v-else-if="VISTAPORTAFOLIO === 8"/>
+            <avance v-else-if="VISTAPORTAFOLIO === 9"/>
           </v-card>
         </v-col>
       </v-row>
     </v-card>
-
   </v-card>
 
   <v-card flat v-else>
@@ -168,6 +170,7 @@ import transferencia from "@/components/cobros/portafolios/transferencia";
 import portafolios from "@/components/cobros/portafolios/portafolios";
 import historial from "@/components/cobros/portafolios/historial";
 import reportes from "@/components/cobros/portafolios/reportes";
+import avance from "@/components/cobros/portafolios/avance.vue";
 export default {
   components:{
     gestiones,
@@ -177,7 +180,8 @@ export default {
     transferencia,
     portafolios,
     historial,
-    reportes
+    reportes,
+    avance
   },
   data(){
     return{
@@ -187,14 +191,25 @@ export default {
   },
   name: "cuentas",
   computed:{
-    VISTAEXPANDIR(){
-      return this.$store.state.cobros.portafolios.VISTAEXPANDIR;
+    LOADPORTAFOLIO(){
+      return this.$store.state.cobros.portafolios.LOADPORTAFOLIO;
+    },
+    PERMISOS(){
+      let permisos = this.$store.state.permisosUser.split(',');
+      let per = [];
+      if (permisos.length > 1){
+        permisos.forEach((item)=>{
+          per.push(parseInt(item))
+        })
+        return per;
+      }else
+        return [];
     },
     PORTAFOLIO() {
       return this.$store.state.cobros.portafolios.PORTAFOLIO;
     },
-    LOADPORTAFOLIO(){
-      return this.$store.state.cobros.portafolios.LOADPORTAFOLIO;
+    VISTAEXPANDIR(){
+      return this.$store.state.cobros.portafolios.VISTAEXPANDIR;
     },
     VISTAPORTAFOLIO:{
       get: function (){
@@ -203,21 +218,30 @@ export default {
       set: function (val){
         this.$store.commit('cobros/portafolios/cambiar_VISTAPORTAFOLIO', val);
       }
-    }
+    },
   },
   created() {
     this.VISTAPORTAFOLIO = 1;
   },
   mounted() {
-    if (this.PORTAFOLIO.normalidad < 35)
-      this.colorNormalidad = 'red';
-    else if (this.PORTAFOLIO.normalidad > 35 && this.PORTAFOLIO.normalidad < 70)
-      this.colorNormalidad = 'yellow darken-3';
-    else if (this.PORTAFOLIO.normalidad > 71 && this.PORTAFOLIO.normalidad < 90)
-      this.colorNormalidad = 'teal';
-    else if (this.PORTAFOLIO.normalidad > 90)
-      this.colorNormalidad = 'green';
+    this.cambiarColorNormalidad();
   },
+  methods:{
+    actualizar(){
+      this.$store.commit('cobros/portafolios/cargar_PORTAFOLIO');
+      this.$store.commit('cobros/portafolios/cargar_GESTIONES');
+    },
+    cambiarColorNormalidad(){
+      if (this.PORTAFOLIO.normalidad < 35)
+        this.colorNormalidad = 'red';
+      else if (this.PORTAFOLIO.normalidad > 35 && this.PORTAFOLIO.normalidad < 70)
+        this.colorNormalidad = 'yellow darken-3';
+      else if (this.PORTAFOLIO.normalidad > 71 && this.PORTAFOLIO.normalidad < 90)
+        this.colorNormalidad = 'teal';
+      else if (this.PORTAFOLIO.normalidad > 90)
+        this.colorNormalidad = 'green';
+    }
+  }
 }
 </script>
 
