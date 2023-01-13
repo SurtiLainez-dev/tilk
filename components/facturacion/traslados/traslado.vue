@@ -1,182 +1,151 @@
 <template>
-    <div>
-      <v-row>
-        <v-col md="3" cols="4">
-          <v-hover v-slot:default="{ hover }" close-delay="100">
-            <v-card color="blue-grey lighten-3" dark height="90px"
-                    :elevation="hover ? 16 : 2" class="pl-2 pr-2 pt-2 pb-2 rowsTable">
-              <h4 class="text-center">Sucursal de Origen</h4>
-              <h6 class="text-center">{{Traslado.sucursal.nombre}}</h6>
-            </v-card>
-          </v-hover>
-        </v-col>
-        <v-col md="3" cols="4">
-          <v-hover v-slot:default="{ hover }" close-delay="100">
-            <v-card color="blue-grey lighten-3" dark height="90px"
-                    class="pl-2 pr-2 pt-2 pb-2  rowsTable" :elevation="hover ? 16 : 2">
-              <h4 class="text-center">Sucursal de Destino</h4>
-              <h6 class="text-center">{{Traslado.destino.nombre}}</h6>
-            </v-card>
-          </v-hover>
-        </v-col>
-        <v-col md="3" cols="4">
-          <v-hover v-slot:default="{ hover }" close-delay="100">
-            <v-card color="blue-grey lighten-3" dark height="90px"
-                    class="pl-2 pr-2 pt-2 pb-2  rowsTable" :elevation="hover ? 16 : 2">
-              <h4 class="text-center">Solicitado por:</h4>
-              <h6 class="text-center">{{Traslado.user.usuario}}</h6>
-              <h6 class="text-center">{{Traslado.fecha_creado.split('-')[2]}}/{{Traslado.fecha_creado.split('-')[1]}}/{{Traslado.fecha_creado.split('-')[0]}}</h6>
-            </v-card>
-          </v-hover>
-        </v-col>
-        <v-col md="3" cols="12">
-          <v-hover v-slot:default="{ hover }" close-delay="100">
-            <v-card color="blue-grey lighten-3" dark height="90px"
-                    class="pl-2 pr-2 pt-2 pb-2  rowsTable" :elevation="hover ? 16 : 2">
-              <h4 class="text-center">Código</h4>
-              <h6 class="text-center">{{Traslado.codigo}}</h6>
-            </v-card>
-          </v-hover>
-        </v-col>
-      </v-row>
-      <small>Observación:</small>{{Traslado.observacion}}
-      <v-divider></v-divider>
-      <v-row>
-        <v-col cols="3">
-          <strong>Detalles de Transferencia</strong>
-        </v-col>
-        <v-col cols="9" class="d-flex justify-end">
-          <v-tooltip top>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn v-if="Traslado.estado_remision === 4" class="ma-1" dark small
-                     color="orange" v-on="on" v-bind="attrs" @click="$store.commit('valorDialogo', true)">
-                Decidir sobre transferencia
-              </v-btn>
-            </template>
-            <span>Aceptar o Rechzar la Transferencia</span>
-          </v-tooltip>
-          <v-tooltip top>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn class="ma-1" dark fab x-small @click="verDocumento"
-                     color="red" v-on="on" v-bind="attrs">
-                <v-icon>fa fa-file-pdf</v-icon>
-              </v-btn>
-            </template>
-            <span>Ver Documento de la Transferencia</span>
-          </v-tooltip>
-        </v-col>
-      </v-row>
-      <v-container>
-        <v-row>
-          <v-col cols="7">Detalle</v-col>
-          <v-col cols="1" class="text-center">Cant.</v-col>
-          <v-col cols="1" class="text-center">Estado</v-col>
-          <v-col cols="1" class="text-center">Remisión</v-col>
-          <v-col cols="1" class="text-center">Compue.</v-col>
-          <v-col cols="1" class="text-center">Vehículo</v-col>
-        </v-row>
-      </v-container>
-      <v-expansion-panels>
-        <v-expansion-panel :class="{'grey  lighten-2': i%2 === 0,'grey lighten-4': i%2 !== 0}"
-          v-for="(item,i) in Traslado.cuerpo_transferencias" :key="i" class="rowsTable">
-          <v-expansion-panel-header>
-            <v-row>
-              <v-col cols="7">
-                <h5>{{item.articulo.nombre_articulo}}</h5>
-              </v-col>
-              <v-col cols="1" class="text-center">
-                <h5>{{item.cantidad}}</h5>
-              </v-col>
-              <v-col cols="1" class="text-center">
-                <h5>{{item.estado_articulo}}</h5>
-              </v-col>
-              <v-col cols="1" class="text-center">
-                <v-icon v-if="item.is_remision === 1" dark x-small color="success">fa fa-check</v-icon>
-                <v-icon v-else dark x-small color="error">fa fa-times</v-icon>
-              </v-col>
-              <v-col cols="1" class="text-center">
-                <v-icon v-if="item.is_componente === 1" dark x-small color="success">fa fa-check</v-icon>
-                <v-icon v-else dark x-small color="error">fa fa-times</v-icon>
-              </v-col>
-              <v-col cols="1" class="text-center">
-                <v-icon v-if="item.articulo.is_motocicleta === 1" dark x-small color="success">fa fa-check</v-icon>
-                <v-icon v-else dark x-small color="error">fa fa-times</v-icon>
+    <v-card flat>
+      <table>
+        <thead>
+        <tr>
+          <th colspan="5">Detalle de la Transferencia</th>
+        </tr>
+        </thead>
+        <thead>
+        <tr>
+          <th>Sucursal de Origen</th>
+          <th>Sucursal de Destino</th>
+          <th>Solicitado por</th>
+          <th>Fecha Solicitado</th>
+          <th>Referencia</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>{{Traslado.sucursal.nombre}}</td>
+          <td>{{Traslado.destino.nombre}}</td>
+          <td>{{Traslado.user.usuario}}</td>
+          <td>{{Traslado.fecha_creado.split('-')[2]}}/{{Traslado.fecha_creado.split('-')[1]}}/{{Traslado.fecha_creado.split('-')[0]}}</td>
+          <td>{{Traslado.codigo}}</td>
+        </tr>
+        </tbody>
+        <thead>
+        <tr>
+          <th colspan="5">Observación</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td colspan="5">{{Traslado.observacion}}</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <thead>
+        <tr>
+          <th style="width: 60%">
+            <v-row no-gutters>
+              <v-col cols="6">Detalle de los Artículos</v-col>
+              <v-col cols="6" class="d-flex justify-end">
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn v-if="Traslado.estado_remision === 4" class="ma-1" dark small width="20" height="20"
+                           color="orange" v-on="on" v-bind="attrs" @click="$store.commit('valorDialogo', true)">
+                      Decidir sobre transferencia
+                    </v-btn>
+                  </template>
+                  <span>Aceptar o Rechzar la Transferencia</span>
+                </v-tooltip>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn class="ma-1" dark fab @click="verDocumento"
+                           color="red" v-on="on" v-bind="attrs" width="20" height="20">
+                      <v-icon x-small>fa fa-file-pdf</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Ver Documento de la Transferencia</span>
+                </v-tooltip>
               </v-col>
             </v-row>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <hr>
-            <v-row>
-              <v-col v-if="item.is_componente === 1">
-                <small>*Componentes solicitados para enviar:</small>
-                <v-simple-table dense fixed-header height="180px">
-                  <template v-slot:default>
-                    <thead>
-                    <tr>
-                      <th>Detalle</th>
-                      <th>Cantidad</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="componente in item.componentes_transferencias">
-                      <td>{{componente.articulo_compuesto.cantidad}} {{componente.articulo_compuesto.detalle}} <small v-if="componente.articulo_compuesto.detalle_cantidad">({{componente.articulo_compuesto.detalle_cantidad}} unidades)</small></td>
-                      <td class="text-center">{{componente.cantidad}}</td>
-                    </tr>
-                    </tbody>
-                  </template>
-                </v-simple-table>
-              </v-col>
-              <v-col v-if="item.is_remision === 1">
-                <small>*Artículos en remisión a enviar:</small>
-                <v-simple-table dense fixed-header height="180px">
-                  <template v-slot:default>
-                    <thead>
-                    <tr>
-                      <th>Cód. Sístema</th>
-                      <th>Seríe</th>
-                      <th>Color</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="remision in item.remision_art_traslado">
-                      <td>{{remision.remision_articulo.serie_sistema}}</td>
-                      <td>{{remision.remision_articulo.serie_fabricante}}</td>
-                      <td>{{remision.remision_articulo.color}}</td>
-                    </tr>
-                    </tbody>
-                  </template>
-                </v-simple-table>
-              </v-col>
-              <v-col v-if="item.articulo.is_motocicleta === 1">
-                <small>*Motocicletas:</small>
-                <v-simple-table fixed-header height="180px" dense>
-                  <template v-slot:default>
-                    <thead>
-                    <tr>
-                      <th>Chasís</th>
-                      <th>Motor</th>
-                      <th>Año</th>
-                      <th>CC</th>
-                      <th>Placa</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="moto in item.remision_art_traslado">
-                      <td>{{moto.remision_articulo.motocicleta.chasis}}</td>
-                      <td>{{moto.remision_articulo.motocicleta.motor}}</td>
-                      <td>{{moto.remision_articulo.motocicleta.anio}}</td>
-                      <td>{{moto.remision_articulo.motocicleta.cilindraje}}</td>
-                      <td>{{moto.remision_articulo.motocicleta.placa}}</td>
-                    </tr>
-                    </tbody>
-                  </template>
-                </v-simple-table>
-              </v-col>
-            </v-row>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
-      <br>
+          </th>
+          <th style="width: 4%" class="text-center">Cant.</th>
+          <th style="width: 9%" class="text-center">Estado</th>
+          <th style="width: 9%" class="text-center">Remisión</th>
+          <th style="width: 9%" class="text-center">Compuesto</th>
+          <th style="width: 9%" class="text-center">Vehículo</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr :class="{'grey  lighten-4': i%2 === 0,'grey lighten-5': i%2 !== 0}"
+            class="rowsTable" v-for="(item,i) in Traslado.cuerpo_transferencias">
+          <td>{{item.articulo.nombre_articulo}}
+            <table v-if="item.is_componente === 1">
+              <thead>
+              <tr>
+                <th style="width: 95%">Detalle de Componentes</th>
+                <th style="width: 5%">Cant.</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="componente in item.componentes_transferencias">
+                <td>{{componente.articulo_compuesto.cantidad}} {{componente.articulo_compuesto.detalle}} <small style="font-size: 9px" v-if="componente.articulo_compuesto.detalle_cantidad">({{componente.articulo_compuesto.detalle_cantidad}} unidades)</small></td>
+                <td class="text-center">{{componente.cantidad}}</td>
+              </tr>
+              </tbody>
+            </table>
+            <table v-if="item.is_remision === 1">
+              <thead>
+              <tr>
+                <th>Cód. Sístema</th>
+                <th>Seríe</th>
+                <th>Color</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="remision in item.remision_art_traslado">
+                <td>{{remision.remision_articulo.serie_sistema}}</td>
+                <td>{{remision.remision_articulo.serie_fabricante}}</td>
+                <td>{{remision.remision_articulo.color}}</td>
+              </tr>
+              </tbody>
+            </table>
+            <table v-if="item.articulo.is_motocicleta === 1">
+              <thead>
+              <tr>
+                <th>Chasís</th>
+                <th>Motor</th>
+                <th>Año</th>
+                <th>CC</th>
+                <th>Placa</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="moto in item.remision_art_traslado">
+                <td>{{moto.remision_articulo.motocicleta.chasis}}</td>
+                <td>{{moto.remision_articulo.motocicleta.motor}}</td>
+                <td>{{moto.remision_articulo.motocicleta.anio}}</td>
+                <td>{{moto.remision_articulo.motocicleta.cilindraje}}</td>
+                <td>{{moto.remision_articulo.motocicleta.placa}}</td>
+              </tr>
+              </tbody>
+            </table>
+          </td>
+          <td class="text-center">{{item.cantidad}}</td>
+          <td class="text-center">{{item.estado_articulo}}</td>
+          <td class="text-center">
+            <v-icon v-if="item.is_remision === 1" dark x-small color="success">fa fa-check</v-icon>
+            <v-icon v-else dark x-small color="error">fa fa-times</v-icon>
+          </td>
+          <td class="text-center">
+            <v-icon v-if="item.is_componente === 1" dark x-small color="success">fa fa-check</v-icon>
+            <v-icon v-else dark x-small color="error">fa fa-times</v-icon>
+          </td>
+          <td class="text-center">
+            <v-icon v-if="item.articulo.is_motocicleta === 1" dark x-small color="success">fa fa-check</v-icon>
+            <v-icon v-else dark x-small color="error">fa fa-times</v-icon>
+          </td>
+        </tr>
+        <tr >
+          <td colspan="6" class="text-center">--- Fin de la Transferencia ---</td>
+        </tr>
+        </tbody>
+      </table>
 
       <v-dialog v-model="dialogo" width="30%">
         <v-card class="pl-5 pr-5">
@@ -220,7 +189,7 @@
           </v-btn>
         </template>
       </v-snackbar>
-    </div>
+    </v-card>
 </template>
 
 <script>
@@ -423,5 +392,44 @@ import Vue from "vue";
 <style scoped>
   .rowsTable{
     cursor: pointer;
+  }
+  table{
+    width: 100%;
+    border: solid #b2b0b0 1px;
+  }
+  table thead tr{
+    border-bottom: solid #b2b0b0 1px;
+    border-top: solid #b2b0b0 1px;
+  }
+  table thead tr th{
+    padding: 5px;
+    font-size: 14px;
+  }
+  table thead tr th{
+    border-left: solid #b2b0b0 1px;
+  }
+  table tbody tr td{
+    padding: 5px;
+    border-left: solid #b2b0b0 1px;
+    font-size: 12px;
+  }
+  table tbody tr td table{
+    width: 80%;
+  }
+  table tbody tr td table thead tr th{
+    font-size: 10px;
+    padding: 2px;
+  }
+  table tbody tr td table tbody tr td{
+    font-size: 9px;
+  }
+  table caption{
+    caption-side: top;
+  }
+  table thead tr th:hover{
+    background-color: #f6f6f6;
+  }
+  table tbody tr td:hover{
+    background-color: #f6f6f6;
   }
 </style>

@@ -27,6 +27,7 @@
           <inventario v-if="i.key === 6"/>
           <editar_inventario v-if="i.key === 7"/>
           <articulo_nuevo v-if="i.key === 8"/>
+          <motocicletas v-if="i.key === 9"/>
         </v-tab-item>
       </v-tabs-items>
 
@@ -39,20 +40,23 @@
 </template>
 
 <script>
+import Motocicletas from "@/pages/ventas/motocicletas.vue";
+
 const notification = document.getElementById('notification');
 const message = document.getElementById('message');
 const restartButton = document.getElementById('restart-button');
 import side from "../components/dashboard/side";
 import NuxtLoading from "../.nuxt/components/nuxt-loading";
 import Cuerpo from "../components/Pestanas/Cuerpo";
-import caja from "../components/caja/index"
+import caja from "../components/caja/index";
 import inicio from "@/components/cobros/inicio";
 import to_do_inidex from "@/components/to_to/to_do_inidex";
 import perfiles from "@/components/Ventas/pes/perfiles";
 import cuentas from "@/components/Ventas/pes/cuentas";
-import inventario from "@/components/Inventario/inventario"
+import inventario from "@/components/Inventario/inventario";
 import editar_inventario from "@/components/Inventario/editar_inventario";
 import articulo_nuevo from "@/components/Inventario/articulo_nuevo";
+import motocicletas from "@/components/Inventario/motocicletas.vue";
 export default {
   watch: {
     over (val) {
@@ -60,7 +64,8 @@ export default {
       }, 500)
     },
   },
-  components:{NuxtLoading, side, Cuerpo, caja, cobros: inicio,
+  components:{
+    Motocicletas, NuxtLoading, side, Cuerpo, caja, cobros: inicio ,motocicletas,
     to_do_inidex, perfiles, cuentas, inventario, editar_inventario, articulo_nuevo},
   data(){
     return{

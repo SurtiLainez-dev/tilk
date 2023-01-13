@@ -64,11 +64,15 @@
         })
       },
       envioCorreo(){
+        let correos = [];
+        this.selected.forEach((item)=>{
+          correos.push(item.email)
+        })
         this.$store.commit('activarOverlay', true);
         this.$store.commit('valorDialogo', false);
         this.$store.commit('valorDialogo2', false);
         this.$axios.post('envio_remision',{
-          data: this.selected,
+          data: correos,
           dir: this.$store.state.file[0],
           remision: this.$store.state.file[1]
         },{

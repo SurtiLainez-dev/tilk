@@ -1,5 +1,5 @@
 <template>
-    <v-card class="pl-2 pr-2">
+    <v-card flat class="pl-2 pr-2">
       <div v-if="!vista">
         <v-row>
           <v-col><v-card-title>Guías de Remisiones</v-card-title></v-col>

@@ -1,5 +1,5 @@
 <template>
-    <v-card class="pl-2 pr-2">
+    <v-card flat class="pl-2 pr-2">
       <div v-if="!select">
         <v-card-title>Trasnferencias de Artículos</v-card-title>
         <hr>

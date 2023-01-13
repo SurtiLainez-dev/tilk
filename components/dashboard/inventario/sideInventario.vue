@@ -8,6 +8,9 @@
       <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="anadirPestana(6, 'Inventario')">
         Inventario
       </v-list-item>
+      <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="anadirPestana(9, 'Inventario de Motocicletas')">
+        Motocicletas
+      </v-list-item>
       <v-list-item v-if="PERMISOS.includes(310)"  dense class="itemOpciones" @click="anadirPestana(8, 'Crear Artículo')">
         Crear Artículo
       </v-list-item>
