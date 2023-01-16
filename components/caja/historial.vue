@@ -2,95 +2,69 @@
   <v-card flat :loading="$store.state.cajas.historial.LOADCIERRE">
     <v-card-subtitle>Resumen de la Caja</v-card-subtitle>
 
-    <v-row>
-      <v-col>
-        <v-simple-table class="rowsTable" dense>
-          <template v-slot:default>
-            <tbody>
-            <tr>
-              <th>Total de Ingresos</th>
-              <td>L. {{int.format(HISTORIAL.total)}}</td>
-            </tr>
-            <tr>
-              <th>Total de Ingreso de Efectivo</th>
-              <td>L. {{int.format(HISTORIAL.ingreso)}}</td>
-            </tr>
-            <tr>
-              <th>Total de Egresos</th>
-              <td>L. {{int.format(HISTORIAL.egreso)}}</td>
-            </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-      </v-col>
-      <v-col>
-        <v-simple-table class="rowsTable" dense>
-          <template v-slot:default>
-            <tbody>
-            <tr>
-              <th>Efectivo al Final del Día</th>
-              <td>L. {{int.format(HISTORIAL.efectivo)}}</td>
-            </tr>
-            <tr>
-              <th>Efectivo Declarado</th>
-              <td>L. {{int.format(HISTORIAL.efectivo_declarado)}}</td>
-            </tr>
-            <tr>
-              <th>Descuadre</th>
-              <td>L. {{int.format(HISTORIAL.descuadre)}}</td>
-            </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
-        <v-simple-table dense class="rowsTable">
-          <template v-slot:default>
-            <tbody>
-            <tr>
-              <th>Sucursal</th>
-              <td>{{HISTORIAL.cajas.sucursal.nombre}}</td>
-            </tr>
-            <tr>
-              <th>Caja</th>
-              <td>{{HISTORIAL.cajas.codigo}}</td>
-            </tr>
-            <tr>
-              <th>Documento</th>
-              <td>
-                <b-link @click="verDocumento(HISTORIAL.file)" v-if="HISTORIAL.file">Ver Cierre</b-link>
-                <b-link v-else @click="dialogoCierre = true">Hacer cierre (Subir documento firmado)</b-link>
-<!--                <b-link  @click="dialogoCierre = true">Hacer cierre (Subir documento firmado)</b-link>-->
-              </td>
-            </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-      </v-col>
-      <v-col>
-        <v-simple-table dense class="rowsTable">
-          <template v-slot:default>
-            <tbody>
-            <tr>
-              <th>Fecha de Cierre</th>
-              <td>{{HISTORIAL.fecha}}</td>
-            </tr>
-            <tr>
-              <th>Observación</th>
-              <td>{{HISTORIAL.observacion}}</td>
-            </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-      </v-col>
-    </v-row>
-
-    <v-divider></v-divider>
+    <v-card class="ma-2" flat>
+      <table>
+        <thead>
+        <tr>
+          <th>Total de Ingresos</th>
+          <th>Total de Ingreso en Efectivo</th>
+          <th>Total de Egresos</th>
+          <th>Efectivo al Final del Día</th>
+          <th>Efectivo Declarado</th>
+          <th>Descuadre</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>L. {{int.format(HISTORIAL.total)}}</td>
+          <td>L. {{int.format(HISTORIAL.ingreso)}}</td>
+          <td>L. {{int.format(HISTORIAL.egreso)}}</td>
+          <td>L. {{int.format(HISTORIAL.efectivo)}}</td>
+          <td>L. {{int.format(HISTORIAL.efectivo_declarado)}}</td>
+          <td>L. {{int.format(HISTORIAL.descuadre)}}</td>
+        </tr>
+        </tbody>
+        <thead>
+        <tr>
+          <th>Sucursal</th>
+          <th>Caja</th>
+          <th>Fecha de Cierre</th>
+          <th>Ver Documento</th>
+          <th colspan="2">¿Revisado?</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>{{HISTORIAL.cajas.sucursal.nombre}}</td>
+          <td>{{HISTORIAL.cajas.codigo}}</td>
+          <td>{{HISTORIAL.fecha}}</td>
+          <td>
+            <b-link @click="verDocumento(HISTORIAL.file)" v-if="HISTORIAL.file">Ver Cierre</b-link>
+            <b-link v-else @click="dialogoCierre = true">Hacer cierre (Subir documento firmado)</b-link>
+          </td>
+          <td  v-if="HISTORIAL.revisado === 1" colspan="2"><v-chip x-small color="success" dark>Sí</v-chip></td>
+          <td colspan="2" v-else>
+            <v-chip x-small color="red" dark>No</v-chip> <b-link @click="dialogoRevision = true">Terminar Revisión</b-link>
+          </td>
+        </tr>
+        </tbody>
+        <thead>
+        <tr>
+          <th colspan="3">Observación Cajero</th>
+          <th colspan="3">Comentario Revisión</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td colspan="3">{{HISTORIAL.observacion}}</td>
+          <td colspan="3">{{HISTORIAL.comentario_revision}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </v-card>
 
     <v-card-subtitle>Resumen de Formas de Pago</v-card-subtitle>
-    <v-simple-table dense height="150px" fixed-header class="rowsTable">
+    <v-simple-table dense fixed-header class="rowsTable">
       <template v-slot:default>
         <thead>
         <tr>
@@ -107,10 +81,8 @@
       </template>
     </v-simple-table>
 
-    <v-divider></v-divider>
-
     <v-card-subtitle>Resumen de Caja</v-card-subtitle>
-    <v-simple-table dense height="250px" fixed-header class="rowsTable">
+    <v-simple-table dense fixed-header class="rowsTable">
       <template v-slot:default>
         <thead>
         <tr>
@@ -137,10 +109,10 @@
         </tbody>
       </template>
     </v-simple-table>
-    <v-divider></v-divider>
+
     <v-card-subtitle>Historial Completo de Caja</v-card-subtitle>
     <v-progress-linear indeterminate v-if="loadHistorial"></v-progress-linear>
-    <v-simple-table dense height="500px" fixed-header class="rowsTable">
+    <v-simple-table dense fixed-header class="rowsTable">
       <template v-slot:default>
         <thead>
         <tr>
@@ -167,6 +139,7 @@
           <td>{{item.forma_pago.nombre}}</td>
           <td v-if="item.tipo === 0">+</td>
           <td v-else>-</td>
+          <td>L. {{int.format(item.total)}}</td>
           <td>
             <b-link v-if="item.tipo_documento === 1 && item.factura" @click="solicitarClave(1, 0, item, 1)">Ver</b-link>
             <b-link v-else-if="item.tipo_documento === 2 && item.recibo" @click="solicitarClave(2,2,item.recibo, 1)">Ver</b-link>
@@ -209,6 +182,22 @@
         </v-container>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialogoRevision" width="35%">
+      <v-card>
+        <v-card-title>Terminando Revisión</v-card-title>
+        <v-divider></v-divider>
+        <v-form ref="FormRevisionCierreCaja">
+          <v-text-field dense disabled :value="USUARIO" class="ma-2"></v-text-field>
+          <v-textarea class="ma-2" rows="3" label="Comentario de Revisión de Cierre de Caja"
+                      v-model="HISTORIAL.comentario_revision"></v-textarea>
+        </v-form>
+        <v-card-actions class="d-flex justify-end">
+          <v-btn color="orange" text tile small @click="dialogoRevision = false" class="ma-2">Cerrar</v-btn>
+          <v-btn color="success" dark tile small @click="comentarioRevisado">Culminar Revisión</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -224,6 +213,7 @@ export default {
   },
   data(){
     return{
+      dialogoRevision: '',
       int:new Intl.NumberFormat(),
       historial: [],
       loadHistorial: false,
@@ -282,6 +272,26 @@ export default {
         this.loadHistorial = false;
         this.historial = res.data.historial;
       })
+    },
+    comentarioRevisado(){
+      if (this.HISTORIAL.comentario_revision && this.HISTORIAL.comentario_revision.length > 10){
+        this.$store.commit('activarOverlay', true);
+        this.dialogoRevision = false
+        this.$axios.post('caja/cierre/culminar_revision',{
+          cierre_id: this.HISTORIAL.id,
+          comentario: this.HISTORIAL.comentario_revision
+        }).then((res)=>{
+          this.HISTORIAL.revisado = 1;
+          this.$store.commit('notificacion', {texto:res.data.msj, color:'success'});
+          this.$store.commit('activarOverlay', false);
+        }).catch((error)=>{
+          this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
+          this.$store.commit('activarOverlay', false);
+          this.dialogoRevision = true;
+        })
+      }else{
+        this.$store.commit('notificacion', {texto:'El comentario tiene que ser mayor a 10 carácteres', color:'warning'});
+      }
     },
     culminarCierre(){
       if (this.file && this.ccBanco){
@@ -349,7 +359,41 @@ export default {
 </script>
 
 <style scoped>
-.rowsTable{
+table{
+  width: 100%;
+  border: solid #b2b0b0 1px;
+}
+
+table thead tr th{
+  padding: 5px;
+  font-size: 14px;
+  border-left: solid #b2b0b0 1px;
+  border-top: solid #b2b0b0 1px;
+}
+table tbody tr td{
+  padding: 5px;
+  border-left: solid #b2b0b0 1px;
+  border-bottom: solid #b2b0b0 1px;
+  font-size: 12px;
   cursor: pointer;
+}
+table tbody tr td table{
+  width: 80%;
+}
+table tbody tr td table thead tr th{
+  font-size: 10px;
+  padding: 2px;
+}
+table tbody tr td table tbody tr td{
+  font-size: 9px;
+}
+table caption{
+  caption-side: top;
+}
+table thead tr th:hover{
+  background-color: #f6f6f6;
+}
+table tbody tr td:hover{
+  background-color: #f6f6f6;
 }
 </style>

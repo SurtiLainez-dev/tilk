@@ -298,14 +298,14 @@
                   <span>Seleccionar</span>
                 </v-tooltip>
               </template>
-              <template v-slot:item.remision_articulo.precio_actual="{item}">
-                <span v-if="item.remision_articulo.estado_articulo_id === 1 || item.remision_articulo.estado_articulo_id === 2">
-                  L {{item.remision_articulo.articulo.precio_activo.precio_contado}}
-                </span>
-                <span v-else-if="item.remision_articulo.estado_articulo_id === 3">
-                  L {{item.remision_articulo.precio_actual}}
-                </span>
-              </template>
+<!--              <template v-slot:item.remision_articulo.precio_actual="{item}">-->
+<!--                <span v-if="item.remision_articulo.estado_articulo_id === 1 || item.remision_articulo.estado_articulo_id === 2">-->
+<!--                  L {{item.remision_articulo.articulo.precio_activo.precio_contado}}-->
+<!--                </span>-->
+<!--                <span v-else-if="item.remision_articulo.estado_articulo_id === 3">-->
+<!--                  L {{item.remision_articulo.precio_actual}}-->
+<!--                </span>-->
+<!--              </template>-->
             </v-data-table>
           </v-tab-item>
           <v-tab-item :key="2">

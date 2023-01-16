@@ -1,182 +1,350 @@
 <template>
 <v-card flat :loading="show">
   <div v-if="!vistaInfoPago">
-    <v-row no-gutters>
-      <v-col cols="3">
-        <v-card class="ma-2">
-          <v-simple-table class="rowsTable" dense>
-            <template v-slot:default>
-              <tbody>
-              <tr>
-                <th>Facturada:</th>
-                <td>
-                  <v-icon x-small color="success" dark v-if="CUENTA.facturada === 1">fa fa-check</v-icon>
-                  <v-icon x-small color="red" dark v-else-if="CUENTA.facturada === 0">fa fa-times</v-icon>
-                </td>
-              </tr>
-              <tr v-if="CUENTA.facturada === 0">
-                <th>Facturar:</th>
-                <td>
-                  <v-btn :disabled="CUENTA.tipo_venta === 1" x-small class="text-white" color="indigo" @click="crearFactura">Facturar</v-btn>
-                </td>
-              </tr>
-              <tr>
-                <th>Documento a Realizar:</th>
-                <td v-if="CUENTA.tipo_venta === 1">Factura de Contado</td>
-                <td v-else-if="CUENTA.tipo_venta === 2">Recibo</td>
-              </tr>
-              <tr>
-                <th>Saldo Inicial:</th>
-                <td><strong>L </strong>{{CUENTA.total}}</td>
-              </tr>
-              <tr v-if="CUENTA.tipo_venta === 2">
-                <th>Saldo Mora:</th>
-                <td v-if="CUENTA.contrato_cliente"><strong>L </strong> {{CUENTA.contrato_cliente.saldo_mora}}</td>
-              </tr>
-              <tr v-if="CUENTA.tipo_venta === 2">
-                <th>Saldo Abonado:</th>
-                <td v-if="CUENTA.contrato_cliente"><strong>L </strong> {{CUENTA.contrato_cliente.saldo_abonado}}</td>
-              </tr>
-              <tr>
-                <th>Saldo Actual</th>
-                <td><strong>L </strong> {{CUENTA.saldo_actual}}</td>
-              </tr>
-              <tr>
-                <th>Cuota</th>
-                <td v-if="CUENTA.tipo_venta === 2 && CUENTA.contrato_cliente"><strong>L </strong>{{CUENTA.contrato_cliente.cuota}}</td>
-                <td v-else><strong>L </strong> {{CUENTA.total}}</td>
-              </tr>
-              <tr v-if="CUENTA.tipo_venta === 2">
-                <th>Forma de Pago</th>
-                <td v-if="CUENTA.contrato_cliente">
-                  <v-chip x-small color="indigo" dark v-if="CUENTA.contrato_cliente.forma_pago === 1">Semanal</v-chip>
-                  <v-chip x-small color="indigo" dark v-else-if="CUENTA.contrato_cliente.forma_pago === 2">Quincenal</v-chip>
-                  <v-chip x-small color="indigo" dark v-if="CUENTA.contrato_cliente.forma_pago === 3">Mensual</v-chip>
-                </td>
-              </tr>
-              <tr>
-                <th>Estado:</th>
-                <td>
-                  <v-chip color="orange" x-small v-if="CUENTA.estado === 1" dark>Al día</v-chip>
-                  <v-chip color="red" x-small v-else-if="CUENTA.estado === 2" dark>Mora</v-chip>
-                  <v-chip color="success" x-small v-else-if="CUENTA.estado === 3" dark>Cancelada</v-chip>
-                  <v-chip color="indigo" x-small v-else-if="CUENTA.estado === 4" dark>Pendiente por aceptar</v-chip>
-                </td>
-              </tr>
-              <tr>
-                <th>Cliente</th>
-              </tr>
-              <tr>
-                <th>Identidad:</th>
-                <td>{{CUENTA.cliente.identidad}}</td>
-              </tr>
-              <tr>
-                <th>Artículo</th>
-              </tr>
-              <tr v-if="CUENTA.tipo_venta === 1 && CUENTA.facturas_contados" v-for="item in CUENTA.facturas_contados">
-                <td colspan="2">{{item.articulo.nombre_articulo}} - {{item.articulo.marca.nombre}}</td>
-              </tr>
-              <tr v-if="CUENTA.tipo_venta === 2">
-                <th>Artículo:</th>
-                <td v-if="CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo}}</td>
-              </tr>
-              <tr v-if="CUENTA.tipo_venta === 2">
-                <th>Módelo:</th>
-                <td v-if="CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.modelo}}</td>
-              </tr>
-              <tr v-if="CUENTA.tipo_venta === 2">
-                <th>Marca:</th>
-                <td v-if="CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</td>
-              </tr>
-              <tr>
-                <th colspan="2">Documentos por Cobrar Pendientes</th>
-              </tr>
-              <tr v-if="CUENTA.pagos_extras_ventas && item.estado === 1" v-for="item in CUENTA.pagos_extras_ventas">
-                <td colspan="2">{{item.descripcion}}</td>
-              </tr>
-              </tbody>
+    <table>
+      <thead>
+      <tr>
+        <th colspan="3">Nombre Completo</th>
+        <th># Venta</th>
+        <th>Identidad</th>
+        <th>Facturada</th>
+        <th v-if="CUENTA.facturada === 0">Facturar</th>
+        <th>Documento</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td colspan="3">{{CUENTA.cliente.nombres}} {{CUENTA.cliente.apellidos}}</td>
+        <td>{{CUENTA.cod}}</td>
+        <td>{{CUENTA.cliente.identidad}}</td>
+        <td v-if="CUENTA.facturada === 0">
+          <v-btn :disabled="CUENTA.tipo_venta === 1" x-small class="text-white" color="indigo" @click="crearFactura">Facturar</v-btn>
+        </td>
+        <td>
+          <v-icon x-small color="success" dark v-if="CUENTA.facturada === 1">fa fa-check</v-icon>
+          <v-icon x-small color="red" dark v-else-if="CUENTA.facturada === 0">fa fa-times</v-icon>
+        </td>
+        <td v-if="CUENTA.tipo_venta === 1">Factura de Contado</td>
+        <td v-else-if="CUENTA.tipo_venta === 2">Recibo</td>
+      </tr>
+      </tbody>
+
+      <thead>
+      <tr>
+        <th>Saldo Inicial</th>
+        <th>Saldo Mora</th>
+        <th>Total Abonado</th>
+        <th>Saldo Actual</th>
+        <th>Cuota</th>
+        <th>Forma de Pago</th>
+        <th>Estado</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>L. {{int.format(CUENTA.total)}}</td>
+        <td>
+          <span v-if="CUENTA.tipo_venta === 2 && CUENTA.contrato_cliente">L. {{int.format(CUENTA.contrato_cliente.saldo_mora)}}</span>
+          <span v-else>Venta de contado</span>
+        </td>
+        <td>
+          <span v-if="CUENTA.tipo_venta === 2 && CUENTA.contrato_cliente">L. {{int.format(CUENTA.contrato_cliente.saldo_abonado)}}</span>
+          <span v-else>Venta de contado</span>
+        </td>
+        <td>L. {{int.format(CUENTA.saldo_actual)}}</td>
+        <td>
+          <span v-if="CUENTA.tipo_venta === 2 && CUENTA.contrato_cliente">L. {{int.format(CUENTA.contrato_cliente.cuota)}}</span>
+          <span v-else>L. {{int.format(CUENTA.total)}}</span>
+        </td>
+        <td v-if="CUENTA.contrato_cliente">
+          <v-chip x-small color="indigo" dark v-if="CUENTA.contrato_cliente.forma_pago === 1">Semanal</v-chip>
+          <v-chip x-small color="indigo" dark v-else-if="CUENTA.contrato_cliente.forma_pago === 2">Quincenal</v-chip>
+          <v-chip x-small color="indigo" dark v-if="CUENTA.contrato_cliente.forma_pago === 3">Mensual</v-chip>
+        </td>
+        <td>
+          <v-chip color="orange" x-small v-if="CUENTA.estado === 1" dark>Al día</v-chip>
+          <v-chip color="red" x-small v-else-if="CUENTA.estado === 2" dark>Mora</v-chip>
+          <v-chip color="success" x-small v-else-if="CUENTA.estado === 3" dark>Cancelada</v-chip>
+          <v-chip color="indigo" x-small v-else-if="CUENTA.estado === 4" dark>Pendiente por aceptar</v-chip>
+        </td>
+      </tr>
+      </tbody>
+
+      <thead>
+      <tr>
+        <th colspan="3">Artículo</th>
+        <th colspan="2">Modelo</th>
+        <th colspan="2">Marca</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td colspan="3" v-if="CUENTA.tipo_venta === 1 && CUENTA.facturas_contados" >
+          <table>
+            <tbody>
+            <tr v-for="item in CUENTA.facturas_contados">
+              <td>
+                {{item.articulo.nombre_articulo}} - {{item.articulo.modelo}} - {{item.articulo.marca.nombre}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </td>
+        <td colspan="3" v-else-if="CUENTA.tipo_venta === 2">{{CUENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo}}</td>
+        <td colspan="2">
+          <span v-if="CUENTA.tipo_venta === 2 && CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.modelo}}</span>
+          <span v-else>-</span>
+        </td>
+        <td colspan="2">
+          <span v-if="CUENTA.tipo_venta === 2 && CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</span>
+          <span v-else>-</span>
+        </td>
+      </tr>
+      </tbody>
+
+    </table>
+
+    <v-card flat class="ma-2 pa-4">
+      <v-row no-gutters>
+        <v-col cols="3">
+          <v-text-field class="ma-2" outlined dense placeholder="0"
+                        label="Abono" prefix="L" v-model="Abono.total"></v-text-field>
+        </v-col>
+        <v-col cols="6">
+          <v-btn color="indigo" class="ma-2" @click="distribuirPago" outlined tile dark>Distribuir Pago</v-btn>
+        </v-col>
+        <v-col cols="3" class="d-flex justify-end">
+          <v-tooltip top>
+            <template v-slot:activator="{on, attr}">
+              <v-btn color="orange" class="ma-1" v-bind="attr" @click="dialogoPagos = true"  v-on="on" fab tile x-small dark>
+                <v-icon>fa fa-expand-arrows-alt</v-icon>
+              </v-btn>
             </template>
-          </v-simple-table>
-        </v-card>
-      </v-col>
-      <v-col cols="9">
-        <v-card class="ma-2 pa-4">
-          <v-row no-gutters>
-            <v-col cols="4">
-              <v-text-field class="ma-2" outlined dense label="# Cuenta" disabled v-model="CUENTA.cod"></v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-text-field class="ma-2" outlined dense placeholder="0"
-                            label="Abono" prefix="L" v-model="Abono.total"></v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-btn color="indigo" class="ma-2" @click="distribuirPago" outlined tile dark>Distribuir Pago</v-btn>
-            </v-col>
-          </v-row>
-          <v-toolbar flat color="grey lighten-5">
-            <h6>Distribución de Pagos</h6>
-            <v-spacer></v-spacer>
-            <v-tooltip top>
-              <template v-slot:activator="{on, attr}">
-                <v-btn color="orange" v-bind="attr" @click="dialogoPagos = true"  v-on="on" fab tile x-small dark>
-                  <v-icon>fa fa-expand-arrows-alt</v-icon>
-                </v-btn>
-              </template>
-              <span>Ver Tabla de Pagos Completa</span>
-            </v-tooltip>
-            <v-tooltip top>
-              <template v-slot:activator="{on, attr}">
-                <v-btn color="indigo" class="ma-1" v-bind="attr"
-                       v-on="on" fab tile x-small dark @click="dialogoCalculadora = true">
-                  <v-icon>fa fa-calculator</v-icon>
-                </v-btn>
-              </template>
-              <span>Calculadora de Pagos</span>
-            </v-tooltip>
-            <v-tooltip top>
-              <template v-slot:activator="{on, attr}">
-                <v-btn color="success" class="ma-1" @click="dialogoDXC = true"
-                       v-bind="attr" v-on="on" fab tile x-small dark>
-                  <v-icon>fa fa-expand-arrows-alt</v-icon>
-                </v-btn>
-              </template>
-              <span>Documentos por Cobrar</span>
-            </v-tooltip>
-          </v-toolbar>
-          <v-simple-table dense height="250" class="rowsTable" >
-            <template v-slot:default>
-              <thead>
-              <tr>
-                <th>Tipo</th>
-                <th>Descripción</th>
-                <th>Pendiente</th>
-                <th>Pagará</th>
-                <th>Saldo</th>
-                <th>Aún Hay</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr v-for="item in PagosDistrubuidos">
-                <td>{{item.tipo}}</td>
-                <td>
-                  {{item.detalle}}
-                </td>
-                <td><strong>L. </strong>{{item.pendiente}}</td>
-                <td><strong>L. </strong>{{item.pagara}}</td>
-                <td><strong>L. </strong>{{item.saldo}}</td>
-                <td><strong>L. </strong>{{item.hay}}</td>
-              </tr>
-              </tbody>
+            <span>Ver Tabla de Pagos Completa</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{on, attr}">
+              <v-btn color="indigo" class="ma-1" v-bind="attr"
+                     v-on="on" fab tile x-small dark @click="dialogoCalculadora = true">
+                <v-icon>fa fa-calculator</v-icon>
+              </v-btn>
             </template>
-          </v-simple-table>
-          <v-divider></v-divider>
-          <v-card-actions class="d-flex justify-end">
-            <v-btn color="indigo" tile class="white--text" @click="abrirDialogoRegistrar"
-                   small >Registrar Pago</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
+            <span>Calculadora de Pagos</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{on, attr}">
+              <v-btn color="success" class="ma-1" @click="dialogoDXC = true"
+                     v-bind="attr" v-on="on" fab tile x-small dark>
+                <v-icon>fa fa-expand-arrows-alt</v-icon>
+              </v-btn>
+            </template>
+            <span>Documentos por Cobrar</span>
+          </v-tooltip>
+        </v-col>
+      </v-row>
+      <v-simple-table height="250">
+        <thead >
+        <tr>
+          <th style="border: none !important;">Tipo</th>
+          <th style="border: none !important;">Descripción</th>
+          <th style="border: none !important;">Pendiente</th>
+          <th style="border: none !important;">Pagará</th>
+          <th style="border: none !important;">Saldo</th>
+          <th style="border: none !important;">Aún Hay</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="item in PagosDistrubuidos">
+          <td style="border: none !important;">{{item.tipo}}</td>
+          <td style="border: none !important;">
+            {{item.detalle}}
+          </td>
+          <td style="border: none !important;"><strong>L. </strong>{{item.pendiente}}</td>
+          <td style="border: none !important;"><strong>L. </strong>{{item.pagara}}</td>
+          <td style="border: none !important;"><strong>L. </strong>{{item.saldo}}</td>
+          <td style="border: none !important;"><strong>L. </strong>{{item.hay}}</td>
+        </tr>
+        </tbody>
+      </v-simple-table>
+      <v-divider></v-divider>
+      <v-card-actions class="d-flex justify-end">
+        <v-btn color="indigo" tile class="white--text" @click="abrirDialogoRegistrar"
+               small >Registrar Pago</v-btn>
+      </v-card-actions>
+    </v-card>
+
+<!--    <v-row no-gutters>-->
+<!--      <v-col cols="3">-->
+<!--        <v-card class="ma-2">-->
+<!--          <v-simple-table class="rowsTable" dense>-->
+<!--            <template v-slot:default>-->
+<!--              <tbody>-->
+<!--              <tr>-->
+<!--                <th>Facturada:</th>-->
+<!--                <td>-->
+<!--                  <v-icon x-small color="success" dark v-if="CUENTA.facturada === 1">fa fa-check</v-icon>-->
+<!--                  <v-icon x-small color="red" dark v-else-if="CUENTA.facturada === 0">fa fa-times</v-icon>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--              <tr v-if="CUENTA.facturada === 0">-->
+<!--                <th>Facturar:</th>-->
+<!--                <td>-->
+<!--                  <v-btn :disabled="CUENTA.tipo_venta === 1" x-small class="text-white" color="indigo" @click="crearFactura">Facturar</v-btn>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <th>Documento a Realizar:</th>-->
+<!--                <td v-if="CUENTA.tipo_venta === 1">Factura de Contado</td>-->
+<!--                <td v-else-if="CUENTA.tipo_venta === 2">Recibo</td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <th>Saldo Inicial:</th>-->
+<!--                <td><strong>L </strong>{{CUENTA.total}}</td>-->
+<!--              </tr>-->
+<!--              <tr v-if="CUENTA.tipo_venta === 2">-->
+<!--                <th>Saldo Mora:</th>-->
+<!--                <td v-if="CUENTA.contrato_cliente"><strong>L </strong> {{CUENTA.contrato_cliente.saldo_mora}}</td>-->
+<!--              </tr>-->
+<!--              <tr v-if="CUENTA.tipo_venta === 2">-->
+<!--                <th>Saldo Abonado:</th>-->
+<!--                <td v-if="CUENTA.contrato_cliente"><strong>L </strong> {{CUENTA.contrato_cliente.saldo_abonado}}</td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <th>Saldo Actual</th>-->
+<!--                <td><strong>L </strong> {{CUENTA.saldo_actual}}</td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <th>Cuota</th>-->
+<!--                <td v-if="CUENTA.tipo_venta === 2 && CUENTA.contrato_cliente"><strong>L </strong>{{CUENTA.contrato_cliente.cuota}}</td>-->
+<!--                <td v-else><strong>L </strong> {{CUENTA.total}}</td>-->
+<!--              </tr>-->
+<!--              <tr v-if="CUENTA.tipo_venta === 2">-->
+<!--                <th>Forma de Pago</th>-->
+<!--                <td v-if="CUENTA.contrato_cliente">-->
+<!--                  <v-chip x-small color="indigo" dark v-if="CUENTA.contrato_cliente.forma_pago === 1">Semanal</v-chip>-->
+<!--                  <v-chip x-small color="indigo" dark v-else-if="CUENTA.contrato_cliente.forma_pago === 2">Quincenal</v-chip>-->
+<!--                  <v-chip x-small color="indigo" dark v-if="CUENTA.contrato_cliente.forma_pago === 3">Mensual</v-chip>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <th>Estado:</th>-->
+<!--                <td>-->
+<!--                  <v-chip color="orange" x-small v-if="CUENTA.estado === 1" dark>Al día</v-chip>-->
+<!--                  <v-chip color="red" x-small v-else-if="CUENTA.estado === 2" dark>Mora</v-chip>-->
+<!--                  <v-chip color="success" x-small v-else-if="CUENTA.estado === 3" dark>Cancelada</v-chip>-->
+<!--                  <v-chip color="indigo" x-small v-else-if="CUENTA.estado === 4" dark>Pendiente por aceptar</v-chip>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <th>Cliente</th>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <th>Identidad:</th>-->
+<!--                <td>{{CUENTA.cliente.identidad}}</td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <th>Artículo</th>-->
+<!--              </tr>-->
+<!--              <tr v-if="CUENTA.tipo_venta === 1 && CUENTA.facturas_contados" v-for="item in CUENTA.facturas_contados">-->
+<!--                <td colspan="2">{{item.articulo.nombre_articulo}} - {{item.articulo.marca.nombre}}</td>-->
+<!--              </tr>-->
+<!--              <tr v-if="CUENTA.tipo_venta === 2">-->
+<!--                <th>Artículo:</th>-->
+<!--                <td v-if="CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo}}</td>-->
+<!--              </tr>-->
+<!--              <tr v-if="CUENTA.tipo_venta === 2">-->
+<!--                <th>Módelo:</th>-->
+<!--                <td v-if="CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.modelo}}</td>-->
+<!--              </tr>-->
+<!--              <tr v-if="CUENTA.tipo_venta === 2">-->
+<!--                <th>Marca:</th>-->
+<!--                <td v-if="CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <th colspan="2">Documentos por Cobrar Pendientes</th>-->
+<!--              </tr>-->
+<!--              <tr v-if="CUENTA.pagos_extras_ventas && item.estado === 1" v-for="item in CUENTA.pagos_extras_ventas">-->
+<!--                <td colspan="2">{{item.descripcion}}</td>-->
+<!--              </tr>-->
+<!--              </tbody>-->
+<!--            </template>-->
+<!--          </v-simple-table>-->
+<!--        </v-card>-->
+<!--      </v-col>-->
+<!--      <v-col cols="9">-->
+<!--        <v-card class="ma-2 pa-4">-->
+<!--          <v-row no-gutters>-->
+<!--            <v-col cols="4">-->
+<!--              <v-text-field class="ma-2" outlined dense placeholder="0"-->
+<!--                            label="Abono" prefix="L" v-model="Abono.total"></v-text-field>-->
+<!--            </v-col>-->
+<!--            <v-col cols="4">-->
+<!--              <v-btn color="indigo" class="ma-2" @click="distribuirPago" outlined tile dark>Distribuir Pago</v-btn>-->
+<!--            </v-col>-->
+<!--          </v-row>-->
+<!--          <v-toolbar flat color="grey lighten-5">-->
+<!--            <h6>Distribución de Pagos</h6>-->
+<!--            <v-spacer></v-spacer>-->
+<!--            <v-tooltip top>-->
+<!--              <template v-slot:activator="{on, attr}">-->
+<!--                <v-btn color="orange" v-bind="attr" @click="dialogoPagos = true"  v-on="on" fab tile x-small dark>-->
+<!--                  <v-icon>fa fa-expand-arrows-alt</v-icon>-->
+<!--                </v-btn>-->
+<!--              </template>-->
+<!--              <span>Ver Tabla de Pagos Completa</span>-->
+<!--            </v-tooltip>-->
+<!--            <v-tooltip top>-->
+<!--              <template v-slot:activator="{on, attr}">-->
+<!--                <v-btn color="indigo" class="ma-1" v-bind="attr"-->
+<!--                       v-on="on" fab tile x-small dark @click="dialogoCalculadora = true">-->
+<!--                  <v-icon>fa fa-calculator</v-icon>-->
+<!--                </v-btn>-->
+<!--              </template>-->
+<!--              <span>Calculadora de Pagos</span>-->
+<!--            </v-tooltip>-->
+<!--            <v-tooltip top>-->
+<!--              <template v-slot:activator="{on, attr}">-->
+<!--                <v-btn color="success" class="ma-1" @click="dialogoDXC = true"-->
+<!--                       v-bind="attr" v-on="on" fab tile x-small dark>-->
+<!--                  <v-icon>fa fa-expand-arrows-alt</v-icon>-->
+<!--                </v-btn>-->
+<!--              </template>-->
+<!--              <span>Documentos por Cobrar</span>-->
+<!--            </v-tooltip>-->
+<!--          </v-toolbar>-->
+<!--          <v-simple-table dense height="250" class="rowsTable" >-->
+<!--            <template v-slot:default>-->
+<!--              <thead>-->
+<!--              <tr>-->
+<!--                <th>Tipo</th>-->
+<!--                <th>Descripción</th>-->
+<!--                <th>Pendiente</th>-->
+<!--                <th>Pagará</th>-->
+<!--                <th>Saldo</th>-->
+<!--                <th>Aún Hay</th>-->
+<!--              </tr>-->
+<!--              </thead>-->
+<!--              <tbody>-->
+<!--              <tr v-for="item in PagosDistrubuidos">-->
+<!--                <td>{{item.tipo}}</td>-->
+<!--                <td>-->
+<!--                  {{item.detalle}}-->
+<!--                </td>-->
+<!--                <td><strong>L. </strong>{{item.pendiente}}</td>-->
+<!--                <td><strong>L. </strong>{{item.pagara}}</td>-->
+<!--                <td><strong>L. </strong>{{item.saldo}}</td>-->
+<!--                <td><strong>L. </strong>{{item.hay}}</td>-->
+<!--              </tr>-->
+<!--              </tbody>-->
+<!--            </template>-->
+<!--          </v-simple-table>-->
+<!--          <v-divider></v-divider>-->
+<!--          <v-card-actions class="d-flex justify-end">-->
+<!--            <v-btn color="indigo" tile class="white&#45;&#45;text" @click="abrirDialogoRegistrar"-->
+<!--                   small >Registrar Pago</v-btn>-->
+<!--          </v-card-actions>-->
+<!--        </v-card>-->
+<!--      </v-col>-->
+<!--    </v-row>-->
   </div>
   <div v-else>
     <info_pago/>
@@ -344,6 +512,7 @@ export default {
   components:{info_pago},
   data(){
     return{
+      int: Intl.NumberFormat(),
       dxc: 0,
       btnCalculadora: false,
       calculadora: [],
@@ -615,7 +784,6 @@ export default {
           let pago = 0, saldo_p = 0;
           this.PagosDistrubuidos = [];
           pagos.forEach((item)=>{
-            console.log(item)
             if (saldo > 0){
               if (item.is_mora === 1 && item.mora > 0) {
                 if (saldo > item.mora) {
@@ -790,7 +958,41 @@ export default {
 </script>
 
 <style scoped>
-.rowsTable{
+table{
+  width: 100%;
+  border: solid #b2b0b0 1px;
+}
+
+table thead tr th{
+  padding: 5px;
+  font-size: 14px;
+  border-left: solid #b2b0b0 1px;
+  border-top: solid #b2b0b0 1px;
+}
+table tbody tr td{
+  padding: 5px;
+  border-left: solid #b2b0b0 1px;
+  border-bottom: solid #b2b0b0 1px;
+  font-size: 12px;
   cursor: pointer;
+}
+table tbody tr td table{
+  width: 80%;
+}
+table tbody tr td table thead tr th{
+  font-size: 10px;
+  padding: 2px;
+}
+table tbody tr td table tbody tr td{
+  font-size: 9px;
+}
+table caption{
+  caption-side: top;
+}
+table thead tr th:hover{
+  background-color: #f6f6f6;
+}
+table tbody tr td:hover{
+  background-color: #f6f6f6;
 }
 </style>
