@@ -42,11 +42,8 @@
             <v-container class="contenedores">
               <p>Configurando la dirección del servidor al que conectará la aplicación.</p>
               <v-form>
-                <v-text-field
-                  label="Dirección del Servidor"
-                  required
-                  v-model="servidor"
-                ></v-text-field>
+                <v-text-field label="Nombre del Servidor" required v-model="nombreServidor"></v-text-field>
+                <v-text-field label="Dirección del Servidor" required v-model="servidor"></v-text-field>
                 <v-row>
                   <v-col class="d-flex justify-end">
                     <v-btn class="mt-3" color="primary" @click="goLogin">Agregar</v-btn>
@@ -80,6 +77,7 @@
         data(){
             return{
                 servidor: 'http://',
+                nombreServidor: '',
                 e1: 1,
                 iconos:[
                     {'titulo': 'Contabilidad', 'icono':'file-invoice-dollar', 'color':'green'},
@@ -103,8 +101,12 @@
         },
         methods:{
             goLogin(){
-                if (this.servidor.length > 20){
-                    ipcRenderer.send('add_conexion', this.servidor)
+                if (this.servidor.length > 20 && this.nombreServidor.length > 4){
+                    let data = {
+                      servidor: this.servidor,
+                      alias:   this.nombreServidor
+                    }
+                    ipcRenderer.send('add_conexion', data);
                 }else{
                     this.nextLogin = true
                 }

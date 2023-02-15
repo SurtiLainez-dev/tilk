@@ -1,6 +1,6 @@
 {
   "name": "TILK",
-  "version": "2.0.63",
+  "version": "3.0.16",
   "description": "Sístema de Negocios - Surtidora Laínez",
   "author": "SurtiLainez-dev",
   "private": false,
@@ -24,8 +24,10 @@
     "deploy": "nuxt build && electron-builder build --win --publish always --config ./electron-builder.yml"
   },
   "dependencies": {
+    "@chilkat/ck-node15-win64": "^9.50.93",
     "@fortawesome/fontawesome-free": "^5.15.0",
     "@nuxtjs/axios": "^5.9.5",
+    "axios": "^1.2.3",
     "bootstrap-vue": "^2.15.0",
     "chart.js": "^2.9.4",
     "download-github-release": "^0.3.2",
@@ -37,13 +39,16 @@
     "html2canvas": "^1.4.1",
     "jquery": "^1.9.1",
     "material-icons": "^0.5.5",
+    "node-cmd": "^5.0.0",
     "nuxt": "^2.14.0",
     "nuxt-html2canvas-proxy": "^1.0.1",
+    "pdfinfojs": "^0.5.2",
     "request": "^2.88.2",
     "sweetalert2": "^9.15.3",
     "update-electron-app": "^2.0.1",
     "vue-chartkick": "^0.6.1",
     "vue-html2canvas": "0.0.4",
+    "vue-pdf": "^4.0.8",
     "vue-toast-notification": "^0.5.4",
     "vuesax": "^3.12.2",
     "vuetify": "^2.3.2"

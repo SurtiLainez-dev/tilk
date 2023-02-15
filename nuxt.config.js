@@ -22,6 +22,7 @@ module.exports = {
 		title: 'TILK',
 	}, // Headers of the page
 	build: {
+		vendor: ['vue-pdf'],
 		extend (config, { isDev, isClient }) {
 			if (isDev && isClient) {
 				// Run ESLint on save

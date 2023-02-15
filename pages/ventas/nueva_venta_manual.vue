@@ -1,54 +1,93 @@
 <template>
-<v-card>
+<v-card flat>
   <v-toolbar flat color="grey lighten-4">
     <h5>Agregando Cuenta</h5>
     <v-spacer></v-spacer>
-    <v-btn color="indigo" small dark class="ma-2" tile @click="Ciudad.dialogo = true">Ciudad/Caserio/Aldea Nueva</v-btn>
-    <v-btn color="indigo" small dark class="ma-2" tile @click="Colonia.dialogo = true">Colonia Nueva</v-btn>
   </v-toolbar>
 
-  <v-form ref="FormNuevaCuentaManual">
-    <v-card-text>Datos del Cliente</v-card-text>
-    <v-row no-gutters class="ma-5">
-      <v-col>
-        <v-text-field class="ma-1" v-model="data.cliente.identidad"
-                      @keyup.enter="cargarCliente" loader-height="4"
-                      :rules="[rules.select.req, rules.identidad.some, rules.identidad.id]"
-                      :loading="load.identidad" dense outlined label="Identidad del Cliente"></v-text-field>
-      </v-col>
-      <v-col>
-        <v-text-field class="ma-1" v-model="data.cliente.nombres"
-                      ref="inputDCNombres" @keyup.enter="$refs.inputDCApellidos.focus()"
-                      :disabled="!data.disabled.cliente" :rules="[rules.select.req]"
-                      dense outlined label="Nombres del Cliente"></v-text-field>
-      </v-col>
-      <v-col>
-        <v-text-field class="ma-1" v-model="data.cliente.apellidos"
-                      ref="inputDCApellidos" @keyup.enter="$refs.inputDCSexo.focus()"
-                      :disabled="!data.disabled.cliente" :rules="[rules.select.req]"
-                      dense outlined label="Apellidos del Cliente"></v-text-field>
-      </v-col>
-      <v-col>
-        <v-select class="ma-1" v-model="data.cliente.sexo"
-                  ref="inputDCSexo"
-                  :disabled="!data.disabled.cliente" :rules="[rules.select.req]"
-                  dense :items="SelectSexos" outlined label="Sexo del Cliente"></v-select>
-      </v-col>
-      <v-col>
-        <v-text-field class="ma-1" v-model="data.cliente.nacionalidad"
-                      :disabled="!data.disabled.cliente" :rules="[rules.select.req]"
-                      dense label="Nacionalidad" outlined></v-text-field>
-      </v-col>
-    </v-row>
+  <v-stepper  v-model="pagina">
+    <v-stepper-header >
+      <v-stepper-step :complete="pagina > 1" step="1">Datos del Cliente</v-stepper-step>
+      <v-divider></v-divider>
+      <v-stepper-step :complete="pagina > 2" step="2">Detalles del Cliente</v-stepper-step>
+      <v-divider></v-divider>
+      <v-stepper-step :complete="pagina > 3" step="3">Detalles de la Cuenta</v-stepper-step>
+      <v-divider></v-divider>
+      <v-stepper-step step="4">Pagos</v-stepper-step>
+    </v-stepper-header>
 
-    <v-card flat :disabled="!data.disabled.cuerpo">
-      <v-expansion-panels>
-        <v-expansion-panel>
-          <v-expansion-panel-header>
-            Direcciones
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-simple-table dense class="rowsTable">
+    <v-stepper-items>
+      <v-stepper-content step="1">
+        <v-card-subtitle>Datos del Cliente</v-card-subtitle>
+        <v-divider></v-divider>
+        <v-card flat class="d-flex justify-center">
+          <v-card flat width="40%">
+            <v-form ref="FormDatosCliente">
+              <v-text-field class="ma-1" v-model="data.cliente.identidad"
+                            @keyup.enter="cargarCliente" loader-height="4"
+                            :rules="[rules.select.req, rules.identidad.some, rules.identidad.id]"
+                            :loading="load.identidad" dense outlined label="Identidad del Cliente"></v-text-field>
+
+              <v-text-field class="ma-1" v-model="data.cliente.nombres"
+                            ref="inputDCNombres" @keyup.enter="$refs.inputDCApellidos.focus()"
+                            :disabled="!data.disabled.cliente" :rules="[rules.select.req]"
+                            dense outlined label="Nombres del Cliente"></v-text-field>
+
+              <v-text-field class="ma-1" v-model="data.cliente.apellidos"
+                            ref="inputDCApellidos" @keyup.enter="$refs.inputDCSexo.focus()"
+                            :disabled="!data.disabled.cliente" :rules="[rules.select.req]"
+                            dense outlined label="Apellidos del Cliente"></v-text-field>
+
+              <v-select class="ma-1" v-model="data.cliente.sexo"
+                        ref="inputDCSexo"
+                        :disabled="!data.disabled.cliente" :rules="[rules.select.req]"
+                        dense :items="SelectSexos" outlined label="Sexo del Cliente"></v-select>
+
+              <v-text-field class="ma-1" v-model="data.cliente.nacionalidad"
+                            :disabled="!data.disabled.cliente" :rules="[rules.select.req]"
+                            dense label="Nacionalidad" outlined></v-text-field>
+
+
+              <v-divider></v-divider>
+              <v-card-actions class="d-flex justify-end">
+                <v-btn color="success" dark tile small @click="validarDatosCliente">Siguiente</v-btn>
+              </v-card-actions>
+            </v-form>
+          </v-card>
+        </v-card>
+      </v-stepper-content>
+
+      <v-stepper-content step="2">
+        <v-toolbar flat dense>
+          <v-card-subtitle>Dirección y Telefono del Cliente</v-card-subtitle>
+          <v-spacer></v-spacer>
+          <v-btn color="indigo" small dark class="ma-2" tile @click="Ciudad.dialogo = true">Ciudad/Caserio/Aldea Nueva</v-btn>
+          <v-btn color="indigo" small dark class="ma-2" tile @click="Colonia.dialogo = true">Colonia Nueva</v-btn>
+        </v-toolbar>
+        <v-divider></v-divider>
+        <table>
+          <thead>
+            <tr>
+              <th>Identidad</th>
+              <th>Nombre Completo</th>
+              <th>Sexo</th>
+              <th>Nacionalidad</th>
+            </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>{{data.cliente.identidad}}</td>
+            <td>{{data.cliente.nombres}} {{data.cliente.apellidos}}</td>
+            <td v-if="data.cliente.sexo === 1 ">Masculino</td>
+            <td v-else>Femenino</td>
+            <td>{{data.cliente.nacionalidad}}</td>
+          </tr>
+          </tbody>
+        </table>
+        <v-form ref="FormDetallesCliente">
+          <v-card flat class="ma-1">
+            <v-card-subtitle>Dirreción del Cliente</v-card-subtitle>
+            <v-simple-table style="width: 99%" dense class="rowsTable">
               <template v-slot:default>
                 <thead>
                 <tr>
@@ -56,17 +95,17 @@
                   <th>Municipio</th>
                   <th>Ciudad/Aldea/Caserio</th>
                   <th>Colonia</th>
-                  <th>Dirección Completa</th>
+                  <th style="border-right: solid #b2b0b0 1px;">Dirección Completa</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="item in data.direcciones">
                   <td style="width: 15%">
-                    <v-select v-model="item.departamento" :rules="[rules.select.req]"
-                              @change="cargarMunicipio(item)" outlined dense
-                              :disabled="item.key < logns.direcciones"
-                              :items="DEPARTAMENTOS" :item-text="'nombre'" :item-value="'id'">
-                    </v-select>
+                    <v-autocomplete v-model="item.departamento" :rules="[rules.select.req]"
+                                    @change="cargarMunicipio(item)" outlined dense
+                                    :disabled="item.key < logns.direcciones"
+                                    :items="DEPARTAMENTOS" :item-text="'nombre'" :item-value="'id'">
+                    </v-autocomplete>
                   </td>
                   <td style="width: 15%">
                     <v-autocomplete :items="item.Municipios" v-model="item.municipio"
@@ -91,7 +130,7 @@
                                     :item-text="'nombre'" :item-value="'id'">
                     </v-autocomplete>
                   </td>
-                  <td>
+                  <td style="border-right: solid #b2b0b0 1px;">
                     <v-textarea v-model="item.detalle" counter
                                 :rules="[rules.select.req, rules.detalle.min, rules.detalle.max]"
                                 :rows="2" dense outlined>
@@ -101,20 +140,14 @@
                 </tbody>
               </template>
             </v-simple-table>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-
-        <v-expansion-panel>
-          <v-expansion-panel-header>
-            Telefonos
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-simple-table class="rowsTable" dense>
+            <br>
+            <v-card-subtitle>Telefono del Cliente</v-card-subtitle>
+            <v-simple-table style="width: 99%" class="rowsTable" dense>
               <template v-slot:default>
                 <thead>
                 <tr>
                   <th>Detalle</th>
-                  <th>Teléfono</th>
+                  <th style="border-right: solid #b2b0b0 1px;">Teléfono</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -124,7 +157,7 @@
                                   :rules="[rules.select.req, rules.detalleTelefono.min, rules.detalleTelefono.max]"
                                   v-model="item.detalle"></v-text-field>
                   </td>
-                  <td>
+                  <td style="border-right: solid #b2b0b0 1px;">
                     <v-text-field dense :disabled="item.key < logns.telefonos" outlined counter
                                   :rules="[rules.select.req, rules.num.min, rules.num.max, rules.num.tel]"
                                   v-model="item.num"></v-text-field>
@@ -133,314 +166,416 @@
                 </tbody>
               </template>
             </v-simple-table>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
-      <v-divider></v-divider>
-      <v-card-text>Datos del Artículo</v-card-text>
+          </v-card>
+        </v-form>
+        <v-divider></v-divider>
+        <v-card-actions class="d-flex justify-end">
+          <v-btn color="orange" @click="pagina = 1" dark tile small >Volver</v-btn>
+          <v-btn color="success" dark tile small @click="validarDetallesCliente">Siguiente</v-btn>
+        </v-card-actions>
+      </v-stepper-content>
 
-      <v-row no-gutters class="ma-5">
-
-        <v-col cols="4">
-          <v-tooltip top>
-            <template v-slot:activator="{on, attrs}">
-              <v-text-field dense class="ma-1" v-on="on" v-bind="attrs" v-model="data.articulo.nombre"
-                            :rules="[rules.select.req]"
-                            outlined label="Artículo" @keyup.enter="dialogo.articulos = true">
-              </v-text-field>
-            </template>
-            <span>Enter para expandir los artículos</span>
-          </v-tooltip>
-        </v-col>
-
-        <v-col>
-          <v-text-field dense class="ma-1" disabled v-model="data.articulo.familia"
-                        outlined label="Familía" :rules="[rules.select.req]">
-          </v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field dense class="ma-1" v-model="data.articulo.serie" :rules="[rules.select.req]" @keyup.enter="fabricarSerie"
-                        outlined label="Serie del Fabricante" hint="Para fabricar presione enter" persistent-hint>
-          </v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field dense outlined class="ma-1" :rules="[rules.select.req]"
-                        v-model="data.articulo.color" label="Color">
-          </v-text-field>
-        </v-col>
-      </v-row>
-      <v-divider></v-divider>
-      <v-card-text>Datos del Crédito</v-card-text>
-
-      <v-row no-gutters class="ma-5">
-        <v-col>
-          <v-text-field dense class="ma-1" label="Total Inicial del Crédito"
-                        @change="calcularCuota" @keyup.enter="$refs.inputPrima.focus()"
-                        prefix="L" :rules="[rules.select.req, rules.moneda.num]"
-                        outlined v-model="data.cuenta.total_inicial"></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field dense class="ma-1" label="Prima" prefix="L"
-                        ref="inputPrima" @keyup.enter="$refs.inputFormaPago.focus()"
-                        :rules="[rules.select.req, rules.moneda.num]"
-                        @change="calcularCuota"
-                        outlined v-model="data.cuenta.prima"></v-text-field>
-        </v-col>
-        <v-col>
-          <v-select dense outlined label="Forma de Pago"
-                    ref="inputFormaPago" @keyup.enter="$refs.inputCuotas.focus()"
-                    v-model="data.cuenta.forma_pago"
-                    class="ma-1" :items="selectFormaPago" :rules="[rules.select.req]">
-          </v-select>
-        </v-col>
-        <v-col>
-          <v-text-field dense class="ma-1" label="# de Cuotas" @change="calcularCuota"
-                        @keyup.enter="$refs.inputEstadoCuenta.focus()"
-                        v-model="data.cuenta.cuotas" ref="inputCuotas"
-                        outlined :rules="[rules.select.req, rules.moneda.num]">
-          </v-text-field>
-        </v-col>
-        <v-col>
-          <v-select dense class="ma-1" label="Estado de la Cuenta"
-                    @keyup.enter="$refs.inputSaldoCapital.focus()"
-                    :items="selectEstadoCuenta" ref="inputEstadoCuenta"
-                    outlined v-model="data.cuenta.estado" :rules="[rules.select.req]">
-          </v-select>
-        </v-col>
-      </v-row>
-      <v-row no-gutters class="ma-5">
-        <v-col>
-          <v-text-field prefix="L" class="ma-1" :rules="[rules.select.req, rules.moneda.num]"
-                        @keyup.enter="$refs.inputSaldoMora.focus()"
-                        @change="calcularSaldoCapital"
-                        hint="Es el saldo actual de la cuenta sin mora" persistent-hint
-                        v-model="data.cuenta.saldo_capital" ref="inputSaldoCapital"
-                        dense outlined label="Saldo Capital">
-          </v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field dense outlined label="Saldo en Mora" class="ma-1"
-                        @change="calcularSaldoCapital"
-                        :rules="[rules.moneda.num]" ref="inputSaldoMora"
-                        @keyup.enter="$refs.inputSaldoActualCuenta.focus()"
-                        prefix="L" v-model="data.cuenta.saldo_mora">
-          </v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field prefix="L" class="ma-1" :rules="[rules.select.req, rules.moneda.num]"
-                        @keyup.enter="$refs.inputTotalAbonado.focus()"
-                        v-model="data.cuenta.saldo_actual" ref="inputSaldoActualCuenta"
-                        dense outlined label="Saldo Actual de la Cuenta">
-          </v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field dense outlined label="Total Abonado" prefix="L"
-                        v-model="data.cuenta.total_abonado" ref="inputTotalAbonado"
-                        @keyup.enter="$refs.inputCuota.focus()"
-                        hint="Abonado a Capital e Intereses(mora no)" persistent-hint
-                        class="ma-1" :rules="[rules.select.req, rules.moneda.num]"></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field dense outlined label="Cuota" class="ma-1"
-                        v-model="data.cuenta.couta" ref="inputCuota"
-                        @keyup.enter="dialogo.fechaPrima = true"
-                        prefix="L" :rules="[rules.select.req, rules.moneda.num]">
-          </v-text-field>
-        </v-col>
-      </v-row>
-      <v-row no-gutters class="ma-5">
-        <v-col>
-          <v-dialog ref="dialogoFechaPrima" :return-value.sync="data.cuenta.fecha_prima" persistent
-                    width="290px" v-model="dialogo.fechaPrima">
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field v-model="data.cuenta.fecha_prima" label="Fecha de la Prima"
-                            :rules="[rules.select.req]" dense class="ma-1"
-                            readonly v-bind="attrs" v-on="on" outlined>
-              </v-text-field>
-            </template>
-            <v-date-picker v-model="data.cuenta.fecha_prima" scrollable>
-              <v-spacer></v-spacer>
-              <v-btn tile small dark color="orange" @click="dialogo.fechaPrima = false">Cerrar</v-btn>
-              <v-btn tile small color="indigo" class="text-white"
-                     @click="saveFechaPrima" :disabled="!data.cuenta.fecha_prima">Seleccionar</v-btn>
-            </v-date-picker>
-          </v-dialog>
-        </v-col>
-        <v-col>
-          <v-dialog ref="dialogoFechaVencimiento" :return-value.sync="data.cuenta.fecha_vencimiento" persistent
-                    width="290px" v-model="dialogo.fechaVencimiento">
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field v-model="data.cuenta.fecha_vencimiento" label="Fecha de Vencimiento"
-                            persistent-hint hint="Último Pago de la Cuenta"
-                            :rules="[rules.select.req]" dense class="ma-1"
-                            readonly v-bind="attrs" v-on="on" outlined></v-text-field>
-            </template>
-            <v-date-picker v-model="data.cuenta.fecha_vencimiento" scrollable>
-              <v-spacer></v-spacer>
-              <v-btn tile small dark color="orange" @click="dialogo.fechaVencimiento = false">Cerrar</v-btn>
-              <v-btn tile small color="indigo" class="text-white"
-                     @click="saveFechaVencimiento" :disabled="!data.cuenta.fecha_vencimiento">Seleccionar</v-btn>
-            </v-date-picker>
-          </v-dialog>
-        </v-col>
-        <v-col>
-          <v-select dense class="ma-1" outlined :rules="[rules.select.req]"
-                    v-model="data.cuenta.sucursal" :item-value="'id'"
-                    :loading="load.sucursales" loader-height="3"
-                    @change="cargarColaboradores"
-                    :items="Sucursales" :item-text="'nombre'" label="Sucursal de Venta">
-          </v-select>
-        </v-col>
-        <v-col>
-          <v-autocomplete dense class="ma-1" outlined :rules="[rules.select.req]"
-                    v-model="data.cuenta.colaborador"
-                    :loading="load.colaboradores" loader-height="3"
-                    :items="Colaboradores" label="Colaborador">
-          </v-autocomplete>
-        </v-col>
-        <v-col class="d-flex justify-end align-center">
-          <v-btn small dark color="indigo" @click="crearPagos" tile>Crear Pagos</v-btn>
-        </v-col>
-      </v-row>
-
-    </v-card>
-  </v-form>
-
-  <v-divider></v-divider>
-  <v-card-text>Revisión de los Pagos</v-card-text>
-  <v-form ref="FormValidarConcordanciaDePagos">
-    <v-row no-gutters>
-      <v-col cols="10">
-        <v-card class="ma-2">
-          <b-table responsive small
-                   class="rowsTable"
-                   :current-page="currentPage"
-                   :per-page="perPage"
-                   :fields="headerPagos"
-                   :items="data.pagos"
-                   hover>
-            <template v-slot:head(fecha_pago)><div class="text-nowrap">Fecha de Pago</div></template>
-            <template v-slot:head(detalle)><div class="text-nowrap">Detalle del Pago</div></template>
-            <template v-slot:head(pago_inicial)><div class="text-nowrap">Pago Inicial</div></template>
-            <template v-slot:head(total_abonado)><div class="text-nowrap">Total Abonado</div></template>
-            <template v-slot:head(saldo_abonado)><div class="text-nowrap">Saldo Abonado</div></template>
-            <template v-slot:head(mora)><div class="text-nowrap">Saldo en Mora</div></template>
-            <template v-slot:head(total_pago)><div class="text-nowrap">Total del Pago</div></template>
-            <template v-slot:head(saldo_actual)><div class="text-nowrap">Saldo Actual</div></template>
-            <template v-slot:head(is_mora)><div class="text-nowrap">Estado de la Mora</div></template>
-            <template v-slot:head(estao)><div class="text-nowrap">Estado del Pago</div></template>
-            <template v-slot:head(inicio_mora)><div class="text-nowrap">Inicio de la Mora</div></template>
-            <template v-slot:head(revisado)><div class="text-nowrap">Revisado</div></template>
-            <template v-slot:head(dias_mora)><div class="text-nowrap">Dias en Mora</div></template>
-            <template v-slot:head(saldo_cap)><div class="text-nowrap">Saldo Capital</div></template>
-
-            <template v-slot:cell(fecha_pago)="scope">
-              <v-menu v-model="scope.item.dialogo" :nudge-right="40" offset-y min-width="auto"
-                      :close-on-content-click="false" transition="scale-transition">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field v-model="scope.item.fecha_pago"
-                                :rules="[rules.select.req]" dense
-                                persistent-hint
-                                :hint="`${scope.item.fecha_pago.split('-')[2]}/${scope.item.fecha_pago.split('-')[1]}/${scope.item.fecha_pago.split('-')[0]}`"
-                                readonly v-bind="attrs" v-on="on" outlined>
-                  </v-text-field>
-                </template>
-                <v-date-picker
-                    v-model="scope.item.fecha_pago"
-                    @input="scope.item.dialogo = false"></v-date-picker>
-              </v-menu>
-            </template>
-            <template v-slot:cell(detalle)="scope">
-              <div class="text-nowrap">{{scope.item.detalle}}</div>
-            </template>
-            <template v-slot:cell(pago_inicial)="scope">L {{scope.item.pago_inicial}}</template>
-            <template v-slot:cell(total_abonado)="scope">
-              <v-text-field dense prefix="L" outlined @change="sumarTotalPago(scope.item)"
-                            :rules="[rules.moneda.num]"
-                            v-model="scope.item.total_abonado"></v-text-field>
-            </template>
-            <template v-slot:cell(mora)="scope">
-              <v-text-field dense prefix="L" outlined @change="sumarTotalPago(scope.item)"
-                            :rules="[rules.moneda.num]"
-                            v-model="scope.item.mora"></v-text-field>
-            </template>
-            <template v-slot:cell(saldo_cap)="scope">
-              <v-text-field dense prefix="L" outlined
-                            :rules="[rules.moneda.num]"
-                            v-model="scope.item.saldo_cap"></v-text-field>
-            </template>
-            <template v-slot:cell(total_pago)="scope">
-              <v-text-field dense prefix="L" outlined
-                            :rules="[rules.select.req, rules.moneda.num]"
-                            disabled v-model="scope.item.total_pago"></v-text-field>
-            </template>
-            <template v-slot:cell(saldo_actual)="scope">
-              <v-text-field dense prefix="L" outlined
-                            :rules="[rules.moneda.num]"
-                            v-model="scope.item.saldo_actual"></v-text-field>
-            </template>
-            <template v-slot:cell(is_mora)="scope">
-              <v-select dense outlined :items="selectEstado" v-model="scope.item.is_mora"></v-select>
-            </template>
-            <template v-slot:cell(estao)="scope">
-              <v-select dense outlined :items="selectPago" :rules="[rules.select.req]"
-                        v-model="scope.item.estao"></v-select>
-            </template>
-            <template v-slot:cell(inicio_mora)="scope">
-              <v-menu v-model="scope.item.dialogoMora" :nudge-right="40" offset-y min-width="auto"
-                      :close-on-content-click="false" transition="scale-transition">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field v-model="scope.item.inicio_mora" dense
-                                :hint="scope.item.inicio_mora ? `${scope.item.fecha_pago.split('-')[2]}/${scope.item.fecha_pago.split('-')[1]}/${scope.item.fecha_pago.split('-')[0]}`:'No hay fecha de inicio de mora'"
-                                persistent-hint
-                                readonly v-bind="attrs" v-on="on" outlined>
-                  </v-text-field>
-                </template>
-                <v-date-picker
-                    v-model="scope.item.inicio_mora" @change="calcularDiasMora(scope.item)"
-                    @input="scope.item.dialogoMora = false"></v-date-picker>
-              </v-menu>
-            </template>
-            <template v-slot:cell(dias_mora)="scope">
-              <v-text-field outlined dense v-model="scope.item.dias_mora" suffix="días"></v-text-field>
-            </template>
-            <template v-slot:cell(revisado)="scope" class="d-flex align-center">
-              <v-checkbox @change="contPagosRevisados(scope.item)"
-                          v-model="scope.item.revisado" :rules="[rules.check.check]">
-              </v-checkbox>
-            </template>
-          </b-table>
+      <v-stepper-content step="3">
+        <v-card-subtitle>Detalles del Pago</v-card-subtitle>
+        <table>
+          <thead>
+          <tr>
+            <th>Identidad</th>
+            <th>Nombre Completo</th>
+            <th>Sexo</th>
+            <th>Nacionalidad</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>{{data.cliente.identidad}}</td>
+            <td>{{data.cliente.nombres}} {{data.cliente.apellidos}}</td>
+            <td v-if="data.cliente.sexo === 1 ">Masculino</td>
+            <td v-else>Femenino</td>
+            <td>{{data.cliente.nacionalidad}}</td>
+          </tr>
+          </tbody>
+        </table>
+        <v-form ref="FormDetallesPrecio">
+          <v-card-subtitle>Datos del Artículo</v-card-subtitle>
+          <v-divider></v-divider>
           <v-row no-gutters>
-            <v-col class="d-flex justify-center">
-              <b-pagination v-model="currentPage"
-                            :total-rows="totalRows"
-                            :per-page="perPage"
-                            align="fill"
-                            size="sm"
-                            class="my-0"
-              ></b-pagination>
+            <v-col cols="4">
+              <v-tooltip top>
+                <template v-slot:activator="{on, attrs}">
+                  <v-text-field v-on="on" v-bind="attrs" v-model="data.articulo.nombre"
+                                :rules="[rules.select.req]" dense class="mt-1"
+                                outlined label="Artículo" @keyup.enter="dialogo.articulos = true">
+                  </v-text-field>
+                </template>
+                <span>Enter para expandir los artículos</span>
+              </v-tooltip>
+            </v-col>
+            <v-col>
+              <v-text-field class="ma-1" dense disabled v-model="data.articulo.familia"
+                            outlined label="Familía" :rules="[rules.select.req]">
+              </v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field dense class="ma-1" v-model="data.articulo.serie" :rules="[rules.select.req]" @keyup.enter="fabricarSerie"
+                            outlined label="Serie del Fabricante" hint="Para fabricar presione enter" persistent-hint>
+              </v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field dense outlined :rules="[rules.select.req]" class="mt-1"
+                            v-model="data.articulo.color" label="Color">
+              </v-text-field>
             </v-col>
           </v-row>
-        </v-card>
-      </v-col>
-      <v-col cols="">
-        <v-card class="ma-2">
-          <v-card-title>Revisión</v-card-title>
+          <v-card-subtitle>Datos del Precio</v-card-subtitle>
           <v-divider></v-divider>
-          <v-text-field class="ma-1" outlined dense disabled :rules="[rules.revision.revisados]"
-                        label="Pagos Revisados" v-model="revision.user.revisados">
-          </v-text-field>
-          <v-text-field class="ma-1" outlined dense disabled prefix="L" :rules="[rules.revision.saldo_actual]"
-                        label="Saldo Actual" v-model="revision.user.saldo_actual">
-          </v-text-field>
-          <v-text-field class="ma-1" outlined dense disabled :rules="[rules.revision.saldo_mora]"
-                        label="Saldo en Mora" v-model="revision.user.mora">
-          </v-text-field>
-          <v-btn block color="indigo" dark tile small @click="validarEnvio">Registrar</v-btn>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-form>
+          <v-row no-gutters >
+            <v-col>
+              <v-text-field dense class="mt-1" label="Total Inicial del Crédito"
+                            @change="calcularCuota" @keyup.enter="$refs.inputPrima.focus()"
+                            prefix="L" :rules="[rules.select.req, rules.moneda.num]"
+                            outlined v-model="data.cuenta.total_inicial"></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field dense class="ma-1" label="Prima" prefix="L"
+                            ref="inputPrima" @keyup.enter="$refs.inputFormaPago.focus()"
+                            :rules="[rules.select.req, rules.moneda.num]"
+                            @change="calcularCuota"
+                            outlined v-model="data.cuenta.prima"></v-text-field>
+            </v-col>
+            <v-col>
+              <v-select dense outlined label="Forma de Pago"
+                        ref="inputFormaPago" @keyup.enter="$refs.inputCuotas.focus()"
+                        v-model="data.cuenta.forma_pago"
+                        class="ma-1" :items="selectFormaPago" :rules="[rules.select.req]">
+              </v-select>
+            </v-col>
+            <v-col>
+              <v-text-field dense class="ma-1" label="# de Cuotas" @change="calcularCuota"
+                            @keyup.enter="$refs.inputEstadoCuenta.focus()"
+                            v-model="data.cuenta.cuotas" ref="inputCuotas"
+                            outlined :rules="[rules.select.req, rules.moneda.num]">
+              </v-text-field>
+            </v-col>
+            <v-col>
+              <v-select dense class="mt-1" label="Estado de la Cuenta"
+                        @keyup.enter="$refs.inputSaldoCapital.focus()"
+                        :items="selectEstadoCuenta" ref="inputEstadoCuenta"
+                        outlined v-model="data.cuenta.estado" :rules="[rules.select.req]">
+              </v-select>
+            </v-col>
+          </v-row>
+          <v-row no-gutters>
+            <v-col>
+              <v-text-field prefix="L" class="mt-1" :rules="[rules.select.req, rules.moneda.num]"
+                            @keyup.enter="$refs.inputSaldoMora.focus()"
+                            @change="calcularSaldoCapital"
+                            hint="Es el saldo actual de la cuenta sin mora" persistent-hint
+                            v-model="data.cuenta.saldo_capital" ref="inputSaldoCapital"
+                            dense outlined label="Saldo Capital">
+              </v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field dense outlined label="Saldo en Mora" class="ma-1"
+                            @change="calcularSaldoCapital"
+                            :rules="[rules.moneda.num]" ref="inputSaldoMora"
+                            @keyup.enter="$refs.inputSaldoActualCuenta.focus()"
+                            prefix="L" v-model="data.cuenta.saldo_mora">
+              </v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field prefix="L" class="ma-1" :rules="[rules.select.req, rules.moneda.num]"
+                            @keyup.enter="$refs.inputTotalAbonado.focus()"
+                            v-model="data.cuenta.saldo_actual" ref="inputSaldoActualCuenta"
+                            dense outlined label="Saldo Actual de la Cuenta">
+              </v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field dense outlined label="Total Abonado" prefix="L"
+                            v-model="data.cuenta.total_abonado" ref="inputTotalAbonado"
+                            @keyup.enter="$refs.inputCuota.focus()"
+                            hint="Abonado a Capital e Intereses(mora no)" persistent-hint
+                            class="ma-1" :rules="[rules.select.req, rules.moneda.num]"></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field dense outlined label="Cuota" class="mt-1"
+                            v-model="data.cuenta.couta" ref="inputCuota"
+                            @keyup.enter="dialogo.fechaPrima = true"
+                            prefix="L" :rules="[rules.select.req, rules.moneda.num]">
+              </v-text-field>
+            </v-col>
+          </v-row>
+          <v-row no-gutters>
+            <v-col>
+              <v-dialog ref="dialogoFechaPrima" :return-value.sync="data.cuenta.fecha_prima" persistent
+                        width="290px" v-model="dialogo.fechaPrima">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="data.cuenta.fecha_prima" label="Fecha de la Prima"
+                                :rules="[rules.select.req]" dense class="ma-1"
+                                readonly v-bind="attrs" v-on="on" outlined>
+                  </v-text-field>
+                </template>
+                <v-date-picker v-model="data.cuenta.fecha_prima" scrollable>
+                  <v-spacer></v-spacer>
+                  <v-btn tile small dark color="orange" @click="dialogo.fechaPrima = false">Cerrar</v-btn>
+                  <v-btn tile small color="indigo" class="text-white"
+                         @click="saveFechaPrima" :disabled="!data.cuenta.fecha_prima">Seleccionar</v-btn>
+                </v-date-picker>
+              </v-dialog>
+            </v-col>
+            <v-col>
+              <v-dialog ref="dialogoFechaVencimiento" :return-value.sync="data.cuenta.fecha_vencimiento" persistent
+                        width="290px" v-model="dialogo.fechaVencimiento">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="data.cuenta.fecha_vencimiento" label="Fecha de Vencimiento"
+                                persistent-hint hint="Último Pago de la Cuenta"
+                                :rules="[rules.select.req]" dense class="ma-1"
+                                readonly v-bind="attrs" v-on="on" outlined></v-text-field>
+                </template>
+                <v-date-picker v-model="data.cuenta.fecha_vencimiento" scrollable>
+                  <v-spacer></v-spacer>
+                  <v-btn tile small dark color="orange" @click="dialogo.fechaVencimiento = false">Cerrar</v-btn>
+                  <v-btn tile small color="indigo" class="text-white"
+                         @click="saveFechaVencimiento" :disabled="!data.cuenta.fecha_vencimiento">Seleccionar</v-btn>
+                </v-date-picker>
+              </v-dialog>
+            </v-col>
+            <v-col>
+              <v-select dense class="ma-1" outlined :rules="[rules.select.req]"
+                        v-model="data.cuenta.sucursal" :item-value="'id'"
+                        :loading="load.sucursales" loader-height="3"
+                        @change="cargarColaboradores"
+                        :items="Sucursales" :item-text="'nombre'" label="Sucursal de Venta">
+              </v-select>
+            </v-col>
+            <v-col>
+              <v-autocomplete dense class="ma-1" outlined :rules="[rules.select.req]"
+                              v-model="data.cuenta.colaborador"
+                              :loading="load.colaboradores" loader-height="3"
+                              :items="Colaboradores" label="Colaborador">
+              </v-autocomplete>
+            </v-col>
+          </v-row>
+        </v-form>
+        <v-divider></v-divider>
+        <v-card-actions class="d-flex justify-end">
+          <v-btn color="orange" @click="pagina = 2" dark tile small >Volver</v-btn>
+          <v-btn color="success" dark tile small @click="validarDetallesPrecio">Siguiente</v-btn>
+        </v-card-actions>
+      </v-stepper-content>
+
+      <v-stepper-content step="4">
+        <v-card-actions class="d-flex justify-end">
+          <v-btn small tile color="orange" dark @click="pagina = 3" >Volver</v-btn>
+        </v-card-actions>
+        <table>
+          <thead>
+          <tr>
+            <th colspan="2">Identidad</th>
+            <th colspan="2">Nombre Completo</th>
+            <th>Sexo</th>
+            <th>Nacionalidad</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td colspan="2">{{data.cliente.identidad}}</td>
+            <td colspan="2">{{data.cliente.nombres}} {{data.cliente.apellidos}}</td>
+            <td v-if="data.cliente.sexo === 1 ">Masculino</td>
+            <td v-else>Femenino</td>
+            <td>{{data.cliente.nacionalidad}}</td>
+          </tr>
+          </tbody>
+          <thead>
+          <tr>
+            <th>Total Inicial</th>
+            <th>Prima</th>
+            <th>Forma de Pago</th>
+            <th># Cuotas</th>
+            <th>Estado de la Cuenta</th>
+            <th>Saldo Capital</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>L. {{int.format(data.cuenta.total_inicial)}}</td>
+            <td>L. {{int.format(data.cuenta.prima)}}</td>
+            <td v-if="data.cuenta.estado === 1">Semanal</td>
+            <td v-else-if="data.cuenta.estado === 2">Quincenal</td>
+            <td v-else-if="data.cuenta.estado === 3">Mensual</td>
+            <td>{{data.cuenta.cuotas}}</td>
+            <td v-if="data.cuenta.estado === 1">Al Día</td>
+            <td v-else-if="data.cuenta.estado === 2">Mora</td>
+            <td>L. {{int.format(data.cuenta.saldo_capital)}}</td>
+          </tr>
+          </tbody>
+          <thead>
+          <tr>
+            <th>Saldo en Mora</th>
+            <th>Saldo Actual</th>
+            <th>Total Abonado</th>
+            <th>Cuota</th>
+            <th>Fecha de Prima</th>
+            <th>Fecha Vencimiento</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>L. {{int.format(data.cuenta.saldo_mora)}}</td>
+            <td>L. {{int.format(data.cuenta.saldo_actual)}}</td>
+            <td>L. {{int.format(data.cuenta.total_abonado)}}</td>
+            <td>L. {{int.format(data.cuenta.couta)}}</td>
+            <td>{{data.cuenta.fecha_prima.split('-')[2]}}/{{data.cuenta.fecha_prima.split('-')[1]}}/{{data.cuenta.fecha_prima.split('-')[0]}}</td>
+            <td>{{data.cuenta.fecha_vencimiento.split('-')[2]}}/{{data.cuenta.fecha_vencimiento.split('-')[1]}}/{{data.cuenta.fecha_vencimiento.split('-')[0]}}</td>
+          </tr>
+          </tbody>
+        </table>
+        <pagos_ingreso_cuenta_manual :revision="revision" :data="data"/>
+      </v-stepper-content>
+    </v-stepper-items>
+  </v-stepper>
+
+<!--&lt;!&ndash;    <v-col>&ndash;&gt;-->
+<!--&lt;!&ndash;      <v-text-field class="ma-1" outlined dense disabled :rules="[rules.revision.revisados]"&ndash;&gt;-->
+<!--&lt;!&ndash;                    label="Pagos Revisados" v-model="revision.user.revisados">&ndash;&gt;-->
+<!--&lt;!&ndash;      </v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;    </v-col>&ndash;&gt;-->
+<!--&lt;!&ndash;    <v-col>&ndash;&gt;-->
+<!--&lt;!&ndash;      <v-text-field class="ma-1" outlined dense disabled prefix="L" :rules="[rules.revision.saldo_actual]"&ndash;&gt;-->
+<!--&lt;!&ndash;                    label="Saldo Actual" v-model="revision.user.saldo_actual">&ndash;&gt;-->
+<!--&lt;!&ndash;      </v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;    </v-col>&ndash;&gt;-->
+<!--&lt;!&ndash;    <v-col>&ndash;&gt;-->
+<!--&lt;!&ndash;      <v-text-field class="ma-1" outlined dense disabled :rules="[rules.revision.saldo_mora]"&ndash;&gt;-->
+<!--&lt;!&ndash;                    label="Saldo en Mora" v-model="revision.user.mora">&ndash;&gt;-->
+<!--&lt;!&ndash;      </v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;    </v-col>&ndash;&gt;-->
+<!--&lt;!&ndash;    <v-card class="ma-2">&ndash;&gt;-->
+<!--&lt;!&ndash;      <b-table responsive small&ndash;&gt;-->
+<!--&lt;!&ndash;               class="rowsTable"&ndash;&gt;-->
+<!--&lt;!&ndash;               :current-page="currentPage"&ndash;&gt;-->
+<!--&lt;!&ndash;               :per-page="perPage"&ndash;&gt;-->
+<!--&lt;!&ndash;               :fields="headerPagos"&ndash;&gt;-->
+<!--&lt;!&ndash;               :items="data.pagos"&ndash;&gt;-->
+<!--&lt;!&ndash;               hover>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(fecha_pago)><div class="text-nowrap">Fecha de Pago</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(detalle)><div class="text-nowrap">Detalle del Pago</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(pago_inicial)><div class="text-nowrap">Pago Inicial</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(total_abonado)><div class="text-nowrap">Total Abonado</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(saldo_abonado)><div class="text-nowrap">Saldo Abonado</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(mora)><div class="text-nowrap">Saldo en Mora</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(total_pago)><div class="text-nowrap">Total del Pago</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(saldo_actual)><div class="text-nowrap">Saldo Actual</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(is_mora)><div class="text-nowrap">Estado de la Mora</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(estao)><div class="text-nowrap">Estado del Pago</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(inicio_mora)><div class="text-nowrap">Inicio de la Mora</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(revisado)><div class="text-nowrap">Revisado</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(dias_mora)><div class="text-nowrap">Dias en Mora</div></template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:head(saldo_cap)><div class="text-nowrap">Saldo Capital</div></template>&ndash;&gt;-->
+
+<!--&lt;!&ndash;        <template v-slot:cell(fecha_pago)="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <v-menu v-model="scope.item.dialogo" :nudge-right="40" offset-y min-width="auto"&ndash;&gt;-->
+<!--&lt;!&ndash;                  :close-on-content-click="false" transition="scale-transition">&ndash;&gt;-->
+<!--&lt;!&ndash;            <template v-slot:activator="{ on, attrs }">&ndash;&gt;-->
+<!--&lt;!&ndash;              <v-text-field v-model="scope.item.fecha_pago"&ndash;&gt;-->
+<!--&lt;!&ndash;                            :rules="[rules.select.req]" dense&ndash;&gt;-->
+<!--&lt;!&ndash;                            persistent-hint&ndash;&gt;-->
+<!--&lt;!&ndash;                            :hint="`${scope.item.fecha_pago.split('-')[2]}/${scope.item.fecha_pago.split('-')[1]}/${scope.item.fecha_pago.split('-')[0]}`"&ndash;&gt;-->
+<!--&lt;!&ndash;                            readonly v-bind="attrs" v-on="on" outlined>&ndash;&gt;-->
+<!--&lt;!&ndash;              </v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;            </template>&ndash;&gt;-->
+<!--&lt;!&ndash;            <v-date-picker&ndash;&gt;-->
+<!--&lt;!&ndash;                v-model="scope.item.fecha_pago"&ndash;&gt;-->
+<!--&lt;!&ndash;                @input="scope.item.dialogo = false"></v-date-picker>&ndash;&gt;-->
+<!--&lt;!&ndash;          </v-menu>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(detalle)="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <div class="text-nowrap">{{scope.item.detalle}}</div>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(pago_inicial)="scope">L {{scope.item.pago_inicial}}</template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(total_abonado)="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <v-text-field dense prefix="L" outlined @change="sumarTotalPago(scope.item)"&ndash;&gt;-->
+<!--&lt;!&ndash;                        :rules="[rules.moneda.num]"&ndash;&gt;-->
+<!--&lt;!&ndash;                        v-model="scope.item.total_abonado"></v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(mora)="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <v-text-field dense prefix="L" outlined @change="sumarTotalPago(scope.item)"&ndash;&gt;-->
+<!--&lt;!&ndash;                        :rules="[rules.moneda.num]"&ndash;&gt;-->
+<!--&lt;!&ndash;                        v-model="scope.item.mora"></v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(saldo_cap)="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <v-text-field dense prefix="L" outlined&ndash;&gt;-->
+<!--&lt;!&ndash;                        :rules="[rules.moneda.num]"&ndash;&gt;-->
+<!--&lt;!&ndash;                        v-model="scope.item.saldo_cap"></v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(total_pago)="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <v-text-field dense prefix="L" outlined&ndash;&gt;-->
+<!--&lt;!&ndash;                        :rules="[rules.select.req, rules.moneda.num]"&ndash;&gt;-->
+<!--&lt;!&ndash;                        disabled v-model="scope.item.total_pago"></v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(saldo_actual)="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <v-text-field dense prefix="L" outlined&ndash;&gt;-->
+<!--&lt;!&ndash;                        :rules="[rules.moneda.num]"&ndash;&gt;-->
+<!--&lt;!&ndash;                        v-model="scope.item.saldo_actual"></v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(is_mora)="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <v-select dense outlined :items="selectEstado" v-model="scope.item.is_mora"></v-select>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(estao)="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <v-select dense outlined :items="selectPago" :rules="[rules.select.req]"&ndash;&gt;-->
+<!--&lt;!&ndash;                    v-model="scope.item.estao"></v-select>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(inicio_mora)="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <v-menu v-model="scope.item.dialogoMora" :nudge-right="40" offset-y min-width="auto"&ndash;&gt;-->
+<!--&lt;!&ndash;                  :close-on-content-click="false" transition="scale-transition">&ndash;&gt;-->
+<!--&lt;!&ndash;            <template v-slot:activator="{ on, attrs }">&ndash;&gt;-->
+<!--&lt;!&ndash;              <v-text-field v-model="scope.item.inicio_mora" dense&ndash;&gt;-->
+<!--&lt;!&ndash;                            :hint="scope.item.inicio_mora ? `${scope.item.fecha_pago.split('-')[2]}/${scope.item.fecha_pago.split('-')[1]}/${scope.item.fecha_pago.split('-')[0]}`:'No hay fecha de inicio de mora'"&ndash;&gt;-->
+<!--&lt;!&ndash;                            persistent-hint&ndash;&gt;-->
+<!--&lt;!&ndash;                            readonly v-bind="attrs" v-on="on" outlined>&ndash;&gt;-->
+<!--&lt;!&ndash;              </v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;            </template>&ndash;&gt;-->
+<!--&lt;!&ndash;            <v-date-picker&ndash;&gt;-->
+<!--&lt;!&ndash;                v-model="scope.item.inicio_mora" @change="calcularDiasMora(scope.item)"&ndash;&gt;-->
+<!--&lt;!&ndash;                @input="scope.item.dialogoMora = false"></v-date-picker>&ndash;&gt;-->
+<!--&lt;!&ndash;          </v-menu>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(dias_mora)="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <v-text-field outlined dense v-model="scope.item.dias_mora" suffix="días"></v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <template v-slot:cell(revisado)="scope" class="d-flex align-center">&ndash;&gt;-->
+<!--&lt;!&ndash;          <v-checkbox @change="contPagosRevisados(scope.item)"&ndash;&gt;-->
+<!--&lt;!&ndash;                      v-model="scope.item.revisado" :rules="[rules.check.check]">&ndash;&gt;-->
+<!--&lt;!&ndash;          </v-checkbox>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;      </b-table>&ndash;&gt;-->
+<!--&lt;!&ndash;      <v-row no-gutters>&ndash;&gt;-->
+<!--&lt;!&ndash;        <v-col class="d-flex justify-center">&ndash;&gt;-->
+<!--&lt;!&ndash;          <b-pagination v-model="currentPage"&ndash;&gt;-->
+<!--&lt;!&ndash;                        :total-rows="totalRows"&ndash;&gt;-->
+<!--&lt;!&ndash;                        :per-page="perPage"&ndash;&gt;-->
+<!--&lt;!&ndash;                        align="fill"&ndash;&gt;-->
+<!--&lt;!&ndash;                        size="sm"&ndash;&gt;-->
+<!--&lt;!&ndash;                        class="my-0"&ndash;&gt;-->
+<!--&lt;!&ndash;          ></b-pagination>&ndash;&gt;-->
+<!--&lt;!&ndash;        </v-col>&ndash;&gt;-->
+<!--&lt;!&ndash;      </v-row>&ndash;&gt;-->
+<!--&lt;!&ndash;    </v-card>&ndash;&gt;-->
+<!--&lt;!&ndash;    <v-card class="ma-2">&ndash;&gt;-->
+<!--&lt;!&ndash;      <v-card-title>Revisión</v-card-title>&ndash;&gt;-->
+<!--&lt;!&ndash;      <v-divider></v-divider>&ndash;&gt;-->
+<!--&lt;!&ndash;      <v-text-field class="ma-1" outlined dense disabled :rules="[rules.revision.revisados]"&ndash;&gt;-->
+<!--&lt;!&ndash;                    label="Pagos Revisados" v-model="revision.user.revisados">&ndash;&gt;-->
+<!--&lt;!&ndash;      </v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;      <v-text-field class="ma-1" outlined dense disabled prefix="L" :rules="[rules.revision.saldo_actual]"&ndash;&gt;-->
+<!--&lt;!&ndash;                    label="Saldo Actual" v-model="revision.user.saldo_actual">&ndash;&gt;-->
+<!--&lt;!&ndash;      </v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;      <v-text-field class="ma-1" outlined dense disabled :rules="[rules.revision.saldo_mora]"&ndash;&gt;-->
+<!--&lt;!&ndash;                    label="Saldo en Mora" v-model="revision.user.mora">&ndash;&gt;-->
+<!--&lt;!&ndash;      </v-text-field>&ndash;&gt;-->
+<!--&lt;!&ndash;      <v-btn block color="indigo" dark tile small @click="validarEnvio">Registrar</v-btn>&ndash;&gt;-->
+<!--&lt;!&ndash;    </v-card>&ndash;&gt;-->
+<!--  </v-form>-->
 
 
   <v-dialog v-model="dialogo.articulos" width="90%">
@@ -542,11 +677,15 @@
 
 <script>
 import Vue from "vue";
-var moment = require('moment');
+import pagos_ingreso_cuenta_manual from "@/components/tablas/cuentas/pagos_ingreso_cuenta_manual.vue";
 export default {
   name: "nueva_venta_manual",
+  components:{pagos_ingreso_cuenta_manual},
   data(){
     return{
+      pagina: 1,
+      validarDatos: false,
+      int: Intl.NumberFormat(),
       articulos: [],
       Ciudad:{
         rules:{
@@ -584,7 +723,7 @@ export default {
           id: null,
           nombre: '',
           familia: '',
-          color:   '',
+          color:   'CS',
           serie:   ''
         },
         cliente:{
@@ -600,14 +739,14 @@ export default {
         cuenta:{
           saldo_capital: 0,
           total_inicial: 0,
-          prima: 5000,
+          prima: 0,
           tiempo: 0,
-          cuotas: 6,
+          cuotas: 0,
           estado: '',
           saldo_actual: 0,
           total_abonado: 0,
           saldo_mora: 0,
-          couta: 560,
+          couta: 0,
           forma_pago: 3,
           fecha_prima:'',
           fecha_vencimiento: '',
@@ -657,8 +796,8 @@ export default {
         telefonos: 0
       },
       Municipios: [],
-      perPage:10,
-      searchArticulo: '',
+      perPage:25,
+      searchArticulo: 'FINANCIAMI',
       selectEstadoCuenta:[
         {text:'Al día', value:1},
         {text:'Mora', value:2},
@@ -801,9 +940,10 @@ export default {
     },
     calcularDiasMora(data){
       let f = new Date();
-      let fecha1 = moment(f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate());
-      let fecha2 = moment(data.inicio_mora);
-      data.dias_mora = fecha1.diff(fecha2,'days')
+      let fecha1 = new Date(f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate()).getTime();
+      let fecha2 = new Date(data.inicio_mora).getTime();
+      let diff   = fecha1 - fecha2;
+      data.dias_mora = diff/(1000*60*60*24)
     },
     calcularFechaVencimiento(){
       if (this.data.cuenta.fecha_prima){
@@ -923,7 +1063,14 @@ export default {
         this.load.sucursales = false;
       });
     },
+    copiarSaldoPagado(data){
+      data.total_abonado = data.pago_inicial;
+      this.sumarTotalPago(data)
+    },
     contPagosRevisados(data){
+      console.log(data.revisado)
+      data.revisado = !data.revisado;
+      console.log(data.revisado)
       if (data.revisado)
         this.revision.user.revisados++;
       else
@@ -937,7 +1084,7 @@ export default {
         this.revision.user.mora = 0;
         this.revision.user.revisados = 0;
         let pagos = this.calcularPagos();
-        let fecha = new Date(this.data.cuenta.fecha_prima+'T00:00:00');
+        let fecha = new Date(this.data.cuenta.fecha_prima);
         for (let i = 0; i <= pagos; i++){
           if (i === 0){
             this.agregarPago(this.data.cuenta.prima, this.data.cuenta.prima, 0,
@@ -946,7 +1093,7 @@ export default {
             fecha = this.sumarDias(fecha);
             this.agregarPago(this.data.cuenta.couta, this.data.cuenta.couta, 0,
                 this.data.cuenta.couta,
-                fecha.getFullYear()+'-'+(fecha.getMonth() + 1)+'-'+fecha.getDate(), 'Cuota #'+(i));
+                fecha.getDate()+'-'+(fecha.getMonth()+ 1)+'-'+fecha.getFullYear(), 'Cuota #'+(i));
 
           }
           this.revision.sis.revisados++;
@@ -995,7 +1142,10 @@ export default {
         });
         this.Ciudad.nombre = '';
         this.Ciudad.municipio = '';
-        this.$store.commit('direcciones/cargar_DISTRITOS')
+        this.$store.commit('direcciones/cargar_DISTRITOS');
+        this.$store.commit('direcciones/cargar_DEPARTAMENTOS');
+        this.$store.commit('direcciones/cargar_MUNICIPIOS');
+        this.$store.commit('direcciones/cargar_COLONIAS');
       })
     },
     guardarColonia(){
@@ -1059,6 +1209,9 @@ export default {
       }
     },
     registrarCuenta(cliente){
+      this.data.pagos.forEach((item)=>{
+        item.fecha_pago = item.fecha_pago.split('-')[2]+'-'+item.fecha_pago.split('-')[1]+item.fecha_pago.split('-')[0]
+      })
       this.$axios.post('cuenta/nueva/manual/articulo',{
         articulo_id:       this.data.articulo.id,
         serie:             this.data.articulo.serie,
@@ -1157,11 +1310,23 @@ export default {
 
       this.sumarTotalMora(data);
     },
-    validarEnvio(){
-      if (this.$refs.FormValidarConcordanciaDePagos.validate())
-        this.registrarCliente()
+    validarDatosCliente(){
+      if (this.$refs.FormDatosCliente.validate())
+        this.pagina = 2;
       else
-        this.notificacion('Hay datos que no concuerdan','error');
+        this.notificacion('Datos invalidos', 'warning');
+    },
+    validarDetallesCliente(){
+      if (this.$refs.FormDetallesCliente.validate())
+        this.pagina = 3;
+      else
+        this.notificacion('Datos invalidos', 'warning');
+    },
+    validarDetallesPrecio(){
+      if (this.$refs.FormDetallesPrecio.validate())
+        this.pagina = 4;
+      else
+        this.notificacion('Datos invalidos', 'warning');
     },
     validarFormCiudad(){
       if (this.$refs.FormCiudadNueva.validate())
@@ -1177,32 +1342,40 @@ export default {
 
 <style scoped>
 table{
-  font-family: 'Open Sans', sans-serif;
   width: 100%;
-  padding: 2px;
+  border: solid #b2b0b0 1px;
 }
-table thead{
-  background: #e8e5e5;
-}
+
 table thead tr th{
-  font-size: 12px;
+  padding: 5px;
+  font-size: 14px;
+  border-left: solid #b2b0b0 1px;
+  border-top: solid #b2b0b0 1px;
 }
 table tbody tr td{
-  font-size: 11px;
-}
-table tbody tr td:nth-child(even){
-  background-color: #f2f2f2;
-}
-table tbody tr:hover{
-  background: #f2f2f2;
-  border: 1px solid;
+  padding: 5px;
+  border-left: solid #b2b0b0 1px;
+  border-bottom: solid #b2b0b0 1px;
+  font-size: 12px;
   cursor: pointer;
 }
+table tbody tr td table{
+  width: 80%;
+}
+table tbody tr td table thead tr th{
+  font-size: 10px;
+  padding: 2px;
+}
+table tbody tr td table tbody tr td{
+  font-size: 9px;
+}
 table caption{
-  font-size: 13px;
   caption-side: top;
 }
-table thead tr td{
-  font-size: 12px;
+table thead tr th:hover{
+  background-color: #f6f6f6;
+}
+table tbody tr td:hover{
+  background-color: #f6f6f6;
 }
 </style>

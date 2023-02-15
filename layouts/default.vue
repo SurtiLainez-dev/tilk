@@ -28,6 +28,8 @@
           <editar_inventario v-if="i.key === 7"/>
           <articulo_nuevo v-if="i.key === 8"/>
           <motocicletas v-if="i.key === 9"/>
+          <ordenes_entradas v-if="i.key === 10"/>
+          <guia_remision_entradas v-if="i.key === 11"/>
         </v-tab-item>
       </v-tabs-items>
 
@@ -35,13 +37,38 @@
         <v-progress-circular indeterminate size="64"></v-progress-circular>
       </v-overlay>
 
+
+      <v-snackbar v-model="ACTUALIZACION" absolute timeout="1000000">
+        Hay una actualización nueva de Tilk
+        <template v-slot:action="{ attrs }">
+          <v-btn color="blue" text @click="descargarNuevaVersion"
+                 v-bind="attrs">
+            Descargar
+          </v-btn>
+          <v-btn color="pink" text v-bind="attrs" @click="ACTUALIZACION = false">
+            Cerrar
+          </v-btn>
+        </template>
+      </v-snackbar>
+      <v-snackbar v-model="descargaTerminada" absolute timeout="1000000">
+        Descargar de la actualización terminada. Si la instalas el programa se cerrará.
+        <template v-slot:action="{ attrs }">
+          <v-btn color="blue" text
+                 v-bind="attrs" @click="instalarVersion">
+            Instalar
+          </v-btn>
+          <v-btn color="pink" text v-bind="attrs" @click="descargaTerminada = false">
+            Despues
+          </v-btn>
+        </template>
+      </v-snackbar>
     </v-main>
   </v-app>
 </template>
 
 <script>
 import Motocicletas from "@/pages/ventas/motocicletas.vue";
-
+import {ipcRenderer} from 'electron'
 const notification = document.getElementById('notification');
 const message = document.getElementById('message');
 const restartButton = document.getElementById('restart-button');
@@ -57,6 +84,8 @@ import inventario from "@/components/Inventario/inventario";
 import editar_inventario from "@/components/Inventario/editar_inventario";
 import articulo_nuevo from "@/components/Inventario/articulo_nuevo";
 import motocicletas from "@/components/Inventario/motocicletas.vue";
+import ordenes_entradas from "@/components/Inventario/ordenes_entradas.vue";
+import guia_remision_entradas from "@/components/Inventario/guia_remision_entradas.vue";
 export default {
   watch: {
     over (val) {
@@ -65,25 +94,48 @@ export default {
     },
   },
   components:{
-    Motocicletas, NuxtLoading, side, Cuerpo, caja, cobros: inicio ,motocicletas,
-    to_do_inidex, perfiles, cuentas, inventario, editar_inventario, articulo_nuevo},
+    Motocicletas, NuxtLoading, side, Cuerpo, caja, cobros: inicio ,
+    motocicletas, to_do_inidex, perfiles, cuentas, inventario, guia_remision_entradas,
+    editar_inventario, articulo_nuevo, ordenes_entradas, },
   data(){
     return{
+      dia: true,
+      descargaTerminada: false,
+      actualizacion:  true,
       refe: null,
       Hora: 0,
       Minuto: 0,
       Segundo: 0,
+      urlVersion: null,
+      dirDescargado: ''
     }
   },
   created() {
-    console.log(this.Pes)
+    this.consultarActualizacion();
     this.$store.commit('direcciones/cargar_COLONIAS');
     this.$store.commit('direcciones/cargar_DISTRITOS');
     this.$store.commit('direcciones/cargar_MUNICIPIOS');
     this.$store.commit('direcciones/cargar_DEPARTAMENTOS');
-    this.calcularFecha()
+    this.calcularFecha();
+
+    setInterval(()=>{
+      this.consultarActualizacion();
+    }, 7200000);
+
+    ipcRenderer.on('descarga-version-terminada', (event, arg) => {
+      this.dirDescargado = arg;
+      this.descargaTerminada = true;
+    });
   },
   computed:{
+    ACTUALIZACION:{
+      get: function(){
+        return this.$store.state.ACTUALIZACION;
+      },
+      set: function(item){
+        this.$store.commit('agregarACTUALIZACION', item)
+      }
+    },
     ESTADOMENU:{
       get: function (){
         return this.$store.state.MENU;
@@ -139,6 +191,26 @@ export default {
           month = meses[i]
       }
       return month;
+    },
+    descargarNuevaVersion(){
+      if (this.urlVersion) {
+        let data = {
+          dir: this.$store.state.DIR,
+          url: this.urlVersion
+        }
+        ipcRenderer.send('descargar-nueva-version', data);
+        this.ACTUALIZACION = false;
+      }else
+        this.$store.commit('notificacion',{color:'warning', texto:'Url no soportada'});
+    },
+    consultarActualizacion(){
+      this.$axios.get('actualizacion/'+this.$store.state.VERSION).then((res)=>{
+        this.ACTUALIZACION = !!res.data.estado;
+        this.urlVersion    = res.data.url;
+      })
+    },
+    instalarVersion(){
+      ipcRenderer.send('instalar-version', this.dirDescargado);
     }
   }
 }

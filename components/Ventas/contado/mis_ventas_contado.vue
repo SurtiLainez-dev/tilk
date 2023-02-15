@@ -1,6 +1,31 @@
 <template>
   <v-card flat>
     <b-overlay :show="LOAD_VENTA" rounded="sm">
+      <table>
+        <thead>
+        <tr><th colspan="5">Datos de la Venta</th></tr>
+        </thead>
+        <thead>
+        <tr>
+          <th :colspan="index === 0 ? 2 : 1" v-if="index < 4" v-for="(item, index) in DATOS_CARD">{{item.titulo}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td :colspan="index === 0 ? 2 : 1" v-if="index < 4" v-for="(item, index) in DATOS_CARD">{{item.texto}}</td>
+        </tr>
+        </tbody>
+        <thead>
+        <tr>
+          <th v-if="index >= 4" v-for="(item, index) in DATOS_CARD">{{item.titulo}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td v-if="index >= 4" v-for="(item, index) in DATOS_CARD">{{item.texto}}</td>
+        </tr>
+        </tbody>
+      </table>
       <v-row no-gutters>
         <v-col cols="2">
           <v-card height="450" class="mx-auto">
@@ -39,7 +64,7 @@
           </v-card>
         </v-col>
 
-        <v-col cols="8" v-if="DATA_VENTA">
+        <v-col cols="10" v-if="DATA_VENTA">
 
           <v-card v-if="itemId === 1" flat>
             <v-alert dense color="warning" dark class="ma-2">Si el artículo es una <strong>MOTOCICLETA</strong>, subir los archivos que se le solicitan. Sino es
@@ -69,6 +94,16 @@
                     <td>3</td>
                     <td>Carta Poder</td>
                     <td><b-link @click="mostrarPdf($axios.defaults.baseURL+'print_carta_poder_venta/'+DATA_VENTA.id)">Descargar</b-link></td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>Permiso para Circular sin Placa</td>
+                    <td><b-link @click="solicitarClave">Generar</b-link></td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td>Cargar Expediente Completo</td>
+                    <td><b-link @click="abrirDialogoDocumentoCompleto">Cargar Expediente</b-link></td>
                   </tr>
                   </tbody>
                 </template>
@@ -356,43 +391,28 @@
 
         </v-col>
 
-        <v-col cols="2" v-if="DATA_VENTA" class="pb-5">
-          <v-card height="630" class="mx-auto pb-1">
-            <v-navigation-drawer permanent>
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title class="title">
-                    Datos de la Venta
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-
-              <v-divider></v-divider>
-
-              <v-list-item dense two-line v-for="item in DATOS_CARD" class="rowsTable">
-                <v-list-item-content >
-                  <v-list-item-title>{{item.titulo}}</v-list-item-title>
-                  <v-list-item-subtitle>{{item.texto}}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-navigation-drawer>
-          </v-card>
-        </v-col>
       </v-row>
     </b-overlay>
   </v-card>
 </template>
 
 <script>
+import completo from "@/components/Ventas/pdfs/completo.vue";
 import {vsUpload} from 'vuesax';
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css';
 import Vue from "vue";
 import {ipcRenderer} from "electron";
+
 export default {
   name: "mis_ventas_contado",
+  components:{pdf_completo: completo},
   data(){
     return{
+      pdfCompleto: null,
+      paginas: 0,
+      itemValidarDocumento: 0,
+      validadDocumento: false,
       tituloMenu: 'Salida de Inventario',
       items: [
         { title: 'Documentos',  val:1, dib: false},
@@ -405,7 +425,8 @@ export default {
         carta_poder:       null,
         hoja_conocimiento: null,
         garantia:          null,
-        traspaso:          null
+        traspaso:          null,
+        completo:          null,
       },
       itemId: 1,
       Direccion: '',
@@ -420,12 +441,16 @@ export default {
       btnEnvio: true,
       Regalias: [],
       Colaboradores: [],
-      loadCol: false
+      loadCol: false,
+      dirDocumentoCompleto: ''
     }
   },
   computed:{
     LOAD_VENTA(){
       return this.$store.state.ventas.LOAD_MIS_VENTAS;
+    },
+    USUARIO(){
+      return this.$store.state.usuario;
     },
     DATA_VENTA(){
       if (this.$store.state.ventas.DATA_VENTA && this.$store.state.ventas.DATA_VENTA.estado !== 4){
@@ -452,7 +477,7 @@ export default {
     },
     IS_ACEPTADA(){
       return this.$store.state.ventas.IS_ACEPTADA;
-    }
+    },
   },
   created() {
     this.$store.commit('ventas/cargar_DATA_VENTA_CONTADO');
@@ -462,6 +487,28 @@ export default {
     Vue.use(vsUpload)
   },
   methods:{
+    abrirDialogoDocumentoCompleto(){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+        let data = {
+          token:     this.$store.state.token,
+          token_doc: res.data.clave,
+          data:      this.DATA_VENTA,
+          usuario:   this.USUARIO,
+          dir:       this.$store.state.DIRUTILIDADES,
+          url:       this.$axios.defaults.baseURL,
+        }
+        this.$store.commit('activarOverlay', false);
+        ipcRenderer.send('crear-utilidad', data);
+      }).catch((error)=>{
+        this.$store.commit('notificacion',{texto:'Ocurrio un error', color:'error'});
+        this.$store.commit('activarOverlay', false);
+      })
+    },
+    abrirNavegador(clave){
+      ipcRenderer.send('pint_navegador', this.$axios.defaults.baseURL+'documentos/permiso_s_placa/usuario='+this.USUARIO+'&chasis='+this.DATA_VENTA.facturas_contados[0].remision_articulo.serie_fabricante+'/'+clave);
+      this.$store.commit('activarOverlay', false);
+    },
     cambiarVista(data){
       this.itemId     = data.val;
       this.tituloMenu = data.title;
@@ -570,6 +617,15 @@ export default {
         this.$store.commit('notificacion',{texto:'Selecciona un colaborador o revisa que tengas una dirección', color:'warning'})
       }
     },
+    solicitarClave(){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+        this.abrirNavegador(res.data.clave);
+      }).catch((error)=>{
+        this.$store.commit('notificacion',{texto:'Ocurrio un error', color:'error'});
+        this.$store.commit('activarOverlay', false);
+      })
+    },
     validarFiles(){
       if (this.doc.carta_poder && this.doc.garantia && this.doc.traspaso && this.doc.hoja_conocimiento)
         return true;
@@ -593,7 +649,41 @@ export default {
 </script>
 
 <style scoped>
-.rowsTable{
+table{
+  width: 100%;
+  border: solid #b2b0b0 1px;
+}
+
+table thead tr th{
+  padding: 5px;
+  font-size: 14px;
+  border-left: solid #b2b0b0 1px;
+  border-top: solid #b2b0b0 1px;
+}
+table tbody tr td{
+  padding: 5px;
+  border-left: solid #b2b0b0 1px;
+  border-bottom: solid #b2b0b0 1px;
+  font-size: 12px;
   cursor: pointer;
+}
+table tbody tr td table{
+  width: 80%;
+}
+table tbody tr td table thead tr th{
+  font-size: 10px;
+  padding: 2px;
+}
+table tbody tr td table tbody tr td{
+  font-size: 9px;
+}
+table caption{
+  caption-side: top;
+}
+table thead tr th:hover{
+  background-color: #f6f6f6;
+}
+table tbody tr td:hover{
+  background-color: #f6f6f6;
 }
 </style>

@@ -63,6 +63,7 @@ import mis_ventas from "../../../components/Ventas/mis_ventas";
 import Mis_ventas from "../../../components/Ventas/mis_ventas";
 import mis_ventas_contado from "../../../components/Ventas/contado/mis_ventas_contado";
 import Mis_ventas_contado from "../../../components/Ventas/contado/mis_ventas_contado";
+import {ipcRenderer} from "electron";
 export default {
   components: {Mis_ventas_contado, Mis_ventas},
   comments:{

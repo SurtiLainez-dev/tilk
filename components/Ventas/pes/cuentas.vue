@@ -11,7 +11,7 @@
                     :search="search"
                     dense
                     :items-per-page="50"
-                    :loading="Load"
+                    :loading="LOADCUENTAS"
                     loading-text="Cargando Cuentas"
                     @click:row="goCuenta"
                     :headers="header"
@@ -22,8 +22,8 @@
         <template v-slot:item.saldo_actual="{item}">
           L {{int.format(item.saldo_actual)}}
         </template>
-        <template v-slot:item.cliente.nombres="{item}">
-          {{item.cliente.nombres}} {{item.cliente.apellidos}}
+        <template v-slot:item.nombres="{item}">
+          {{item.nombres}} {{item.apellidos}}
         </template>
         <template v-slot:item.estado="{item}">
           <v-chip color="orange" x-small v-if="item.estado === 1" dark>Al día</v-chip>
@@ -46,7 +46,8 @@
             <v-icon>fa fa-arrow-left</v-icon>
           </v-btn>
           <v-spacer></v-spacer>
-          <h5 class="grey--text">Cuenta de {{CUENTA.cliente.nombres}} {{CUENTA.cliente.apellidos}}</h5>
+          <h5 v-if="CUENTA.cliente" class="grey--text">Cuenta de {{CUENTA.cliente.nombres}} {{CUENTA.cliente.apellidos}}</h5>
+          <h5 v-else class="grey--text">Cuenta de {{CUENTA.nombres}} {{CUENTA.apellidos}}</h5>
           <v-spacer></v-spacer>
           <small class="grey--text"><strong>Cuenta #{{CUENTA.cod}}</strong></small>
         </v-toolbar>
@@ -72,7 +73,7 @@ export default {
       search: '',
       header:[
         {text: 'Código', value: 'cod'},
-        {text: 'Nombre del Cliente', value: 'cliente.nombres'},
+        {text: 'Nombre del Cliente', value: 'nombres'},
         {text: 'total', value: 'total'},
         {text: 'Saldo Actual', value: 'saldo_actual'},
         {text: 'Estado', value: 'estado'},
@@ -92,6 +93,14 @@ export default {
     },
     CUENTA(){
       return this.$store.state.cuentas.CUENTA;
+    },
+    LOADCUENTAS:{
+      get: function(){
+        return this.$store.state.cuentas.LOADCUENTAS;
+      },
+      set: function (val){
+        this.$store.commit('cuentas/cambiarEstado_LOADCUENTAS', val)
+      }
     }
   },
   created() {
@@ -100,10 +109,10 @@ export default {
   },
   methods:{
     cargarCuentas(){
-      this.Load = true;
+      this.LOADCUENTAS = true;
       this.$axios.get('cuentas/ventas/pendientes').then((res)=>{
         this.CUENTAS = res.data.ventas;
-        this.Load    = false;
+        this.LOADCUENTAS    = false;
       })
     },
     notificacion(text, color){

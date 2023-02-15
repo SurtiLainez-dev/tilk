@@ -71,10 +71,15 @@ app.on('activate', () => win === null && newWin());
 
 
 const db = require('./db');
+const upd = require('./actualizaciones');
 db.crear_db_inicios();
 db.crear_db_usuarios();
 db.crear_db_conexiones();
+db.crear_db_conexion();
 db.crear_db_articulos();
 db.crear_db_almacenamientoLocal();
+db.crear_db_almacenamientoUtilidades();
+// db.crear_db_almacenamientoUtilidades();
+// upd.descargarActualizacion();
 
 

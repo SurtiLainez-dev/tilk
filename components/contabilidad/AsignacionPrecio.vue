@@ -438,8 +438,14 @@
       calcularPrecioContado(){
         this.Precio.margenUtilidaReal = this.Precio.margenUtilidad
         if (this.$refs.FormVerificarImpuestoAsignacionPrecio.validate()){
-          if (this.Precio.margenUtilidaReal > 1)
-            this.Precio.margenUtilidaReal = (this.Precio.margenUtilidaReal / 100).toFixed(4);
+          if (this.Precio.margenUtilidaReal > 0) {
+            if (this.Precio.margenUtilidaReal === 1)
+              this.Precio.margenUtilidaReal = 0.01;
+            else
+              this.Precio.margenUtilidaReal = (this.Precio.margenUtilidaReal / 100).toFixed(4);
+          }
+          console.log(this.Precio.margenUtilidaReal);
+          console.log(this.Precio.margenUtilidad);
           this.Precio2.margenGanancia = (parseFloat(this.Precio.precio_s_i * this.Precio.margenUtilidaReal)).toFixed(2)
           let PRECIO_S_IMPUESTO = (parseFloat(this.Precio2.margenGanancia) + parseFloat(this.Precio.precio_s_i)).toFixed(2);
           this.Precio2.impuesto = (parseFloat(PRECIO_S_IMPUESTO * this.Precio.impuesto)).toFixed(2)

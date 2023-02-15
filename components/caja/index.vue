@@ -8,7 +8,7 @@
     </v-toolbar>
 
     <v-card flat>
-      <v-card class="mx-auto" width="100%">
+      <v-card flat class="mx-auto" width="100%">
         <v-bottom-navigation>
           <v-tooltip bottom v-for="item in items" :key="item.title" >
             <template v-slot:activator="{on, attrs}">

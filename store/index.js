@@ -45,16 +45,29 @@ export const state = () =>({
   ARTICULOS_EDIT: [],
   LOAD_ARTICULOS_EDIT: false,
   DIR: null,
+  DIRUTILIDADES: null,
   IMPUESTO: {},
+  ACTUALIZACION: false,
+  VERSION: ''
 });
 
 export const mutations = {
+  agregarACTUALIZACION(state, version){
+    state.ACTUALIZACION = version;
+  },
+  guardarVERSION(state, version){
+    state.VERSION = version;
+  },
   agregar_IMPUESTO(state, data){
     state.IMPUESTO = data;
   },
   agregar_DIR(state, dir){
     state.DIR = dir;
     localStorage.setItem('dir', dir);
+  },
+  agregar_DIRUTILIDADES(state, dir){
+    state.DIRUTILIDADES = dir;
+    localStorage.setItem('dirUtil', dir);
   },
   cargar_ARTICULOS_EDIT(state){
     state.LOAD_ARTICULOS_EDIT = true;

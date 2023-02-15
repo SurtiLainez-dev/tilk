@@ -14,7 +14,9 @@ export default function RedirectLogin({redirect, store, route, $axios}) {
             store.commit("asignarIdSucursal", localStorage.getItem('sucursal_id'))
             store.commit("guardarUsuarioId", localStorage.getItem('usuario_id'));
             store.commit("agregar_DIR", localStorage.getItem('dir'));
-            store.commit("agregar_IMPUESTO", localStorage.getItem('impuesto'));
+            store.commit("agregar_DIRUTILIDADES", localStorage.getItem('dirUtil'));
+            store.commit("agregar_IMPUESTO", localStorage.getItem('impuesto'))
+            store.commit("guardarVERSION", localStorage.getItem('version'));
             $axios.defaults.baseURL = localStorage.getItem('guardarConexion')
             $axios.setToken(store.state.token, 'Bearer')
         }else{

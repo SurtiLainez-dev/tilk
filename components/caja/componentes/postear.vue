@@ -42,9 +42,9 @@ export default {
       titulo: 'Cuentas Pendientes',
       header:[
         {text:'Cuenta', value:'cod'},
-        {text:'Nombres', value:'cliente.nombres'},
-        {text:'Apellidos', value:'cliente.apellidos'},
-        {text:'Identidad', value:'cliente.identidad'},
+        {text:'Nombres', value:'nombres'},
+        {text:'Apellidos', value:'apellidos'},
+        {text:'Identidad', value:'identidad'},
       ]
     }
   },
@@ -62,7 +62,7 @@ export default {
   methods:{
     addCuenta(data){
       console.log(data)
-      this.titulo = 'Cuenta > #'+data.cod+' - '+data.cliente.nombres+ ' '+data.cliente.apellidos;
+      this.titulo = 'Cuenta > #'+data.cod+' - '+data.nombres+ ' '+data.apellidos;
       this.$store.commit('caja/agregar_CUENTA', data);
       this.vista = 2;
     },

@@ -29,6 +29,13 @@
           </v-card-title>
         </v-card>
       </v-col>
+      <v-col lg="2" cols="6">
+        <v-card>
+          <v-card-title>
+            Actualizaciones
+          </v-card-title>
+        </v-card>
+      </v-col>
 
     </v-row>
     <v-row v-if="vista === 1">
@@ -72,7 +79,7 @@
       this.$store.commit('activarOverlay', false);
       this.$store.commit('guardarTitulo', 'Inicio')
       this.$store.commit('valorDialogo', false);
-      this.$store.commit('col/cargar_COLABORADORES')
+      this.$store.commit('col/cargar_COLABORADORES');
     },
     methods:{
       taraa(){

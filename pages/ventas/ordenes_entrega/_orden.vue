@@ -189,7 +189,7 @@ export default {
       data.append('comentarios', this.EnvioOrden.comentarios);
       data.append('encargado',   this.EnvioOrden.responsable);
       data.append('file',        this.EnvioOrden.file);
-
+      console.log(this.EnvioOrden.file)
       this.$store.commit('activarOverlay', true);
       this.dialogo = false;
       this.$axios({

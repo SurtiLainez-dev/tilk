@@ -7,6 +7,7 @@
         <v-text-field v-model="Email" :rules="Login.rulesEmail" label="E-mail" required>
         </v-text-field>
         <v-text-field v-model="Login.password" :type="show ? 'text' : 'password'"
+                      @keyup.enter="validate"
                       :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'" label="Contraseña"
                       class="input-group--focused" @click:append="show = !show" :rules="[rule.required, rule.min]">
         </v-text-field>

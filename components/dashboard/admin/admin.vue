@@ -13,6 +13,12 @@
         <v-list-item class="itemOpciones" @click="go('/admin/modulos')">
           Módulos del Sístema
         </v-list-item>
+        <v-list-item class="itemOpciones" @click="go('/admin/nueva_actualizacion')">
+          Nueva Actualización
+        </v-list-item>
+        <v-list-item class="itemOpciones" @click="go('/admin/actualizaciones')">
+          Actualizaciones
+        </v-list-item>
 
       </v-list-group>
       <v-list-group>

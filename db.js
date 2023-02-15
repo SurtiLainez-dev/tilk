@@ -1,21 +1,19 @@
 const db = require('electron-db')
 const { ipcMain , BrowserWindow, app, shell, dialog, Notification} = require('electron')
 const PDFWindow = require('electron-pdf-window')
-const WINDOW = BrowserWindow.getFocusedWindow()
-const {download} = require('electron-dl')
 const request = require('request');
 const fs      = require('fs')
-// const location = path.join(__dirname, '')
-const log = require('electron-log');
-const electron = require("electron");
-
+const https = require("https")
+const path = require("path");
+const Log = require("electron-log")
 app.on('ready', ()=>{
     let win = BrowserWindow.getFocusedWindow();
     ipcMain.on('traer-usuarios', (v,arg) => {
         this.all_usuarios();
+        this.recuperarConexionSeleccionada();
         this.recuperar_conexion();
         this.recuperar_almacenamientoLocal();
-
+        this.recuperar_almacenamientoUtil();
     });
 
     ipcMain.on('open-nav', (v, arg) => {
@@ -32,6 +30,7 @@ app.on('ready', ()=>{
         shell.openExternal(arg);
     })
 
+
     ipcMain.on('pdf-prueba', (v, arg) => {
         let url = 'http://127.0.0.1:8000/'+arg;
         let winPdf = new PDFWindow({
@@ -47,8 +46,14 @@ app.on('ready', ()=>{
         const dir = await dialog.showOpenDialog(win,{
             properties: ['openDirectory']
         });
-        win.webContents.send('recuperar-almacenamiento', dir[0]);
-        this.crear_almacenamientoLocal(dir[0])
+        if (args === 1){
+            win.webContents.send('recuperar-almacenamiento', dir[0]);
+            this.crear_almacenamientoLocal(dir[0])
+        }
+        else if (args === 2){
+            win.webContents.send('recuperar-almacenamientoUtil', dir[0]);
+            this.crear_almacenamientoUtil(dir[0]);
+        }
     })
 
     ipcMain.on('save_file', (v, args)=>{
@@ -94,6 +99,20 @@ app.on('ready', ()=>{
         }
     })
 
+    ipcMain.on('descargar-nueva-version', (v,arg) => {
+        this.descargarActualizacion(arg);
+    });
+
+    ipcMain.on('instalar-version', (v, arg)=>{
+        Log.info('instalando')
+        Log.info(arg);
+        // let cp = require("child_process");
+        const  cmd = require("node-cmd");
+        cmd.runSync("start "+arg)
+        // cp.exec("star cmd");
+        // cp.spawn('cmd', ['/'+arg.dir, 'start '+arg.exe]);
+    })
+
 });
 
 //usuarios
@@ -107,11 +126,27 @@ ipcMain.on('crear-usuario', (e, arg) =>{
         })
     }
 })
+
+
+ipcMain.on('crear-utilidad', (e, arg)=>{
+    console.log(arg)
+    db.createTable('utilidades', arg.dir, (e, succ)=>{});
+    db.clearTable('utilidades', arg.dir, (e, succ)=>{});
+    this.almacenar_utilidad(arg);
+})
+
 ipcMain.on('add_conexion', (e, arg) => {
     db.getRows( 'conexion', {add:1}, (succ, data) => {
-        console.log("aca si")
+        this.crear_conexion(arg)
+    } )
+});
+ipcMain.on('addConexionSeleccionada', (e, arg) => {
+    db.getRows( 'conexion_seleccionada', {add:1}, (succ, data) => {
+        console.log("conexion seleccionada 1")
+        console.log(data)
         if (!data[0]){
-            this.crear_conexion(arg)
+            console.log('nueva conexion seleccionada')
+            this.crearConexionSeleccionada(arg)
         }else {
             this.actualizar_conexion(1, arg)
         }
@@ -126,8 +161,6 @@ ipcMain.on('add_almacenamiento', (e, arg)=>{
     })
 });
 
-
-
 module.exports.crear_usuario = (correo)=>{
     let obj = new Object();
     obj.correo = correo;
@@ -137,19 +170,53 @@ module.exports.crear_usuario = (correo)=>{
     })
 
 }
+
+module.exports.almacenar_utilidad = (data)=>{
+    // db.createTable('utilidades', data.dir, (succ, arg)=>{
+    //
+    // })
+    let obj       = new Object();
+    obj.token     = data.token;
+    obj.token_doc = data.token_doc;
+    obj.venta     = data.data;
+    obj.usuario   = data.usuario;
+    obj.url       = data.url
+    obj.add       = 1;
+    console.log(data)
+    db.insertTableContent('utilidades',data.dir, obj, (succ, msg)=>{
+        const notification = {
+            title: 'Abriendo Utilidades de Tilk',
+            body:  'Se abrirá Utilidades de Tilk, sino abre, ejecutelo manualmente',
+            silent : false
+        }
+        const Noty = new Notification(notification)
+        Noty.show();
+    })
+}
+
 module.exports.all_usuarios = () => {
     db.getAll('usuarios', (succ, data) => {
         const win = BrowserWindow.getFocusedWindow()
         win.webContents.send('usuarios', data)
     })
 }
-module.exports.crear_conexion = (conexion) => {
+module.exports.crear_conexion = (data) => {
+    let obj = new Object()
+    obj.conexion = data.conexion
+    obj.alias    = data.alias
+    obj.add      = 1
+    db.insertTableContent('conexion', obj, (succ,msg) => {
+        console.log("conexion guardada")
+        this.recuperar_conexion();
+    })
+}
+module.exports.crearConexionSeleccionada = (conexion) => {
     let obj = new Object()
     obj.conexion = conexion
     obj.add = 1
-    db.insertTableContent('conexion', obj, (succ,msg) => {
-        console.log("conexion guardada")
-        this.recuperar_conexion()
+    db.insertTableContent('conexion_seleccionada', obj, (succ,msg) => {
+        console.log("conexion seleccionada guardada")
+        this.recuperarConexionSeleccionada();
     })
 }
 module.exports.actualizar_conexion = (id, conexion) => {
@@ -159,20 +226,25 @@ module.exports.actualizar_conexion = (id, conexion) => {
     let set = {
         "conexion": conexion
     };
-    db.updateRow('conexion', where, set, (succ, msg) => {
+    db.updateRow('conexion_seleccionada', where, set, (succ, msg) => {
         if (succ)
             console.log('se actualizo la conexion');
         else
             console.log("error")
-        this.recuperar_conexion()
+        // this.recuperarConexionSeleccionada()
     })
 };
 module.exports.recuperar_conexion = () => {
     db.getRows('conexion', {add:1}, (succ, data) => {
         const win = BrowserWindow.getFocusedWindow()
-        win.webContents.send('recuperar-conexion', data[0])
-        console.log("entro")
-        console.log(data[0])
+        win.webContents.send('recuperar-conexion', data)
+    })
+}
+
+module.exports.recuperarConexionSeleccionada = () => {
+    db.getRows('conexion_seleccionada', {add:1}, (succ, data) => {
+        const win = BrowserWindow.getFocusedWindow()
+        win.webContents.send('recuperar-conexion-seleccionada', data)
     })
 }
 
@@ -190,18 +262,38 @@ module.exports.actualizar_almacenamientoLocal = (id, dir) => {
     })
     console.log("se actualizo. dir "+dir)
 }
+module.exports.actualizar_almacenamientoUtil = (id, dir) => {
+    let where = {
+        "add": id
+    };
+    let set = {
+        "ruta": dir
+    };
+    db.updateRow('almacenamientoUtil', where, set, (succ, msg) => {
+        this.recuperar_almacenamientoUtil();
+
+    })
+    console.log("se actualizo. dir "+dir)
+}
+module.exports.eliminar_almacenamientoUtilidades = (id, arg) =>{
+    db.clearTable('utilidades',arg.dir,(succ, msg)=>{
+        console.log("informacion utilidad eliminada")
+    })
+}
 module.exports.recuperar_almacenamientoLocal = () =>{
     db.getRows('almacenamientos', {add:1},(succ, data)=>{
         const win = BrowserWindow.getFocusedWindow();
         win.webContents.send('recuperar-almacenamiento', data[0].ruta)
     })
 }
+module.exports.recuperar_almacenamientoUtil = () =>{
+    db.getRows('almacenamientoUtil', {add: 1}, (succ, data)=>{
+        const win = BrowserWindow.getFocusedWindow();
+        win.webContents.send('recuperar-almacenamientoUtil', data[0].ruta)
+    })
+}
 module.exports.crear_almacenamientoLocal = (dir)=> {
     db.getRows('almacenamientos', {add: 1}, (succ, data) => {
-        console.log("succ")
-        console.log(succ);
-        console.log("data")
-        console.log(data)
         if (data.length > 0) {
             this.actualizar_almacenamientoLocal(1,dir);
         }else{
@@ -220,6 +312,26 @@ module.exports.crear_almacenamientoLocal = (dir)=> {
         }
     })
 }
+module.exports.crear_almacenamientoUtil = (dir)=> {
+    db.getRows('almacenamientoUtil', {add: 1}, (succ, data) => {
+        if (data.length > 0) {
+            this.actualizar_almacenamientoUtil(1,dir);
+        }else{
+            let obj = new Object();
+            obj.ruta = dir;
+            obj.add  = 1;
+            db.insertTableContent('almacenamientoUtil', obj, (succ, msg)=>{
+                const notification = {
+                    title: 'Ruta Almacenada',
+                    body: 'La ruta de utilidades de TILK se ha registrado.',
+                    silent : false
+                }
+                const Noty = new Notification(notification)
+                Noty.show();
+            })
+        }
+    })
+}
 //creacion de base de datos
 module.exports.crear_db_usuarios = function () {
     db.createTable('usuarios', (succ, msg) => {
@@ -228,6 +340,10 @@ module.exports.crear_db_usuarios = function () {
 }
 module.exports.crear_db_conexiones = function () {
     db.createTable('conexion', (succ, msg) => {
+    })
+}
+module.exports.crear_db_conexion = function () {
+    db.createTable('conexion_seleccionada', (succ, msg) => {
     })
 }
 module.exports.crear_db_inicios = function () {
@@ -242,4 +358,39 @@ module.exports.crear_db_articulos = function () {
 module.exports.crear_db_almacenamientoLocal = function (){
     db.createTable('almacenamientos', (succ, msg) => {
     })
+}
+
+
+
+module.exports.crear_db_almacenamientoUtilidades = function (){
+    db.createTable('almacenamientoUtil', (succ, msg) => {
+
+    })
+}
+
+
+module.exports.descargarActualizacion = (data) =>{
+    let win = BrowserWindow.getFocusedWindow();
+
+    let nombre = path.basename(data.url)
+    let dir    = data.dir+'/'+nombre;
+    let options = {
+        url: data.url,
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application / octet-stream', // decirle al navegador que este es un archivo binario
+            'Content-Disposition': 'archivo adjunto; nombre de archivo =' + nombre, // Dígale al navegador que este es un archivo que debe descargarse
+        }
+    }
+    Log.info(data);
+    Log.info('dir');
+    Log.info(dir);
+    https.get(data.url, (res)=>{
+        let fileStream = fs.createWriteStream(dir);
+        res.pipe(fileStream);
+        fileStream.on('finish', () => {
+            fileStream.close();
+            win.webContents.send('descarga-version-terminada', dir)
+        })
+    });
 }

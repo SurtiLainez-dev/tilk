@@ -27,6 +27,9 @@
       <v-list-item v-if="PERMISOS.includes(149)" dense class="itemOpciones" @click="go('/ventas/canceladas')">
         Ventas Canceladas
       </v-list-item>
+      <v-list-item v-if="PERMISOS.includes(64)" class="itemOpciones" @click="go('/admin/cuentas')">
+        Editar Cuenta
+      </v-list-item>
     </v-list-group>
 
     <v-list-group v-if="PERMISOS.includes(147)">

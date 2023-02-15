@@ -59,6 +59,10 @@
                           <td>Permiso de Circulación</td>
                           <td><b-link @click="solicitarClave">Descargar Permiso</b-link></td>
                         </tr>
+                        <tr>
+                          <td>Cargar Expediente Completo</td>
+                          <td><b-link @click="infoExpedienteCompleto">Cargar Expediente</b-link></td>
+                        </tr>
                         </tbody>
                       </table>
 
@@ -112,7 +116,7 @@
                         <tr >
                           <td>Factura SAR</td>
                           <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.factura_sar">
-                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.factura_Sar)">Ver hoja de conocimiento</b-link></td>
+                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.factura_sar)">Ver hoja de conocimiento</b-link></td>
                           <td v-else>No hay documento</td>
                         </tr>
                         <tr >
@@ -647,6 +651,24 @@ export default {
         this.$store.commit('activarOverlay', false);
       })
     },
+    infoExpedienteCompleto(){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+        let data = {
+          token:     this.$store.state.token,
+          token_doc: res.data.clave,
+          data:      this.DATA_VENTA,
+          usuario:   this.USUARIO,
+          dir:       this.$store.state.DIRUTILIDADES,
+          url:       this.$axios.defaults.baseURL,
+        }
+        this.$store.commit('activarOverlay', false);
+        ipcRenderer.send('crear-utilidad', data);
+      }).catch((error)=>{
+        this.$store.commit('notificacion',{texto:'Ocurrio un error', color:'error'});
+        this.$store.commit('activarOverlay', false);
+      })
+    },
     mostrarPdf(url){
       ipcRenderer.send('pint_navegador', url);
     },
@@ -730,10 +752,6 @@ export default {
       this.$axios.post('leer_documento/',
           {ubicacion: url}).then((res)=>{
         if (res.status === 200){
-
-
-
-
           this.$store.commit('activarOverlay', false);
 
           this.dialogopdf = true;

@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pl-2">
+  <v-card flat class="pl-2">
     <div v-if="$store.state.vistaPrecioArticulo === 1">
       <v-row >
         <v-col md="3"><v-card-title>Inventario</v-card-title></v-col>
@@ -34,11 +34,33 @@
                         label="Buscar artículo" single-line hide-details></v-text-field>
         </v-col>
       </v-row>
-      <v-data-table :loading="isPeticon" @click:row="verInfo"
-                    loading-text="Cargando artículos... por favor espere un momento"
-                    :headers="header" :items="Inventario" :search="search" class="rowsTable">
 
-      </v-data-table>
+      <v-progress-linear indeterminate v-if="isPeticon"></v-progress-linear>
+      <table>
+        <thead>
+        <tr><th v-for="item in header" v-text="item.text"></th></tr>
+        </thead>
+        <tbody>
+        <tr @click="verInfo(item)" v-for="(item, i) in filterInventario" :key="i">
+          <td v-html="resaltarRows(item.codigo_sistema)"></td>
+          <td v-text="item.codigo_proveedor"></td>
+          <td v-html="resaltarRows(item.marca)"></td>
+          <td v-html="resaltarRows(item.modelo)"></td>
+          <td v-html="resaltarRows(item.nombre_articulo)"></td>
+          <td v-html="resaltarRows(item.fam)"></td>
+        </tr>
+        <tr>
+          <td colspan="6" class="text-center">------</td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="d-flex justify-end">
+        <v-pagination
+            v-model="page"
+            :length="paginas"
+            :total-visible="6"
+        ></v-pagination>
+      </div>
     </div>
     <div v-else-if="$store.state.vistaPrecioArticulo === 2">
       <v-row>
@@ -69,11 +91,11 @@ export default {
       data: [],
       search: '',
       header:[
-        {text:'Marcá',value:'marca'},
-        {text:'Módelo',value:'modelo'},
         {text:'Código Sístema',value:'codigo_sistema'},
-        {text:'Nombre del Artículo',value:'nombre_articulo'},
         {text:'Código Proveedor',value:'codigo_proveedor'},
+        {text:'Marca',value:'marca'},
+        {text:'Módelo',value:'modelo'},
+        {text:'Nombre del Artículo',value:'nombre_articulo'},
         {text:'Sub-familia',value:'fam'},
       ],
       show: false,
@@ -92,7 +114,11 @@ export default {
       modalArticulo:{
         state: false,
         info: null
-      }
+      },
+      resultados: 0,
+      paginas: 1,
+      page: 1,
+      filas: 100
     }
   },
   created() {
@@ -101,6 +127,30 @@ export default {
     this.cargarFamilias();
   },
   computed:{
+    filterInventario(){
+      let filtro = [];
+      filtro = this.Inventario.filter(fila => {
+        let codigo_s = fila.codigo_sistema.toString().toLowerCase();
+        let codigo_p = '';
+        if (fila.codigo_peoveedor)
+          codigo_p = fila.codigo_peoveedor.toString().toLowerCase();
+        let marca    = fila.marca.toString().toLowerCase();
+        let modelo   = fila.modelo.toString().toLowerCase();
+        let nombre   = fila.nombre_articulo.toString().toLowerCase();
+        let familia  = fila.fam.toString().toLowerCase();
+        let search   = this.search.toLowerCase()
+
+        return codigo_s.includes(search) || codigo_p.includes(search) || marca.includes(search) ||
+            modelo.includes(search) || nombre.includes(search) || familia.includes(search)
+      });
+      this.resultados = filtro.length;
+      if (filtro.length) {
+        this.paginas = Math.ceil(filtro.length / this.filas);
+        let inicio = (this.page - 1) * this.filas;
+        filtro = filtro.splice(inicio, this.filas)
+      }
+      return filtro;
+    },
     isPeticon(){
       return this.$store.state.inventario.load;
     },
@@ -175,6 +225,13 @@ export default {
       ipcRenderer.send('pint_navegador', url);
       this.$store.commit('activarOverlay', false);
     },
+    resaltarRows(text){
+      let exits = text.toLowerCase().includes(this.search.toLowerCase());
+      if (!exits) return text;
+
+      let reg = new RegExp(this.search, 'ig');
+      return text.replace(reg, textoRemarcado => `<strong>${textoRemarcado}</strong>`)
+    },
     solicitarClave(){
       this.$store.commit('activarOverlay', true);
       this.$axios.post('solicitar_clave_doucmento').then((res)=>{
@@ -199,5 +256,31 @@ export default {
 </script>
 
 <style scoped>
-
+table{
+  width: 100%;
+  border: solid #b2b0b0 1px;
+  cursor: pointer;
+}
+table thead tr th{
+  padding: 5px;
+  font-size: 14px;
+  border-left: solid #b2b0b0 1px;
+  border-bottom: solid #b2b0b0 1px;
+}
+table tbody tr td{
+  padding: 5px;
+  border-left: solid #b2b0b0 1px;
+  border-bottom: solid #b2b0b0 1px;
+  font-size: 12px;
+  cursor: pointer;
+}
+table caption{
+  caption-side: top;
+}
+table thead tr th:hover{
+  background-color: #f6f6f6;
+}
+table tbody tr:hover{
+  background-color: #f6f6f6;
+}
 </style>

@@ -60,6 +60,8 @@ export default {
         {text:'Módelo', value:'modelo'},
         {text:'Marca', value:'marca.nombre'},
         {text:'Proveedor', value:'marca.proveedor.nombre'},
+        {text:'Referencia 1', value:'codigo_barras'},
+        {text:'Referencia 2', value:'referencia_fabricante'},
       ]
     }
   },
