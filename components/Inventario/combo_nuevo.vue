@@ -111,6 +111,9 @@
                         :rules="[rules.req, rules.impuesto.menor]" @change="calcularPrecioContado"
                         label="Margen de ganancia"></v-text-field>
         </v-col>
+        <v-col>
+          <v-text-field dense class="ma-2" label="Cant. Max. de Uso" :rules="[rules.req, rules.impuesto.menor]"></v-text-field>
+        </v-col>
       </v-row>
     </v-form>
 
@@ -130,6 +133,10 @@
           <v-text-field suffix="meses" :rules="[rules.req]"
                         label="Máximo de meses a financiar" @change="asignarMesPrueba"
                         v-model="combo.maximo_meses" dense class="ma-2"></v-text-field>
+        </v-col>
+        <v-col>
+          <v-select label="Aceptar Venta sin Prima" v-model="combo.sin_prima"
+                    dense class="ma-2" :items="SinPrimas"></v-select>
         </v-col>
       </v-row>
     </v-form>
@@ -280,8 +287,13 @@ export default {
         {text:'Código Proveedor',value:'codigo_proveedor'},
         {text:'Sub-familia',value:'fam'},
       ],
+      SinPrimas: [
+        {text:'Si', value:1},
+        {text:'No', value:0}
+      ],
       combo:{
         sucursales: [],
+        cant_usadas: 0,
         sub_familia: '',
         fecha_final: '',
         articulos: [],
@@ -308,7 +320,8 @@ export default {
         total_credito: 0,
         amortizacion: [],
         nombre: '',
-        detalle: ''
+        detalle: '',
+        sin_prima: 0,
       },
       impuesto: '', //es el impuesto seleccionado por el cliente
       Impuestos: [], //son los impuestos registrados en tilk,
@@ -414,8 +427,8 @@ export default {
       }
     },
     cargarSubs(){
-      this.$axios.get('/2.0/carga_sub_familias/723').then((res)=>{
-        res.data.sub.forEach((item)=>{
+      this.$axios.get('2.0/cargar_sub_familias').then((res)=>{
+        res.data.subs.forEach((item)=>{
           this.subs.push({
             text: item.nombre +' - '+ item.familia_articulo.nombre,
             value: item.id
@@ -507,16 +520,17 @@ export default {
       this.combo.amortizacion = PAGOS;
     },
     registrarComobo(){
-      if (this.$refs.FormNuevoCombo1.validate() && this.$refs.FormNuevoCombo2.validate() && this.$refs.FormComboNuevo3){
+      if (this.$refs.FormNuevoCombo1.validate() && this.$refs.FormNuevoCombo2.validate() && this.$refs.FormComboNuevo3.validate()){
         let th = this.combo;
+        console.log(th);
         this.$store.commit('activarOverlay', true);
 
         this.$axios.post('2.0/combos',{
-          nombre:              th.nombre,
-          detalle:             th.detalle,
-          subfamilia:          th.sub_familia,
-          fecha_final:         th.fecha_final,
-          sucursales:          JSON.stringify(th.sucursales),
+          nombre:               th.nombre,
+          detalle:              th.detalle,
+          sub_familia_articulo: th.sub_familia,
+          fecha_final:          th.fecha_final,
+          sucursales:           JSON.stringify(th.sucursales),
           total_precio_contado: this.TotalPrecioContado,
           precio_contado:       th.precio_contado,
           precio_costo:         th.precio_costo,
@@ -524,8 +538,10 @@ export default {
           margen_ganancia:      th.margenUtilidad,
           financiamiento_anual: th.financiamiento_anual,
           impuesto_id:          th.impuesto_id,
-          meses:                th.maximo_meses,
-          articulos:            th.articulos
+          maximo_financiacion:  th.maximo_meses,
+          articulos:            th.articulos,
+          maximo_cant_usadas:   th.cant_usadas,
+          venta_sin_prima:      th.sin_prima
         }).then((res)=>{
           this.$store.commit('inventario/combos/cargar_COMBOS');
           this.$store.commit('activarOverlay', false);

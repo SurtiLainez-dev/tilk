@@ -63,6 +63,10 @@
     <v-card-text>Sí el artículo es un acuerdo de pago o algún servicio ofrecido por Surtidora Laínez que sea diferente a
     un artículo, presionar la casilla de abajo, ya que sino se selecciona el, se va a cargar al inventario.</v-card-text>
     <v-checkbox v-model="eliminar" dense label="No es un artículo"></v-checkbox>
+    <v-card-text>Sí es una anulación de cuennta por garantía. Presiona el siguiente checkbox. Se cargará el artículo
+    al inventario de reingreso, mientras que al cliente se le aplicará una nota de crédito por el saldo que a abonado a
+    capital.</v-card-text>
+    <v-checkbox v-model="garantia" dense label="Anulación por garantía"></v-checkbox>
     <v-card-text>Cuando registres esta anulación, ten en cuenta que la cuenta por cobrar del cliente quedará totalmente
     en 0 lps. Esto implica que está cuenta pasa a un estado de condonado.</v-card-text>
     <v-row no-gutters>
@@ -88,6 +92,7 @@ export default {
   data(){
     return{
       eliminar: false,
+      garantia: false,
       visible: true,
       int: new Intl.NumberFormat(),
       header:[
@@ -129,7 +134,10 @@ export default {
         remision:    this.CUENTA.contrato_cliente.remision_articulo.id,
         articulo_id: this.CUENTA.contrato_cliente.remision_articulo.articulo_id,
         total_articulo: this.cuenta.precio,
-        articulo:       !this.eliminar
+        articulo:       !this.eliminar,
+        garantia:       this.garantia,
+        saldo:          this.CUENTA.saldo_actual,
+        cliente:        this.CUENTA.cliente.id
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});

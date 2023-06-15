@@ -256,6 +256,32 @@
               </v-card>
             </v-card>
 
+            <v-card tile  flat v-if="vista === 6" class="d-flex justify-center ma-5">
+              <v-card width="30%" tile>
+                <v-card-title>Cuenta Nueva Ligada a una Sucursal</v-card-title>
+                <v-form ref="FormNuevaSubCuentaSucursal">
+                  <v-text-field dense disabled v-model="registros.datos.nombre"
+                                :rules="[rule.nombres.req]"
+                                label="Cuenta Padre" class="ma-2"></v-text-field>
+                  <v-text-field dense disabled v-model="registros.datos.cod"
+                                :rules="[rule.nombres.req]"
+                                label="Código de Cuenta Padre" class="ma-2"></v-text-field>
+                  <v-text-field dense :rules="[rule.nombres.req, rule.nombres.min, rule.nombres.max]"
+                                label="Nombre de la Nueva Cuenta" v-model="nuevaC.nombre"
+                                class="ma-2"></v-text-field>
+                  <v-text-field dense v-model="nuevaC.comentario" :rules="[rule.nombres.req]"
+                                label="Comentario de la Cuenta Nueva" class="ma-2"></v-text-field>
+                  <v-autocomplete label="Sucursal Enlazada" :rules="[rule.nombres.req]" :items="SUCURSALES"
+                                  :item-text="'nombre'" :item-value="'id'"
+                                  dense v-model="nuevaC.sucursal" class="ma-2"></v-autocomplete>
+                  <v-divider></v-divider>
+                  <v-card-actions class="d-flex justify-end">
+                    <v-btn color="success" @click="validarFormAddCCSucursal" tile small dark >Registrar Cuenta</v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card>
+            </v-card>
+
           </v-col>
 
 
@@ -310,6 +336,12 @@
         }else
           return [];
       },
+      LOAD_SUCURSALES(){
+        return this.$store.state.suc.LOAD_SUCURSALES;
+      },
+      SUCURSALES(){
+        return this.$store.state.suc.SUCURSALES;
+      }
     },
     data(){
       return{
@@ -319,7 +351,8 @@
           nombre:     '',
           comentario: '',
           total:       0,
-          sucursales:  false
+          sucursales:  false,
+          sucursal: ''
         },
         field:[
           {key:'cod', label:'Código'},
@@ -368,11 +401,12 @@
         itemHistorial: 5,
         itemSubs:      5,
         btns:[
-          {color:'pink darken-1',        text: 'Ver Historial',    icon: 'fa fa-history',      val: 1},
-          {color:'indigo darken-1',      text: 'Ver Sub-cuentas',  icon: 'fa fa-sitemap',      val: 2},
-          {color:'teal darken-1',        text: 'Crear Registro',  icon: 'fa-solid fa-pen',    val: 3},
-          {color:'deep-orange darken-1', text: 'Crear Obligación',  icon: 'fa fa-sign-out-alt', val: 4},
-          {color:'blue-grey darken-1',   text: 'Crear Sub-cuenta', icon: 'fa fa-plus',         val: 5},
+          {color:'pink darken-1',        text: 'Ver Historial',                            icon: 'fa fa-history',      val: 1},
+          {color:'indigo darken-1',      text: 'Ver Sub-cuentas',                          icon: 'fa fa-sitemap',      val: 2},
+          {color:'teal darken-1',        text: 'Crear Registro',                           icon: 'fa-solid fa-pen',    val: 3},
+          {color:'deep-orange darken-1', text: 'Crear Obligación',                         icon: 'fa fa-sign-out-alt', val: 4},
+          {color:'blue-grey darken-1',   text: 'Crear Sub-cuenta',                         icon: 'fa fa-plus',         val: 5},
+          {color:'blue-grey darken-1',   text: 'Crear Sub-cuenta - Ligada a una sucursal', icon: 'fa fa-plus',         val: 6},
         ],
         rule:{
           nombres:{
@@ -398,6 +432,7 @@
     created() {
       this.$store.commit('guardarTitulo', 'Contabilidad > Catálogo Contable');
       this.$store.commit('contabilidad/catalogo/cargar_CUENTAS');
+      this.$store.commit('suc/cargar_SUCURSALES');
     },
     methods:{
       abrirNavegador(clave){
@@ -470,6 +505,34 @@
         }, 3000);
       })
       },
+      nuevaCuentaSucursal(){
+        this.$store.commit('activarOverlay', true);
+        this.registros.dialogo = false;
+        this.$axios.post('contabilidad/2.0/cuenta_sucursal',{
+          cod_dep:    this.registros.datos.cod,
+          nombre:     this.nuevaC.nombre,
+          comentario: this.nuevaC.comentario,
+          sucursales: this.nuevaC.sucursales,
+          sucursal:   this.nuevaC.sucursal
+      }).then((res)=>{
+        this.nuevaC.nombre     = '';
+        this.nuevaC.comentario = '';
+        this.nuevaC.sucursal   = '';
+        this.$store.commit('contabilidad/catalogo/cargar_CUENTAS');
+        this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
+        setTimeout(()=>{
+          this.$store.commit('activarOverlay', false);
+          this.vista = 0;
+        }, 3000);
+      }).catch((error)=>{
+          console.log(error)
+          this.registros.dialogo = true;
+          this.$store.commit('activarOverlay', false);
+          if (error.response.status == 422) {
+            this.$store.commit('notificacion',{texto:error.response.data.msj, color:'error'});
+          }
+        })
+      },
       printRegistros(){
         this.$store.commit('activarOverlay', true);
         this.registros.dialogo = false;
@@ -508,6 +571,10 @@
       validarForm(){
         if (this.$refs.FormNuevaSubCuenta.validate())
           this.nuevaCuenta()
+      },
+      validarFormAddCCSucursal(){
+        if (this.$refs.FormNuevaSubCuentaSucursal.validate())
+          this.nuevaCuentaSucursal()
       },
       validarFormObligacion(){
         if (this.$refs.FormOnligacionContableNueva.validate())

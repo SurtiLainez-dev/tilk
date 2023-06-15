@@ -4,6 +4,7 @@
       <v-toolbar flat>
         <h6>Cuentas de Clientes de SURTIDORA LAÍNEZ</h6>
         <v-spacer></v-spacer>
+        <v-btn tile small text icon color="indigo" class="ma-2 mb-4" @click="cargarCuentas"><v-icon small>fa fa-sync</v-icon></v-btn>
         <v-text-field label="Buscar Cuenta" dense v-model="search"></v-text-field>
       </v-toolbar>
 

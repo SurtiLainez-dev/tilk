@@ -6,7 +6,7 @@
               <v-spacer></v-spacer>
               <v-spacer></v-spacer>
               <v-spacer></v-spacer>
-              <v-text-field dense label="Buscar... " v-model="search"></v-text-field>
+              <v-text-field dense label="Buscar... " @keyup.enter="buscarDatos" v-model="search"></v-text-field>
             </v-toolbar>
             <v-data-table :headers="header"
                           :search="search"
@@ -82,9 +82,12 @@
         created() {
             this.vista = 1;
             this.$store.commit('guardarTitulo', 'Facturación > Solicitudes de Crédito');
-            this.$store.commit('solicitud_credito/cargarSolicitudes');
+            this.$store.commit('solicitud_credito/cargarSolicitudes',{tipo: 1, search: null});
         },
         methods:{
+            buscarDatos(){
+                this.$store.commit('solicitud_credito/cargarSolicitudes',{tipo: 2, search: this.search});
+            },
             SeleccionarSolicitud(item){
                 this.$store.commit('solicitud_credito/datoSolicitud', item);
                 this.vista     = 2;

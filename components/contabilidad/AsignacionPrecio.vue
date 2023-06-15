@@ -115,8 +115,8 @@
                 <v-form ref="FormVerificarMargenUtilidadAnual">
                   <v-row>
                     <v-col>
-                      <v-text-field label="Precio de Contado" v-model="Precio.precioContado"
-                                    disabled suffix="lps"></v-text-field>
+                      <v-text-field label="Precio Normal de Contado" v-model="Precio.precioContado"
+                                    suffix="lps" disabled></v-text-field>
                     </v-col>
                     <v-col>
                       <v-text-field v-model="Precio.financiamientoAnual" :suffix="Precio.financiamientoMensual+'%'"
@@ -134,11 +134,34 @@
                       <v-text-field label="Prima" disabled v-model="Precio.prima" suffix="lps"></v-text-field>
                     </v-col>
                     <v-col>
-                      <v-text-field label="Descuento en LPS" suffix="lps" v-model="Precio.descuento"></v-text-field>
+                      <v-text-field label="Descuento en LPS - Precio Normal" suffix="lps" v-model="Precio.descuento"></v-text-field>
                     </v-col>
                     <v-col>
                       <v-text-field label="Maximo de meses a financiar" suffix="meses" :rules="[rules.impuesto.req,rules.impuesto.m]"
                                     v-model="Precio.maximo_meses"></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col>
+                      <v-text-field suffix="lps" label="Mejor Precio de Contado" disabled
+                                    :value="(parseFloat(Precio2.impuesto)+parseFloat(Precio2.margenGanancia)+parseFloat(Precio.precio_s_i)).toFixed(2) - Precio.descuento"></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-text-field suffix="lps" label="Precio de Temporada" v-model="Precio.precio_promocion"></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-dialog ref="dialogFechaFinalPromocion" v-model="Precio.dialogoPrecioPromocio" :return-value.sync="Precio.fecha_final"
+                                persistent width="290px">
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field label="Fecha Final Promoción" v-bind="attrs" v-on="on"
+                                        v-model="Precio.fecha_final"></v-text-field>
+                        </template>
+                        <v-date-picker v-model="Precio.fecha_final" scrollable>
+                          <v-spacer></v-spacer>
+                          <v-btn text color="primary" @click="Precio.dialogoPrecioPromocio = false">Cancelar</v-btn>
+                          <v-btn text color="primary" @click="$refs.dialogFechaFinalPromocion.save(Precio.fecha_final)">OK</v-btn>
+                        </v-date-picker>
+                      </v-dialog>
                     </v-col>
                   </v-row>
                   <v-row no-gutters>
@@ -396,7 +419,10 @@
           precio_contado_pagos: false,
           pcp_pagos: 0,
           pcp_cuota: 0,
-          maximo_meses: 1
+          maximo_meses: 1,
+          fecha_final: '',
+          precio_promocion: 0,
+          dialogoPrecioPromocio: false,
         },
         Precio2:{
           margenGanancia: 0,

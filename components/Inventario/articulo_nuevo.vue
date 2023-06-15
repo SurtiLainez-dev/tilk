@@ -524,6 +524,12 @@ export default {
             // this.$router.replace({path:'/inventario/'})
             // this.$store.commit('quitar_pestania', 8)
           }
+        }).catch((error)=>{
+          if (error.response.status === 422) {
+            this.$store.commit('notificacion',{texto:error.response.data.msj, color:'error'})
+            this.$store.commit('notificacion',{texto: 'Si la marca ya existe en un proveedor, tienes que crearla en otro proveedor para poder crear este artículo', color:'warning'})
+          }
+          this.overlay = false;
         })
       }
     },

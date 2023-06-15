@@ -7,7 +7,7 @@
 <script>
 
 export default {
-  // components:{pdf},
+
   name: "completo",
   data(){
     return{

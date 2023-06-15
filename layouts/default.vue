@@ -10,6 +10,10 @@
             <v-btn width="15px" height="15px" @click="$store.commit('quitar_pestania', item.valor)"
                    fab color="indigo" dark v-if="item.key > 0"> <small>x</small>
             </v-btn>
+            <v-btn class="ml-3 border" width="5px" height="15px" @click="$store.commit('cambiar_MENU')"
+                   fab color="success" dark v-if="!$store.state.MENU" icon>
+              <v-icon>mdi-menu</v-icon>
+            </v-btn>
           </div>
         </v-tab>
       </v-tabs>
@@ -30,6 +34,7 @@
           <motocicletas v-if="i.key === 9"/>
           <ordenes_entradas v-if="i.key === 10"/>
           <guia_remision_entradas v-if="i.key === 11"/>
+          <gastos_index v-if="i.key === 12"/>
         </v-tab-item>
       </v-tabs-items>
 
@@ -86,6 +91,7 @@ import articulo_nuevo from "@/components/Inventario/articulo_nuevo";
 import motocicletas from "@/components/Inventario/motocicletas.vue";
 import ordenes_entradas from "@/components/Inventario/ordenes_entradas.vue";
 import guia_remision_entradas from "@/components/Inventario/guia_remision_entradas.vue";
+import gastos_index from "@/components/contabilidad/gastos_index.vue";
 export default {
   watch: {
     over (val) {
@@ -96,7 +102,7 @@ export default {
   components:{
     Motocicletas, NuxtLoading, side, Cuerpo, caja, cobros: inicio ,
     motocicletas, to_do_inidex, perfiles, cuentas, inventario, guia_remision_entradas,
-    editar_inventario, articulo_nuevo, ordenes_entradas, },
+    editar_inventario, articulo_nuevo, ordenes_entradas,gastos_index },
   data(){
     return{
       dia: true,

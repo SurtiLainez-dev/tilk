@@ -61,7 +61,7 @@
                     </v-list-item-icon>
 
                     <v-list-item-content>
-                      <v-list-item-title v-text="'Llamados de Atención'"></v-list-item-title>
+                      <v-list-item-title v-text="'Notificaciones Laborales'"></v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
 
@@ -91,11 +91,12 @@
           </v-card>
         </v-col>
         <v-col>
-          <inicio     v-if="VISTA === 1" />
-          <contratos  v-else-if="VISTA === 2" />
-          <planillas  v-else-if="VISTA === 3" />
-          <contrasena v-else-if="VISTA === 6" />
-          <ordenes v-else-if="VISTA === 7"/>
+          <inicio             v-if="VISTA === 1" />
+          <contratos          v-else-if="VISTA === 2" />
+          <planillas          v-else-if="VISTA === 3" />
+          <mis_notificaciones v-else-if="VISTA === 5"/>
+          <contrasena         v-else-if="VISTA === 6" />
+            <ordenes          v-else-if="VISTA === 7"/>
         </v-col>
       </v-row>
     </v-card>
@@ -109,6 +110,7 @@ import contratos from "../../../components/mi_perfil/contratos";
 import planillas from "../../../components/mi_perfil/planillas";
 import contrasena from "../../../components/mi_perfil/contrasena";
 import ordenes from "@/components/mi_perfil/ordenes";
+import mis_notificaciones from "@/components/mi_perfil/mis_notificaciones.vue";
 export default {
   name: "mi_perfil",
   components:{
@@ -116,7 +118,8 @@ export default {
     contratos,
     planillas,
     contrasena,
-    ordenes
+    ordenes,
+    mis_notificaciones
   },
   computed:{
     USER(){

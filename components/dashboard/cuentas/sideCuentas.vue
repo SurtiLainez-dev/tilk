@@ -30,6 +30,12 @@
       <v-list-item v-if="PERMISOS.includes(64)" class="itemOpciones" @click="go('/admin/cuentas')">
         Editar Cuenta
       </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/ventas/prospectos')">
+        Prospectos
+      </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/ventas/ventas_x_col')">
+        Vista Ventas
+      </v-list-item>
     </v-list-group>
 
     <v-list-group v-if="PERMISOS.includes(147)">

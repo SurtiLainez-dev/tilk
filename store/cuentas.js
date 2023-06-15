@@ -10,7 +10,8 @@ export const state = () => ({
     VENTAS_REV_DOC: [],
     VENTA_REV_DOC: {},
     LOAD_CUENTAS_REV_DOC: false,
-    LOADCUENTAS: false
+    LOADCUENTAS: false,
+    VENTASVV: []
 })
 
 export const mutations = {
@@ -34,6 +35,13 @@ export const mutations = {
             state.VENTA_REV_DOC = res.data.venta;
             state.LOAD_CUENTAS_REV_DOC = false;
         })
+    },
+    cargar_VENTAS_VISTA(state, fechas){
+      state.LOADCUENTAS = true;
+      this.$axios.get(`ventas/f/fecha_inicial/${fechas.inicio}/fecha_final/${fechas.final}`).then((res)=>{
+        state.VENTASVV     = res.data.ventas;
+        state.LOADCUENTAS = false;
+      })
     },
     estado_LOAD_CUENTAS_REV_DOC(state, estado){
       state.LOAD_CUENTAS_REV_DOC = estado;

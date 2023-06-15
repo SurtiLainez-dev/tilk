@@ -48,6 +48,8 @@
           <v-chip color="orange" x-small v-if="CUENTA.estado === 1" dark>Al día</v-chip>
           <v-chip color="red" x-small v-else-if="CUENTA.estado === 2" dark>Mora</v-chip>
           <v-chip color="success" x-small v-else-if="CUENTA.estado === 3" dark>Cancelada</v-chip>
+          <v-chip color="success" x-small v-else-if="CUENTA.estado === 5" dark>Condonado</v-chip>
+          <v-chip color="red" x-small v-else-if="CUENTA.estado === 6" dark>Cancelado por Falta de Pago</v-chip>
           <v-chip color="indigo" x-small v-else-if="CUENTA.estado === 4" dark>Pendiente por aceptar</v-chip>
         </td>
       </tr>
@@ -63,14 +65,14 @@
           <v-chip color="orange" x-small v-else-if="CUENTA.is_aceptado === 3" dark>Pendiente</v-chip>
         </td>
       </tr>
-      <tr>
+<!--      <tr>-->
 <!--        <th>Cuenta registrada en portafolio</th>-->
 <!--        <td>-->
 <!--          <v-chip color="success" x-small v-if="verificar === 1" dark>Sí</v-chip>-->
 <!--          <v-chip color="red" x-small v-else-if="verificar === 0" dark>No</v-chip>-->
 <!--          <v-btn v-if="verificar === 0" color="indigo" x-small dark @click="registrarCuentaPortafolio" tile>Registrar en portafolio</v-btn>-->
 <!--        </td>-->
-      </tr>
+<!--      </tr>-->
       </tbody>
     </template>
   </v-simple-table>

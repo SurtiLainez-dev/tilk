@@ -49,7 +49,7 @@
       <v-list-item dense class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pagos/')">
         Pagos Realizados
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(411)" dense class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pagos/nuevo')">
+      <v-list-item v-if="PERMISOS.includes(49)" dense class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pagos/nuevo')">
         Realizar Pago a Proveedor
       </v-list-item>
       <v-list-item dense class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/pagos/lista')">
@@ -68,9 +68,23 @@
       methods:{
         go(url){
           this.$router.push(url)
-        }
+        },
+        anadirPestana(key, titulo){
+          let bandera = 0;
+          this.Pes.forEach((item)=>{
+            if (item.key === key)
+              bandera++;
+          });
+          if (bandera === 0){
+            this.$store.commit('anadirCaja', {titulo:titulo, key: key});
+            this.$store.commit('cambiarTab', {val:key, tipo:false});
+          }
+        },
       },
       computed:{
+        Pes(){
+          return this.$store.state.pestana
+        },
         PERMISOS(){
           let permisos = this.$store.state.permisosUser.split(',');
           let per = [];
@@ -82,7 +96,7 @@
           }else
             return [];
         },
-      }
+      },
     }
 </script>
 

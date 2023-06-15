@@ -21,10 +21,40 @@ export const mutations = {
             val = state.segunda_peticion;
 
         this.$axios.get('consultar_articulo/'+state.valor_peticion+'/'+val).then((res)=>{
-            if (res.status === 200){
-                state.data = res.data.inventario;
-                state.load = false;
+            state.data = [];
+            if (res.data.inventario){
+                res.data.inventario.forEach(item=>{
+                    state.data.push({
+                        codigo_sistema:   item.codigo_sistema,
+                        codigo_proveedor: item.codigo_proveedor,
+                        marca:            item.marca,
+                        modelo:           item.modelo,
+                        nombre_articulo:  item.nombre_articulo,
+                        fam:              item.fam,
+                        combo:            false,
+                        articulo:         item.articulo,
+                        descripcion_corta: item.descripcion_corta
+                    })
+                })
             }
+
+            if (res.data.combos){
+                res.data.combos.forEach(item=>{
+                    state.data.push({
+                        codigo_sistema:   item.codigo,
+                        codigo_proveedor: item.codigo_proveedor,
+                        marca:            'Surti Lainez',
+                        modelo:           'Surti Lainez',
+                        nombre_articulo:  item.nombre,
+                        fam:              item.fam,
+                        combo:            true,
+                        articulo:         item.id,
+                        descripcion_corta: item.detalle
+                    })
+                })
+            }
+
+            state.load = false;
         })
 
     },

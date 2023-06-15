@@ -15,7 +15,7 @@
           <th>{{i+1}}</th>
           <td>{{item.fecha}}</td>
           <td>
-            <b-link @click="solicitarClave(item.codigo)">{{item.codigo}}</b-link>
+            <b-link @click="solicitarClave(item.codigo, item.file)">{{item.codigo}}</b-link>
           </td>
           <td>L {{item.total}}</td>
         </tr>
@@ -39,17 +39,20 @@ export default {
     }
   },
   methods:{
-    abrirNavegador(clave, recibo){
-      let url = '';
-      url = this.$axios.defaults.baseURL + 'documentos/cajas/recibos/usuario=' + this.USUARIO + '/recibo=' + recibo + '/' + clave;
+    abrirNavegador(clave, recibo, tipo){
+    let url = '';
+    if(!tipo || tipo == 1)
+        url = this.$axios.defaults.baseURL + 'documentos/cajas/recibos/usuario=' + this.USUARIO + '/recibo=' + recibo + '/' + clave;
+    else if(tipo == 2)
+        url = this.$axios.defaults.baseURL + 'documentos/cajas/recibo_dxc/usuario=' + this.USUARIO + '/recibo=' + recibo + '/' + clave;
 
-      ipcRenderer.send('pint_navegador', url);
-      this.$store.commit('activarOverlay', false);
+    ipcRenderer.send('pint_navegador', url);
+    this.$store.commit('activarOverlay', false);
     },
-    solicitarClave(recibo){
+    solicitarClave(recibo, tipo){
       this.$store.commit('activarOverlay', true);
       this.$axios.post('solicitar_clave_doucmento').then((res)=>{
-        this.abrirNavegador(res.data.clave, recibo);
+        this.abrirNavegador(res.data.clave, recibo, tipo);
       }).catch((error)=>{
         this.$store.commit('notificacion',{texto:'Ocurrio un error', color:'error'});
         this.$store.commit('activarOverlay', false);

@@ -11,6 +11,9 @@
       <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="anadirPestana(9, 'Inventario de Motocicletas')">
         Motocicletas
       </v-list-item>
+      <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="anadirPestana(9, 'Inventario de Combos')">
+        Motocicletas
+      </v-list-item>
       <v-list-item v-if="PERMISOS.includes(310)"  dense class="itemOpciones" @click="anadirPestana(8, 'Crear Artículo')">
         Crear Artículo
       </v-list-item>
@@ -42,6 +45,9 @@
       </v-list-item>
       <v-list-item v-if="PERMISOS.includes(39)" dense class="itemOpciones" @click="go('/inventario/peps')">
         Movimientos
+      </v-list-item>
+      <v-list-item v-if="PERMISOS.includes(314)"  dense class="itemOpciones" @click="go('/inventario/articulos/x_sucursal')">
+        Inventario x Sucursal
       </v-list-item>
     </v-list-group>
     <v-list-group v-if="PERMISOS.includes(311) || PERMISOS.includes(32) || PERMISOS.includes(37) || PERMISOS.includes(31)">

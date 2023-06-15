@@ -4,7 +4,7 @@
       <template v-slot:activator value="true">
         <v-list-item-title>Gastos</v-list-item-title>
       </template>
-      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/gastos/')">
+      <v-list-item dense class="itemOpciones" @click="anadirPestana(12, 'Ordenes de Entrada')">
         Ver Gastos
       </v-list-item>
       <v-list-item dense class="itemOpciones" @click="go('/contabilidad/gastos/nuevo')">
@@ -17,10 +17,26 @@
 <script>
 export default {
   name: "gastos",
+  computed:{
+    Pes(){
+      return this.$store.state.pestana
+    },
+  },
   methods:{
     go(url){
       this.$router.push(url)
-    }
+    },
+    anadirPestana(key, titulo){
+      let bandera = 0;
+      this.Pes.forEach((item)=>{
+        if (item.key === key)
+          bandera++;
+      });
+      if (bandera === 0){
+        this.$store.commit('anadirCaja', {titulo:titulo, key: key});
+        this.$store.commit('cambiarTab', {val:key, tipo:false});
+      }
+    },
   }
 }
 </script>

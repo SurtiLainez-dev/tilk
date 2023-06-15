@@ -104,6 +104,39 @@
 
         <v-divider></v-divider>
         <v-card-text>Descuento que se puede aplicar L. {{descuento.inicial}}</v-card-text>
+
+        <v-card tile v-if="isMoto">
+          <v-card-text>
+            El cobro de matricula se cobra automaticamente, al saldo final se le resta la matricula. Si le
+            autorizaron descuento rebajando el saldo de la matricula, por favor seleccione editat cobro de matricula
+            y coloque el saldo nuevo de la matricula que se va a cobrar al cliente. El saldo final de la venta no se
+            verá reflejada en este momento, se reflejará hasta que se realice la facturación. Si la moto es de segunda
+            por favor, cambie el valor de cobro de matricula. A las motos de segunda no se les cobra matricula.
+          </v-card-text>
+          <v-simple-table dense>
+            <thead>
+            <tr>
+              <th>Cobro de Matricula</th>
+              <th>Editar Cobro de Matricula</th>
+              <th>Cobro de Matricula</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>
+                <v-switch dense v-model="cobroMatricula"></v-switch>
+              </td>
+              <td>
+                <v-switch dense v-model="editMatricula"></v-switch>
+              </td>
+              <td>
+                <v-text-field dense v-model="matricula" :disabled="!editMatricula"></v-text-field>
+              </td>
+            </tr>
+            </tbody>
+          </v-simple-table>
+        </v-card>
+
         <br>
         <v-alert dense type="warning" class="ma-2" border="left" outlined dismissible dark>Recuerda que solo puedes facturar <strong>un artículo</strong>, para cosas pequeñas, se debe facturar en caja.</v-alert>
       </v-card>
@@ -151,7 +184,7 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-col cols="7">
+              <v-col cols="5">
                 <v-row no-gutters style="border: solid 1px #000">
                   <v-col class="d-flex justify-end">
                     <span class="ma-2" style="font-size: 13px"><strong>Sub-total:</strong></span>
@@ -168,20 +201,20 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="5">
+              <v-col cols="7">
                 <v-row no-gutters style="border: solid 1px #000">
                   <v-col class="d-flex justify-end">
-                    <span class="ma-2" style="font-size: 13px"><strong>L {{Venta.sub_total}}</strong></span>
+                    <span class="ma-2" style="font-size: 13px"><strong>L {{int.format(Venta.sub_total)}}</strong></span>
                   </v-col>
                 </v-row>
                 <v-row no-gutters style="border: solid 1px #000">
                   <v-col class="d-flex justify-end">
-                    <span class="ma-2" style="font-size: 13px"><strong>L {{Venta.impuesto}}</strong></span>
+                    <span class="ma-2" style="font-size: 13px"><strong>L {{int.format(Venta.impuesto)}}</strong></span>
                   </v-col>
                 </v-row>
                 <v-row no-gutters style="border: solid 1px #000">
                   <v-col class="d-flex justify-end">
-                    <span class="ma-2" style="font-size: 13px"><strong>L {{Venta.total}}</strong></span>
+                    <span class="ma-2" style="font-size: 13px"><strong>L {{int.format(Venta.total)}}</strong></span>
                   </v-col>
                 </v-row>
               </v-col>
@@ -534,7 +567,11 @@ export default {
       loadArticulos: false,
       ArticulosI: [],
       Colaboradores: [],
-      loadColaborador: false
+      loadColaborador: false,
+      isMoto: false,
+      cobroMatricula: true,
+      editMatricula: false,
+      matricula: 0
     }
   },
   created() {
@@ -551,6 +588,7 @@ export default {
   methods:{
     addLineaArticulo(data){
       this.tipoVenta = 1;
+      this.isMoto    = false;
       if (data.articulo.precio_activo){
         if (data.articulo.is_motocicleta !== 1){
           this.Venta.filas.push({
@@ -609,13 +647,14 @@ export default {
       });
 
       this.tipoVenta = data.remision_articulo.estado_articulo_id;
+      this.isMoto = true;
 
       this.sumarTotalFactura(data.estado_articulo_id);
       this.descuento.inicial = this.Venta.filas.reduce((total, item) => total + item.descuento, 0);
       this.dialogoBusqueda = false;
     },
     addLineaRemision(data){
-      console.log(data)
+      this.isMoto = false;
       if (data.articulo.is_motocicleta !== 1){
         this.Venta.filas.push({
           key: this.Venta.filas.length,
@@ -789,7 +828,11 @@ export default {
         filas:       this.Venta.filas,
         regalias:    this.Venta.regalias,
         descuento:   this.descuento.aplicado,
-        tipoVenta:   this.tipoVenta
+        tipoVenta:   this.tipoVenta,
+        isMoto:      this.isMoto,
+        matricula:   this.matricula,
+        editMatricula:  this.editMatricula,
+        cobroMatricula: this.cobroMatricula
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.notificacion(res.data.msj,'success');

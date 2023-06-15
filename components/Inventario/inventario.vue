@@ -72,7 +72,8 @@
           <small>[{{data.descripcion_corta}}]</small>
         </v-col>
       </v-row>
-      <info :data="data"/>
+      <info v-if="!data.combo" :data="data"/>
+      <combo_vista_venta v-else-if="data.combo" :combo="data"/>
     </div>
   </v-card>
 </template>
@@ -80,11 +81,13 @@
 <script>
 import {ipcRenderer} from "electron";
 import info from "@/components/Inventario/info";
+import combo_vista_venta from "@/components/Inventario/combos/combo_vista_venta.vue";
 
 export default {
   name: "inventario",
   components:{
-    info
+    info,
+    combo_vista_venta
   },
   data(){
     return{
@@ -130,10 +133,11 @@ export default {
     filterInventario(){
       let filtro = [];
       filtro = this.Inventario.filter(fila => {
-        let codigo_s = fila.codigo_sistema.toString().toLowerCase();
+        let codigo_s = fila.codigo_sistema.toString()
         let codigo_p = '';
         if (fila.codigo_peoveedor)
           codigo_p = fila.codigo_peoveedor.toString().toLowerCase();
+
         let marca    = fila.marca.toString().toLowerCase();
         let modelo   = fila.modelo.toString().toLowerCase();
         let nombre   = fila.nombre_articulo.toString().toLowerCase();

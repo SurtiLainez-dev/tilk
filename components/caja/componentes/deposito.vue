@@ -25,7 +25,7 @@
         <v-toolbar dense flat><v-card-title>Datos del depósito</v-card-title></v-toolbar>
         <v-divider></v-divider>
         <v-form ref="FormDepositoCliente">
-          <v-text-field v-if="cuenta.length > 0" class="ma-2" dense :value="cuenta[0].cliente.nombres+' '+cuenta[0].cliente.apellidos" label="Nombre Completo" disabled></v-text-field>
+          <v-text-field v-if="cuenta.length > 0" class="ma-2" dense :value="cuenta[0].nombres+' '+cuenta[0].apellidos" label="Nombre Completo" disabled></v-text-field>
           <v-text-field v-else class="ma-2" dense  label="Nombre Completo" disabled></v-text-field>
           <v-text-field v-if="cuenta.length > 0" class="ma-2" dense :value="cuenta[0].cod" label="# de Cuenta" disabled></v-text-field>
           <v-text-field v-else class="ma-2" dense label="# de Cuenta" disabled></v-text-field>
@@ -82,9 +82,9 @@ export default {
       },
       header:[
         {text:'Cuenta', value:'cod'},
-        {text:'Nombres', value:'cliente.nombres'},
-        {text:'Apellidos', value:'cliente.apellidos'},
-        {text:'Identidad', value:'cliente.identidad'},
+        {text:'Nombres', value:'nombres'},
+        {text:'Apellidos', value:'apellidos'},
+        {text:'Identidad', value:'identidad'},
       ]
     }
   },

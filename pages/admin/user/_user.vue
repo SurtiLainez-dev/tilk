@@ -133,6 +133,9 @@
                 <template v-slot:item.user_id="{item}">
                   {{User.usuario}}
                 </template>
+                <template v-slot:item.nombre="{item}">
+                  <strong>{{item.nombre}}</strong> - {{item.modulo}}
+                </template>
                 <template v-slot:item.estado="{item}" >
                   <div class="d-flex justify-center">
                     <v-checkbox v-model="item.estado" @click="item.estado = !item.estado"></v-checkbox>

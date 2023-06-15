@@ -44,7 +44,7 @@
           </td>
           <td  v-if="HISTORIAL.revisado === 1" colspan="2"><v-chip x-small color="success" dark>Sí</v-chip></td>
           <td colspan="2" v-else>
-            <v-chip x-small color="red" dark>No</v-chip> <b-link @click="dialogoRevision = true">Terminar Revisión</b-link>
+            <v-chip x-small color="red" dark>No</v-chip> <b-link v-if="tipo === 1" @click="dialogoRevision = true">Terminar Revisión</b-link>
           </td>
         </tr>
         </tbody>
@@ -209,7 +209,8 @@ export default {
   props:{
     anio: Number,
     mes: Number,
-    dia: Number
+    dia: Number,
+    tipo: Number
   },
   data(){
     return{

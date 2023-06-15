@@ -541,7 +541,8 @@ export default {
         else{
           this.notificacion('Esta cuenta aún tiene pagos pendientes','success');
         }
-        this.verDocumento(res.data.file)
+        let url = this.$axios.defaults.baseURL+'documentos/cajas/factura/usuario='+this.USUARIO+'/factura='+res.data.contador+'/'+res.data.token;
+        ipcRenderer.send('pint_navegador', url);
       }).catch((error)=>{
         this.$store.commit('activarOverlay', false);
         if (error.response.data.status === 422)

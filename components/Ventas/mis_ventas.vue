@@ -104,7 +104,7 @@
                         <tr >
                           <td>Carta poder</td>
                           <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.carta_poder">
-                            <b-link @click="verDocumento(documento_ventas.carta_poder)">Ver hoja de conocimiento</b-link></td>
+                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.carta_poder)">Ver hoja de conocimiento</b-link></td>
                           <td v-else>No hay documento</td>
                         </tr>
                         <tr >
@@ -698,7 +698,8 @@ export default {
         if (decision === 1) {
           this.notificacion('Se han realizado todos los procedicimientos para la venta', 'success');
           this.notificacion('Se le va enviar esta venta al correo: '+this.Colaborador, 'success');
-          this.OrdenEntrada_id = res.data.orden;
+          if (res.data.orden)
+            this.OrdenEntrada_id = res.data.orden;
         }
         else
           this.notificacion('Se ha cancelado la venta exitosamente','success');
@@ -723,17 +724,18 @@ export default {
       })
     },
     ValidarDatos(decision){
-      this.registrarVenta(decision);
-      if (this.DATA_VENTA.is_aceptado === 1 && this.DATA_VENTA.estado === 4)
-        if (this.Colaborador)
-          if (this.Direccion)
+      // this.registrarVenta(decision);
+      if (this.DATA_VENTA.is_aceptado === 1 && this.DATA_VENTA.estado === 4) {
+        if (this.Colaborador) {
+          if (this.Direccion) {
             this.registrarVenta(decision);
-          else
-            this.notificacion('Tienes que seleccionar una dirección de envio.','error');
-        else
-          this.notificacion('Tienes que seleccionar al colaborador que va a recibir la venta','error');
-      // else
-      //   this.notificacion('Esta venta no se puede registrar de ninguna manera','error');
+          }else {
+            this.notificacion('Tienes que seleccionar una dirección de envio.', 'error');
+          }
+        }else {
+          this.notificacion('Tienes que seleccionar al colaborador que va a recibir la venta', 'error');
+        }
+      }
     },
     verDocumento(url){
       this.$store.commit('activarOverlay', true);

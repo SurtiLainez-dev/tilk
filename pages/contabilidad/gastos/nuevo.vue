@@ -27,7 +27,7 @@
               </tr>
               </thead>
               <tbody>
-              <tr v-if="nivel === 0 && item.cod === 4" v-for="item in CUENTAS">
+              <tr v-if="nivel === 0 && item.cod == 4" v-for="item in CUENTAS">
                 <td>{{item.cod}}</td>
                 <td>{{item.nombre}} [<strong>L {{int.format(item.total)}}</strong>]</td>
                 <td><b-link @click="acomodarCuentas(item.cod_dep, 0)">{{item.cod_dep}}</b-link></td>
@@ -59,6 +59,7 @@
         </v-form>
       </v-card>
     </v-card>
+
   </v-card>
 </template>
 
@@ -94,11 +95,11 @@ export default {
   created() {
     this.$store.commit('guardarTitulo','Contabilidad > Gastos > Nuevo');
     this.cargarSucursales();
-    this.$store.commit('contabilidad/catalogo/cargar_CUENTAS');
+    this.$store.commit('contabilidad/catalogo/cargar_CUENTASGASTOS');
   },
   computed:{
     CUENTAS(){
-      return this.$store.state.contabilidad.catalogo.CUENTAS;
+      return this.$store.state.contabilidad.catalogo.CUENTASG;
     },
     LOAD(){
       return this.$store.state.contabilidad.catalogo.LOADCUENTAS;

@@ -384,9 +384,6 @@
             <b-input size="sm" placeholder="Introducir la dirección manualmente" v-model="Direccion"></b-input>
             <v-divider></v-divider>
 
-            <v-card-actions class="d-flex justify-end">
-              <v-btn small dark color="indigo" tile>Crear Orden de Entrega </v-btn>
-            </v-card-actions>
           </v-card>
 
         </v-col>
@@ -397,7 +394,7 @@
 </template>
 
 <script>
-import completo from "@/components/Ventas/pdfs/completo.vue";
+
 import {vsUpload} from 'vuesax';
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css';
@@ -406,7 +403,6 @@ import {ipcRenderer} from "electron";
 
 export default {
   name: "mis_ventas_contado",
-  components:{pdf_completo: completo},
   data(){
     return{
       pdfCompleto: null,

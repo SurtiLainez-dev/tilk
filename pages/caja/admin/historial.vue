@@ -36,7 +36,7 @@
         {{titulo}}
       </v-toolbar>
 
-      <historial_suc :anio="anio" :mes="mes" :dia="dia"/>
+      <historial_suc :tipo="1" :anio="anio" :mes="mes" :dia="dia"/>
     </v-card>
   </v-card>
 </template>

@@ -30,7 +30,7 @@
           <pago_nuevo             v-else-if="VISTA === 4"/>
           <pagos_agregados_cuenta v-else-if="VISTA === 5"/>
           <pagos_cuenta           v-else-if="VISTA === 6"/>
-          <estado_cuenta          v-else-if="VISTA === 7"/>
+          <estado_cuenta          v-else-if="VISTA === 7 && CUENTA.tipo_venta === 2"/>
           <orden_entrega          v-else-if="VISTA === 8"/>
           <recibos                v-else-if="VISTA === 9"/>
           <deducción_mora         v-else-if="VISTA === 10 && PERMISOS.includes(148)"/>

@@ -286,13 +286,21 @@ export const mutations = {
             state.Cliente.subiendo = false;
         })
     },
-    cargarSolicitudes(state){
+    cargarSolicitudes(state, val){
         state.loadSolicitudes = true;
-        this.$axios.get('solicitudes_credtio')
-        .then((res)=>{
-            state.Solicitudes = res.data.solicitudes;
-            state.loadSolicitudes = false;
-        })
+        if (val.tipo === 1){
+            this.$axios.get('solicitudes_credtio')
+                .then((res)=>{
+                    state.Solicitudes = res.data.solicitudes;
+                    state.loadSolicitudes = false;
+                })
+        }else if (val.tipo === 2){
+            this.$axios.get('solicitudes_credito/'+val.search)
+                .then((res)=>{
+                    state.Solicitudes = res.data.solicitudes;
+                    state.loadSolicitudes = false;
+                })
+        }
     },
     cargarSolicitud(state, ruta){
         state.loadSolicitudes = true;

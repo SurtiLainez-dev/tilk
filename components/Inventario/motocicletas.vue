@@ -19,7 +19,7 @@
         </v-col>
       </v-row>
     </v-card>
-    <v-progress-linear v-if="LOADMOTOS"></v-progress-linear>
+    <v-progress-linear indeterminate v-if="LOADMOTOS"></v-progress-linear>
     <table>
       <thead>
       <tr><th v-for="item in headers" v-text="item.text"></th></tr>
@@ -45,7 +45,7 @@
     </div>
   </v-card>
 
-  <v-card v-else-if="vista === 2">
+  <v-card flat v-else-if="vista === 2">
     <v-card flat height="100" color="grey lighten-5">
       <v-toolbar color="grey lighten-5" flat dense>
         <v-btn icon small color="orange" fab text @click="vista = 1"><v-icon>fa fa-arrow-left</v-icon></v-btn>

@@ -29,12 +29,14 @@
           <venta         v-else-if="VISTA === 3"/>
           <recibos_hoy   v-else-if="VISTA === 4"/>
           <facturas_hoy  v-else-if="VISTA === 5"/>
+          <historial_caja v-else-if="VISTA === 6"/>
           <transacciones v-else-if="VISTA === 7"/>
           <egreso        v-else-if="VISTA === 8"/>
           <caja_chica    v-else-if="VISTA === 9"/>
           <anticipos     v-else-if="VISTA === 10"/>
           <deposito      v-else-if="VISTA === 11"/>
           <cierre        v-else-if="VISTA === 12"/>
+          <anticipos_recibos v-else-if="VISTA === 13"/>
         </v-card>
       </v-card>
     </v-card>
@@ -56,9 +58,11 @@ import cierre from "@/components/caja/componentes/cierre";
 import caja_chica from "@/components/caja/componentes/caja_chica";
 import anticipos from "@/components/caja/componentes/anticipos";
 import deposito from "@/components/caja/componentes/deposito";
-
+import historial_caja from "@/components/caja/componentes/historial_caja.vue";
+import anticipos_recibos from "@/components/caja/componentes/anticipos_recibos.vue";
 export default {
   components:{
+    anticipos_recibos,
     inicio,
     postear,
     venta,
@@ -69,7 +73,8 @@ export default {
     cierre,
     caja_chica,
     anticipos,
-    deposito
+    deposito,
+    historial_caja
   },
   name: "index",
   data(){
@@ -81,9 +86,10 @@ export default {
         { title: 'Factura de Contado', icon: 'fa fa-file-invoice-dollar', val:3},
         { title: 'Recibos de Hoy', icon: 'fa fa-file-invoice', val:4 },
         { title: 'Facturas de Hoy', icon: 'fa fa-file-invoice-dollar', val:5 },
-        { title: 'Calendario de Pago', icon: 'fa fa-calendar-day', val:6 },
+        { title: 'Historial de Caja', icon: 'fa fa-history', val:6 },
+        { title: 'Recibos por Anticipo Realizados', icon: 'fa fa-history', val:13},
         { title: 'Transacciones', icon: 'fa fa-history', val:7 },
-        { title: 'Egreso', icon: 'fa fa-file-invoice-dollar', val:8 },
+        { title: 'Egreso', icon: 'fa fa-file-invoice-dollar', val:8},
         { title: 'Caja Chica', icon: 'fa fa-wallet', val:9},
         { title: 'Anticipos', icon: 'fa fa-file-invoice-dollar', val:10},
         { title: 'Depósitos a Clientes', icon: 'fa fa-file-invoice-dollar', val:11},

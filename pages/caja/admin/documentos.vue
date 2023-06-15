@@ -29,7 +29,8 @@
     </template>
     <template v-slot:item.tipo="{item}">
       <v-chip x-small color="orange" dark v-if="item.tipo === 1">Recibos</v-chip>
-      <v-chip x-small color="indigo" dark v-else>Facturas</v-chip>
+      <v-chip x-small color="indigo" dark v-else-if="item.tipo === 2">F. Contado</v-chip>
+      <v-chip x-small color="indigo" dark v-else-if="item.tipo === 3">F. Crédito</v-chip>
     </template>
     <template v-slot:item.estado="{item}">
       <v-chip x-small color="success" dark v-if="item.estado === 1">Activo</v-chip>
@@ -156,6 +157,7 @@ export default {
       SelectTipo:[
         {text:'Recibos de Clientes', value:1},
         {text:'Facturas de Contado', value:2},
+        {text:'Facturas de Crédito', value:3},
       ],
       rule: {
         contadorI: {

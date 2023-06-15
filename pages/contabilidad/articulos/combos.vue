@@ -5,7 +5,8 @@
         <v-icon>fa fa-arrow-left</v-icon>
       </v-btn>
       <v-card-title>{{TITULO}}</v-card-title>
-      <v-btn v-if="VISTA === 1" color="indigo" small tile dark @click="go('Combo Nuevo', 2)">Crear Combo</v-btn>
+      <v-btn v-if="VISTA === 1" color="indigo" small class="ma-2" tile dark @click="go('Combo Nuevo', 2)">Crear Combo</v-btn>
+      <v-btn v-if="VISTA === 1" color="indigo" text class="ma-2" small tile dark @click="$store.commit('inventario/combos/cargar_COMBOS')">Recargar</v-btn>
       <v-spacer v-if="VISTA === 1"></v-spacer>
       <v-spacer v-if="VISTA === 1"></v-spacer>
       <v-spacer v-if="VISTA === 1"></v-spacer>

@@ -16,8 +16,8 @@
         <template v-slot:item.saldo_actual="{item}">
           L {{int.format(item.saldo_actual)}}
         </template>
-        <template v-slot:item.cliente.nombres="{item}">
-          {{item.cliente.nombres}} {{item.cliente.apellidos}}
+        <template v-slot:item.nombres="{item}">
+          {{item.nombres}} {{item.apellidos}}
         </template>
         <template v-slot:item.estado="{item}">
           <v-chip color="orange" x-small v-if="item.estado === 1" dark>Al día</v-chip>
@@ -37,7 +37,7 @@
       <v-toolbar dense color="grey lighten-3">
         <v-btn color="orange" dark fab x-small @click="vista =1"><v-icon>fa fa-arrow-left</v-icon></v-btn>
         <v-spacer></v-spacer>
-        <h6>{{CUENTA.cliente.nombres}} {{CUENTA.cliente.apellidos}} - {{CUENTA.cod}}</h6>
+        <h6>{{CUENTA.nombres}} {{CUENTA.apellidos}} - {{CUENTA.cod}}</h6>
       </v-toolbar>
       <devo/>
     </v-card>
@@ -61,8 +61,8 @@ export default {
       load:   false,
       header:[
         {text: 'Código', value: 'cod'},
-        {text: 'Identidad', value: 'cliente.identidad'},
-        {text: 'Nombre del Cliente', value: 'cliente.nombres'},
+        {text: 'Identidad', value: 'identidad'},
+        {text: 'Nombre del Cliente', value: 'nombres'},
         {text: 'total', value: 'total'},
         {text: 'Saldo Actual', value: 'saldo_actual'},
         {text: 'Estado', value: 'estado'},
@@ -91,8 +91,16 @@ export default {
       })
     },
     go(data){
-      this.$store.commit('cuentas/agregar_CUENTA', data);
-      this.vista = 2;
+      this.$store.commit('activarOverlay', true);
+      this.$axios.get('cuentas/ventas/'+data.id).then((res)=>{
+        console.log(res.data.venta);
+        this.$store.commit('cuentas/agregar_CUENTA', res.data.venta);
+        this.$store.commit('activarOverlay', false);
+        this.vista = 2;
+      }).catch((error)=>{
+        this.$store.commit('activarOverlay', false);
+        this.$store.commit('notificacion',{texto:'Ha ocurrido al cargar los datos', color:"error"});
+      })
     },
   }
 }

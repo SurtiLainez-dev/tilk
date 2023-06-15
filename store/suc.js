@@ -2,10 +2,18 @@ export const state = () => ({
     LOAD_SUCURSALES: false,
     SUCURSALES: [],
     LOAD_COLABORADORES: false,
-    COLABORADORES: []
+    COLABORADORES: [],
+    VISTA_MULTIPLE: 1,
+    TITULO_GENERICO: '',
 });
 
 export const mutations = {
+    cambiar_VISTA_MULTIPLE(state, val){
+        state.VISTA_MULTIPLE = val
+    },
+    cambiar_TITULO_GENERICO(state, val){
+      state.TITULO_GENERICO = val;
+    },
     cargar_SUCURSALES(state) {
         if (state.SUCURSALES.length === 0){
             state.LOAD_SUCURSALES = true;

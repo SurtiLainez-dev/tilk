@@ -41,7 +41,7 @@ export const state = () =>({
   Seguimientos: [],
   loadSeguimiento: false,
   tab: 1,
-  MENU: false,
+  MENU: true,
   ARTICULOS_EDIT: [],
   LOAD_ARTICULOS_EDIT: false,
   DIR: null,

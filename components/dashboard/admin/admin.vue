@@ -32,6 +32,21 @@
           Editar Recibo
         </v-list-item>
       </v-list-group>
+
+      <v-list-group>
+        <template v-slot:activator value="true">
+          <v-list-item-title>Manual</v-list-item-title>
+        </template>
+        <v-list-item class="itemOpciones" @click="go('/admin/manual/seccionmanual')">
+          Crear Sección
+        </v-list-item>
+        <v-list-item class="itemOpciones" @click="go('/admin/manual/nuevasubseccion')">
+          Crear Sub Sección
+        </v-list-item>
+        <v-list-item class="itemOpciones" @click="go('/admin/manual/subsecciones')">
+          Sub Secciones
+        </v-list-item>
+      </v-list-group>
     </div>
 </template>
 

@@ -14,6 +14,18 @@
         Planillas Pendientes
       </v-list-item>
     </v-list-group>
+
+    <v-list-group v-if="PERMISOS.includes(133)">
+      <template v-slot:activator value="true">
+        <v-list-item-title>Notificaciones</v-list-item-title>
+      </template>
+      <v-list-item class="itemOpciones" @click="go('/colaborador/notificaciones/nuevo')">
+        Crear Notificación
+      </v-list-item>
+      <v-list-item class="itemOpciones" @click="go('/colaborador/notificaciones/')">
+        Notificaciones
+      </v-list-item>
+    </v-list-group>
   </div>
 </template>
 

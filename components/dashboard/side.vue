@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer app dark permanent>
+    <v-navigation-drawer v-if="$store.state.MENU" app dark permanent>
         <v-list>
           <v-list-item >
             <v-list-item-content>
@@ -73,6 +73,17 @@
                     <v-tooltip right>
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn @click="go(item.url, item.id, item.accion)" v-on="on" v-bind="attrs"
+                               :color="item.color" fab x-small dark>
+                          <v-icon>{{item.icono}}</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>{{item.titulo}}</span>
+                    </v-tooltip>
+                  </v-col>
+                  <v-col v-else-if="item.id === 12" class="d-flex justify-center">
+                    <v-tooltip right>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn @click="$store.commit('cambiar_MENU')" v-on="on" v-bind="attrs"
                                :color="item.color" fab x-small dark>
                           <v-icon>{{item.icono}}</v-icon>
                         </v-btn>
@@ -227,7 +238,9 @@
           {'color':'green darken-4', 'titulo':'Reportes', 'icono':'fa fa-file-contract',
             'url': '', 'id': 10, 'modulo': 0, 'accion': false},
           {'color':'light-blue darken-4', 'titulo':'Cerrar Sesión', 'icono':'fa fa-sign-in-alt',
-            'url': '', 'id': 11, 'modulo': 0, 'accion': false}
+            'url': '', 'id': 11, 'modulo': 0, 'accion': false},
+          {'color':'light-blue darken-4', 'titulo':'Esconder Menú', 'icono':'mdi-eye-off',
+            'url': '', 'id': 12, 'modulo': 0, 'accion': false}
         ]
     }
     },
