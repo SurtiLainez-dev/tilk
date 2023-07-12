@@ -483,7 +483,7 @@ export default {
         cc_id_anticipo: this.cc.id,
         sucursal_id:    this.cuenta.sucursal_id,
         caja_id:        this.caja,
-        pagos:          this.nc.pagos
+        pagos:          this.nc.pagos,
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
@@ -506,7 +506,7 @@ export default {
         cc_id_anticipo: this.cc.id,
         sucursal_id:    this.cuenta.sucursal_id,
         caja_id:        this.caja,
-        dxc:            cuenta[0]
+        dxc:            cuenta[0],
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});

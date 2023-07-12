@@ -875,6 +875,9 @@
           }
         }).catch((error)=>{
           this.$store.commit('activarOverlay', false);
+          if (error.response.status === 422)
+            this.$store.commit('notificacion',{texto:error.response.data.msj, color:'error'})
+
           Swal.fire(
               'Hubo un error en el servidor',
               `La factura ${this.Factura.num} no se pudo regstrar correctamente.`,

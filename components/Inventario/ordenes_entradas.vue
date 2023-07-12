@@ -8,7 +8,8 @@
             <v-row no-gutters>
               <v-col cols="10">Ordenes de Ingreso de Inventario</v-col>
               <v-col cols="2" class="d-flex justify-end">
-                <v-btn small text dark color="indigo">Busqueda Avanzada</v-btn>
+                <v-btn small text dark color="indigo" @click="$store.commit('inventario/ordenes_entrada/cargar_ORDENES')">Recargar</v-btn>
+                <v-btn small text dark color="indigo" disabled>Busqueda Avanzada</v-btn>
               </v-col>
             </v-row>
             <v-progress-linear v-if="LOAD_ORDENES" indeterminate></v-progress-linear>

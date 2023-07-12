@@ -241,27 +241,23 @@
                             <tbody>
                             <tr v-for="item in Cliente.direcciones">
                                 <td width="15%">
-                                    <select class="select-css" v-model="item.departamento" @change="cargarMunicipios(item)">
-                                        <option v-for="depto in Departamentos"  :value="depto.id">{{depto.nombre}}</option>
-                                    </select>
+                                  <v-autocomplete v-model="item.departamento" @change="cargarMunicipios(item)" :item-text="'nombre'"
+                                                  :items="Departamentos" :item-value="'id'" dense outlined></v-autocomplete>
                                 </td>
                                 <td width="15%">
-                                    <select class="select-css" v-model="item.municipio" @change="cargarCiudades(item)">
-                                        <option v-for="muni in item.Municipios" :value="muni.id">{{muni.nombre}}</option>
-                                    </select>
+                                  <v-autocomplete v-model="item.municipio" :items="item.Municipios" :item-value="'id'" dense
+                                                  outlined @change="cargarCiudades(item)" :item-text="'nombre'"></v-autocomplete>
                                 </td>
                                 <td width="20%">
-                                    <select class="select-css" v-model="item.ciudad" @change="cargarColonias(item)">
-                                        <option v-for="ciudad in item.Ciudades" :value="ciudad.id">{{ciudad.nombres}} - {{ciudad.tipo}}</option>
-                                    </select>
+                                  <v-autocomplete v-model="item.ciudad" :items="item.Ciudades" :item-value="'id'" dense
+                                                  outlined  @change="cargarColonias(item)" :item-text="'nombre'"></v-autocomplete>
                                 </td>
                                 <td width="20%">
-                                    <select class="select-css" v-model="item.colonia">
-                                        <option v-for="colonia in item.Colonias" :value="colonia.id">{{colonia.nombre}}</option>
-                                    </select>
+                                  <v-autocomplete v-model="item.colonia" :items="item.Colonias" :item-value="'id'" dense
+                                                  outlined :item-text="'nombre'"></v-autocomplete>
                                 </td>
                                 <td width="28%">
-                                    <textarea rows="2" v-model="item.detalle"></textarea>
+                                    <v-textarea rows="2" style="font-size: 10px; padding: 1px" outlined v-model="item.detalle"></v-textarea>
                                 </td>
                                 <td width="2%">
                                     <v-btn width="20px" height="20px" @click="removeDireccion(item.key)"
@@ -635,12 +631,18 @@
             },
             cargarCiudades: function (item) {
                 this.loadDireccion = true;
+                item.Ciudades = [];
                 this.$axios.get('/ciudades/'+item.municipio,{
                     headers:{
                         'Authorization': 'Bearer '+ this.$store.state.token
                     }
                 }).then((res)=>{
-                    item.Ciudades = res.data.ciudades;
+                    res.data.ciudades.forEach((i)=>{
+                      item.Ciudades.push({
+                        id: i.id,
+                        nombre: i.nombres+' - '+i.tipo
+                      })
+                    })
                     this.loadDireccion = false;
                 })
             },
@@ -719,6 +721,8 @@
                 if (this.Fechas.mes && this.Fechas.mes.length === 1 && this.Fechas.mes < 10)
                     this.Fechas.mes = `${0}${this.Fechas.mes}`;
                 this.Cliente.fecha_nacimiento = this.Fechas.ano+'-'+this.Fechas.mes+'-'+this.Fechas.dia;
+                console.log(this.Fechas.mes)
+                console.log(this.Cliente.fecha_nacimiento)
             },
             guardarCiudad(){
                 this.Ciudad.dialogo = false;
@@ -893,7 +897,7 @@
                 else
                     this.notificacion('el sexo es obligatorio','warning');
 
-                let regexFecha = new RegExp("^\\d{4}([\\-/.])(0?[1-9]|1[1-2])\\1(3[01]|[12][0-9]|0?[1-9])$");
+                let regexFecha = new RegExp("^(\\d{4})[\\/\\-](0?[1-9]|1[012])[\\/\\-](0?[1-9]|[12][0-9]|3[01])$");
                 if (regexFecha.test(th.fecha_nacimiento))
                     cont++;
                 else

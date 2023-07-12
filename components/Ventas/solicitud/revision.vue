@@ -18,7 +18,7 @@
                     </tr>
                     <tr>
                         <th>Fecha de nacimiento:</th>
-                        <td>{{Cliente.fecha_nacimiento.split('-')[2]}}/{{Cliente.fecha_nacimiento.split('-')[1]}}/{{Cliente.fecha_nacimiento.split('-')[0]}}</td>
+                        <td v-if="Cliente.fecha_nacimiento">{{Cliente.fecha_nacimiento.split('-')[2]}}/{{Cliente.fecha_nacimiento.split('-')[1]}}/{{Cliente.fecha_nacimiento.split('-')[0]}}</td>
                     </tr>
                     <tr>
                         <th>Sexo:</th>
@@ -133,64 +133,95 @@
         <hr>
         <v-row class="grey lighten-3">
             <v-col>
-                <small>Datos del artículo</small>
-                <v-divider></v-divider>
-                <table class="rowsTable">
+                <v-card v-if="combo" flat>
+                  <table>
+                    <thead>
+                    <tr>
+                      <th colspan="2">Codigo</th>
+                      <th colspan="1">Nombre</th>
+                      <th colspan="3">Detalle</th>
+                    </tr>
+                    </thead>
                     <tbody>
                     <tr>
-                        <th>Descripción:</th>
-                        <td>{{Solicitud_Articulo.descripcion_corta}}</td>
-                    </tr>
-                    <tr>
-                        <th>Familía:</th>
-                        <td>{{Solicitud_Articulo.familia}}</td>
-                    </tr>
-                    <tr>
-                        <th>Sub-familía:</th>
-                        <td>{{Solicitud_Articulo.fam}}</td>
-                    </tr>
-                    <tr>
-                        <th>Tipo:</th>
-                        <td v-if="Solicitud_Articulo.is_motocicleta === 1">Vehículo</td>
-                        <td v-else-if="Solicitud_Articulo.is_motocicleta === 0">Artículo</td>
-                    </tr>
-                    <tr>
-                        <th>Marca:</th>
-                        <td>{{Solicitud_Articulo.marca}}</td>
-                    </tr>
-                    <tr>
-                        <th>Módelo:</th>
-                        <td>{{Solicitud_Articulo.modelo}}</td>
+                      <td colspan="2">{{Solicitud_Articulo.codigo}}</td>
+                      <td colspan="1">{{Solicitud_Articulo.nombre}}</td>
+                      <td colspan="3">{{Solicitud_Articulo.detalle}}</td>
                     </tr>
                     </tbody>
-                </table>
-            </v-col>
-            <v-col>
-                <small>Datos del precio</small>
-                <v-divider></v-divider>
-                <table class="rowsTable">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Código</th>
+                      <th>Articulos Incluidos</th>
+                      <th>Modelo</th>
+                      <th>Marca</th>
+                      <th>Sub Familia</th>
+                    </tr>
+                    </thead>
                     <tbody>
-                        <tr>
-                            <th>Prima: </th>
-                            <td>L {{Solicitud_Precio.prima}}</td>
-                        </tr>
-                        <tr>
-                            <th>Tiempo de crédito:</th>
-                            <td>{{Solicitud_Precio.meses}} meses</td>
-                        </tr>
-                        <tr>
-                            <th>Forma de pago:</th>
-                            <td v-if="Solicitud_Precio.forma_pago === 1">Semanal</td>
-                            <td v-else-if="Solicitud_Precio.forma_pago === 2">Quincenal</td>
-                            <td v-else-if="Solicitud_Precio.forma_pago === 3">Mensual</td>
-                        </tr>
-                        <tr>
-                            <th>Cuota:</th>
-                            <td>L {{Solicitud_Precio.cuota}}</td>
-                        </tr>
+                    <tr v-for="(item, i) in Solicitud_Articulo.detalle_combo">
+                      <td>{{i+1}}</td>
+                      <td>{{item.articulo.codigo_sistema}}</td>
+                      <td>{{item.articulo.nombre_articulo}}</td>
+                      <td>{{item.articulo.modelo}}</td>
+                      <td>{{item.articulo.marca.nombre}}</td>
+                      <td>{{item.articulo.sub_familia_articulo.nombre}}</td>
+                    </tr>
                     </tbody>
-                </table>
+                  </table>
+                </v-card>
+                <v-card v-else flat>
+                  <small>Datos del artículo</small>
+                  <v-divider></v-divider>
+                  <table class="rowsTable">
+                    <tbody>
+                    <tr>
+                      <th>Descripción:</th>
+                      <td>{{Solicitud_Articulo.descripcion_corta}}</td>
+                    </tr>
+                    <tr>
+                      <th>Sub-familía:</th>
+                      <td>{{Solicitud_Articulo.fam}}</td>
+                    </tr>
+                    <tr>
+                      <th>Marca:</th>
+                      <td>{{Solicitud_Articulo.marca}}</td>
+                    </tr>
+                    <tr>
+                      <th>Módelo:</th>
+                      <td>{{Solicitud_Articulo.modelo}}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </v-card>
             </v-col>
+<!--            <v-col>-->
+<!--                <small>Datos del precio</small>-->
+<!--                <v-divider></v-divider>-->
+<!--                <table class="rowsTable">-->
+<!--                    <tbody>-->
+<!--                        <tr>-->
+<!--                            <th>Prima: </th>-->
+<!--                            <td>L {{Solicitud_Precio.prima}}</td>-->
+<!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <th>Tiempo de crédito:</th>-->
+<!--                            <td>{{Solicitud_Precio.meses}} meses</td>-->
+<!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <th>Forma de pago:</th>-->
+<!--                            <td v-if="Solicitud_Precio.forma_pago === 1">Semanal</td>-->
+<!--                            <td v-else-if="Solicitud_Precio.forma_pago === 2">Quincenal</td>-->
+<!--                            <td v-else-if="Solicitud_Precio.forma_pago === 3">Mensual</td>-->
+<!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <th>Cuota:</th>-->
+<!--                            <td>L {{Solicitud_Precio.cuota}}</td>-->
+<!--                        </tr>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+<!--            </v-col>-->
         </v-row>
         <v-divider></v-divider>
         <v-row class="grey lighten-3">
@@ -240,23 +271,27 @@
         </v-autocomplete>
         <v-row no-gutters>
             <v-col class="d-flex justify-end align-center">
-                <v-btn :disabled="!registrado" @click="dialogoArchivo = true" small>Abrir envío del archivo</v-btn>
+                <v-btn tile :disabled="!registrado" @click="dialogoArchivo = true" small>Abrir envío del archivo</v-btn>
                 <v-tooltip top>
                     <template v-slot:activator="{on, attrs}">
                         <v-btn fab class="ma-2" v-on="on" :disabled="!registrado"
-                               v-bind="attrs" @click="print" small text>
+                               v-bind="attrs" @click="solicitarClave" small text>
                             <v-icon>fa fa-print</v-icon>
                         </v-btn>
                     </template>
                     <span>Imprimir solicitúd de crédito</span>
                 </v-tooltip>
-                <v-btn class="ma-2" color="success" @click="registrar" small>
+                <v-btn class="ma-2" tile color="success" @click="registrar" small>
                     Enviar solicitúd
                 </v-btn>
-                <v-btn class="ma-2" color="warning" @click="sideSolicitud = false"
+                <v-btn class="ma-2" tile color="warning" @click="sideSolicitud = false"
                        small>
                     Cerrar
                 </v-btn>
+              <v-btn class="ma-2" tile text color="warning" @click="vistaSolicitud = 3"
+                     small>
+                Volver
+              </v-btn>
             </v-col>
         </v-row>
 
@@ -281,6 +316,7 @@
     import {ipcRenderer} from "electron";
     import Vue from "vue";
     export default {
+        props:{combo: Boolean},
         name: "revision",
         computed:{
             Cliente(){
@@ -302,13 +338,24 @@
                 return this.$store.state.solicitud_credito.data.observacion_precio;
             },
             sideSolicitud:{
-                get:function () {
-                    return this.$store.state.solicitud_credito.SolicitudCredito_view;
-                },
-                set: function (val) {
-                    this.$store.commit('solicitud_credito/cambiarValorVista', val);
-                }
+              get:function () {
+                return this.$store.state.solicitud_credito.SolicitudCredito_view;
+              },
+              set: function (val) {
+                this.$store.commit('solicitud_credito/cambiarValorVista', val);
+              }
             },
+            user(){
+              return this.$store.state.usuario;
+            },
+            vistaSolicitud:{
+            get:function () {
+              return this.$store.state.solicitud_credito.SolicitudCredito_vista;
+            },
+            set:function (val) {
+              return this.$store.commit('solicitud_credito/cambiarVista', val)
+            }
+          },
         },
         mounted() {
             this.cargarDirecciones(this.Cliente.direcciones);
@@ -386,13 +433,18 @@
                     item.Municipios = res.data.municipios;
                 })
             },
-            print(){
-                let url = this.$axios.defaults.baseURL+'print_solicitud_credito/'+this.Solicitud;
-                ipcRenderer.send('open-nav', url);
+            print(clave){
+                let url = this.$axios.defaults.baseURL+'documentos/ventas/solicitud_credito/usuario='+this.user+'/solicitud='+this.Solicitud+'/'+clave
+                ipcRenderer.send('pint_navegador', url);
+                this.$store.commit('activarOverlay', false);
                 this.dialogoArchivo = true;
-
             },
             registrar(){
+                let codigo = '';
+                if (this.combo)
+                  codigo = this.Solicitud_Articulo.codigo;
+                else
+                  codigo = this.Solicitud_Articulo.codigo_sistema;
                 if (this.Archivo.colaborador){
                     let forma_pago = '';
                     if (this.Solicitud_Precio.forma_pago === 1)
@@ -405,7 +457,7 @@
                     this.$axios.post('solicitud_credito',{
                         user:               this.Archivo.colaborador,
                         cliente_id:         this.Cliente.id,
-                        cod_sistema:        this.Solicitud_Articulo.codigo_sistema,
+                        cod_sistema:        codigo,
                         saldo_financiar:    parseFloat(this.Solicitud_Precio.total_credito),
                         tasa:               this.Solicitud_Precio.financiamiento,
                         tiempo:             parseInt(this.Solicitud_Precio.meses),
@@ -416,7 +468,8 @@
                         prima:              this.Solicitud_Precio.prima,
                         observacion_precio: this.Observacion,
                         avales:             JSON.stringify(this.Solicitud_Avales),
-                        cuota:              this.Solicitud_Precio.cuota
+                        cuota:              this.Solicitud_Precio.cuota,
+                        combo:              this.combo
                     }).then((res)=>{
                         this.$store.commit('activarOverlay', false);
                         this.Solicitud = res.data.solicitud;
@@ -446,6 +499,16 @@
                     }
                 })
             },
+            solicitarClave(){
+              this.$store.commit('activarOverlay', true);
+              this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+                this.$store.commit('notificacion',{texto:'Cargando inventario', color:'success'});
+                this.print(res.data.clave)
+              }).catch((error)=>{
+                this.$store.commit('activarOverlay', false);
+                this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'danger'});
+            })
+          },
             validarformFile(){
                 if (this.Archivo.file)
                     this.terminacionRegistro();

@@ -12,7 +12,8 @@ export const state = () => ({
     DATA_COMPONENTES:  [],
     DATA_REGALIAS:     [],
     IS_ACEPTADA:       0,
-    VISTA:             1
+    VISTA:             1,
+    COMBO:             {}
 })
 
 export const mutations = {
@@ -57,48 +58,57 @@ export const mutations = {
             else if (state.DATA_VENTA.is_aceptado === 3)
                 AceptadoPorFacturacion = 'Pendiente';
 
+            let articulo ='', codigo='', marca= '';
+            if (!state.DATA_VENTA.is_combo || !state.DATA_VENTA.is_combo === 0){
+                articulo = state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo;
+                codigo   = state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.codigo_sistema;
+                marca    = state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.marca.nombre;
+                state.IS_MOTO = state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.is_motocicleta === 1;
+
+                let stock_reingreso = 0, stock_nuevo = 0;
+                state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.articulo_compuestos.forEach( (item) => {
+                    if (item.inventario_compuestos){
+                        item.inventario_compuestos.forEach( (i) => {
+                            if (i.sucursal_id === state.DATA_VENTA.colaborador.sucursal_id){
+                                console.log(i)
+                                stock_nuevo     = i.stock_nuevo;
+                                stock_reingreso =  i.stock_reingreso;
+                                console.log(stock_reingreso)
+                                console.log(stock_nuevo)
+                            }
+                        });
+                    }
+
+                    state.DATA_COMPONENTES.push({
+                        detalle:          item.detalle,
+                        codigo:           item.codigo,
+                        salida:           false,
+                        id_articulo:      item.id,
+                        stock_nuevo:      stock_nuevo,
+                        stock_reingreso:  stock_reingreso
+                    })
+                    stock_nuevo     = 0;
+                    stock_reingreso = 0;
+                })
+            }else{
+                articulo    = state.DATA_VENTA.combo.nombre
+                state.COMBO = state.DATA_VENTA.combo
+            }
             state.DATOS_CARD = [
                 {titulo: 'Nombre del cliente',        texto: state.DATA_VENTA.cliente.nombres+' '+ state.DATA_VENTA.cliente.apellidos},
-                {titulo: 'Nombre del vendedor',       texto: state.DATA_VENTA.colaborador.nombres+' '+state.DATA_VENTA.colaborador.apellidos},
                 {titulo: 'Sucursal de venta',         texto: state.DATA_VENTA.colaborador.sucursal.nombre},
+                {titulo: 'Nombre del vendedor',       texto: state.DATA_VENTA.colaborador.nombres+' '+state.DATA_VENTA.colaborador.apellidos},
                 {titulo: 'Tipo de venta',             texto: TipoVenta},
                 {titulo: 'Estado de venta',           texto: EstadoVenta},
                 {titulo: 'Código de venta',           texto: state.DATA_VENTA.cod},
                 {titulo: 'Aceptado por facturación',  texto: AceptadoPorFacturacion},
                 {titulo: 'Total de la venta',         texto: 'L. '+state.DATA_VENTA.total},
                 {titulo: 'Número de Cuotas',          texto: state.DATA_VENTA.num_cuotas+' cuotas'},
-                {titulo: 'Artículo',                  texto: state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo},
-                {titulo: 'Código del sistema',        texto: state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.codigo_sistema},
-                {titulo: 'Marca',                     texto: state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.marca.nombre},
+                {titulo: 'Artículo',                  texto: articulo},
+                {titulo: 'Código del sistema',        texto: codigo},
+                {titulo: 'Marca',                     texto: marca},
             ]
 
-            state.IS_MOTO = state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.is_motocicleta === 1;
-
-            let stock_reingreso = 0, stock_nuevo = 0;
-            state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.articulo_compuestos.forEach( (item) => {
-                if (item.inventario_compuestos){
-                    item.inventario_compuestos.forEach( (i) => {
-                        if (i.sucursal_id === state.DATA_VENTA.colaborador.sucursal_id){
-                            console.log(i)
-                            stock_nuevo     = i.stock_nuevo;
-                            stock_reingreso =  i.stock_reingreso;
-                            console.log(stock_reingreso)
-                            console.log(stock_nuevo)
-                        }
-                    });
-                }
-
-                state.DATA_COMPONENTES.push({
-                    detalle:          item.detalle,
-                    codigo:           item.codigo,
-                    salida:           false,
-                    id_articulo:      item.id,
-                    stock_nuevo:      stock_nuevo,
-                    stock_reingreso:  stock_reingreso
-                })
-                stock_nuevo     = 0;
-                stock_reingreso = 0;
-            })
 
             state.DATA_VENTA.regalias_ventas.forEach( (item) => {
                 state.DATA_REGALIAS.push({

@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-list-group v-if="PERMISOS.includes(34) || PERMISOS.includes(310) || PERMISOS.includes(38)
-    || PERMISOS.includes(312) || PERMISOS.includes(33) || PERMISOS.includes(39)">
+    || PERMISOS.includes(312) || PERMISOS.includes(33) || PERMISOS.includes(39) || PERMISOS.includes(315)">
       <template v-slot:activator value="true">
         <v-list-item-title>Inventario</v-list-item-title>
       </template>
@@ -20,10 +20,10 @@
       <v-list-item v-if="PERMISOS.includes(310)"  dense class="itemOpciones" @click="anadirPestana(7, 'Editando Artículo')">
         Editar Artículo
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(38)" dense class="itemOpciones" @click="go('/inventario/traslados/traslados_externos')">
+      <v-list-item v-if="PERMISOS.includes(315)" dense class="itemOpciones" @click="go('/inventario/traslados/traslados_externos')">
         Transferencias Externas
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(38)" dense class="itemOpciones" @click="go('/inventario/traslados/externas')">
+      <v-list-item v-if="PERMISOS.includes(315)" dense class="itemOpciones" @click="go('/inventario/traslados/externas')">
         Crear Transferencia Externa
       </v-list-item>
       <v-list-item v-if="PERMISOS.includes(312)" dense class="itemOpciones" @click="go('/contabilidad/notas_credito/proveedor/devoluciones')">

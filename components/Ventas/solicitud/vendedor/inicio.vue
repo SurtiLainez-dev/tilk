@@ -41,7 +41,8 @@
                 <v-col>
                     <v-card class="pl-2 pr-2 pt-2 pb-2" width="100%" color="grey lighten-2">
                         <v-row no-gutters><v-col><small><strong>Descripción del artículo</strong></small></v-col></v-row>
-                        <v-row no-gutters><v-col><small>{{Soli.articulo.descripcion_corta}}</small></v-col></v-row>
+                        <v-row no-gutters v-if="Soli.is_combo === 1"><v-col><small>{{Soli.combo.nombre}}</small></v-col></v-row>
+                        <v-row no-gutters v-else><v-col><small>{{Soli.articulo.descripcion_corta}}</small></v-col></v-row>
                     </v-card>
                 </v-col>
             </v-row>
@@ -63,7 +64,7 @@
                 <v-col>
                     <v-card class="pl-2 pr-2 pt-2 pb-2" width="100%" color="grey lighten-2">
                         <v-row no-gutters><v-col><small><strong>Referencias</strong></small></v-col></v-row>
-                        <v-row no-gutters><v-col><small>{{JSON.parse(Soli.referencias).length}}</small></v-col></v-row>
+                        <v-row no-gutters ><v-col><small>{{JSON.parse(Soli.referencias).length}}</small></v-col></v-row>
                     </v-card>
                 </v-col>
             </v-row>

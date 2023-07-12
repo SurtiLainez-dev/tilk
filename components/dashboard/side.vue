@@ -112,7 +112,7 @@
             <v-col cols="9" v-if="select === 3">
             <v-list>
               <side-colaboradores/>
-              <side-planilla v-if="PERMISOS.includes(1)"/>
+              <side-planilla v-if="PERMISOS.includes(1) || PERMISOS.includes(133) || PERMISOS.includes(134)"/>
               <mobiliario/>
             </v-list>
           </v-col>
@@ -257,6 +257,9 @@
           setTimeout(()=>{
             this.$store.commit('activarOverlay', false);
           },2000);
+
+          window.Echo.channel('channel').disconnect('NewMessage', ()=>{})
+
           this.$router.replace({path:'/'});
         }).catch((error)=>{
           this.$store.commit("guardarToken", null);

@@ -34,6 +34,16 @@
 <script>
     import { ipcRenderer } from 'electron'
     import qs from "qs";
+
+    import Echo from "laravel-echo";
+    // window.Pusher = require('pusher-js');
+    //
+    // window.Echo = new Echo({
+    //   broadcaster: 'pusher',
+    //   key: '75f5606b4af13fd6b44d',
+    //   cluster: 'us2',
+    //   forceTLS: false
+    // })
     export default {
         name: "login",
         props:{email: String},
@@ -121,6 +131,13 @@
                 ipcRenderer.send('crear-usuario', this.Email)
                 this.$axios.setToken(this.$store.state.token, 'Bearer')
                 this.load = false;
+
+
+                // window.Echo.channel('channel').listen('NewMessage', (res)=>{
+                //   console.log(res)
+                // })
+
+
                 this.$router.replace({path:'/inicio/'});
               }
             }).catch((error)=>{

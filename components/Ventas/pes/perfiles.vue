@@ -1,5 +1,5 @@
 <template>
-  <v-card >
+  <v-card flat>
     <v-card flat v-if="VISTA === 1">
       <v-toolbar flat>
         <h6>Clientes Existentes en Surtidora Laínez</h6>

@@ -16,11 +16,11 @@
                           loading-text="Cargando nuevos datos"
                           :loading="loadSolicitudes"
                           class="rowsTable">
-                <template v-slot:item.cliente.nombres="{item}">
-                    {{item.cliente.nombres}} {{item.cliente.apellidos}}
+                <template v-slot:item.clN="{item}">
+                    {{item.clN}} {{item.cliA}}
                 </template>
-                <template v-slot:item.user.colaborador.nombres="{item}">
-                    {{item.user.colaborador.nombres}} {{item.user.colaborador.apellidos}}
+                <template v-slot:item.colN="{item}">
+                    {{item.colN}} {{item.colA}}
                 </template>
                 <template v-slot:item.fecha_creado="{item}">
                     {{item.fecha_creado.split('-')[2]}}/{{item.fecha_creado.split('-')[1]}}/{{item.fecha_creado.split('-')[0]}}
@@ -59,9 +59,9 @@
               search: '',
                 header:[
                     {text:'Referencia', value: 'codigo'},
-                    {text:'Nombre del cliente', value: 'cliente.nombres'},
-                    {text:'Artículo', value: 'articulo.descripcion_corta'},
-                    {text:'Creado por', value: 'user.colaborador.nombres'},
+                    {text:'Nombre del cliente', value: 'clN'},
+                    {text:'Artículo', value: 'articulo'},
+                    {text:'Creado por', value: 'colN'},
                     {text:'Fecha creado', value: 'fecha_creado'},
                     {text:'Estado', value: 'estado'},
                 ],
@@ -89,8 +89,17 @@
                 this.$store.commit('solicitud_credito/cargarSolicitudes',{tipo: 2, search: this.search});
             },
             SeleccionarSolicitud(item){
-                this.$store.commit('solicitud_credito/datoSolicitud', item);
-                this.vista     = 2;
+                this.$store.commit('activarOverlay', true);
+                this.$axios.get('solicitud_credito/'+item.id).then((res)=>{
+                  this.$store.commit('solicitud_credito/datoSolicitud', res.data.solicitud);
+                  this.vista     = 2;
+                  this.$store.commit('activarOverlay', false);
+                  this.$store.commit('notificacion',{texto:'Datos cargados exitosamente', color:'success'});
+                }).catch((error)=>{
+                  this.$store.commit('activarOverlay', false);
+                  this.$store.commit('notificacion',{texto:'No se pudo cargar los datos', color:'warning'});
+                })
+
             }
         }
     }

@@ -488,7 +488,7 @@
             <v-col cols="11" class="d-flex justify-center align-center"><h4>Solicitud de Crédito</h4></v-col>
           </v-row>
           <hr>
-          <solicitud v-if="sideSolicitud" :precio="Precios" :articulo="data" :forma_pago="forma_de_pago"/>
+          <solicitud v-if="sideSolicitud" :precio="Precios" :combo="false" :articulo="data" :forma_pago="forma_de_pago"/>
         </v-container>
       </v-navigation-drawer>
 

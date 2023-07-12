@@ -31,6 +31,10 @@
         <v-text-field class="ma-4" dense disabled label="# de Cuotas"
                       suffix="cuotas" :value="CUENTA.num_cuotas"></v-text-field>
       </v-col>
+      <v-col>
+        <v-autocomplete :loading="LOADSUCURSALES" :items="SUCURSALES" :item-value="'id'" :item-text="'nombre'"
+                        label="Sucursal de ingreso" class="ma-4" dense v-model="sucursal_id"></v-autocomplete>
+      </v-col>
     </v-row>
     <v-card-text>Pagos de la Cuenta</v-card-text>
     <v-data-table :headers="header" dense :items="cuenta.pagos" :items-per-page="5">
@@ -91,6 +95,7 @@ export default {
   name: "devolucion",
   data(){
     return{
+      sucursal_id: 0,
       eliminar: false,
       garantia: false,
       visible: true,
@@ -119,10 +124,17 @@ export default {
   created() {
     this.cuenta.pagos = this.CUENTA.pagos_contratos;
     this.$store.commit('activarOverlay', false);
+    this.$store.commit('suc/cargar_SUCURSALES');
   },
   computed:{
     CUENTA(){
       return this.$store.state.cuentas.CUENTA;
+    },
+    LOADSUCURSALES(){
+      return this.$store.state.suc.LOAD_SUCURSALES;
+    },
+    SUCURSALES(){
+      return this.$store.state.suc.SUCURSALES;
     }
   },
   methods:{
@@ -137,7 +149,8 @@ export default {
         articulo:       !this.eliminar,
         garantia:       this.garantia,
         saldo:          this.CUENTA.saldo_actual,
-        cliente:        this.CUENTA.cliente.id
+        cliente:        this.CUENTA.cliente.id,
+        sucursal_id:    this.sucursal_id
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
@@ -148,7 +161,7 @@ export default {
       })
     },
     validar(){
-      if (this.cuenta.observacion.length > 10){
+      if (this.cuenta.observacion.length > 10 && this.sucursal_id > 0){
         if (!this.eliminar){
           if (this.cuenta.precio > 0)
             this.registrarAnulacion();
@@ -158,7 +171,7 @@ export default {
           this.registrarAnulacion();
         }
       }else{
-        this.$store.commit('notificacion',{texto:'La observación tiene que ser mayor a 10 carácteres', color:'warning'});
+        this.$store.commit('notificacion',{texto:'La observación tiene que ser mayor a 10 carácteres o no haz selecciona la sucursal de destino', color:'warning'});
       }
     }
   }

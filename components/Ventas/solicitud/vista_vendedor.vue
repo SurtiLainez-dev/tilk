@@ -22,14 +22,17 @@
                     <small><strong>Solicitud de Crédito</strong></small>
                 </v-col>
             </v-row >
+            <v-divider></v-divider>
             <v-row no-gutters>
-                <v-col>
-                    <v-btn class="ma-2" color="grey lighten-2"
-                           block small depressed @click="vista = 1">
-                        {{String_Estado}}
-                    </v-btn>
+                <v-col class="d-flex justify-center">
+                    <v-chip small color="orange" v-if="Soli.estado === 1">Pendiente</v-chip>
+                    <v-chip small color="indigo" v-else-if="Soli.estado === 2">Falta Documentos</v-chip>
+                    <v-chip small color="red" v-else-if="Soli.estado === 3">Rechazada</v-chip>
+                    <v-chip small color="success" v-else-if="Soli.estado === 4">Aceptado</v-chip>
+                    <v-chip small color="duccess" v-else-if="Soli.estado === 5">Aceptado / Venta</v-chip>
                 </v-col>
             </v-row >
+          <v-divider></v-divider>
             <v-row no-gutters>
                 <v-col>
                     <v-btn class="ma-2" color="grey lighten-2"
@@ -227,21 +230,9 @@
             }
         },
         created(){
-            if (this.Soli.estado === 1)
-                this.String_Estado = 'Pendiente';
-            else if (this.Soli.estado === 2)
-                this.String_Estado = 'Falta documentos';
-            else if (this.Soli.estado === 3)
-                this.String_Estado = 'Rechazado';
-            else if (this.Soli.estado === 4)
-                this.String_Estado = 'Aceptada';
-            else if (this.Soli.estado === 5)
-                this.String_Estado = 'Aceptada/Venta'
 
             this.Venta = this.Soli.estado === 4;
-            console.log(this.Venta)
             this.$store.commit('solicitud_credito/agregadDetallesPrecios', JSON.parse(this.Soli.detalles_precio))
-            // this.vista = 1;
 
             let dataAval = null;
             this.$store.commit('solicitud_credito/agregarAvalesEstaticos', {tipo: 2});

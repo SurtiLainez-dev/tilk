@@ -52,8 +52,9 @@
         </v-col>
       </v-row>
       <v-divider></v-divider>
-      <mis_ventas_contado v-if="tipo === 1"/>
-      <mis_ventas v-else-if="tipo === 2"/>
+      <mis_ventas_contado v-if="tipo === 1 && !is_combo"/>
+      <mis_ventas v-else-if="tipo === 2 && !is_combo"/>
+      <vista_salida_combos v-else-if="tipo === 2 && is_combo === 1"/>
     </div>
   </v-card>
 </template>
@@ -63,12 +64,13 @@ import mis_ventas from "../../../components/Ventas/mis_ventas";
 import Mis_ventas from "../../../components/Ventas/mis_ventas";
 import mis_ventas_contado from "../../../components/Ventas/contado/mis_ventas_contado";
 import Mis_ventas_contado from "../../../components/Ventas/contado/mis_ventas_contado";
+import vista_salida_combos from "@/components/Ventas/combos/vista_salida_combos.vue";
 import {ipcRenderer} from "electron";
 export default {
-  components: {Mis_ventas_contado, Mis_ventas},
+  components: {Mis_ventas_contado, Mis_ventas, vista_salida_combos},
   comments:{
     mis_ventas,
-    mis_ventas_contado
+    mis_ventas_contado,
 },
 name: "ventas",
   data(){
@@ -83,7 +85,8 @@ name: "ventas",
         {text: 'Aceptado por F.', value:'is_aceptado'},
         {text: 'Total',           value:'total'},
       ],
-      tipo: 0
+      tipo: 0,
+      is_combo: null
     }
   },
   created() {
@@ -109,7 +112,7 @@ name: "ventas",
   methods:{
     verVista(data){
       this.tipo = data.tipo_venta
-      console.log(data.id)
+      this.is_combo = data.is_combo
       this.$store.commit('ventas/asignar_ID_VENTA', data.id);
       this.vista = 2;
     }

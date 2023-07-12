@@ -67,7 +67,7 @@
 
           <v-row no-gutters>
             <v-col>
-              <v-btn tile color="red" small block dark @click="verDocumento(Orden.file_save)">
+              <v-btn tile color="red" small block dark @click="solicitarClave">
                 <v-icon small>fa fa-file-pdf</v-icon>
                 Descargar
               </v-btn>
@@ -166,10 +166,20 @@ export default {
   },
   methods:{
     abrirDialogoEnvio(){
-      if (this.Orden.venta.colaborador.sucursal_id == this.SUCURSAL_ID)
-        this.dialogo = true;
-      else
-        this.notificacion('No puedes acceder a este formulario, porque no eres de la sucursal de venta','success')
+      if (this.Orden.venta.facturada === 1){
+        if (this.Orden.venta.colaborador.sucursal_id == this.SUCURSAL_ID)
+          this.dialogo = true;
+        else
+          this.notificacion('No puedes acceder a este formulario, porque no eres de la sucursal de venta','success')
+      }else{
+        this.$store.commit('notificacion',{texto:'Tienes que facturar la venta primero, despues puedes imprimir la orden', color:'warning'})
+      }
+    },
+    abrirNavegador(clave){
+      let url = this.$axios.defaults.baseURL+'documentos/orden_entraga/usuario='+this.USUARIO+'/cod_orden_entrega_venta='+this.Orden.cod+'/'+clave;
+
+      ipcRenderer.send('pint_navegador', url);
+      this.$store.commit('activarOverlay', false);
     },
     cargarOrden(val){
       if (val === 1)
@@ -221,6 +231,15 @@ export default {
         duration: 4000
       });
     },
+    solicitarClave(){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('solicitar_clave_doucmento').then((res)=>{
+        this.abrirNavegador(res.data.clave)
+      }).catch((error)=>{
+        this.dialogoPartida = true;
+        this.$store.commit('activarOverlay', false);
+      });
+    },
     validarFormulario(){
       if (this.$refs.FormEnvioOrdenEntrega.validate())
         this.EnviarOrden();
@@ -228,22 +247,28 @@ export default {
         this.notificacion('Te hacen falta datos en el formulario de envio','error');
     },
     verDocumento(URL){
-      this.$store.commit('activarOverlay', true);
-      this.$axios.post('leer_documento/',
-          {ubicacion: URL}).then((res)=>{
-        if (res.status === 200){
-          ipcRenderer.send('open-nav', res.data.url);
+      if (this.Orden.venta.facturada === 1){
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('leer_documento/',
+            {ubicacion: URL}).then((res)=>{
+          if (res.status === 200){
+            ipcRenderer.send('open-nav', res.data.url);
+            this.$store.commit('activarOverlay', false);
+          }
+        }).catch((error)=>{
           this.$store.commit('activarOverlay', false);
-        }
-      }).catch((error)=>{
-        this.$store.commit('activarOverlay', false);
-      })
+        })
+      }else
+        this.$store.commit('notificacion',{texto:'Tienes que facturar la venta primero, despues puedes imprimir la orden', color:'warning'})
     }
   },
   computed:{
     SUCURSAL_ID(){
       return this.$store.state.sucursal;
-    }
+    },
+    USUARIO(){
+      return this.$store.state.usuario;
+    },
   },
   async fetch (){
     this.cargarOrden(1);

@@ -25,8 +25,8 @@
             <v-tab :key="0">Información General</v-tab>
             <v-tab  :key="1">Inventario Disponible</v-tab>
             <v-tab  :key="2">Entradas-Salidas</v-tab>
-            <v-tab  :key="3">Ordenes de Entrada</v-tab>
-            <v-tab  :key="4">Fotos</v-tab>
+            <v-tab  :key="3">Historial Completa</v-tab>
+            <v-tab  :key="4">Ordenes de Entrada</v-tab>
             <v-tab  :key="5">Ventas</v-tab>
           </v-tabs>
         </template>
@@ -36,6 +36,8 @@
         <v-tab-item :key="0" >1</v-tab-item>
         <v-tab-item :key="1" ><stock/></v-tab-item>
         <v-tab-item :key="2" ><entradas_salidas/></v-tab-item>
+        <v-tab-item :key="4" ><historial_articulo/></v-tab-item>
+
       </v-tabs-items>
     </v-card>
   </v-dialog>
@@ -46,8 +48,9 @@
 import info from "@/components/Inventario/info";
 import entradas_salidas from "@/components/Inventario/info/entradas_salidas";
 import stock from "@/components/Inventario/info/stock";
+import historial_articulo from "@/components/Inventario/info/historial_articulo.vue";
 export default {
-  components:{info, entradas_salidas, stock},
+  components:{info, entradas_salidas, stock, historial_articulo},
   name: "peps",
   data(){
     return{

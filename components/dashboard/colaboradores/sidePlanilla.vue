@@ -15,7 +15,7 @@
       </v-list-item>
     </v-list-group>
 
-    <v-list-group v-if="PERMISOS.includes(133)">
+    <v-list-group v-if="PERMISOS.includes(133) || PERMISOS.includes(134)">
       <template v-slot:activator value="true">
         <v-list-item-title>Notificaciones</v-list-item-title>
       </template>
@@ -23,6 +23,9 @@
         Crear Notificación
       </v-list-item>
       <v-list-item class="itemOpciones" @click="go('/colaborador/notificaciones/')">
+        Notificaciones Creadas
+      </v-list-item>
+      <v-list-item v-if="PERMISOS.includes(134)" class="itemOpciones" @click="go('/colaborador/notificaciones/all_norificaciones')">
         Notificaciones
       </v-list-item>
     </v-list-group>

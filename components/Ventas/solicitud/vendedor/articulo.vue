@@ -3,7 +3,7 @@
         <h5>Artículo</h5>
         <hr>
         <v-container>
-            <v-row no-gutters>
+            <v-row v-if="Soli.is_combo === 0" no-gutters>
                 <v-col cols="5">
                     <v-card>
                         <h6 class="text-center">{{foto.titulo}}</h6>
@@ -58,6 +58,38 @@
                     </div>
                 </v-col>
             </v-row>
+            <v-simple-table v-else-if="Soli.is_combo === 1">
+              <template>
+                <thead>
+                <tr><th colspan="7">Nombre del Combo</th></tr>
+                </thead>
+                <tbody>
+                <tr><td colspan="7">{{Soli.combo.nombre}}</td></tr>
+                </tbody>
+                <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
+                  <th>Cod. Sistema</th>
+                  <th>Cod. Proveedor</th>
+                  <th>Familia</th>
+                  <th>Sub_Familia</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in Soli.combo.detalle_combo">
+                  <td>{{item.articulo.nombre_articulo}}</td>
+                  <td>{{item.articulo.marca.nombre}}</td>
+                  <td>{{item.articulo.marca.proveedor.nombre}}</td>
+                  <td>{{item.articulo.codigo_sistema}}</td>
+                  <td>{{item.articulo.codigo_proveedor}}</td>
+                  <td>{{item.articulo.sub_familia_articulo.familia_articulo.nombre}}</td>
+                  <td>{{item.articulo.sub_familia_articulo.nombre}}</td>
+                </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
         </v-container>
     </v-card>
 </template>
@@ -66,6 +98,11 @@
     export default {
         name: "articulo",
         computed:{
+          Soli:{
+            get:function () {
+              return this.$store.state.solicitud_credito.Solicitud;
+            }
+          },
             EstadoVista(){
                 return this.$store.state.solicitud_credito.EstadoVistaSolicitud;
             },
@@ -73,6 +110,10 @@
                 return this.$store.state.solicitud_credito.Solicitud.articulo;
             },
             Imgs(){
+              let fotos = [];
+              if (this.Soli.is_combo === 1){
+                return [];
+              }else
                 return this.$store.state.solicitud_credito.Solicitud.articulo.fotos_articulos;
             },
             View_Tarea: {
@@ -93,19 +134,19 @@
             }
         },
         created() {
-            this.Imgs.forEach( (i) => {
-                console.log(i)
+            if (this.Soli.is_combo === 0){
+              this.Imgs.forEach( (i) => {
                 if (i.isPrincipal == 1){
-                    console.log(i)
-                    this.foto.src = i.url;
-                    this.foto.titulo = i.detalle
+                  console.log(i)
+                  this.foto.src = i.url;
+                  this.foto.titulo = i.detalle
                 }
-            })
-            if (!this.foto.src){
+              })
+              if (!this.foto.src){
                 this.foto.src = 'https://ign-surti.nyc3.digitaloceanspaces.com/no-found.png';
                 this.foto.titulo = 'Foto no encontrada del artículo'
+              }
             }
-            console.log(this.foto)
         }
     }
 </script>

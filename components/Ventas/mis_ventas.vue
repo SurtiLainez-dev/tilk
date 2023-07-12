@@ -57,11 +57,15 @@
                           </tr>
                         <tr v-if="DATA_VENTA.contrato_cliente.remision_articulo.articulo.is_motocicleta === 1 ||  DATA_VENTA.contrato_cliente.remision_articulo.articulo.is_motocicleta === true">
                           <td>Permiso de Circulación</td>
-                          <td><b-link @click="solicitarClave">Descargar Permiso</b-link></td>
+                          <td><b-link @click="solicitarClave(1)">Descargar Permiso</b-link></td>
                         </tr>
                         <tr>
                           <td>Cargar Expediente Completo</td>
                           <td><b-link @click="infoExpedienteCompleto">Cargar Expediente</b-link></td>
+                        </tr>
+                        <tr>
+                          <td>Tarjeta de la Venta</td>
+                          <td><b-link @click="solicitarClave(2)">Descargar Tarjeta</b-link></td>
                         </tr>
                         </tbody>
                       </table>
@@ -587,8 +591,12 @@ export default {
     this.cargarColaboradores();
   },
   methods:{
-    abrirNavegador(clave){
-      ipcRenderer.send('pint_navegador', this.urlA+'documentos/permiso_s_placa/usuario='+this.USUARIO+'&chasis='+this.DATA_VENTA.contrato_cliente.remision_articulo.serie_fabricante+'/'+clave);
+    abrirNavegador(clave, tipo){
+      if (tipo === 1)
+        ipcRenderer.send('pint_navegador', this.urlA+'documentos/permiso_s_placa/usuario='+this.USUARIO+'&chasis='+this.DATA_VENTA.contrato_cliente.remision_articulo.serie_fabricante+'/'+clave);
+      else if (tipo === 2)
+        ipcRenderer.send('pint_navegador', this.urlA+'documentos/imprimir_tarjeta/usuario='+this.USUARIO+'&venta='+this.DATA_VENTA.cod+'&'+clave);
+
       this.$store.commit('activarOverlay', false);
     },
     capturarDireccion(dir){
@@ -686,6 +694,7 @@ export default {
         decision:    decision,
         regalias:    this.Regalias,
         componentes: this.Componentes,
+        is_combo:    0,
         remision_id: this.DATA_VENTA.contrato_cliente.remision_articulo_id,
         venta_id:    this.DATA_VENTA.id,
         sucursal_id: this.DATA_VENTA.colaborador.sucursal_id,
@@ -714,10 +723,10 @@ export default {
         this.notificacion('Ha ocurrido un error, comunicate con el soporte técnico.','error');
       })
     },
-    solicitarClave(){
+    solicitarClave(tipo){
       this.$store.commit('activarOverlay', true);
       this.$axios.post('solicitar_clave_doucmento').then((res)=>{
-        this.abrirNavegador(res.data.clave);
+        this.abrirNavegador(res.data.clave, tipo);
       }).catch((error)=>{
         this.$store.commit('notificacion',{texto:'Ocurrio un error', color:'error'});
         this.$store.commit('activarOverlay', false);

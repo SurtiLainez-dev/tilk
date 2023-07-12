@@ -28,7 +28,8 @@
 
                 <v-stepper-content step="2">
                     <small>Datos del artículo</small>
-                    <articulo :articulo="articulo" :precio="precio"/>
+                    <articulo  v-if="!combo" :articulo="articulo" :precio="precio"/>
+                    <combo v-else :combo="articulo" :precio="precio"/>
                 </v-stepper-content>
 
                 <v-stepper-content step="3">
@@ -36,7 +37,7 @@
                 </v-stepper-content>
 
                 <v-stepper-content step="4">
-                    <revision v-if="vistaSolicitud === 4"/>
+                    <revision :combo="combo" v-if="vistaSolicitud === 4"/>
                 </v-stepper-content>
             </v-stepper-items>
         </v-stepper>
@@ -48,12 +49,14 @@
     import articulo from "./solicitud/articulo";
     import referencias from "./solicitud/referencias";
     import revision from "./solicitud/revision";
+    import combo from "@/components/Ventas/solicitud/combo.vue";
     export default {
-        components:{cliente, articulo, referencias, revision},
+        components:{cliente, articulo, referencias, revision, combo},
         props:{
             precio:     Object,
             articulo:   Object,
-            forma_pago: String
+            forma_pago: String,
+            combo:      Boolean
         },
         name: "solicitud_credito",
         computed:{

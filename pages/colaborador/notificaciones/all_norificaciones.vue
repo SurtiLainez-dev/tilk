@@ -2,7 +2,7 @@
 <v-card flat>
   <v-card flat height="100" color="grey lighten-5">
     <v-toolbar color="grey lighten-5" flat dense>
-      <v-toolbar-title>Notificaciones Generadas</v-toolbar-title>
+      <v-toolbar-title>Todas las Notificaciones Generadas</v-toolbar-title>
       <v-spacer></v-spacer>
     </v-toolbar>
 
@@ -22,12 +22,10 @@
 <script>
 import notificaciones from "@/components/tablas/colaboradores/notificaciones.vue";
 export default {
-  name: "index",
-  components:{
-    notificaciones
-  },
+  name: "all_norificaciones",
+  components:{notificaciones},
   created() {
-    this.$store.commit('guardarTitulo','Colaboradores > Notificaciones > Propias');
+    this.$store.commit('guardarTitulo','Colaboradores > Notificaciones > Todas las Notificaciones');
     this.cargarNotificaciones();
   },
   data(){
@@ -44,7 +42,7 @@ export default {
   },
   methods:{
     cargarNotificaciones() {
-      this.$axios.get('memo/propias/'+this.USUARIO_ID).then((res)=>{
+      this.$axios.get('memo/notificaciones').then((res)=>{
         this.data = res.data.notificaciones;
         this.load = false;
       })

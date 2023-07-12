@@ -1,22 +1,56 @@
 <template>
   <v-app>
     <side/>
-    <v-app-bar height="35" app>
-
-      <v-tabs height="35" v-model="tab" align-with-title hide-slider>
-        <v-tab v-for="item in Pes" :key="item.key" class="blue-grey lighten-5">
-          <small>{{ item.titulo }}</small>
-          <div class="pl-5">
-            <v-btn width="15px" height="15px" @click="$store.commit('quitar_pestania', item.valor)"
-                   fab color="indigo" dark v-if="item.key > 0"> <small>x</small>
-            </v-btn>
-            <v-btn class="ml-3 border" width="5px" height="15px" @click="$store.commit('cambiar_MENU')"
-                   fab color="success" dark v-if="!$store.state.MENU" icon>
-              <v-icon>mdi-menu</v-icon>
-            </v-btn>
-          </div>
-        </v-tab>
-      </v-tabs>
+    <v-app-bar  height="50" app>
+      <v-row no-gutters>
+        <v-col cols="9">
+          <v-tabs height="50" v-model="tab" align-with-title hide-slider>
+            <v-tab v-for="item in Pes" :key="item.key" class="blue-grey lighten-5">
+              <small>{{ item.titulo }}</small>
+              <div class="pl-5">
+                <v-btn width="15px" height="15px" @click="$store.commit('quitar_pestania', item.valor)"
+                       fab color="indigo" dark v-if="item.key > 0"> <small>x</small>
+                </v-btn>
+                <v-btn class="ml-3 border" width="5px" height="15px" @click="$store.commit('cambiar_MENU')"
+                       fab color="success" dark v-if="!$store.state.MENU" icon>
+                  <v-icon>mdi-menu</v-icon>
+                </v-btn>
+              </div>
+            </v-tab>
+          </v-tabs>
+        </v-col>
+        <v-col cols="3" class="d-flex justify-end align-center white">
+          <v-badge :value="isNotificaciones" bordered bottom overlap offset-x="20" offset-y="20">
+            <v-avatar class="cursor" height="35" ><v-icon>mdi-bell</v-icon></v-avatar>
+          </v-badge>
+          <v-chip color="transparent">
+            {{USUARIO}}
+            <v-menu rounded offset-y>
+              <template v-slot:activator="{attrs, on}">
+                <v-badge overlap flet offset-x="10"
+                         offset-y="10" dot :value="isNotificaciones">
+                  <v-btn small icon tile text color="grey" dark v-bind="attrs" v-on="on">
+                    <v-icon>mdi-menu-down</v-icon>
+                  </v-btn>
+                </v-badge>
+              </template>
+              <v-list>
+                <v-list-item link @click="go('/inicio/otras_gestiones/mi_perfil')">
+                  <v-list-item-title v-text="'Mi Perfil'" ></v-list-item-title>
+                </v-list-item>
+                <v-list-item link @click="go('/inicio/otras_gestiones/ordenes_genericas')">
+                  <v-list-item-title v-text="'Mis Ordenes'" ></v-list-item-title>
+                </v-list-item>
+                <v-list-item link>
+                  <v-badge offset-x="10" :value="isNotificaciones" left :content="Notificaciones" color="success">
+                    <v-list-item-title v-text="'Notificaciones'"></v-list-item-title>
+                  </v-badge>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-chip>
+        </v-col>
+      </v-row>
     </v-app-bar>
 
     <v-main app>
@@ -67,6 +101,8 @@
           </v-btn>
         </template>
       </v-snackbar>
+
+
     </v-main>
   </v-app>
 </template>
@@ -92,6 +128,7 @@ import motocicletas from "@/components/Inventario/motocicletas.vue";
 import ordenes_entradas from "@/components/Inventario/ordenes_entradas.vue";
 import guia_remision_entradas from "@/components/Inventario/guia_remision_entradas.vue";
 import gastos_index from "@/components/contabilidad/gastos_index.vue";
+
 export default {
   watch: {
     over (val) {
@@ -106,6 +143,8 @@ export default {
   data(){
     return{
       dia: true,
+      isNotificaciones: false,
+      Notificaciones: 0,
       descargaTerminada: false,
       actualizacion:  true,
       refe: null,
@@ -117,16 +156,16 @@ export default {
     }
   },
   created() {
-    this.consultarActualizacion();
+    // this.consultarActualizacion();
     this.$store.commit('direcciones/cargar_COLONIAS');
     this.$store.commit('direcciones/cargar_DISTRITOS');
     this.$store.commit('direcciones/cargar_MUNICIPIOS');
     this.$store.commit('direcciones/cargar_DEPARTAMENTOS');
     this.calcularFecha();
 
-    setInterval(()=>{
-      this.consultarActualizacion();
-    }, 7200000);
+    // setInterval(()=>{
+    //   this.consultarActualizacion();
+    // }, 7200000);
 
     ipcRenderer.on('descarga-version-terminada', (event, arg) => {
       this.dirDescargado = arg;
@@ -166,6 +205,9 @@ export default {
     },
     Pes(){
       return this.$store.state.pestana
+    },
+    USUARIO(){
+      return this.$store.state.usuario;
     }
   },
   methods:{
@@ -215,9 +257,12 @@ export default {
         this.urlVersion    = res.data.url;
       })
     },
+    go(url){
+      this.$router.push(url)
+    },
     instalarVersion(){
       ipcRenderer.send('instalar-version', this.dirDescargado);
-    }
+    },
   }
 }
 </script>
@@ -261,5 +306,8 @@ export default {
   }
   .hidden {
     display: none;
+  }
+  .cursor:hover{
+    cursor: pointer;
   }
 </style>

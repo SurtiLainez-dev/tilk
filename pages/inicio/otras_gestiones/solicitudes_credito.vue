@@ -17,15 +17,13 @@
                       loading-text="Cargando nuevos datos"
                       :loading="loadSolicitudes"
                       class="rowsTable">
-            <template v-slot:item.cliente.nombres="{item}">
-                {{item.cliente.nombres}} {{item.cliente.apellidos}}
+            <template v-slot:item.clN="{item}">
+                {{item.clN}} {{item.clA}}
             </template>
-            <template v-slot:item.user.colaborador.nombres="{item}">
-                {{item.user.colaborador.nombres}} {{item.user.colaborador.apellidos}}
+            <template v-slot:item.colN="{item}">
+                {{item.colN}} {{item.colA}}
             </template>
-            <template v-slot:item.fecha_creado="{item}">
-                {{item.fecha_creado.split('-')[2]}}/{{item.fecha_creado.split('-')[1]}}/{{item.fecha_creado.split('-')[0]}}
-            </template>
+
             <template v-slot:item.estado="{item}">
                 <v-chip v-if="item.estado === 1" x-small dark color="warning">Pendiente</v-chip>
                 <v-chip v-else-if="item.estado === 2" x-small dark color="indigo">Falta documentación</v-chip>
@@ -35,7 +33,7 @@
             </template>
         </v-data-table>
 
-        <v-dialog v-model="dialogo" width="70%" v-if="dialogo">
+        <v-dialog v-model="dialogo" width="98%" v-if="dialogo">
             <v-card class="gray lighten-5">
                 <v-card flat class="pl-5 pr-5 pb-3">
                     <vista_vendedor :tipo="1"/>
@@ -59,10 +57,9 @@
                 search: '',
                 header:[
                     {text:'Referencia', value: 'codigo'},
-                    {text:'Nombre del cliente', value: 'cliente.nombres'},
-                    {text:'Artículo', value: 'articulo.descripcion_corta'},
-                    {text:'Creado por', value: 'user.colaborador.nombres'},
-                    {text:'Fecha creado', value: 'fecha_creado'},
+                    {text:'Nombre del cliente', value: 'clN'},
+                    {text:'Artículo', value: 'articulo'},
+                    {text:'Creado por', value: 'colN'},
                     {text:'Estado', value: 'estado'},
                 ],
             }
@@ -109,9 +106,12 @@
         },
         methods:{
             SeleccionarSolicitud(item){
-                this.$store.commit('solicitud_credito/datoSolicitud', item);
-                this.dialogo = true;
-                console.log(this.$store.state.solicitud_credito.Solicitud)
+                this.$store.commit('activarOverlay', true);
+                this.$axios.get('solicitud_credito/'+item.id).then((res)=>{
+                  this.$store.commit('solicitud_credito/datoSolicitud', res.data.solicitud);
+                  this.dialogo = true;
+                  this.$store.commit('activarOverlay', false);
+                })
             }
         }
     }

@@ -3,7 +3,7 @@ module.exports = {
 	components: true,
 	head: {
 		script:[
-			{ src: 'https://cdn.jsdelivr.net/npm/chart.js@2.8.0'}
+			{ src: 'https://cdn.jsdelivr.net/npm/chart.js@2.8.0'},
 		],
 		meta: [
 			{ charset: 'utf-8' },
@@ -34,7 +34,7 @@ module.exports = {
 			}
 			// Extend only webpack config for client-bundle
 			if (isClient) { config.target = 'electron-renderer' }
-		}
+		},
 	},
 	router:{
 		middleware:[
@@ -51,6 +51,7 @@ module.exports = {
 		'@/plugins/chartjs',
 	],
 	modules: [
+		"vue2-editor/nuxt",
 		'@nuxtjs/axios',
 		'@nuxtjs/vuetify',
 		'bootstrap-vue/nuxt',

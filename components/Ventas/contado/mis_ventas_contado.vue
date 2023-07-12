@@ -69,7 +69,7 @@
           <v-card v-if="itemId === 1" flat>
             <v-alert dense color="warning" dark class="ma-2">Si el artículo es una <strong>MOTOCICLETA</strong>, subir los archivos que se le solicitan. Sino es
             motocicleta, prosiga a la finalización de la venta.</v-alert>
-            <v-card flat v-if="!DATA_VENTA.documento_ventas">
+            <v-card flat >
               <v-simple-table dense class="rowsTable">
                 <template v-slot:default>
                   <thead>
@@ -115,7 +115,7 @@
               <v-file-input dense class="ma-4" v-model="doc.garantia" label="Cargar Hoja de Garantía"></v-file-input>
               <v-divider></v-divider>
             </v-card>
-            <v-card flat v-else>
+            <v-card flat >
               <v-simple-table dense class="rowsTable">
                 <template v-slot:default>
                   <thead>
@@ -358,6 +358,7 @@
                       label="Colaborador a enviar venta"
                       :items="Colaboradores"></v-select>
             <v-divider></v-divider>
+
             <v-simple-table dense class="rowsTable">
               <template v-slot:default>
                 <caption>Seleccionar dirección de envio</caption>

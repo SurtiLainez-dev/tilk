@@ -12,87 +12,56 @@
   <v-card flat class="ma-2">
     <v-form ref="FormNuevaNotificacion">
       <v-row>
-        <v-col cols="6">
-          <v-row>
-            <v-col>
-              <v-textarea rows="2" outlined dense label="Asunto" :rules="[rule.nombres.req, rule.nombres.min, rule.exp.max]"
-                          counter v-model="not.asunto" class="ma-2" :counter="200"></v-textarea>
-              <v-autocomplete dense label="Tipo de Docuento" v-model="not.tipo"
-                              class="ma-2" :loading="tipo.load" :rules="[rule.nombres.req]"
-                              :items="tipos" :item-text="'nombre'" :item-value="'id'"></v-autocomplete>
-              <v-radio-group class="ma-2" v-model="not.grupal" col>
-                <v-radio label="Firma Individual" :value="0"></v-radio>
-                <v-radio label="Firma Grupal" :value="1"></v-radio>
-              </v-radio-group>
-              <v-switch label="Agregar links externos" class="ma-2" v-model="not.docs"></v-switch>
-              <v-card flat tile v-if="not.docs">
-                <v-simple-table dense>
-                  <template>
-                    <thead>
-                    <tr>
-                      <th>Nombre</th>
-                      <th>Link</th>
-                      <th>Quitar</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="item in not.links">
-                      <td>
-                        <v-text-field :rules="[rule.nombres.req, rule.nombres.min]" dense v-model="item.nombre"></v-text-field>
-                      </td>
-                      <td>
-                        <v-text-field :rules="[rule.nombres.req, rule.nombres.min]" @keyup.enter="agregarLink" dense v-model="item.link"></v-text-field>
-                      </td>
-                      <td>
-                        <v-btn icon fab x-small color="red" @click="deleteLink(item.key)" text dark><v-icon small>fa fa-times</v-icon></v-btn>
-                      </td>
-                    </tr>
-                    </tbody>
-                  </template>
-                </v-simple-table>
-              </v-card>
-
-              <v-card flat tile :loading="loadUsers" class="mx-auto">
-                <v-toolbar flat color="grey lighten-4">
-                  <v-toolbar-title>Usuarios</v-toolbar-title>
-                </v-toolbar>
-
-                <v-container class="py-0">
-                  <v-row align="center" justify="start">
-                    <v-col v-for="(selection, i) in selectedUsers" :key="i" class="shrink">
-                      <v-chip x-small :disabled="loading" close @click:close="deleteUser(selection.key)">
-                        {{ selection.nombres }}
-                      </v-chip>
-                    </v-col>
-
-                    <v-col cols="12">
-                      <v-text-field ref="search" v-model="search" full-width dense class="ma-2"
-                          hide-details label="Escribe el nombre para buscar" single-line></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-container>
-                <v-divider v-if="!allSelected"></v-divider>
-                <v-list dense height="200">
-                  <template v-for="(item, i) in Users">
-                    <v-list-item :key="i" :disabled="loading"
-                        @click="selectedUsers.push(item)" v-if="!selectedUsers.includes(item) && i < 5">
-                      <v-list-item-title v-text="item.text"></v-list-item-title>
-                    </v-list-item>
-                  </template>
-                </v-list>
-
-              </v-card>
-            </v-col>
-          </v-row>
+        <v-col>
+          <v-textarea rows="2" outlined dense label="Asunto" :rules="[rule.nombres.req, rule.nombres.min, rule.exp.max]"
+                      counter v-model="not.asunto" class="ma-2" :counter="200"></v-textarea>
+          <v-autocomplete dense label="Tipo de Docuento" v-model="not.tipo"
+                          class="ma-2" :loading="tipo.load" :rules="[rule.nombres.req]"
+                          :items="tipos" :item-text="'nombre'" :item-value="'id'"></v-autocomplete>
+          <v-radio-group class="ma-2" v-model="not.grupal" col>
+            <v-radio label="Firma Individual" :value="0"></v-radio>
+            <v-radio label="Firma Grupal" :value="1"></v-radio>
+          </v-radio-group>
         </v-col>
-        <v-divider vertical></v-divider>
+        <v-col>
+          <v-card flat tile :loading="loadUsers" class="mx-auto">
+            <v-toolbar flat color="grey lighten-4">
+              <v-toolbar-title>Usuarios</v-toolbar-title>
+            </v-toolbar>
+
+            <v-container class="py-0">
+              <v-row align="center" justify="start">
+                <v-col v-for="(selection, i) in selectedUsers" :key="i" class="shrink">
+                  <v-chip x-small :disabled="loading" close @click:close="deleteUser(selection.key)">
+                    {{ selection.nombres }}
+                  </v-chip>
+                </v-col>
+
+                <v-col cols="12">
+                  <v-text-field ref="search" v-model="search" full-width dense class="ma-2"
+                                hide-details label="Escribe el nombre para buscar" single-line></v-text-field>
+                </v-col>
+              </v-row>
+            </v-container>
+
+            <v-list v-if="search.length > 0" dense height="100">
+              <template v-for="(item, i) in Users">
+                <v-list-item :key="i" :disabled="loading"
+                             @click="selectedUsers.push(item)" v-if="!selectedUsers.includes(item) && i < 3">
+                  <v-list-item-title v-text="item.text"></v-list-item-title>
+                </v-list-item>
+              </template>
+            </v-list>
+
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-divider></v-divider>
+      <v-row>
         <v-col >
-          <v-row>
-            <v-col>
-              <v-textarea outlined rows="25" dense class="ma-2" label="Contenido" :rules="[rule.nombres.req, rule.nombres.min, rule.not.max]"
-                          v-model="not.contenido" :counter="2000"></v-textarea>
-            </v-col>
-          </v-row>
+          <client-only>
+            <VueEditor v-model="not.contenido" />
+          </client-only>
         </v-col>
       </v-row>
     </v-form>
@@ -132,6 +101,7 @@
 
 <script>
 import {ipcRenderer} from "electron";
+import { VueEditor } from "vue2-editor";
 
 export default {
   name: "nuevo",
@@ -279,7 +249,7 @@ export default {
         }
         this.$store.commit('activarOverlay', true);
         this.$axios.post('memo/documento',{
-          usuarios:  JSON.stringify(this.usuarios),
+          usuarios:  JSON.stringify(users),
           asunto:    this.not.asunto,
           contenido: this.not.contenido,
           urls:      JSON.stringify(files),

@@ -1,11 +1,15 @@
 <template>
-    <v-card>
-      <v-card-title>Remisiones por Aceptar</v-card-title>
+    <v-card tile>
+      <v-toolbar flat tile>
+        <v-toolbar-title>Remisiones por Aceptar</v-toolbar-title>
+      </v-toolbar>
+      <v-divider></v-divider>
       <v-data-table :headers="header"
                     :loading="load"
                     dense
                     @click:row="abrirDialogoVerificacion"
                     class="rowsTable"
+                    :items-per-page="4"
                     loading-text="Cargando datos ..."
                     :items="Transferencias">
       </v-data-table>

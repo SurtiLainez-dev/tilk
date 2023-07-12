@@ -168,8 +168,7 @@ export default {
   },
   created() {
     let     f = new Date();
-    // let fecha = f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate();
-    let fecha = '2023-06-13'
+    let fecha = f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate();
     this.$store.commit('caja/cargar_HISTORIAL', fecha);
     this.$store.commit('caja/cargar_TRANSACCIONES', fecha);
     this.cargarCcCuentasBancos();
@@ -256,8 +255,7 @@ export default {
   methods:{
     abrirNavegador(clave){
       let     f = new Date();
-      // let fecha = f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate();
-      let fecha = '2023-06-13'
+      let fecha = f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate();
       let url = this.$axios.defaults.baseURL+`documentos/cajas/cierre/usuario=${this.USUARIO}/caja=${this.INFOCAJA.codigo}/fecha=${fecha}/${clave}`;
       ipcRenderer.send('pint_navegador', url);
       this.$store.commit('activarOverlay', false);
@@ -279,8 +277,7 @@ export default {
       if (this.cierre.file){
         let data = new FormData();
         let     f = new Date();
-        // let fecha = f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate();
-        let fecha = '2023-06-13'
+        let fecha = f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate();
         data.append('caja_id', this.CAJA);
         data.append('cierre_id',this.cierre.cierre);
         data.append('file', this.cierre.file);
@@ -321,8 +318,7 @@ export default {
     registrarCierre(){
       this.dialogoCierre = false;
       let     f = new Date();
-      // let fecha = f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate();
-      let fecha = '2023-06-13'
+      let fecha = f.getFullYear()+'-'+(f.getMonth() + 1)+'-'+f.getDate();
       this.$store.commit('activarOverlay', true);
       this.$axios.post('caja/cierre',{
         caja_id: this.CAJA,

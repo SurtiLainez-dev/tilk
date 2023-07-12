@@ -166,6 +166,7 @@
           headerPermisos:  [
             {text:'Módulo', value:'nombre'},
             {text:'Usuario', value: 'user_id'},
+            {text:'#', value: 'num'},
             {text:'Estado', value:'estado', align:'center'}
           ]
         }

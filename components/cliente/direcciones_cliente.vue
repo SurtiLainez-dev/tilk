@@ -244,8 +244,9 @@ export default {
     validarDirecciones(){
       let bandera = 0;
       this.Direcciones.forEach( (i, cont) =>{
-        if (!this.$refs.FormDireccionescliente[cont].validate())
-          bandera++
+        console.log(cont)
+        // if (!this.$refs.FormDireccionescliente[cont].validate())
+        //   bandera++
       })
 
       if (bandera === 0)

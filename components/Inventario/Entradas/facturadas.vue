@@ -306,7 +306,8 @@
           proveedor: this.Ingreso.proveedor,
           sucursal:  this.Ingreso.sucursal,
           tipo:      this.tipo,
-          articulos: this.Ingreso.articulo
+          articulos: this.Ingreso.articulo,
+          observacion: this.Ingreso.observacion
         },{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token

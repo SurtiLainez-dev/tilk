@@ -34,12 +34,15 @@
     <td v-if="ORDEN.tipo_entrada_articulo_id !==2" colspan="2">{{ORDEN.user.colaborador.nombres}} {{ORDEN.user.colaborador.apellidos}}</td>
     <td v-else >{{ORDEN.user.colaborador.nombres}} {{ORDEN.user.colaborador.apellidos}}</td>
     <td>
-      <v-chip x-small dark v-if="orden.estado ===1" color="success">Registrado</v-chip>
+      <v-chip x-small dark v-if="ORDEN.estado === 1" color="success">Registrado</v-chip>
       <v-chip x-small dark v-else color="red">Pendiente</v-chip>
     </td>
     <td><b-link @click="imprimir">Ver documento</b-link></td>
     <td v-if="ORDEN.tipo_entrada_articulo_id ===2"><b-link @click="goGuiaRemision">Ver Guía</b-link></td>
-    <td><b-link disabled>Ver documento</b-link></td>
+    <td v-if="ORDEN.estado === 1" @click="verDocumento(ORDEN.file_subdio)"><b-link>Ver documento</b-link></td>
+    <td v-else-if="ORDEN.estado === 0">
+      <v-btn tile small dark color="pink" @click="dialogo = true">Cargar Documento</v-btn>
+    </td>
   </tr>
   </tbody>
   <thead>
@@ -109,6 +112,19 @@
   </tr>
   </tbody>
 </table>
+
+
+  <v-dialog v-model="dialogo" width="40%">
+    <v-card>
+      <v-card-title>Cargando Orden Firmado</v-card-title>
+      <v-divider></v-divider>
+      <v-file-input class="ma-2" v-model="file" label="Documento firmado" accept="application/pdf"></v-file-input>
+      <v-card-actions class="d-flex justify-end">
+        <v-btn color="orange" text dark small tile @click="dialogo = false">Cerrar</v-btn>
+        <v-btn color="success" dark small tile @click="cargarDocumento">Registrar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </v-card>
 </template>
 
@@ -126,6 +142,12 @@ export default {
       return this.$store.state.pestana
     },
   },
+  data(){
+    return{
+      dialogo: false,
+      file: null
+    }
+  },
   methods:{
     anadirPestana(key, titulo){
       let bandera = 0;
@@ -136,6 +158,35 @@ export default {
       if (bandera === 0){
         this.$store.commit('anadirCaja', {titulo:titulo, key: key});
         this.$store.commit('cambiarTab', {val:key, tipo:false});
+      }
+    },
+    cargarDocumento(){
+      if (this.file){
+        this.dialogo = false;
+        this.$store.commit('activarOverlay', true);
+        let data = new FormData();
+        data.append('file', this.file);
+        data.append('orden', this.ORDEN.id);
+        this.$axios({
+          method: 'post',
+          data:   data,
+          url:    'orden_entrada/firmado',
+          headers:{
+            'Authorization': 'Bearer ' + this.$store.state.token,
+            'Content-Type': "multipart/form-data"
+          }
+        }).then((res)=>{
+            this.$store.commit('inventario/ordenes_entrada/cargar_ORDEN', this.ORDEN.id);
+            this.$store.commit('notificacion', {texto:res.data.msj, color:'success'});
+            this.$store.commit('activarOverlay', false);
+            this.file = null;
+          this.$store.commit('inventario/ordenes_entrada/cargar_ORDENES');
+        }).catch((error)=>{
+          this.$store.commit('notificacion', {texto:'Hubo un error en el servidor', color:'error'});
+          this.$store.commit('activarOverlay', false);
+        })
+      }else{
+        this.$store.commit('notificacion',{texto:'Tienes que cargar un documentos', color:'warning'});
       }
     },
     goGuiaRemision(){
@@ -160,6 +211,19 @@ export default {
         }
       })
     },
+    verDocumento(URL){
+      this.$store.commit('activarOverlay',  true);
+      this.$axios.post('leer_documento/',
+          {ubicacion: URL}).then((res)=>{
+        if (res.status === 200){
+          ipcRenderer.send('pint_navegador', res.data.url);
+          this.$store.commit('activarOverlay', false);
+        }
+      }).catch((error)=>{
+        this.$store.commit('notificacion',{texto:'Hubo un error al cargar el documento',color:'error'})
+        this.$store.commit('activarOverlay', false);
+      })
+    }
   },
   created() {
     this.$store.commit('activarOverlay', false);

@@ -17,6 +17,8 @@
         </v-row>
       </v-card>
 
+      <v-progress-linear v-if="LOADANTICIPOS" indeterminate></v-progress-linear>
+
       <table>
         <thead>
         <tr><th v-for="i in headers" v-text="i.text"></th></tr>

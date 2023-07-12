@@ -9,14 +9,12 @@
                 <v-text-field v-model="item.key + 1" disabled></v-text-field>
               </td>
               <td>
-                <v-text-field v-model="item.detalle" label="Detalle del Número"
-                              :rules="[rules.num.req, rules.detalle.min, rules.detalle.max]"
-                              :disabled="item.key < longTelefonos"></v-text-field>
+                <v-text-field v-model="item.detalle" label="Detalle del Número" class="ma-2"
+                              :rules="[rules.num.req, rules.detalle.min, rules.detalle.max]"></v-text-field>
               </td>
               <td>
-                <v-text-field v-model="item.num" label="Número de Telefono"
-                              :rules="[rules.num.req, rules.num.min, rules.num.tel, rules.num.max]"
-                              :disabled="item.key < longTelefonos"></v-text-field>
+                <v-text-field v-model="item.num" label="Número de Telefono" class="ma-2"
+                              :rules="[rules.num.req, rules.num.min, rules.num.tel, rules.num.max]"></v-text-field>
               </td>
               <td>
                 <v-btn fab tile color="red" x-small class="text-white" @click="removeTelefono(item.key)"
@@ -35,7 +33,7 @@
         <v-icon small left>fa fa-plus</v-icon>
         Agregar Telefono</v-btn>
       <v-btn color="success" class="text-white"
-             :disabled="!habilitarBtnEnvio" @click="validarTelefonos"
+              @click="validarTelefonos"
              small tile>Guardar Telefonos</v-btn>
     </v-card-actions>
   </v-card>

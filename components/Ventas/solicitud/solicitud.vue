@@ -1,6 +1,6 @@
 <template>
-    <v-container>
-        <v-toolbar flat color="teal darken-2" rounded dark>
+    <v-card tile flat class="ma-2">
+        <v-toolbar tile flat color="teal darken-2" rounded dark>
             <v-toolbar-title>Solicitud de crédito de {{Solicitud.cliente.nombres}} {{Solicitud.cliente.apellidos}} - {{Solicitud.cliente.identidad}}</v-toolbar-title>
         </v-toolbar>
         <v-tabs vertical class="grey lighten-5">
@@ -10,7 +10,7 @@
             <v-tab @click="cambiarVista('Referencias/Avales')">Referencias</v-tab>
             <v-tab @click="cambiarVista('Comentarios')">Comentarios</v-tab>
             <v-tab @click="cambiarVista('Tareas')">Tareas</v-tab>
-            <v-tab >Perfil</v-tab>
+            <v-tab >{{tituloPErfil}}</v-tab>
 
             <v-tab-item>
                 <v-card class="pl-5 pr-5 pb-5">
@@ -55,7 +55,7 @@
                                 <tbody>
                                 <tr>
                                     <th>Nombre completo:</th>
-                                    <td><input type="text" disabled :value="Cliente.nombres+' '+Cliente.apellidos"></td>
+                                    <td><b-link @click="perfilAval(Cliente.nombres, Cliente.id)">{{Cliente.nombres}} {{Cliente.apellidos}}</b-link></td>
                                 </tr>
                                 <tr>
                                     <th>Identidad:</th>
@@ -196,6 +196,7 @@
                     </v-row>
                 </v-card>
             </v-tab-item>
+
             <v-tab-item>
                 <v-card class="pl-5 pr-5 pb-5">
                     <v-card :disabled="cardDisabled" flat>
@@ -234,8 +235,8 @@
                     </v-card>
                     <v-divider></v-divider>
                     <v-row no-gutters>
-                        <v-col cols="8">
-                            <table class="rowsTable">
+                        <v-col>
+                            <table v-if="Solicitud.is_combo === 0" class="rowsTable">
                                 <tbody>
                                 <tr>
                                     <th>Nombre:</th>
@@ -274,6 +275,40 @@
                                     <td><input type="text" disabled :value="Articulo.codigo_proveedor"></td>
                                 </tr>
                                 </tbody>
+                            </table>
+                            <table v-else-if="Solicitud.is_combo === 1" class="rowsTable">
+                              <thead>
+                              <tr>
+                                <th colspan="7">Nombre del Combo</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <tr>
+                                <td colspan="7">{{Solicitud.combo.nombre}}</td>
+                              </tr>
+                              </tbody>
+                              <thead>
+                              <tr>
+                                <th>Nombre</th>
+                                <th>Marca</th>
+                                <th>Proveedor</th>
+                                <th>Modelo</th>
+                                <th>Sub_Familia</th>
+                                <th>Cod. Sistema</th>
+                                <th>Cod. Proveedor</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <tr v-for="item in Solicitud.combo.detalle_combo">
+                                <td>{{item.articulo.nombre_articulo}}</td>
+                                <td>{{item.articulo.marca.nombre}}</td>
+                                <td>{{item.articulo.marca.proveedor.nombre}}</td>
+                                <td>{{item.articulo.modelo}}</td>
+                                <td>{{item.articulo.sub_familia_articulo.nombre}}</td>
+                                <td>{{item.articulo.codigo_sistema}}</td>
+                                <td>{{item.articulo.codigo_proveedor}}</td>
+                              </tr>
+                              </tbody>
                             </table>
                         </v-col>
                     </v-row>
@@ -400,7 +435,7 @@
                         </v-col>
                     </v-row>
                     <br>
-                    <b-link v-if="Articulo.is_motocicleta === 0">Quitar traspaso de la prima</b-link>
+<!--                    <b-link v-if="Articulo.is_motocicleta === 0">Quitar traspaso de la prima</b-link>-->
                     <br>
                     <small>Tabla de pagos</small>
                     <hr>
@@ -492,6 +527,7 @@
                             <th>Solicitúd</th>
                             <th class="d-flex justify-center">Documentos</th>
                             <th>Rechazar</th>
+                            <th>Ver Perfil</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -519,7 +555,7 @@
                                   <span v-else-if="item.estado === 1">Declinar aval.</span>
                                 </v-tooltip>
                               </td>
-
+                              <td><b-link @click="perfilAval(item.cliente.nombres, item.cliente_id)">Ver Perfil</b-link></td>
                             </tr>
                         </tbody>
                     </table>
@@ -643,6 +679,8 @@
             <v-tab-item>
               <cliente/>
             </v-tab-item>
+
+
         </v-tabs>
 
 
@@ -795,7 +833,7 @@
             </v-container>
           </v-card>
         </v-dialog>
-    </v-container>
+    </v-card>
 </template>
 
 <script>
@@ -807,6 +845,7 @@
         name: "solicitud",
         data(){
             return{
+                tituloPErfil: '',
                 traspaso: 0,
                 dialogoTraspaso: false,
                 cardDisabled: false,
@@ -874,6 +913,7 @@
             }
         },
         created() {
+            this.tituloPErfil = this.Solicitud.cliente.apellidos
             if (this.Solicitud.estado < 3)
                 this.cardDisabled = false;
             else
@@ -997,6 +1037,12 @@
                     position: 'bottom-left',
                     duration: 4000
                 });
+            },
+            perfilAval(titulo, val){
+              this.$route.params.cliente = val;
+              this.$store.commit('cliente/cargar_CLIENTE', val)
+              this.tituloPErfil = titulo;
+              this.$store.commit('notificacion',{texto:'Se ha agregado el perfil a la vista', color:'success'})
             },
             registrarSoliitud(tipo){
                 this.btnEnvio = true;

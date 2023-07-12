@@ -84,34 +84,19 @@
       <tr>
         <th colspan="3">Artículo</th>
         <th colspan="2">Modelo</th>
-        <th v-if="CUENTA.facturada === 0" colspan="3">Marca</th>
-        <th v-else colspan="2">Marca</th>
+        <th colspan="3">Marca</th>
       </tr>
       </thead>
       <tbody>
-      <tr>
-        <td colspan="3" v-if="CUENTA.tipo_venta === 1 && CUENTA.facturas_contados" >
-          <table>
-            <tbody>
-            <tr v-for="item in CUENTA.facturas_contados">
-              <td>
-                {{item.articulo.nombre_articulo}} - {{item.articulo.modelo}} - {{item.articulo.marca.nombre}}</td>
-            </tr>
-            </tbody>
-          </table>
+      <tr v-for="item in CUENTA.facturas_contados">
+        <td colspan="3">
+          {{item.articulo.nombre_articulo}} - {{item.articulo.modelo}} - {{item.articulo.marca.nombre}}
         </td>
-        <td colspan="3" v-else-if="CUENTA.tipo_venta === 2">{{CUENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo}}</td>
         <td colspan="2">
-          <span v-if="CUENTA.tipo_venta === 2 && CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.modelo}}</span>
-          <span v-else>-</span>
+          <span >{{item.articulo.modelo}}</span>
         </td>
-        <td v-if="CUENTA.facturada === 0" colspan="3">
-          <span v-if="CUENTA.tipo_venta === 2 && CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</span>
-          <span v-else>-</span>
-        </td>
-        <td v-else colspan="2">
-          <span v-if="CUENTA.tipo_venta === 2 && CUENTA.contrato_cliente">{{CUENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</span>
-          <span v-else>-</span>
+        <td  colspan="3">
+          <span >{{item.articulo.marca.nombre}}</span>
         </td>
       </tr>
       </tbody>
@@ -590,17 +575,29 @@ export default {
       }
     },
     crearFactura(){
+      let cuerpo = [];
+      let serie = '', serieS = '';
       this.$store.commit('activarOverlay', true);
+      this.CUENTA.facturas_contados.forEach(item=>{
+        if (item.is_remision === 1){
+          serie  = item.remision_articulo.serie_fabricante;
+          serieS = item.remision_articulo.serie_sistema;
+        }else{
+          serie = '-';
+          serieS = '-';
+        }
+        cuerpo.push({
+          articulo: item.articulo.nombre_articulo,
+          serie:    serie,
+          serieS:   serieS
+        })
+      })
       this.$axios.post('venta/credito/generar_factura',{
         sucursal_id: this.SUCURSAL_ID,
         total:       this.CUENTA.total,
         venta_id:    this.CUENTA.id,
         caja_id:     this.CAJA.id,
-        cuerpo:      [{
-          articulo: this.CUENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo,
-          serie:    this.CUENTA.contrato_cliente.remision_articulo.serie_fabricante,
-          serieS:   this.CUENTA.contrato_cliente.remision_articulo.serie_sistema,
-        }],
+        cuerpo:      cuerpo
       }).then((res)=>{
         this.show = true;
         this.$axios.get('cuentas/ventas/'+this.CUENTA.id).then((res)=>{

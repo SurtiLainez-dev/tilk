@@ -163,7 +163,7 @@ export default {
     },
     cargarSolicitudes(){
       this.Load = true
-      this.$axios.get('solicitudes_credito/'+this.CLIENTE.id).then((res)=>{
+      this.$axios.get('solicitudes_credito_all/'+this.CLIENTE.id).then((res)=>{
         this.SOLICITUDES = res.data.solicitudes;
         this.SOLICITUDES_AVAL = res.data.soli_aval;
         this.Load = false

@@ -68,8 +68,8 @@
           <v-icon>fa fa-arrow-left</v-icon>
         </v-btn></v-col>
         <v-col cols="11" class="d-flex justify-center align-center">
-          {{data.nombre_articulo}}
-          <small>[{{data.descripcion_corta}}]</small>
+          <h4>{{data.nombre_articulo}}
+            <small>[{{data.descripcion_corta}}]</small></h4>
         </v-col>
       </v-row>
       <info v-if="!data.combo" :data="data"/>
