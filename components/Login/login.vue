@@ -122,12 +122,12 @@
                 this.$store.commit("guardarTipoUsuario", localStorage.getItem('tipoUsuario'));
                 this.$store.commit("guardarSucursal", localStorage.getItem('sucursal'));
                 this.$store.commit("guardarEstadoUsuario", localStorage.getItem('estadoUsuario'));
-                this.$store.commit("guardarPermisos", localStorage.getItem('permisosUser'));
-                this.$store.commit("guardarColaborador", localStorage.getItem('colaborador'));
-                this.$store.commit("guardarMiniToken", localStorage.getItem('miniToken'));
-                this.$store.commit("asignarIdSucursal", localStorage.getItem('sucursal_id'));
-                this.$store.commit("guardarUsuarioId", localStorage.getItem('usuario_id'));
-                this.$store.commit("agregar_IMPUESTO", localStorage.getItem('impuesto'));
+                this.$store.commit("guardarPermisos",      localStorage.getItem('permisosUser'));
+                this.$store.commit("guardarColaborador",   localStorage.getItem('colaborador'));
+                this.$store.commit("guardarMiniToken",     localStorage.getItem('miniToken'));
+                this.$store.commit("asignarIdSucursal",    localStorage.getItem('sucursal_id'));
+                this.$store.commit("guardarUsuarioId",     localStorage.getItem('usuario_id'));
+                this.$store.commit("agregar_IMPUESTO",     localStorage.getItem('impuesto'));
                 ipcRenderer.send('crear-usuario', this.Email)
                 this.$axios.setToken(this.$store.state.token, 'Bearer')
                 this.load = false;

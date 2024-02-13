@@ -17,9 +17,13 @@ export const state = () => ({
 })
 
 export const mutations = {
-    cargar_MIS_VENTAS(state){
+    cargar_MIS_VENTAS(state, fecha){
         state.LOAD_MIS_VENTAS = true;
-        this.$axios.get('mis_ventas').then((res)=>{
+        let date = new Date();
+        if (!fecha){
+            fecha = date.getFullYear()+'-'+(date.getMonth() + 1)+'-01';
+        }
+        this.$axios.get('mis_ventas/fecha/'+fecha).then((res)=>{
             state.MIS_VENTAS      = res.data.ventas;
             state.LOAD_MIS_VENTAS = false;
         })
@@ -60,13 +64,16 @@ export const mutations = {
 
             let articulo ='', codigo='', marca= '';
             if (!state.DATA_VENTA.is_combo || !state.DATA_VENTA.is_combo === 0){
-                articulo = state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo;
-                codigo   = state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.codigo_sistema;
-                marca    = state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.marca.nombre;
-                state.IS_MOTO = state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.is_motocicleta === 1;
+                articulo = state.DATA_VENTA.facturas_contados[0].articulo.nombre_articulo;
+                codigo   = state.DATA_VENTA.facturas_contados[0].articulo.codigo_sistema;
+                marca    = state.DATA_VENTA.facturas_contados[0].articulo.marca.nombre;
+                state.IS_MOTO = state.DATA_VENTA.facturas_contados[0].articulo.is_motocicleta === 1;
 
                 let stock_reingreso = 0, stock_nuevo = 0;
-                state.DATA_VENTA.contrato_cliente.remision_articulo.articulo.articulo_compuestos.forEach( (item) => {
+
+                let datos = state.DATA_VENTA.facturas_contados[0].articulo
+
+                datos.articulo_compuestos.forEach( (item) => {
                     if (item.inventario_compuestos){
                         item.inventario_compuestos.forEach( (i) => {
                             if (i.sucursal_id === state.DATA_VENTA.colaborador.sucursal_id){

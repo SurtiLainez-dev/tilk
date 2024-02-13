@@ -33,23 +33,23 @@
                   <v-form :ref="'FormDireccionescliente'">
                     <v-select :items="DEPARTAMENTOS" v-model="item.departamento"
                               label="Departamento" :rules="[rules.select.req]" dense
-                              @change="cargarMunicipio(item)" :disabled="item.key < longDirecciones"
+                              @change="cargarMunicipio(item)" :disabled="!habilitarBtnEnvio"
                               :item-text="'nombre'" :item-value="'id'">
                     </v-select>
                     <v-autocomplete :items="item.Municipios" v-model="item.municipio"
-                                    :disabled="item.key < longDirecciones" :rules="[rules.select.req]"
+                                    :disabled="!habilitarBtnEnvio" :rules="[rules.select.req]"
                                     label="Municipio" @change="cargarCiudades(item)" dense
                                     :item-text="'nombre'" :item-value="'id'">
                     </v-autocomplete>
                     <v-autocomplete :items="item.Ciudades" v-model="item.ciudad"
-                                    :disabled="item.key < longDirecciones" :rules="[rules.select.req]"
+                                    :disabled="!habilitarBtnEnvio" :rules="[rules.select.req]"
                                     label="Ciudad/Aldea/Caserio" @change="cargarColonias(item)" dense
                                     :item-text="'nombres'" :item-value="'id'">
                     </v-autocomplete>
 
                     <v-autocomplete :items="item.Colonias" :rules="[rules.select.req]"
                                     v-model="item.colonia" label="Colonia"
-                                    :disabled="item.key < longDirecciones" dense
+                                    :disabled="!habilitarBtnEnvio" dense
                                     :item-text="'nombre'" :item-value="'id'">
                     </v-autocomplete>
                     <v-textarea v-model="item.detalle" counter
@@ -108,15 +108,19 @@
         <v-btn color="success" small :disabled="!habilitarBtnEnvio" @click="validarDirecciones"
                tile class="text-white">Guardar Direcciones</v-btn>
       </v-card-actions>
+
+      <v-divider></v-divider>
+      <mapa />
     </v-container>
   </v-card>
 </template>
 
 <script>
 import Vue from "vue";
-
+import mapa from "@/components/google_maps/mapa.vue";
 export default {
   name: "direcciones_cliente",
+  components:{mapa},
   computed:{
     numberOfPages () {
       return Math.ceil(this.Direcciones.length / this.itemsPerPage)
@@ -182,7 +186,6 @@ export default {
       this.habilitarBtnEnvio = true;
     },
     cargarCiudades(data){
-      console.log(data.municipio)
       data.Ciudades = this.DISTRITOS.filter(muni => muni.municipio_id === data.municipio);
     },
     cargarColonias(data){
@@ -200,6 +203,11 @@ export default {
     },
     enviarDirecciones(){
       this.$store.commit('activarOverlay', true);
+      this.Direcciones.forEach((item)=>{
+        item.Ciudades   = null;
+        item.Colonias   = null;
+        item.Municipios = null;
+      })
       this.$axios.post('perfil_cliente/edit/direcciones',{
         id: this.CLIENTE.id,
         direcciones: JSON.stringify(this.Direcciones)

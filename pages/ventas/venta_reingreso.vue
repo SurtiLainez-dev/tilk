@@ -10,8 +10,8 @@
     </v-toolbar>
 
     <v-data-table :search="search"
-                  :loading="load_inventario" loading-text="Cargando inventaio de segunda mano ..."
-                  :headers="header" :items="inventario">
+                  :loading="LOAD_REINGRESOS" loading-text="Cargando inventaio de segunda mano ..."
+                  :headers="header" :items="REINGRESOS">
       <template v-slot:item.id="{item}">
         <v-tooltip top>
           <template v-slot:activator="{on, attrs}">
@@ -26,15 +26,6 @@
           <span>Proceder a solicitúd</span>
         </v-tooltip>
       </template>
-      <template v-slot:item.sucursal.abreviatura="{item}">
-        <v-tooltip left>
-          <template v-slot:activator="{on, attrs}">
-            <span v-on="on" v-bind="attrs">{{item.sucursal.abreviatura}}</span>
-          </template>
-          <span>{{item.sucursal.nombre}}</span>
-        </v-tooltip>
-      </template>
-      <template v-slot:item.precio_actual="{item}">L {{int.format(item.precio_actual)}}</template>
     </v-data-table>
   </v-card>
 
@@ -42,7 +33,7 @@
     <v-toolbar flat dense>
       <v-btn fab color="orange" small icon @click="VISTA = 1"><v-icon>fa fa-arrow-left</v-icon></v-btn>
       <v-spacer></v-spacer>
-      <v-toolbar-title>{{REINGRESO.articulo.nombre_articulo}} - {{REINGRESO.serie_fabricante}}</v-toolbar-title>
+<!--      <v-toolbar-title>{{REINGRESO.articulo.nombre_articulo}} - {{REINGRESO.serie_fabricante}}</v-toolbar-title>-->
     </v-toolbar>
 
     <solicitud_reingreso/>
@@ -63,29 +54,30 @@ export default {
       load_inventario: false,
       articulo: {},
       header:[
-        {text:'Sucursal',value:'sucursal.abreviatura'},
-        {text:'Nombre',value:'articulo.nombre_articulo'},
-        {text:'Marca',value:'articulo.marca.nombre'},
-        {text:'Modelo',value:'articulo.modelo'},
-        {text:'Serie Fabricante',value:'serie_fabricante'},
-        {text:'Serie Sístema',value:'serie_sistema'},
-        {text:'Precio de Contado',value:'precio_actual'},
+        {text:'Sucursal',value:'suc'},
+        {text:'Nombre',value:'articulo'},
+        {text:'Marca',value:'marca'},
+        {text:'Modelo',value:'modelo'},
+        {text:'Serie Fabricante',value:'fab'},
         {text:'Acciones',value:'id'},
       ]
     }
   },
   created() {
-    this.cargar_inventario();
+    this.$store.commit('inventario/reingreso/cargar_REINGRESOS',{tipo: 3, consulta: 1});
     this.VISTA = 1;
   },
   computed:{
-    REINGRESO:{
+    REINGRESOS:{
       get: function (){
-        return this.$store.state.inventario.reingreso.REINGRESO
+        return this.$store.state.inventario.reingreso.REINGRESOS
       },
       set: function (data){
         this.$store.commit('inventario/reingreso/asignar_REINGRESO', data)
       }
+    },
+    LOAD_REINGRESOS(){
+      return this.$store.state.inventario.reingreso.LOAD_REINGRESOS;
     },
     VISTA:{
       get: function (){
@@ -97,16 +89,8 @@ export default {
     }
   },
   methods:{
-    cargar_inventario(){
-      this.load_inventario = true;
-      this.$axios.get('/2.0/inventario_reingreso/tipo/3').then((res)=>{
-        this.inventario = res.data.inventario;
-        this.load_inventario = false;
-      })
-    },
     goPrecio(data){
-      this.REINGRESO = data;
-      this.VISTA     = 2;
+      this.$store.commit('inventario/reingreso/cargar_REINGRESOS',{tipo: data.id, consulta: 2});
     }
   }
 }

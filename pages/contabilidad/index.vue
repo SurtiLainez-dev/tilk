@@ -550,8 +550,8 @@
         this.$axios.post('contabilidad/2.0/cuenta/obligacion',{
           comentario: this.ccCredito.comentario,
           total:      this.ccCredito.totalObl,
-          ccDebito:   this.registros.datos.id,
-          ccCredito:  this.ccCredito.id,
+          ccDebito:   this.ccCredito.id,
+          ccCredito:  this.registros.datos.id,
         },{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token

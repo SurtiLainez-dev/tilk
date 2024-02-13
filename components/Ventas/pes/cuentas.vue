@@ -1,5 +1,5 @@
 <template>
-  <v-card flat>
+  <v-card flat tile>
     <div v-if="vista === 1">
       <v-toolbar flat>
         <h6>Cuentas de Clientes de SURTIDORA LAÍNEZ</h6>
@@ -41,7 +41,7 @@
       </v-data-table>
     </div>
     <div v-else>
-      <v-card flat>
+      <v-card flat tile>
         <v-toolbar flat>
           <v-btn color="orange" fab tile dark x-small @click="vista = 1">
             <v-icon>fa fa-arrow-left</v-icon>

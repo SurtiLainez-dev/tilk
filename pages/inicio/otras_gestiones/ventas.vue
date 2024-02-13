@@ -54,7 +54,7 @@
       <v-divider></v-divider>
       <mis_ventas_contado v-if="tipo === 1 && !is_combo"/>
       <mis_ventas v-else-if="tipo === 2 && !is_combo"/>
-      <vista_salida_combos v-else-if="tipo === 2 && is_combo === 1"/>
+      <vista_salida_combos v-else-if="is_combo === 1"/>
     </div>
   </v-card>
 </template>

@@ -1,14 +1,26 @@
 <template>
   <div>
-    <v-list-group>
+    <v-list-group color="green" >
       <template v-slot:activator value="true">
         <v-list-item-title>Gastos</v-list-item-title>
       </template>
-      <v-list-item dense class="itemOpciones" @click="anadirPestana(12, 'Ordenes de Entrada')">
+      <v-list-item dense class="itemOpciones" @click="anadirPestana(12, 'Gastos')">
         Ver Gastos
       </v-list-item>
       <v-list-item dense class="itemOpciones" @click="go('/contabilidad/gastos/nuevo')">
         Crear Gastos
+      </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/gastos/cargar_gastos')">
+        Subir Facturas de Gastos
+      </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/gastos/gastos')">
+        Ver Facturas de Gastos
+      </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/formato_pagos/nueva_solicitud_pago')">
+        Nueva Solicitud de Pago
+      </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/formato_pagos/solicitudes_pago')">
+        Solicitudes de Pago
       </v-list-item>
     </v-list-group>
   </div>

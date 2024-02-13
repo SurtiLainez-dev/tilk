@@ -57,15 +57,17 @@
         data(){
             return{
               search: '',
-                header:[
+              header:[
                     {text:'Referencia', value: 'codigo'},
                     {text:'Nombre del cliente', value: 'clN'},
                     {text:'Artículo', value: 'articulo'},
                     {text:'Creado por', value: 'colN'},
                     {text:'Fecha creado', value: 'fecha_creado'},
                     {text:'Estado', value: 'estado'},
-                ],
-                vista: 1,
+              ],
+              vista: 1,
+              fecha: '',
+              FechaParseada: '',
             }
         },
         computed:{
@@ -80,13 +82,16 @@
             },
         },
         created() {
-            this.vista = 1;
-            this.$store.commit('guardarTitulo', 'Facturación > Solicitudes de Crédito');
-            this.$store.commit('solicitud_credito/cargarSolicitudes',{tipo: 1, search: null});
+          this.vista = 1;
+          this.$store.commit('guardarTitulo', 'Facturación > Solicitudes de Crédito');
+          let date           = new Date();
+          this.fecha         = date.getFullYear()+'-'+(date.getMonth() + 1)+'-01';
+          this.FechaParseada = date.getFullYear()+'/'+(date.getMonth() + 1)+'/01';
+          this.$store.commit('solicitud_credito/cargarSolicitudes', {tipo: 1, search: null, fecha: this.fecha});
         },
         methods:{
             buscarDatos(){
-                this.$store.commit('solicitud_credito/cargarSolicitudes',{tipo: 2, search: this.search});
+                this.$store.commit('solicitud_credito/cargarSolicitudes',{tipo: 2, search: this.search, fecha: this.fecha});
             },
             SeleccionarSolicitud(item){
                 this.$store.commit('activarOverlay', true);

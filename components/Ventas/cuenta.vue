@@ -1,5 +1,5 @@
 <template>
-<v-card flat>
+<v-card flat tile>
     <v-row>
       <v-col cols="2">
         <v-card  :loading="!loadData" height="460" width="256" class="mx-auto">

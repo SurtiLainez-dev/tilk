@@ -1,13 +1,13 @@
 <template>
   <div>
-    <v-list-group>
+    <v-list-group color="green" >
       <template v-slot:activator value="true">
         <v-list-item-title>Proveedores</v-list-item-title>
       </template>
       <v-list-item v-if="PERMISOS.includes(23)" class="itemOpciones" @click="go('/proveedores/')">
         Ver Proveedores
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(21)" class="itemOpciones" @click="go('/proveedores/nuevo')">
+      <v-list-item v-if="PERMISOS.includes(21)" class="itemOpciones" @click="anadirPestana(23, 'Proveedor Nuevo')">
         Crear Proveedor
       </v-list-item>
       <v-list-item v-if="PERMISOS.includes(22)" class="itemOpciones" @click="go('/proveedores/contactos')">
@@ -17,7 +17,7 @@
         Marcas
       </v-list-item>
     </v-list-group>
-    <v-list-group v-if="PERMISOS.includes(24) || PERMISOS.includes(25)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(24) || PERMISOS.includes(25)">
       <template v-slot:activator value="true">
         <v-list-item-title>Cotizaciones</v-list-item-title>
       </template>
@@ -37,9 +37,24 @@
     methods:{
       go(url){
         this.$router.push(url)
-      }
+      },
+      anadirPestana(key, titulo){
+        let bandera = 0;
+        this.Pes.forEach((item)=>{
+          if (item.key === key)
+            bandera++;
+        });
+        if (bandera === 0){
+          this.$store.commit('anadirCaja', {titulo:titulo, key: key});
+          this.$store.commit('cambiarTab', {val:key, tipo:false});
+        }
+      },
+
     },
     computed:{
+      Pes(){
+        return this.$store.state.pestana
+      },
       PERMISOS(){
         let permisos = this.$store.state.permisosUser.split(',');
         let per = [];
@@ -51,7 +66,7 @@
         }else
           return [];
       },
-    }
+    },
   }
 </script>
 

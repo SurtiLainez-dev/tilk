@@ -5,7 +5,7 @@
         <v-stepper v-model="SECC" >
             <v-stepper-header>
                 <v-stepper-step :complete="SECC > 1" step="1">
-                    Datos del Artículo
+                    Datos del Bien
                 </v-stepper-step>
                 <v-divider></v-divider>
                 <v-stepper-step step="2">
@@ -15,7 +15,7 @@
             <v-stepper-items>
                 <v-stepper-content step="1">
                     <v-card v-if="Soli.is_combo === 0" color="grey lighten-5">
-                        <v-row no-gutters>
+                        <v-row no-gutters v-if="Soli.venta_financiera === 0">
                             <v-col class="d-flex justify-end">
                                 <v-btn v-if="statusArticulo.stock_nuevo > 0" x-small color="success" text dark>Stock nuevo: {{statusArticulo.stock_nuevo}}</v-btn>
                                 <v-btn v-else x-small color="red" text dark>Stock nuevo: {{statusArticulo.stock_nuevo}}</v-btn>
@@ -24,14 +24,15 @@
                             </v-col>
                         </v-row>
                         <v-row no-gutters>
-                            <v-col class="d-flex align-center"> <v-card-title>Datos del artículo</v-card-title></v-col>
+                            <v-col class="d-flex align-center"> <v-card-title>Datos del bien</v-card-title></v-col>
                             <v-col class="d-flex justify-end align-center ma-2">
                                 <v-btn x-small color="red" class="ma-2" dark @click="declinarVenta">Declinar Venta</v-btn>
                                 <v-btn x-small @click="dialogoBusquedaMoto = true"
                                        :disabled="!Is_motocicleta"
+                                       v-if="Soli.venta_financiera === 0"
                                        color="success" class="text-white ma-2">
                                     Buscar motocicleta</v-btn>
-                                <v-btn x-small color="warning" dark @click="dialogoRemisionArticulo = true">Buscar Artículos con seríe</v-btn>
+                                <v-btn v-if="Soli.venta_financiera === 0" x-small color="warning" dark @click="dialogoRemisionArticulo = true">Buscar Artículos con seríe</v-btn>
                             </v-col>
                         </v-row>
                         <v-form ref="FormAgregarRemisionArticulo" class="ma-2 pt-5">
@@ -77,7 +78,7 @@
                                                   label="Vendedor" disabled></v-text-field>
                                 </v-col>
                                 <v-col>
-                                    <v-select label="Tipo de venta" :item-text="'text'"
+                                    <v-select label="Tipo de venta" :item-text="'text'" :disabled="Soli.venta_financiera === 1"
                                               :rules="[rule.serie.req]" v-model="Venta.tipo_id"
                                               :items="Venta.tipos" :item-value="'val'"></v-select>
                                 </v-col>
@@ -122,8 +123,8 @@
                           </v-row>
                         </v-form>
 
-                        <b-link @click="dialogoBuscarInventario = true" class="pl-5">Agregar regalias</b-link>
-                        <v-data-table dense :headers="headerRegalias"
+                        <b-link v-if="Soli.venta_financiera === 0" @click="dialogoBuscarInventario = true" class="pl-5">Agregar regalias</b-link>
+                        <v-data-table v-if="Soli.venta_financiera === 0" dense :headers="headerRegalias"
                                     :items="Regalias"
                                     caption="Regalias">
                             <template v-slot:item.precio="{item}">
@@ -710,6 +711,7 @@ export default {
 
             }).catch((error)=>{
               this.$store.commit('tareas/cambiarValorVista', true);
+              this.$store.commit('solicitud_credito/cambiarValorVistaVendedor', 1);
               this.$store.commit('activarOverlay', false);
               console.log(error)
               if(error.response.status === 422)
@@ -718,6 +720,51 @@ export default {
               this.dialogo = true;
             })
           },
+            crearVentaFinanciera(){
+              let forma_pago = 0;
+              let cuotas     = 0;
+              if (this.Soli.forma_pago === 'Semanal') {
+                forma_pago = 1;
+                cuotas     = this.Soli.tiempo * 4;
+              }else if (this.Soli.forma_pago === 'Quincenal') {
+                forma_pago = 2;
+                cuotas     = this.Soli.tiempo * 2;
+              }else if (this.Soli.forma_pago === 'Mensual') {
+                forma_pago = 3;
+                cuotas     = this.Soli.tiempo
+              }
+
+              this.$store.commit('activarOverlay', true);
+              this.$axios.post('surti_creditos/solicitud_credito',{
+                tipo: 1,
+                articulo: this.Soli.articulo.id,
+                serie_articulo: this.AArticulo.serie,
+                color_articulo: this.AArticulo.color,
+                precio_contado_articulo: this.Soli.precio_contado,
+                sucursal_id:             this.Venta.sucursal_id,
+                cliente:                     this.Soli.cliente.id,
+                colaborador:                 this.Venta.colaborador_id,
+                total_credito:              (parseFloat(this.Soli.cuota * cuotas) + parseFloat(this.Soli.prima)),
+                num_cuotas:                  cuotas,
+                identidad:                   this.Soli.cliente.identidad,
+                cuota:                       this.Soli.cuota,
+                forma_pago:                  forma_pago,
+                tasa_anual:                  this.Soli.tasa,
+                solicitud_credito:           this.Soli.id,
+                precio_contado:              this.Soli.precio_contado,
+                prima:                       this.Soli.prima,
+                financiamiento:              parseFloat(this.Soli.precio_contado) - parseFloat(this.Soli.prima),
+              }).then((res)=>{
+                this.$store.commit('tareas/cambiarValorVista', true);
+                this.$store.commit('activarOverlay', false);
+                this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
+                this.dialogo = false;
+                this.vistaVenta = false
+              }).catch((error)=>{
+                this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
+                this.$store.commit('activarOverlay', false);
+              })
+            },
             dataMotocicleta(data){
                 if (this.Soli.is_combo === 0){
                   let th = this.Venta;
@@ -836,12 +883,16 @@ export default {
                 })
             },
             validarFormCrearVenta(){
-                if (this.Is_motocicleta) {
+                if (this.Soli.venta_financiera === 0){
+                  if (this.Is_motocicleta) {
                     if (this.$refs.FormAgregarRemisionArticulo.validate() && this.$refs.FormAgregarDatosMotocicletaVenta.validate())
-                        this.crearVenta()
-                }else {
+                      this.crearVenta()
+                  }else {
                     if (this.$refs.FormAgregarRemisionArticulo.validate())
-                        this.crearVenta()
+                      this.crearVenta()
+                  }
+                }else {
+                  this.crearVentaFinanciera();
                 }
             },
             validarFormVentaCombo(){

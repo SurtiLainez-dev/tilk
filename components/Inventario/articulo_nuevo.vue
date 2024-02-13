@@ -143,70 +143,77 @@
               </v-col>
               <v-divider vertical></v-divider>
               <v-col>
-                <v-card class="pa-2" flat :disabled="!Articulo.isDetalles">
-                  <v-card-subtitle>Detalles Técnicos de {{Articulo.nombre}}</v-card-subtitle>
-                  <v-row no-gutters>
-                    <v-col >
-                      <v-row no-gutters>
-                        <v-col cols="8"><v-card-subtitle>Detalles técnicos</v-card-subtitle></v-col>
-                        <v-col class="d-flex justify-end">
-                          <v-btn x-small dark @click="addFilaDetalles" color="success" class="ma-2" fab>
-                            <v-icon>fa fa-plus</v-icon>
-                          </v-btn>
-                        </v-col>
-                      </v-row>
-                      <v-card flat>
-                        <v-simple-table dense :height="380">
-                          <template v-slot:default>
-                            <thead>
-                            <tr>
-                              <th>Detalle</th>
-                              <th>Quitar</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="(item, index) in Articulo.detalles">
-                              <td width="90%">
-                                <v-text-field :rules="[rules.nombre.req, rules.modelo.min, rules.nombre.maxDet]"
-                                              v-model="item.detalle" dense :counter="250"></v-text-field>
-                              </td>
-                              <td>
-                                <v-btn color="red" @click="removeFilaDetalles(item.fila)" fab width="25px" height="25px" dark>
-                                  <v-icon size="15px">fa fa-times</v-icon>
-                                </v-btn>
-                              </td>
-                            </tr>
-                            </tbody>
-                          </template>
-                        </v-simple-table>
-                      </v-card>
-                    </v-col>
-                    <v-divider vertical></v-divider>
-                    <v-col >
-                      <v-card flat :loading="loadDetallesTecnicos">
-                        <v-card-subtitle>Detalles técnicos similares</v-card-subtitle>
-                        <v-simple-table dense :height="380">
-                          <template v-slot:default>
-                            <thead>
-                            <tr>
-                              <th>#</th>
-                              <th>Detalle</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="(i, item) in detallesTecnicos" @click="addDetalleTecnico(i.detalle)">
-                              <td>{{item+1}}</td>
-                              <td>{{i.detalle}}</td>
-                            </tr>
-                            </tbody>
-                          </template>
-                        </v-simple-table>
-                      </v-card>
-                    </v-col>
-                  </v-row>
-                </v-card>
               </v-col>
             </v-row>
+            <v-card class="pa-2" flat v-if="Articulo.isDetalles" :disabled="!Articulo.isDetalles">
+              <v-card-subtitle>Detalles Técnicos de {{Articulo.nombre}}</v-card-subtitle>
+              <v-row no-gutters>
+                <v-col >
+                  <v-row no-gutters>
+                    <v-col cols="8"><v-card-subtitle>Detalles técnicos</v-card-subtitle></v-col>
+                    <v-col class="d-flex justify-end">
+                      <v-btn x-small dark @click="addFilaDetalles" color="success" class="ma-2" fab>
+                        <v-icon>fa fa-plus</v-icon>
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                  <v-card flat>
+                    <v-simple-table dense :height="380">
+                      <template v-slot:default>
+                        <thead>
+                        <tr>
+                          <th>Titulo</th>
+                          <th>Detalle</th>
+                          <th>Quitar</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(item, index) in Articulo.detalles">
+                          <td width="40%">
+                            <v-text-field :rules="[rules.nombre.req, rules.modelo.min, rules.nombre.maxDet]"
+                                          v-model="item.titulo" dense :counter="250"></v-text-field>
+                          </td>
+                          <td width="50%">
+                            <v-text-field :rules="[rules.nombre.req, rules.modelo.min, rules.nombre.maxDet]"
+                                          v-model="item.detalle" dense :counter="250"></v-text-field>
+                          </td>
+                          <td>
+                            <v-btn color="red" @click="removeFilaDetalles(item.fila)" fab width="25px" height="25px" dark>
+                              <v-icon size="15px">fa fa-times</v-icon>
+                            </v-btn>
+                          </td>
+                        </tr>
+                        </tbody>
+                      </template>
+                    </v-simple-table>
+                  </v-card>
+                </v-col>
+                <v-divider vertical></v-divider>
+                <v-col >
+                  <v-card flat :loading="loadDetallesTecnicos">
+                    <v-card-subtitle>Detalles técnicos similares</v-card-subtitle>
+                    <v-simple-table dense :height="380">
+                      <template v-slot:default>
+                        <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Titulo</th>
+                          <th>Detalle</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(i, item) in detallesTecnicos" @click="addDetalleTecnico(i.detalle)">
+                          <td>{{item+1}}</td>
+                          <td>{{i.titulo}}</td>
+                          <td>{{i.detalle}}</td>
+                        </tr>
+                        </tbody>
+                      </template>
+                    </v-simple-table>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-card>
             <v-divider></v-divider>
             <v-card-actions class="d-flex justify-end">
               <v-btn small dark color="success" class="ma-2" @click="verificarForm" tile>Registrar Artículo</v-btn>
@@ -377,6 +384,7 @@ export default {
         "fila": fila ,
         "cantidad": 1,
         "detalle": '',
+        "titulo": '',
         "cantidad_detalle": null,
         "required": false
       })

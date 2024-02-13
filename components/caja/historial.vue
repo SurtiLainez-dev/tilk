@@ -307,7 +307,7 @@ export default {
         this.$store.commit('activarOverlay', true);
         this.$axios({
           method: 'post',
-          url:    'caja/cierre/culminar',
+          url:    'caja/cierre/culminar/otro_dia',
           data:   data,
           headers:{
             'Authorization': 'Bearer ' + this.$store.state.token,

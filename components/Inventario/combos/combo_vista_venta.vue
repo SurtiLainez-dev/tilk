@@ -303,7 +303,7 @@ export default {
       this.observacion = 'VENTA FINANCIADA'
       this.calcularP = true;
       let MESES = this.Precios.meses, FIN = this.Precios.financiamiento;
-      console.log(MESES)
+
       let SALDO_F = this.Precios.saldo_nuevo;
       this.calcularSaldoNuevo();
       if (MESES <= this.Precios.maximo_financiamiento){
@@ -311,13 +311,13 @@ export default {
           this.Precios.cuota = 0
           this.Precios.pagos = [];
           let TASA_M = (FIN / 12).toFixed(4);
-          console.log(TASA_M)
+
           let TASA = Math.pow(parseInt(1) + parseFloat(TASA_M), -MESES);
-          console.log(TASA)
+
           TASA = TASA - 1;
-          console.log(TASA)
+
           TASA = TASA / TASA_M;
-          console.log(TASA)
+
           let pagos = 0;
           if (this.Precios.forma_pago === 1) {
             pagos = this.Precios.meses * 4;
@@ -333,8 +333,7 @@ export default {
           }
           this.Precios.total_credito = 0;
           this.Precios.total_credito = (this.Precios.cuota * pagos).toFixed(2);
-          console.log("saldo a financiar "+SALDO_F);
-          console.log("Tasa "+TASA_M);
+
           this.crearPagos(pagos, this.Precios.forma_pago, TASA_M)
         }
       }else

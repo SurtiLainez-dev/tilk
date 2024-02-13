@@ -12,7 +12,6 @@
     <v-data-table dense :headers="headers" :items="PORTAFOLIOS" loading-text="Cargando carteras ..."
                   :loading="LOADPORTAFOLIOS"></v-data-table>
 
-    <pre>{{PORTAFOLIOS}}</pre>
   </v-card>
 
   <v-card flat v-else-if="VISTA >= 2">

@@ -274,8 +274,13 @@
                                     <th>Código del proveedor:</th>
                                     <td><input type="text" disabled :value="Articulo.codigo_proveedor"></td>
                                 </tr>
+                                <tr v-if="Solicitud.venta_financiera === 1">
+                                  <th>Detalles del bien</th>
+                                  <td><input type="text" disabled :value="Solicitud.observacion_precio"></td>
+                                </tr>
                                 </tbody>
                             </table>
+
                             <table v-else-if="Solicitud.is_combo === 1" class="rowsTable">
                               <thead>
                               <tr>
@@ -412,6 +417,12 @@
                                     <th>Prima: </th>
                                     <td><input type="text" disabled :value="'L'+Solicitud.prima"></td>
                                 </tr>
+                                <tr>
+                                  <th >Observacion del precio:</th>
+                                  <td>
+                                    <textarea disabled rows="5" :value="Solicitud.observacion_precio"></textarea>
+                                  </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </v-col>
@@ -434,6 +445,7 @@
                             </table>
                         </v-col>
                     </v-row>
+
                     <br>
 <!--                    <b-link v-if="Articulo.is_motocicleta === 0">Quitar traspaso de la prima</b-link>-->
                     <br>
@@ -924,6 +936,10 @@
             this.CM  = this.Comentarios;
             this.ID  = this.Solicitud.id;
             this.Tareas.data = this.Tareass;
+
+            if(this.Solicitud.observacion_precio){
+              this.$store.commit('notificacion',{texto:'Revisa bien el precio ya que puede ser una venta de articulo de segunda', color:'warning'})
+            }
         },
         methods:{
             addComentario(){
@@ -1062,7 +1078,7 @@
                     this.$store.commit('activarOverlay', false);
                     this.btnRegistro = false;
                     this.notificacion('Se han registrado los datos de solicitud exitosamente','success');
-                    this.$store.commit('solicitud_credito/cargarSolicitudes');
+                    this.$store.commit('solicitud_credito/cargarSolicitudes', {tipo: 1, search: null, fecha: null});
                     this.notificacion('Para ver los cambios actualizados salga y vuelva anetrar.');
                 }).catch((error)=>{
                     this.$store.commit('tareas/cambiarValorVista', true);
@@ -1152,7 +1168,7 @@
     table tbody{
         font-size: 12px;
     }
-    table tbody tr td input[type=text], select{
+    table tbody tr td input[type=text], select, textarea{
         width: 100%;
         box-sizing: border-box;
         padding: 2px 10px;

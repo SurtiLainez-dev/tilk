@@ -127,7 +127,6 @@ export default {
         saldo_actual: this.pago.saldo_actual,
         mora:         this.pago.mora,
         venta_id:     this.CUENTA.id,
-        contrato_id:  this.CUENTA.contrato_cliente.id,
         credito:      this.credito
       }).then((res)=>{
         this.$axios.get('cuentas/ventas/pendientes').then((res)=>{

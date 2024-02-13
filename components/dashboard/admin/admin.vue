@@ -1,6 +1,6 @@
 <template>
     <div>
-      <v-list-group>
+      <v-list-group color="green" >
         <template v-slot:activator value="true">
           <v-list-item-title>Usuarios</v-list-item-title>
         </template>
@@ -21,7 +21,7 @@
         </v-list-item>
 
       </v-list-group>
-      <v-list-group>
+      <v-list-group color="green" >
         <template v-slot:activator value="true">
           <v-list-item-title>Cuentas</v-list-item-title>
         </template>
@@ -33,7 +33,7 @@
         </v-list-item>
       </v-list-group>
 
-      <v-list-group>
+      <v-list-group color="green" >
         <template v-slot:activator value="true">
           <v-list-item-title>Manual</v-list-item-title>
         </template>

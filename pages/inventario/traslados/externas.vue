@@ -263,7 +263,7 @@
             componentes = [];
             i.articulo.articulo_compuestos.forEach( (item) => {
               inventario = [];
-              if (item.inventario_compuestos.length > 0){
+              if (item.inventario_compuestos.length > 0 && item.motocicleta){
                 inventario = item.inventario_compuestos[0];
                 componentes.push({
                   "moto_id":                     i.motocicleta.id,
@@ -276,28 +276,30 @@
                 })
               }
             });
-            this.Traslado.Motocicletas.push({
-              "remision_id":             i.id,
-              "id":                      i.motocicleta.id,
-              "chasis":                  i.motocicleta.chasis,
-              "motor":                   i.motocicleta.motor,
-              "marca":                   i.articulo.marca.nombre,
-              "articulo_id":             i.articulo.id,
-              "color":                   i.color,
-              "modelo":                  i.articulo.modelo,
-              "sucursal":                i.sucursal.abreviatura,
-              "sucursal_actual_nombre":  i.sucursal.nombre,
-              "estado":                  i.estado_articulo.nombre,
-              "guia_remision":           i.motocicleta.guia_remision.num_guia,
-              "entrada":                 i.motocicleta.guia_remision.orden_entrada.sucursal.abreviatura,
-              "sucursal_entrada_nombre": i.motocicleta.guia_remision.orden_entrada.sucursal.nombre,
-              "serie_sistema":           i.serie_sistema,
-              "cc":                      i.motocicleta.cilindraje,
-              "fecha_entrada":           i.motocicleta.guia_remision.orden_entrada.fecha_creacion,
-              "año":                     i.motocicleta.anio,
-              "componentes":             componentes,
-              "revisado":                false
-            })
+            if (i.motocicleta){
+              this.Traslado.Motocicletas.push({
+                "remision_id":             i.id,
+                "id":                      i.motocicleta.id,
+                "chasis":                  i.motocicleta.chasis,
+                "motor":                   i.motocicleta.motor,
+                "marca":                   i.articulo.marca.nombre,
+                "articulo_id":             i.articulo.id,
+                "color":                   i.color,
+                "modelo":                  i.articulo.modelo,
+                "sucursal":                i.sucursal.abreviatura,
+                "sucursal_actual_nombre":  i.sucursal.nombre,
+                "estado":                  i.estado_articulo.nombre,
+                "guia_remision":           i.motocicleta.guia_remision.num_guia,
+                "entrada":                 i.motocicleta.guia_remision.orden_entrada.sucursal.abreviatura,
+                "sucursal_entrada_nombre": i.motocicleta.guia_remision.orden_entrada.sucursal.nombre,
+                "serie_sistema":           i.serie_sistema,
+                "cc":                      i.motocicleta.cilindraje,
+                "fecha_entrada":           i.motocicleta.guia_remision.orden_entrada.fecha_creacion,
+                "año":                     i.motocicleta.anio,
+                "componentes":             componentes,
+                "revisado":                false
+              })
+            }
           });
           this.load = false
         })

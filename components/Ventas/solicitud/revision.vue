@@ -186,7 +186,7 @@
                     </tr>
                     <tr>
                       <th>Marca:</th>
-                      <td>{{Solicitud_Articulo.marca}}</td>
+                      <td>{{Solicitud_Articulo.marca.nombre}}</td>
                     </tr>
                     <tr>
                       <th>Módelo:</th>
@@ -466,10 +466,11 @@
                         referencias:        JSON.stringify(this.Solicitud_Referencias),
                         precio_contado:     this.Solicitud_Precio.contado,
                         prima:              this.Solicitud_Precio.prima,
-                        observacion_precio: this.Observacion,
+                        observacion_precio: this.Solicitud_Precio.observacion,
                         avales:             JSON.stringify(this.Solicitud_Avales),
                         cuota:              this.Solicitud_Precio.cuota,
-                        combo:              this.combo
+                        combo:              this.combo,
+                        financiera:         false
                     }).then((res)=>{
                         this.$store.commit('activarOverlay', false);
                         this.Solicitud = res.data.solicitud;

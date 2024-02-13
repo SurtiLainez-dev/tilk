@@ -25,7 +25,7 @@
       </v-col>
       <v-col>
         <v-text-field class="ma-4" dense disabled label="Saldo Abonado"
-                      suffix="lps" :value="CUENTA.contrato_cliente ? CUENTA.contrato_cliente.saldo_abonado : 'Sin datos del contrato'"></v-text-field>
+                      suffix="lps" :value="CUENTA.total_abonado"></v-text-field>
       </v-col>
       <v-col>
         <v-text-field class="ma-4" dense disabled label="# de Cuotas"
@@ -50,20 +50,26 @@
       </template>
     </v-data-table>
     <v-card-text>Datos del Artículo</v-card-text>
-    <v-row no-gutters>
-      <v-col cols="3">
-        <v-text-field label="Código del Artículo" class="ma-4" v-if="CUENTA.contrato_cliente.remision_articulo"
-                      :value="CUENTA.contrato_cliente.remision_articulo.articulo.codigo_sistema" dense disabled></v-text-field>
-      </v-col>
-      <v-col cols="6">
-        <v-text-field label="Artículo" dense v-if="CUENTA.contrato_cliente.remision_articulo" :value="CUENTA.contrato_cliente.remision_articulo.articulo.descripcion_corta"
-                      disabled class="ma-4"></v-text-field>
-      </v-col>
-      <v-col cols="3">
-        <v-text-field label="Serie del Sistema" dense v-if="CUENTA.contrato_cliente.remision_articulo" :value="CUENTA.contrato_cliente.remision_articulo.serie_sistema"
-                      disabled class="ma-4"></v-text-field>
-      </v-col>
-    </v-row>
+    <v-simple-table dense>
+      <thead>
+      <tr>
+        <th>Codigo del Articulo</th>
+        <th>Articulos</th>
+        <th>Serie del Sistema</th>
+        <th>Serie del Fabricante</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr v-for="item in CUENTA.facturas_contados">
+        <td>{{item.articulo.codigo_sistema}}</td>
+        <td>{{item.articulo.nombre_articulo}}</td>
+        <td v-if="item.remision_articulo_id && item.remision_articulo_id > 0">{{item.remision_articulo.serie_sistema}}</td>
+        <td v-else>-----</td>
+        <td v-if="item.remision_articulo_id && item.remision_articulo_id > 0">{{item.remision_articulo.serie_fabricante}}</td>
+        <td v-else>-----</td>
+      </tr>
+      </tbody>
+    </v-simple-table>
     <v-card-text>Sí el artículo es un acuerdo de pago o algún servicio ofrecido por Surtidora Laínez que sea diferente a
     un artículo, presionar la casilla de abajo, ya que sino se selecciona el, se va a cargar al inventario.</v-card-text>
     <v-checkbox v-model="eliminar" dense label="No es un artículo"></v-checkbox>
@@ -143,8 +149,6 @@ export default {
       this.$axios.post('cuenta/anulacion',{
         venta_id: this.CUENTA.id,
         observacion: this.cuenta.observacion,
-        remision:    this.CUENTA.contrato_cliente.remision_articulo.id,
-        articulo_id: this.CUENTA.contrato_cliente.remision_articulo.articulo_id,
         total_articulo: this.cuenta.precio,
         articulo:       !this.eliminar,
         garantia:       this.garantia,

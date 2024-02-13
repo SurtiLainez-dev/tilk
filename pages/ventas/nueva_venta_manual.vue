@@ -147,15 +147,21 @@
                 <thead>
                 <tr>
                   <th>Detalle</th>
+                  <th>Cod.</th>
                   <th style="border-right: solid #b2b0b0 1px;">Teléfono</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="item in data.telefonos">
-                  <td width="50%">
+                  <td style="width: 40%">
                     <v-text-field dense :disabled="item.key < logns.telefonos" outlined counter
                                   :rules="[rules.select.req, rules.detalleTelefono.min, rules.detalleTelefono.max]"
                                   v-model="item.detalle"></v-text-field>
+                  </td>
+                  <td style="width: 20%">
+                    <v-text-field dense :disabled="item.key < logns.telefonos" outlined counter
+                                  :rules="[rules.select.req]"
+                                  v-model="item.area"></v-text-field>
                   </td>
                   <td style="border-right: solid #b2b0b0 1px;">
                     <v-text-field dense :disabled="item.key < logns.telefonos" outlined counter
@@ -899,6 +905,7 @@ export default {
     this.data.telefonos.push({
       num:     '',
       detalle: 'Telefono '+(parseInt(this.data.telefonos.length) + parseInt(1)),
+      areA:    '504',
       key:     this.data.telefonos.length
     });
     this.cargarInventario();

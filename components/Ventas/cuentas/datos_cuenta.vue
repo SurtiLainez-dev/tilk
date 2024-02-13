@@ -20,7 +20,7 @@
       </tr>
       <tr>
         <th>Sucursal</th>
-        <td>{{CUENTA.colaborador.sucursal.nombre}}</td>
+        <td>{{CUENTA.sucursal.nombre}}</td>
       </tr>
       <tr>
         <th>Vendedor</th>
@@ -30,17 +30,25 @@
         <th>Saldo Inicial del Crédito</th>
         <td><strong>L </strong>{{int.format(CUENTA.total)}}</td>
       </tr>
-      <tr v-if="CUENTA.contrato_cliente">
+      <tr>
         <th>Total Abonado</th>
-        <td><strong>L </strong>{{int.format(CUENTA.contrato_cliente.saldo_abonado)}}</td>
+        <td><strong>L </strong>{{int.format(CUENTA.total_abonado)}}</td>
       </tr>
-      <tr v-if="CUENTA.contrato_cliente">
+      <tr>
         <th>Saldo en Mora</th>
-        <td><strong>L </strong>{{int.format(CUENTA.contrato_cliente.saldo_mora)}}</td>
+        <td><strong>L </strong>{{int.format(CUENTA.mora)}}</td>
       </tr>
       <tr>
         <th>Saldo Actual</th>
         <td><strong>L </strong>{{int.format(CUENTA.saldo_actual)}}</td>
+      </tr>
+      <tr>
+        <th>Saldo Capital</th>
+        <td><strong>L </strong>{{int.format(CUENTA.saldo_actual_cap)}}</td>
+      </tr>
+      <tr>
+        <th>Saldo Total en Mora</th>
+        <td><strong>L </strong>{{int.format(CUENTA.pagando)}}</td>
       </tr>
       <tr>
         <th>Estado</th>
@@ -65,14 +73,18 @@
           <v-chip color="orange" x-small v-else-if="CUENTA.is_aceptado === 3" dark>Pendiente</v-chip>
         </td>
       </tr>
-<!--      <tr>-->
-<!--        <th>Cuenta registrada en portafolio</th>-->
-<!--        <td>-->
-<!--          <v-chip color="success" x-small v-if="verificar === 1" dark>Sí</v-chip>-->
-<!--          <v-chip color="red" x-small v-else-if="verificar === 0" dark>No</v-chip>-->
-<!--          <v-btn v-if="verificar === 0" color="indigo" x-small dark @click="registrarCuentaPortafolio" tile>Registrar en portafolio</v-btn>-->
-<!--        </td>-->
-<!--      </tr>-->
+      <tr>
+        <th>Portafolio</th>
+        <td v-if="CUENTA.cob_portafolio">
+          {{CUENTA.cob_portafolio.nombre}}
+        </td>
+      </tr>
+      <tr>
+        <th>Segmento</th>
+        <td v-if="CUENTA.cob_portafolio">
+          {{CUENTA.cob_segmento.nombre}}
+        </td>
+      </tr>
       </tbody>
     </template>
   </v-simple-table>

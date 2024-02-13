@@ -9,8 +9,12 @@
                 <v-text-field v-model="item.key + 1" disabled></v-text-field>
               </td>
               <td>
-                <v-text-field v-model="item.detalle" label="Detalle del Número" class="ma-2"
+                <v-text-field v-model="item.detalle" label="Detalle del Número" class="ma-2" counter
                               :rules="[rules.num.req, rules.detalle.min, rules.detalle.max]"></v-text-field>
+              </td>
+              <td>
+                <v-text-field v-model="item.area" label="Cod. Área" class="ma-2" counter
+                              :rules="[rules.num.req]"></v-text-field>
               </td>
               <td>
                 <v-text-field v-model="item.num" label="Número de Telefono" class="ma-2"
@@ -65,7 +69,7 @@ export default {
         },
         detalle:{
           min: v => (v && v.length >= 5) || 'Tiene que ser mayor a 5 carácteres.',
-          max: v => (v && v.length <= 25) || 'Tiene que ser menor o igual a 25 carácteres.',
+          max: v => (v && v.length <= 100) || 'Tiene que ser menor o igual a 25 carácteres.',
         }
       }
     }
@@ -84,6 +88,7 @@ export default {
       this.Telefonos.push({
         num:     '',
         detalle: 'Telefono '+(parseInt(this.Telefonos.length) + parseInt(1)),
+        area:    '504',
         key:     this.Telefonos.length
       });
       this.habilitarBtnEnvio = true;

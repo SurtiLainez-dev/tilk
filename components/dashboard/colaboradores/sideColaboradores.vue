@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-list-group>
+    <v-list-group color="green" >
       <template v-slot:activator value="true">
         <v-list-item-title>Colaboradores</v-list-item-title>
       </template>

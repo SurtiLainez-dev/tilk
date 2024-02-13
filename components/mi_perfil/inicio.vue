@@ -8,7 +8,7 @@
                 :lazy-src="url"
                 max-height="250"
                 max-width="350"
-                :src="!USER || USER.colaborador ? USER.colaborador.foto_perfil : url"
+                :src="!USER || (USER.colaborador && USER.colaborador.foto_perfil) ? USER.colaborador.foto_perfil : url"
             ></v-img>
           </v-col>
         </v-row>

@@ -134,7 +134,7 @@ export default {
             marca.includes(search) || color.includes(search) || sucursal.includes(search) || estado.includes(search)
       });
       this.resultados = filtro.length;
-      if (filtro.length) {
+      if (filtro.length > 0) {
         this.paginas = Math.ceil(filtro.length / this.filas);
         let inicio = (this.page - 1) * this.filas;
         filtro = filtro.splice(inicio, this.filas)

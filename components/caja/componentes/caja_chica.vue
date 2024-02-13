@@ -27,6 +27,8 @@
           <v-form ref="FormNuevoGasto">
             <v-text-field class="ma-2" dense label="Detalle del gasto" counter
                           v-model="gasto.detaalle" :rules="[rule.pago.req]"></v-text-field>
+            <v-text-field class="ma-2" dense label="Correlativo" counter
+                          v-model="gasto.correlativo" :rules="[rule.pago.req]"></v-text-field>
             <v-autocomplete class="ma-2" dense label="Seleccionar gasto" :items="TIPOGASTOS" :rules="[rule.pago.req]"
                             :item-value="'id'" :item-text="'nombre'" v-model="gasto.gasto"></v-autocomplete>
             <v-text-field class="ma-2" dense label="Total del gasto" suffix="lps"
@@ -88,7 +90,8 @@ export default {
         total:    0,
         gasto:    '',
         detaalle: '',
-        file:     null
+        file:     null,
+        correlativo: ''
       },
       rule:{
         pago:{
@@ -125,6 +128,7 @@ export default {
       data.append('file', this.gasto.file);
       data.append('gasto', this.gasto.gasto);
       data.append('detalle', this.gasto.detaalle);
+      data.append('correlativo', this.gasto.correlativo);
       data.append('total',   this.gasto.total);
       data.append('caja_id', this.CH.id);
       this.$axios({

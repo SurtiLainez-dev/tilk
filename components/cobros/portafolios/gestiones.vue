@@ -21,13 +21,13 @@
   <v-data-table dense :loading="LOADGESTIONES" :headers="header" :items="GESTIONES"
                 loading-text="Cargando gestiones ..." :search="filter" @click:row="goGestion">
     <template v-slot:item.cliente.apellidos="{item}">{{item.cliente.nombres}} {{item.cliente.apellidos}}</template>
-    <template v-slot:item.saldo_actual="{item}">L {{int.format((item.saldo_actual - item.contrato.saldo_mora).toFixed(2))}}</template>
-    <template v-slot:item.contrato.dias_mora="{item}">{{item.contrato.dias_mora}}</template>
-    <template v-slot:item.contrato.saldo_mora="{item}">L {{int.format(item.contrato.saldo_mora)}}</template>
+    <template v-slot:item.saldo_actual="{item}">L {{int.format((item.saldo_actual - item.mora).toFixed(2))}}</template>
+    <template v-slot:item.dias_mora="{item}">{{item.dias_mora}}</template>
+    <template v-slot:item.mora="{item}">L {{int.format(item.mora)}}</template>
     <template v-slot:item.saldo_abonado="{item}">L {{int.format(item.saldo_abonado)}}</template>
     <template v-slot:item.pagando="{item}">L {{int.format(item.pagando)}}</template>
 
-    <template v-slot:header.contrato.dias_mora="{item}">
+    <template v-slot:header.dias_mora="{item}">
       <v-tooltip top>
         <template v-slot:activator="{on, attrs}"><span v-on="on" v-bind="attrs">DM</span></template>
         <span>Días en Mora</span>
@@ -66,8 +66,8 @@ export default {
           {text:'Venta', value:'cod'},
           {text:'Cliente', value:'cliente.apellidos'},
           {text:'Saldo', value:'saldo_actual'},
-          {text:'DM', value:'contrato.dias_mora'},
-          {text:'Mora Acu.', value:'contrato.saldo_mora'},
+          {text:'DM', value:'dias_mora'},
+          {text:'Mora Acu.', value:'mora'},
           {text:'SPD', value:'pagando'},
           {text:'Segmento', value:'cob_segmento.nombre'},
           {text:'Fecha de Gestión', value:'fecha_gestion'},
@@ -78,7 +78,7 @@ export default {
           {text:'Venta', value:'cod'},
           {text:'Cliente', value:'cliente.apellidos'},
           {text:'Saldo Actual Venta', value:'saldo_actual'},
-          {text:'Días en Mora', value:'contrato.dias_mora'},
+          {text:'Días en Mora', value:'dias_mora'},
           {text:'Segmento', value:'cob_segmento.nombre'},
           {text:'Fecha de Gestión', value:'proxima_gestion'},
         ]

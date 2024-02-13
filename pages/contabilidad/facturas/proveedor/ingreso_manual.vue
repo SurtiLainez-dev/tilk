@@ -303,7 +303,8 @@ export default {
         impuesto:        '',
         impue:           0,
         total:           0,
-        observacion:     'Ingreso Manual'
+        observacion:     'Ingreso Manual',
+        descuento:       0
       });
       this.dialogoInventario = false;
     },

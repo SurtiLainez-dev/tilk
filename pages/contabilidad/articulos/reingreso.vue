@@ -31,17 +31,18 @@ export default {
     return{
       search: '',
       header:[
-        {text:'Estado', value:'estado_articulo.nombre'},
-        {text:'Serie', value:'serie_sistema'},
-        {text:'Sucursal', value:'sucursal.nombre'},
-        {text:'Detalle', value:'articulo.descripcion_corta'},
-        {text:'Marca', value:'articulo.marca.nombre'},
+        {text:'Estado', value:'estado'},
+        {text:'Serie Sistema', value:'serie_sistema'},
+        {text:'Serie Fabricante', value:'fab'},
+        {text:'Sucursal', value:'suc'},
+        {text:'Detalle', value:'articulo'},
+        {text:'Marca', value:'marca'},
       ]
     }
   },
   created() {
     this.$store.commit('guardarTitulo','Contabilidad > Precio > Inventario de Reingreso');
-    this.$store.commit('inventario/reingreso/cargar_REINGRESOS',3);
+    this.$store.commit('inventario/reingreso/cargar_REINGRESOS',{tipo: 3, consulta: 1});
     this.VISTA = 1;
   },
   computed:{
@@ -65,8 +66,7 @@ export default {
   },
   methods:{
     go(data){
-      this.$store.commit('inventario/reingreso/asignar_REINGRESO', data);
-      this.VISTA = 2;
+      this.$store.commit('inventario/reingreso/cargar_REINGRESOS',{tipo: data.id, consulta: 2});
     }
   }
 

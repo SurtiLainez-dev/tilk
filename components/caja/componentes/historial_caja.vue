@@ -12,8 +12,11 @@
       <v-col>
         <v-autocomplete dense class="ma-2" :items="dias" v-model="dia" label="Seleccionar Día"></v-autocomplete>
       </v-col>
+      <v-col>
+        <v-autocomplete dense class="ma-2" :items="tiposTransaccion" v-model="tipoTransaccion" label="tipo de Consulta"></v-autocomplete>
+      </v-col>
       <v-col class="d-flex justify-end">
-        <v-btn class="ma-2" color="success" small tile @click="cargarCierres">Consultar Cierres del  {{dia}}/{{mes}}/{{anio}}</v-btn>
+        <v-btn class="ma-2" color="success" small tile @click="consultar">Consultar  {{dia}}/{{mes}}/{{anio}}</v-btn>
       </v-col>
     </v-row>
 
@@ -35,16 +38,18 @@
       {{titulo}}
     </v-toolbar>
 
-    <historial_suc :tipo="2" :anio="anio" :mes="mes" :dia="dia"/>
+    <historial_suc v-if="tipoTransaccion === 1" :tipo="2" :anio="anio" :mes="mes" :dia="dia"/>
+    <creando_cierre :fecha="anio+'-'+mes+'-'+dia" v-else-if="tipoTransaccion === 2"/>
   </v-card>
 </v-card>
 </template>
 
 <script>
 import historial from "@/components/caja/historial";
+import creando_cierre from "@/components/caja/componentes/creando_cierre.vue";
 export default {
   name: "historial_caja",
-  components:{historial_suc: historial},
+  components:{historial_suc: historial, creando_cierre},
   data(){
     return{
       anio: 0,
@@ -65,7 +70,14 @@ export default {
         {text:'Efectivo Ingresado', value:'efectivo'},
         {text:'Efectivo Declarado', value:'efectivo_declarado'}
       ],
-      titulo: ''
+      titulo: '',
+      tipoTransaccion: 1,
+      tiposTransaccion:[
+        {text:'Consultar Cierre', value: 1},
+        {text:'Crear Cierre', value: 2},
+      ],
+      paginaCierre: false,
+      Transacciones: []
     }
   },
   created() {
@@ -80,7 +92,32 @@ export default {
       this.load = true;
       this.$axios.get(`cajas/historial_cierre/${this.anio}-${this.mes}-${this.dia}/caja/${this.$store.state.caja.CAJA.id}`).then((res)=>{
         this.load = false;
-        this.cierres = res.data.historial
+        this.cierres = res.data.historial;
+
+      })
+    },
+    consultar(){
+      if (this.tipoTransaccion === 1)
+        this.cargarCierres();
+      else if (this.tipoTransaccion === 2)
+        this.consultarParaRegistrarCierre();
+    },
+    consultarParaRegistrarCierre(){
+      let fecha = this.anio+'-'+this.mes+'-'+this.dia;
+      this.load = true;
+      this.$axios.get(`cajas/consultar_cierre/${fecha}/caja/${this.$store.state.caja.CAJA.id}`).then((res)=>{
+        if (res.data.estado == 0)
+          this.$store.commit('notificacion',{texto:res.data.msj, color:'warning'});
+        else if (res.data.estado == 1) {
+          this.$store.commit('notificacion', {texto: res.data.msj, color:'success'});
+          this.load = false;
+          this.titulo = 'Creando del cierre del '+this.dia+'/'+this.mes+'/'+this.anio;
+          this.$store.commit('caja/cargar_HISTORIAL', fecha);
+          this.$store.commit('caja/cargar_TRANSACCIONES', fecha);
+          this.vista  = 2;
+        }
+
+        this.load = false;
       })
     },
     goHistorial(item){

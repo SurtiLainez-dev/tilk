@@ -6,18 +6,20 @@
       <v-card-subtitle>Gestiones</v-card-subtitle>
       <v-spacer></v-spacer>
       <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
       <v-text-field dense label="Burcar ..." class="ma-2" v-model="search"></v-text-field>
+      <v-spacer></v-spacer>
+      <v-btn v-if="seleccionados.length > 0" @click="transferencia.dialogo = true" color="success" text tile small >Concretar Traslado</v-btn>
     </v-toolbar>
-    <v-data-table dense :headers="header" :search="search" loading-text="Cargando datos ..."
-                  :items="gestiones" :loading="loadGestiones" @click:row="abrir_dialogo">
+    <v-data-table dense :headers="header" :search="search" loading-text="Cargando datos ..." item-key="gestion"
+                  :items="gestiones" :loading="loadGestiones" v-model="seleccionados" show-select>
       <template v-slot:item.saldo_actual="{item}">L {{int.format(item.saldo_actual)}}</template>
     </v-data-table>
 
-    <v-dialog v-model="transferencia.dialogo" width="35%">
+    <v-dialog v-model="transferencia.dialogo" width="65%">
       <v-card class="pa-1">
-        <v-toolbar flat color="grey lighten-3"><v-card-subtitle>Transfiriendo {{transferencia.data.titulo}} a otro portafolio</v-card-subtitle></v-toolbar>
-        <v-text-field label="Portafolio Actual" dense class="pa-5"
-                      :value="transferencia.data.portafolio" disabled></v-text-field>
+        <v-toolbar flat color="grey lighten-3"><v-card-subtitle>Transferencia de Postafolios</v-card-subtitle></v-toolbar>
+        <v-data-table dense :headers="header2" :items="seleccionados"></v-data-table>
         <v-autocomplete label="Nuevo Portafolio" class="pa-5" :items="PORTAFOLIOS" dense
                         :item-value="'id'" :item-text="'nombre'" v-model="transferencia.nuevo_portafolio"></v-autocomplete>
         <v-card-actions class="d-flex justify-end">
@@ -34,6 +36,7 @@ export default {
   name: "transferencia",
   data(){
     return{
+      seleccionados: [],
       transferencia:{
         dialogo: false,
         data: {},
@@ -46,6 +49,11 @@ export default {
       header: [
         {text:'Título', value:'titulo'},
         {text:'Saldo Actual Gestión', value:'saldo_actual'},
+        {text:'Segmento', value:'segmento'},
+        {text:'Portafolio', value:'portafolio'},
+      ],
+      header2:[
+        {text:'Título', value:'titulo'},
         {text:'Segmento', value:'segmento'},
         {text:'Portafolio', value:'portafolio'},
       ]
@@ -63,10 +71,6 @@ export default {
     this.cargar_gestiones();
   },
   methods:{
-    abrir_dialogo(data){
-      this.transferencia.data    = data;
-      this.transferencia.dialogo = true;
-    },
     cargar_gestiones(){
       this.$axios.get('corbros/gestiones/portafolios/sucursal/'+this.PORTAFOLIO.sucursal_id).then((res)=>{
         this.gestiones = res.data.gestiones;
@@ -79,8 +83,7 @@ export default {
         this.$store.commit('activarOverlay', true);
         this.$axios.post('cobros/gestiones/portafolios/transferencias',{
           portafolio_nuevo: this.transferencia.nuevo_portafolio,
-          portafolio:       this.transferencia.data.porta,
-          gestion:          this.transferencia.data.gestion
+          gestiones:        this.seleccionados
         }).then((res)=>{
           this.$store.commit('cobros/cartera/cargar_PORTAFOLIOS');
           this.$store.commit('cobros/cartera/cambiar_VISTA', 1);

@@ -334,7 +334,7 @@
                     this.$axios.put('solicitud_credito/avales/'+this.Soli.id,{
                         avales: avales
                     }).then((res)=>{
-                        this.$store.commit('solicitud_credito/cargarSolicitudes');
+                        this.$store.commit('solicitud_credito/cargarSolicitudes', {tipo: 1, search: null, fecha: null});
                         this.Avales = res.data.avales;
                         let dataAval = null;
                         this.$store.commit('solicitud_credito/agregarAvalesEstaticos', {tipo: 2});

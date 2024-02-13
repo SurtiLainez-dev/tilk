@@ -25,8 +25,8 @@
         </thead>
         <tbody>
           <tr v-for="(item, i) in filterData" :key="i" @click="asignarAnticipo(item)">
-            <td v-html="resaltarRows(item.cliente.identidad)"></td>
-            <td > {{item.cliente.nombres}} {{item.cliente.apellidos}}</td>
+            <td v-html="resaltarRows(item.identidad)"></td>
+            <td > {{item.nombres}} {{item.apellidos}}</td>
             <td>{{int.format(item.monto)}} lps</td>
             <td v-html="resaltarRows(item.motivo)"></td>
             <td>{{item.created_at.split('T')[0].split('-')[2]}}/{{item.created_at.split('T')[0].split('-')[1]}}/{{item.created_at.split('T')[0].split('-')[0]}}</td>
@@ -74,8 +74,8 @@ export default {
       search: '',
       int: Intl.NumberFormat(),
       headers:[
-        {text:'Identidad', value:'cliente.identidad'},
-        {text:'Nombre Cliente', value:'cliente.nombre'},
+        {text:'Identidad', value:'identidad'},
+        {text:'Nombre Cliente', value:'nombre'},
         {text:'Monto Disponible', value:'monto'},
         {text:'Motivo', value:'motivo'},
         {text:'Creado', value:'created_at'},
@@ -92,9 +92,9 @@ export default {
     filterData(){
       let filtro = [];
       filtro = this.ANTICIPOS.filter(fila =>{
-        let identidad = fila.cliente.identidad.toString().toLowerCase();
-        let nombres = fila.cliente.nombres.toString().toLowerCase();
-        let apellidos = fila.cliente.apellidos.toString().toLowerCase();
+        let identidad = fila.identidad.toString().toLowerCase();
+        let nombres = fila.nombres.toString().toLowerCase();
+        let apellidos = fila.apellidos.toString().toLowerCase();
         let motivo = fila.motivo.toString().toLowerCase();
         let search   = this.search.toLowerCase()
 

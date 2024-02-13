@@ -30,11 +30,22 @@
           <v-divider></v-divider>
           <v-form ref="FormFamilia">
             <v-text-field v-model="Familia.nombre" :rules="[rule.required, rule.min, rule.max]"
-                          label="Nombre de la Familia" required :counter="60"></v-text-field>
+                          label="Nombre de la Familia" dense required :counter="60"></v-text-field>
+            <v-card v-if="Familia.img" flat tile class="d-flex justify-center">
+              <v-img
+                     :lazy-src="Familia.img"
+                     max-height="150"
+                     max-width="250"
+                     :src="Familia.img"
+              ></v-img>
+            </v-card>
+            <v-divider></v-divider>
+            <v-file-input v-model="img" dense label="Foto de Presentación"></v-file-input>
             <v-row>
               <v-col class="d-flex justify-end">
-                <v-btn color="orange" small @click="editandoFamilia" v-if="sideFamilia" dark>Registrar Cambios</v-btn>
-                <v-btn color="orange" small  @click="registrarFamilia" v-else dark>Registrar Familia</v-btn>
+                <v-btn color="orange" text small @click="usoSide = false" tile dark class="ma-2">Cerrar</v-btn>
+                <v-btn color="orange" small @click="editandoFamilia" v-if="sideFamilia" tile dark class="ma-2">Registrar Cambios</v-btn>
+                <v-btn color="orange" small  @click="registrarFamilia" v-else dark tile class="ma-2">Registrar Familia</v-btn>
               </v-col>
             </v-row>
             <Errores422 v-if="erroresServidor" :errores="erroresServidor"/>
@@ -90,44 +101,58 @@
         Familia:{
           nombre: '',
           codigo: '',
-          familia: null
+          familia: null,
+          img: null
         },
         errorInput: false,
         sideFamilia: false,
-        erroresServidor:{}
+        erroresServidor:{},
+        img: null
       }
     },
     methods:{
       editarFamilia(item){
         this.tituloSide = 'Editando familia '+item.nombre;
         this.usoSide = true
-        this.Familia.nombre = item.nombre
-        this.Familia.codigo = item.codigo
+        this.Familia.nombre  = item.nombre
+        this.Familia.codigo  = item.codigo
         this.Familia.familia = item.id
+        this.Familia.img     = item.img;
         this.sideFamilia = true
       },
       editandoFamilia(){
         if (this.$refs.FormFamilia.validate()) {
           this.overlay = true
           this.usoSide = false
-          this.$axios.put('familia/'+this.Familia.familia,{
-            nombre: this.Familia.nombre
-          },{
-            headers: {
-              'Authorization': 'Bearer ' + this.$store.state.token
+          let data = new FormData();
+          data.append('nombre', this.Familia.nombre);
+          data.append('img', this.img);
+          data.append('id', this.Familia.familia)
+
+          this.$axios({
+            url: 'familia/edit',
+            method: 'post',
+            data: data,
+            headers:{
+              'Authorization': 'Bearer ' + this.$store.state.token,
+              'Content-Type': "multipart/form-data"
             }
           }).then((res)=>{
-            if (res.status === 200){
-              this.$fetch()
-              this.overlay = false
-              Swal.fire(
-                'Registro de Cambios Exitoso',
-                `El cambio de la familia ${this.Familia.nombre} se registro exitosamente en la base de datos`,
+            this.$fetch()
+            this.overlay = false
+            Swal.fire(
+                'Registro Exitoso',
+                `La familia ${this.Familia.nombre} se guardado exitosamente en la base de datos`,
                 'success'
-              )
-              this.Familia.nombre = ''
-              this.Familia.codigo = ''
-              this.Familia.familia = ''
+            )
+            this.Familia.nombre = ''
+            this.Familia.codigo = ''
+            this.Familia.familia = ''
+          }).catch((error)=>{
+            this.usoSide = true
+            this.overlay = false
+            if (error.response.status === 422){
+              this.erroresServidor = error.response.data.errors
             }
           })
         }
@@ -143,25 +168,28 @@
         if (this.$refs.FormFamilia.validate()){
           this.usoSide = false
           this.overlay = true
-          this.$axios.post('familias',{
-            nombre: this.Familia.nombre,
-            codigo: this.Familia.codigo
-          },{
-            headers: {
-              'Authorization': 'Bearer ' + this.$store.state.token
+          let data = new FormData();
+          data.append('nombre', this.Familia.nombre);
+          data.append('codigo', this.Familia.codigo);
+          data.append('img', this.img);
+          this.$axios({
+            url: 'familias',
+            method: 'post',
+            data: data,
+            headers:{
+              'Authorization': 'Bearer ' + this.$store.state.token,
+              'Content-Type': "multipart/form-data"
             }
           }).then((res)=>{
-            if (res.status === 200){
-              this.$fetch()
-              this.overlay = false
-              Swal.fire(
+            this.$fetch()
+            this.overlay = false
+            Swal.fire(
                 'Registro Exitoso',
                 `La familia ${this.Familia.nombre} se guardado exitosamente en la base de datos`,
                 'success'
-              )
-              this.Familia.nombre = ''
-              this.Familia.codigo = ''
-            }
+            )
+            this.Familia.nombre = ''
+            this.Familia.codigo = ''
           }).catch((error)=>{
             this.usoSide = true
             this.overlay = false

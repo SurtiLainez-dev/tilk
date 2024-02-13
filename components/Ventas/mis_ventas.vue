@@ -53,9 +53,11 @@
                         <tbody>
                           <tr v-for="item in documentos">
                             <td>{{item.name}}</td>
-                            <td><b-link @click="mostrarPdf($axios.defaults.baseURL+item.ref+DATA_VENTA.id)">Descargar {{item.name}}</b-link></td>
+                            <td>
+                              <b-link @click="solicitarClave(item.ref)">Descargar {{item.name}}</b-link>
+                            </td>
                           </tr>
-                        <tr v-if="DATA_VENTA.contrato_cliente.remision_articulo.articulo.is_motocicleta === 1 ||  DATA_VENTA.contrato_cliente.remision_articulo.articulo.is_motocicleta === true">
+                        <tr v-if="DATA_VENTA.facturas_contados[0].articulo.is_motocicleta === 1 ||  DATA_VENTA.facturas_contados[0].articulo.is_motocicleta === true">
                           <td>Permiso de Circulación</td>
                           <td><b-link @click="solicitarClave(1)">Descargar Permiso</b-link></td>
                         </tr>
@@ -90,7 +92,7 @@
                         <tr >
                           <td>Pagaré</td>
                           <td v-if="DATA_VENTA.documento_ventas && DATA_VENTA.documento_ventas.garantia_prendaria">
-                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.garantia_prendaria)">Ver pagaré</b-link></td>
+                            <b-link @click="verDocumento(DATA_VENTA.documento_ventas.pagare)">Ver pagaré</b-link></td>
                           <td v-else>No hay documento</td>
                         </tr>
                         <tr >
@@ -241,28 +243,20 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-if="DATA_VENTA.tipo_venta === 1" v-for="item in DATA_VENTA.facturas_contados">
-                              <td>{{item.remision_articulo.articulo.nombre_articulo}}</td>
-                              <td>{{item.remision_articulo.articulo.codigo_proveedor}}</td>
-                              <td>{{item.remision_articulo.articulo.marca.nombre}}</td>
-                              <td>{{item.remision_articulo.articulo.modelo}}</td>
+                            <tr  v-for="item in DATA_VENTA.facturas_contados">
+                              <td>{{item.articulo.nombre_articulo}}</td>
+                              <td>{{item.articulo.codigo_proveedor}}</td>
+                              <td>{{item.articulo.marca.nombre}}</td>
+                              <td>{{item.articulo.modelo}}</td>
                               <td>{{item.remision_articulo.color}}</td>
                               <td>{{item.remision_articulo.serie_sistema}}</td>
-                            </tr>
-                            <tr v-else-if="DATA_VENTA.tipo_venta === 2">
-                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.articulo.nombre_articulo}}</td>
-                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.articulo.codigo_proveedor}}</td>
-                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</td>
-                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.articulo.modelo}}</td>
-                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.color}}</td>
-                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.serie_sistema}}</td>
                             </tr>
                             </tbody>
                           </template>
                         </v-simple-table>
                       </div>
 <!---->
-                      <div v-if="DATA_VENTA.contrato_cliente.remision_articulo.articulo.is_motocicleta && DATA_VENTA.tipo_venta === 1"
+                      <div v-if="DATA_VENTA.facturas_contados[0].articulo.is_motocicleta && DATA_VENTA.tipo_venta === 1"
                            style="border: solid 1px #000" class="pl-3">
                         <small>Motocicleta</small>
                         <v-simple-table dense class="rowsTable">
@@ -278,11 +272,11 @@
                             </thead>
                             <tbody>
                             <tr>
-                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.motocicleta.chasis}}</td>
-                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.motocicleta.motor}}</td>
-                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.motocicleta.cilindraje}}</td>
-                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.motocicleta.placa}}</td>
-                              <td>{{DATA_VENTA.contrato_cliente.remision_articulo.motocicleta.color}}</td>
+                              <td>{{DATA_VENTA.facturas_contados[0].remision_articulo.motocicleta.chasis}}</td>
+                              <td>{{DATA_VENTA.facturas_contados[0].remision_articulo.motocicleta.motor}}</td>
+                              <td>{{DATA_VENTA.facturas_contados[0].remision_articulo.motocicleta.cilindraje}}</td>
+                              <td>{{DATA_VENTA.facturas_contados[0].remision_articulo.motocicleta.placa}}</td>
+                              <td>{{DATA_VENTA.facturas_contados[0].remision_articulo.motocicleta.color}}</td>
                             </tr>
                             </tbody>
                           </template>
@@ -496,7 +490,7 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+    </v-dialog>
 
     <v-dialog v-model="dialogopdf" width="50%">
       <v-card>
@@ -526,11 +520,11 @@ export default {
       url: 'https://ign-surti.nyc3.digitaloceanspaces.com/Venta/0209182178/1660458200-1-c05791314.pdf?X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=P43MQVMWSHE6CPPXLVN2%2F20220814%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20220814T065240Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Signature=05183e782673e874ad3ee563067240bf8459c9730a038caf94bfa58b949f7860',
       dialogopdf: false,
       documentos:[
-        {name:'Contrato', ref:'print_contrato_venta/'},
-        {name:'Pagaré', ref:'print_pagare_venta/'},
-        {name:'Hoja de conocimientos (vehículos)', ref: 'print_hoja_conocimientos_venta/'},
-        {name:'Traspaso (vehículos)', ref: 'print_traspaso_venta/'},
-        {name:'Carta Poder (vehículos)', ref: 'print_carta_poder_venta/'},
+        {name:'Contrato', ref:7},
+        {name:'Pagaré', ref:3},
+        {name:'Hoja de conocimientos (vehículos)', ref: 4},
+        {name:'Traspaso (vehículos)', ref: 5},
+        {name:'Carta Poder (vehículos)', ref: 6},
       ],
       vista: 1,
       doc:{
@@ -592,10 +586,20 @@ export default {
   },
   methods:{
     abrirNavegador(clave, tipo){
-      if (tipo === 1)
-        ipcRenderer.send('pint_navegador', this.urlA+'documentos/permiso_s_placa/usuario='+this.USUARIO+'&chasis='+this.DATA_VENTA.contrato_cliente.remision_articulo.serie_fabricante+'/'+clave);
-      else if (tipo === 2)
+      if (tipo === 1)//permisos para circular sin placa
+        ipcRenderer.send('pint_navegador', this.urlA+'documentos/permiso_s_placa/usuario='+this.USUARIO+'&chasis='+this.DATA_VENTA.facturas_contados[0].remision_articulo.serie_fabricante+'/'+clave);
+      else if (tipo === 2)//tarjeta del cliente
         ipcRenderer.send('pint_navegador', this.urlA+'documentos/imprimir_tarjeta/usuario='+this.USUARIO+'&venta='+this.DATA_VENTA.cod+'&'+clave);
+      else if (tipo === 3)//pagare
+        ipcRenderer.send('pint_navegador', this.urlA+'documentos/print_pagare_venta/usuario='+this.USUARIO+'&venta='+this.DATA_VENTA.cod+'&'+clave);
+      else if (tipo === 4)//hoja conocimiento tramites
+        ipcRenderer.send('pint_navegador', this.urlA+'documentos/print_hoja_conocimientos_venta/usuario='+this.USUARIO+'&venta='+this.DATA_VENTA.cod+'&'+clave);
+      else if (tipo === 5)// hoja de traspaso
+        ipcRenderer.send('pint_navegador', this.urlA+'documentos/print_traspaso_venta/usuario='+this.USUARIO+'&venta='+this.DATA_VENTA.cod+'&'+clave);
+      else if (tipo === 6)//carta poder
+        ipcRenderer.send('pint_navegador', this.urlA+'documentos/print_carta_poder_venta/usuario='+this.USUARIO+'&venta='+this.DATA_VENTA.cod+'&'+clave);
+      else if (tipo === 7)//contrato
+        ipcRenderer.send('pint_navegador', this.urlA+'documentos/print_contrato_venta/usuario='+this.USUARIO+'&venta='+this.DATA_VENTA.cod+'&'+clave);
 
       this.$store.commit('activarOverlay', false);
     },
@@ -690,18 +694,19 @@ export default {
     },
     registrarVenta(decision){
       this.$store.commit('activarOverlay', true);
+      let remision = this.DATA_VENTA.facturas_contados[0].remision_articulo_id;
       this.$axios.post('registrar_venta',{
         decision:    decision,
         regalias:    this.Regalias,
         componentes: this.Componentes,
         is_combo:    0,
-        remision_id: this.DATA_VENTA.contrato_cliente.remision_articulo_id,
+        remision_id: remision,
         venta_id:    this.DATA_VENTA.id,
         sucursal_id: this.DATA_VENTA.colaborador.sucursal_id,
         correo:      this.Colaborador,
         direccion:   this.Direccion
       }).then((res)=>{
-        this.$store.commit('ventas/cargar_MIS_VENTAS');
+        this.$store.commit('ventas/cargar_MIS_VENTAS', null);
 
         this.notificacion('Se ha actualizado la información de la venta', 'success');
         if (decision === 1) {
@@ -714,6 +719,34 @@ export default {
           this.notificacion('Se ha cancelado la venta exitosamente','success');
 
         this.Enviado = true;
+
+        setTimeout(()=>{
+          this.$store.commit('activarOverlay', false);
+        }, 5000)
+      }).catch((error)=>{
+        this.$store.commit('activarOverlay', false);
+        this.notificacion('Ha ocurrido un error, comunicate con el soporte técnico.','error');
+      })
+    },
+    registrarVentaFinanciera(decision){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('surti_creditos/registrar_venta',{
+        decision:    decision,
+        id:    this.DATA_VENTA.id,
+        venta_id: this.DATA_VENTA.id,
+        correo:      this.Colaborador,
+      }).then((res)=>{
+        this.$store.commit('ventas/cargar_MIS_VENTAS', null);
+
+        this.notificacion('Se ha actualizado la información de la venta', 'success');
+        if (decision === 1) {
+          this.notificacion('Se han realizado todos los procedicimientos para la venta', 'success');
+          this.notificacion('Se le va enviar esta venta al correo: '+this.Colaborador, 'success');
+        }
+        else
+          this.notificacion('Se ha cancelado la venta exitosamente','success');
+
+        this.$router.push('/inicio/')
 
         setTimeout(()=>{
           this.$store.commit('activarOverlay', false);
@@ -737,7 +770,11 @@ export default {
       if (this.DATA_VENTA.is_aceptado === 1 && this.DATA_VENTA.estado === 4) {
         if (this.Colaborador) {
           if (this.Direccion) {
-            this.registrarVenta(decision);
+            console.log(this.DATA_VENTA.venta_financiera)
+            if (this.DATA_VENTA.venta_financiera === 0)
+              this.registrarVenta(decision);
+            else
+              this.registrarVentaFinanciera(decision);
           }else {
             this.notificacion('Tienes que seleccionar una dirección de envio.', 'error');
           }

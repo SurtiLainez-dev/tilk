@@ -10,11 +10,11 @@
       </v-toolbar>
       <v-data-table :headers="header" :items="VENTAS" dense @click:row="goVenta"
                     :search="search" :loading="LOAD">
-        <template v-slot:item.colaborador.nombres="{item}">
-          {{item.colaborador.nombres}} {{item.colaborador.apellidos}}
+        <template v-slot:item.nombresCol="{item}">
+          {{item.nombresCol}} {{item.apellidosCol}}
         </template>
-        <template v-slot:item.cliente.nombres="{item}">
-          {{item.cliente.nombres}} {{item.cliente.apellidos}}
+        <template v-slot:item.nombres="{item}">
+          {{item.nombres}} {{item.apellidos}}
         </template>
         <template v-slot:item.tipo_venta="{item}">
           <v-chip color="success" x-small v-if="item.tipo_venta === 1" dark>Contado</v-chip>
@@ -41,7 +41,7 @@
       <v-toolbar dense flat >
         <v-btn fab x-small dark color="orange" @click="vista = 1"><v-icon>fa fa-arrow-left</v-icon></v-btn>
         <v-divider></v-divider>
-        Venta # {{venta.cod}} - {{venta.cliente.nombres}} {{venta.cliente.apellidos}}
+        Venta # {{venta.cod}} - {{venta.nombres}} {{venta.apellidos}}
       </v-toolbar>
 
       <revision_doc/>
@@ -59,13 +59,12 @@ export default {
       int: Intl.NumberFormat(),
       search: '',
       header:[
-        {text: 'Cliente',         value:'cliente.nombres'},
-        {text: 'Vendedor',        value:'colaborador.nombres'},
+        {text: 'Cliente',         value:'nombres'},
+        {text: 'Vendedor',        value:'nombresCol'},
         {text: 'Tipo de venta',   value:'tipo_venta'},
         {text: 'Código',          value:'cod'},
         {text: 'Estado',          value:'estado'},
         {text: 'Aceptado por F.', value:'is_aceptado'},
-        {text: 'Total',           value:'total'},
       ],
       vista: 1,
       venta: {}

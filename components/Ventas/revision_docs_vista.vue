@@ -119,7 +119,7 @@
         <tbody v-if="!LOAD">
         <tr v-if="VENTA.factura_ventas.length > 0" v-for="item in VENTA.factura_ventas">
           <td>{{item.contador}}</td>
-          <td><b-link @click="solicitarClave(item.contador)">Ver factura</b-link></td>
+          <td><b-link @click="solicitarClave(item.contador, 'factura')">Ver factura</b-link></td>
         </tr>
         <tr v-else>
           <td colspan="2">No se ha facturado aún</td>
@@ -129,8 +129,25 @@
 
       <v-divider></v-divider>
 
+
+      <table>
+        <caption>Registro de Revisión de Documentos</caption>
+        <thead>
+        <tr>
+          <td>Documento Imprimible</td>
+          <td>Ver</td>
+        </tr>
+        </thead>
+        <tbody v-if="!LOAD">
+        <tr v-if="VENTA.factura_ventas.length > 0" v-for="item in VENTA.factura_ventas">
+          <td>Imprimir firmas de la venta #{{VENTA.cod}}</td>
+          <td><b-link @click="solicitarClave(null, 'rev')">Imprimir</b-link></td>
+        </tr>
+        </tbody>
+      </table>
+
       <v-card-actions class="d-flex justify-end">
-        <v-btn v-if="viewBtn && VENTA.revision_documentos === 0" @click="registrarValidacion"
+        <v-btn  @click="registrarValidacion" v-if="VENTA.documento_ventas"
                color="success" dark tile small>Revsión OK</v-btn>
       </v-card-actions>
     </v-container>
@@ -159,9 +176,12 @@ export default {
     }
   },
   methods:{
-    abrirNavegador(clave, data){
+    abrirNavegador(clave, data, tipo){
       let url = '';
-      url = this.$axios.defaults.baseURL+'documentos/cajas/factura/usuario='+this.USUARIO+'/factura='+data+'/'+clave;
+      if (tipo === 'factura')
+        url = this.$axios.defaults.baseURL+'documentos/cajas/factura/usuario='+this.USUARIO+'/factura='+data+'/'+clave;
+      else if (tipo === 'rev')
+        url = this.$axios.defaults.baseURL+'documentos/revision_docs/usuario='+this.USUARIO+'&venta='+this.VENTA.cod+'&'+clave;
 
       ipcRenderer.send('pint_navegador', url);
       this.$store.commit('activarOverlay', false);
@@ -179,11 +199,11 @@ export default {
         this.$store.commit('activarOverlay', false);
       })
     },
-    solicitarClave(data){
+    solicitarClave(data, tipo){
       this.$store.commit('activarOverlay', true);
       this.fac = data;
       this.$axios.post('solicitar_clave_doucmento').then((res)=>{
-        this.abrirNavegador(res.data.clave, data);
+        this.abrirNavegador(res.data.clave, data, tipo);
       }).catch((error)=>{
         this.$store.commit('notificacion',{texto:'Ocurrio un error', color:'error'});
         this.$store.commit('activarOverlay', false);

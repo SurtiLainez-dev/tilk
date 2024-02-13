@@ -114,7 +114,7 @@
       verFile(){
         this.$store.commit('activarOverlay', true);
         this.$axios.post('leer_documento/',{
-          ubicacion: this.Factura.file_generado
+          ubicacion: this.Factura.file_subir
         },{
           headers: {
             'Authorization': 'Bearer ' + this.$store.state.token

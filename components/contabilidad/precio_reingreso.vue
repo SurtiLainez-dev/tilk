@@ -92,22 +92,24 @@
         </v-card>
       </v-col>
       <v-col cols="12" lg="7">
-        <v-card height="100%">
+        <v-card>
           <v-row no-gutters>
             <v-col>
               <v-card-text>Comentarios para la venta</v-card-text>
-              <v-data-table dense :items="comentarios" :items-per-page="5" hide-default-footer :headers="headerComen">
-                <template v-slot:item.titulo="{item}">
-                  <vs-input size="small" v-model="item.titulo"/>
-                </template>
-                <template v-slot:item.comentario="{item}">
-                  <vs-input size="small" v-model="item.comentario" style="min-width: 300px"/>
-                </template>
-                <template v-slot:item.key="{item}">
-                  <v-btn color="red" dark fab height="25" @click="deteleComentario(item)"
-                         width="25"><v-icon small>fa fa-times</v-icon></v-btn>
-                </template>
-              </v-data-table>
+              <v-card flat tile >
+                <v-data-table dense :items="comentarios" :items-per-page="5" :headers="headerComen">
+                  <template v-slot:item.titulo="{item}">
+                    <vs-input size="small" v-model="item.titulo"/>
+                  </template>
+                  <template v-slot:item.comentario="{item}">
+                    <vs-input size="small" v-model="item.comentario" style="min-width: 300px"/>
+                  </template>
+                  <template v-slot:item.key="{item}">
+                    <v-btn color="red" dark fab height="25" @click="deteleComentario(item)"
+                           width="25"><v-icon small>fa fa-times</v-icon></v-btn>
+                  </template>
+                </v-data-table>
+              </v-card>
               <div class="d-flex justify-start pt-2">
                 <v-btn tile small dark class="ma-3" color="indigo" @click="addComentario">Agregar Comentario</v-btn>
               </div>
@@ -220,7 +222,7 @@ export default {
         }).then((res)=>{
           this.$store.commit('notificacion',{texto: res.data.msj, color:'success'});
           this.$store.commit('activarOverlay', false);
-          this.$store.commit('inventario/reingreso/cargar_REINGRESOS',3);
+          this.$store.commit('inventario/reingreso/cargar_REINGRESOS',{tipo:3, consulta: 1});
           this.$store.commit('inventario/reingreso/cambiar_VISTA', 1);
         }).catch((error)=>{
           this.$store.commit('notificacion',{texto: 'Hubo un error en el servidor', color:'error'});

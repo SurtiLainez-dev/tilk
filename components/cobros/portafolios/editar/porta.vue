@@ -36,6 +36,7 @@
           <v-toolbar flat>
             <v-card-title>Editando Portafolio</v-card-title>
           </v-toolbar>
+          <v-btn block tile small @click="dialogoEditarUser = true" dark color="success">Cambiar Usuario</v-btn>
           <v-divider></v-divider>
           <v-form ref="FormEditarPortafolio">
             <v-dialog ref="dialogoFechaCierre" :return-value.sync="editar.fecha_cierre" persistent
@@ -66,6 +67,22 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <v-dialog width="35%" v-model="dialogoEditarUser">
+      <v-card>
+        <v-card-title>Asignando Nuevo Usuario</v-card-title>
+        <v-divider></v-divider>
+        <v-card flat tile class="ma-4 pa-4">
+          <v-autocomplete dense label="Seleccionar Usuario" :loading="load_user"
+                          v-model="user" :rules="[rule.req]" :items="Users"></v-autocomplete>
+        </v-card>
+        <v-divider></v-divider>
+        <v-card-actions class="d-flex justify-end">
+          <v-btn color="orange" dark tile small @click="dialogoEditarUser = false" text>Cerrar</v-btn>
+          <v-btn color="success" dark tile small  @click="registrarCambioUsuario">Registrar Cambio</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -87,8 +104,12 @@ export default {
       return this.$store.state.graficas.cobros.gestiones.G_LOADTOTALESSEGMENTOS;
     }
   },
+  created() {
+    this.cargar_usuarios();
+  },
   data(){
     return{
+      dialogoEditarUser:  false,
       editar:{
         dialogo: false,
         fecha_cierre: '',
@@ -99,9 +120,43 @@ export default {
       rule: {
         req: v => !!v || 'Campo requerido',
       },
+      user: 0,
+      load_user: true,
+      Users: []
     }
   },
   methods:{
+    cargar_usuarios(){
+      this.$axios.get('/usuarios').then((res)=>{
+        this.Users = [];
+        res.data.usuarios.forEach(item=>{
+          this.Users.push({
+            value: item.user,
+            text: item.nombres+' '+item.apellidos+' - '+item.usuario
+          })
+        })
+        this.load_user = false;
+      })
+    },
+    registrarCambioUsuario(){
+      if (this.user > 0) {
+        this.dialogoEditarUser = false;
+        this.$store.commit('activarOverlay', true);
+        this.$axios.post('cobros/portafolio/cambiar_user', {
+          portafolio: this.PORTAFOLIO.id,
+          user: this.user
+        }).then((res) => {
+          this.$store.commit('cobros/portafolios/cargar_PORTAFOLIO');
+          this.$store.commit('notificacion', {texto: res.data.msj, color: 'success'});
+          this.$store.commit('activarOverlay', false);
+          this.$store.commit('cobros/portafolios/cambiar_VISTAPORTAFOLIO', 1);
+        }).catch(error => {
+          this.$store.commit('notificacion', {texto: 'Hubo un error en el servidor', color: 'error'});
+          this.$store.commit('activarOverlay', false);
+          this.dialogoEditarUser = true;
+        });
+      }
+    },
     registrarProyeccion(){
       let totales = [];
       if (this.TOTALES.length > 0)
@@ -129,9 +184,6 @@ export default {
         this.registrarProyeccion();
     }
   },
-  mounted() {
-
-  }
 }
 </script>
 

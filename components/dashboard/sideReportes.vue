@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-list-group>
+    <v-list-group color="green" >
       <template v-slot:activator value="true">
         <v-list-item-title>Cobros</v-list-item-title>
       </template>
@@ -14,7 +14,7 @@
         Saldos por Portafolio
       </v-list-item>
     </v-list-group>
-    <v-list-group>
+    <v-list-group color="green" >
       <template v-slot:activator value="true">
         <v-list-item-title>Ventas</v-list-item-title>
       </template>

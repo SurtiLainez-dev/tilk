@@ -13,12 +13,7 @@ export const state = () => ({
         forma_pago:           0,
         articulo_id:          null,
         detalles_articulos:   [],
-        referencias:          [
-            {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 0, comentario: ''},
-            {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 1, comentario: ''},
-            {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 2, comentario: ''},
-            {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 3, comentario: ''},
-        ],
+        referencias:          [],
         avales:               [],
         observacion_precio:   ''
     },
@@ -289,7 +284,11 @@ export const mutations = {
     cargarSolicitudes(state, val){
         state.loadSolicitudes = true;
         if (val.tipo === 1){
-            this.$axios.get('solicitudes_credtio')
+            if (!val.fecha){
+                let date = new Date();
+                val.fecha = date.getFullYear()+'-'+(date.getMonth() + 1)+'-01';
+            }
+            this.$axios.get('solicitudes_credito/fecha/'+val.fecha)
                 .then((res)=>{
                     state.Solicitudes = res.data.solicitudes;
                     state.loadSolicitudes = false;
@@ -298,6 +297,7 @@ export const mutations = {
             this.$axios.get('solicitudes_credito/'+val.search)
                 .then((res)=>{
                     state.Solicitudes = res.data.solicitudes;
+                    console.log(res.data.solicitudes)
                     state.loadSolicitudes = false;
                 })
         }

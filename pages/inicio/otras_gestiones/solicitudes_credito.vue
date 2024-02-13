@@ -50,7 +50,7 @@
         name: "solicitudes_credito",
         created() {
             this.$store.commit('guardarTitulo', 'Inicio > Otras Gestiones > Solicitudes de Crédito');
-            this.$store.commit('solicitud_credito/cargarSolicitudes', {tipo: 1, search: null});
+            this.$store.commit('solicitud_credito/cargarSolicitudes', {tipo: 1, search: null, fecha: null});
         },
         data(){
             return{

@@ -96,6 +96,7 @@ export default {
       this.DIALOGO = true;
       this.$store.commit('inventario/inventario/cargar_PEPS');
       this.$store.commit('inventario/inventario/cargar_STOCK');
+      this.$store.commit('inventario/inventario/cargarHISTORAL');
     },
     cerrarDialogo() {
       this.DIALOGO = false;

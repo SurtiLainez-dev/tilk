@@ -46,11 +46,11 @@ export default {
         {text:'Saldo', value:'monto'},
         {text:'Saldo Actual', value:'monto_actual'},
         {text:'Estado', value:'estado'},
-        {text:'Venta', value:'venta.cod'},
-        {text:'Nombres', value:'venta.cliente.nombres'},
-        {text:'Apellidos', value:'venta.cliente.apellidos'},
-        {text:'Caja', value:'caja.codigo'},
-        {text:'Usuario', value:'user.usuario'},
+        {text:'Venta', value:'cod'},
+        {text:'Nombres', value:'nombres'},
+        {text:'Apellidos', value:'apellidos'},
+        {text:'Caja', value:'codigo'},
+        {text:'Usuario', value:'usuario'},
       ]
     }
   },
@@ -59,15 +59,24 @@ export default {
   },
   methods:{
     goDeposito(item){
-      this.$store.commit('contabilidad/depositos/asignar_DEPOSITO', item);
-      this.titulo = 'Depósito de '+item.venta.cliente.nombres+' '+item.venta.cliente.apellidos;
-      this.$store.commit('cuentas/agregar_CUENTA', item.venta);
-      this.vista = 2;
+      this.titulo = 'Depósito de '+item.nombres+' '+item.apellidos;
+      this.LOADDEPOSITOS = true;
+      this.$axios.get('caja/deposito_cliente/'+item.id).then((res)=>{
+        this.$store.commit('contabilidad/depositos/asignar_DEPOSITO', res.data.deposito);
+        this.$store.commit('cuentas/agregar_CUENTA', res.data.deposito.venta);
+        this.LOADDEPOSITOS = false;
+        this.vista = 2;
+      })
     }
   },
   computed:{
-    LOADDEPOSITOS(){
-      return this.$store.state.contabilidad.depositos.LOADDEPOSITOS;
+    LOADDEPOSITOS:{
+      get: function () {
+        return this.$store.state.contabilidad.depositos.LOADDEPOSITOS;
+      },
+      set(val){
+        this.$store.commit('contabilidad/depositos/cambiar_LOADDEPOSITO', val);
+      }
     },
     DEPOSITOS(){
       return this.$store.state.contabilidad.depositos.DEPOSITOS;

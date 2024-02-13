@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-list-group>
+    <v-list-group color="green" >
       <template v-slot:activator value="true">
         <v-list-item-title>Sucursales</v-list-item-title>
       </template>
@@ -13,7 +13,7 @@
 
     </v-list-group>
 
-    <v-list-group v-if="PERMISOS.includes(9)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(9)">
       <template v-slot:activator value="true">
         <v-tooltip top>
           <template v-slot:activator="{on, attrs}">

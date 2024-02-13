@@ -89,7 +89,6 @@ export default {
       this.$store.commit('activarOverlay', false);
     },
     solicitarClave(data){
-      console.log(data)
       this.$store.commit('activarOverlay', true);
       this.fac = data;
       this.$axios.post('solicitar_clave_doucmento').then((res)=>{

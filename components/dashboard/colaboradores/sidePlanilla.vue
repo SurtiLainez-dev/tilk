@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-list-group>
+    <v-list-group color="green" >
       <template v-slot:activator value="true">
         <v-list-item-title>Planillas</v-list-item-title>
       </template>
@@ -10,12 +10,12 @@
       <v-list-item v-if="PERMISOS.includes(12)" class="itemOpciones" @click="go('/colaborador/planillas/')">
         Ver Planillas
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(13)" class="itemOpciones" @click="go('/colaborador/planillas/pendientes')">
+      <v-list-item v-if="PERMISOS.includes(13)" class="itemOpciones" @click="anadirPestana(29,'Colaboradores - Planillas Pendientes')">
         Planillas Pendientes
       </v-list-item>
     </v-list-group>
 
-    <v-list-group v-if="PERMISOS.includes(133) || PERMISOS.includes(134)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(133) || PERMISOS.includes(134)">
       <template v-slot:activator value="true">
         <v-list-item-title>Notificaciones</v-list-item-title>
       </template>
@@ -36,11 +36,25 @@
     export default {
       name: "sidePlanilla",
       methods:{
+        anadirPestana(key, titulo){
+          let bandera = 0;
+          this.Pes.forEach((item)=>{
+            if (item.key === key)
+              bandera++;
+          });
+          if (bandera === 0){
+            this.$store.commit('anadirCaja', {titulo:titulo, key: key});
+            this.$store.commit('cambiarTab', {val:key, tipo:false});
+          }
+        },
         go(url){
           this.$router.push(url)
         }
       },
       computed:{
+        Pes(){
+          return this.$store.state.pestana
+        },
         PERMISOS(){
           let permisos = this.$store.state.permisosUser.split(',');
           let per = [];

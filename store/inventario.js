@@ -31,9 +31,11 @@ export const mutations = {
                         modelo:           item.modelo,
                         nombre_articulo:  item.nombre_articulo,
                         fam:              item.fam,
+                        familia:          item.familia,
                         combo:            false,
                         articulo:         item.articulo,
-                        descripcion_corta: item.descripcion_corta
+                        descripcion_corta: item.descripcion_corta,
+                        check:             false
                     })
                 })
             }
@@ -47,9 +49,11 @@ export const mutations = {
                         modelo:           'Surti Lainez',
                         nombre_articulo:  item.nombre,
                         fam:              item.fam,
+                        familia:          'Surti Lainez',
                         combo:            true,
                         articulo:         item.id,
-                        descripcion_corta: item.detalle
+                        descripcion_corta: item.detalle,
+                        check:             false
                     })
                 })
             }

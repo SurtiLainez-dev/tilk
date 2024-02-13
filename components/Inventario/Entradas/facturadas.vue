@@ -7,7 +7,7 @@
           <v-row>
             <v-col cols="3">
               <v-autocomplete :items="Sucursales" :item-text="'nombre'" :rules="[rules.nombre.req]"
-                              :item-value="'id'" @change="cargarColaborador"
+                              :item-value="'id'"
                               v-model="Ingreso.sucursal" label="Sucursal de Ingreso"></v-autocomplete>
             </v-col>
             <v-col cols="3">
@@ -16,11 +16,11 @@
                               label="Seleccionar Proveedor" @change="cargarInventario"></v-autocomplete>
             </v-col>
             <v-col cols="3">
-              <v-autocomplete v-model="Ingreso.colaborador" :disabled="!isLoadCol" :rules="[rules.nombre.req]"
-                              :items="Colaboradores" :item-text="'nombres'" :item-value="'id'" label="Seleccionar Colaborador">
-                <template slot='item' slot-scope='{ item }'>
-                  {{ item.nombres }} {{ item.apellidos }}
-                </template>
+              <v-autocomplete v-model="Ingreso.colaborador" :rules="[rules.nombre.req]"
+                              :items="Colaboradores" :item-text="'nombre'" :item-value="'id'" label="Seleccionar Colaborador">
+<!--                <template slot='item' slot-scope='{ item }'>-->
+<!--                  {{ item.nombres }} {{ item.apellidos }}-->
+<!--                </template>-->
               </v-autocomplete>
             </v-col>
             <v-col cols="3">
@@ -199,7 +199,8 @@
     },
     name: "facturadas",
     created() {
-      this.cargarEstados()
+      this.cargarEstados();
+      this.cargarColaboradores();
     },
     methods:{
       addFila(){
@@ -224,18 +225,18 @@
         this.modalIventario = true;
         this.modalId = item.fila
       },
-      cargarColaborador(){
-        this.$axios.get('colaboradores_suc/'+this.Ingreso.sucursal,{
-          headers: {
-            'Authorization': 'Bearer ' + this.$store.state.token
+      cargarColaboradores(){
+        this.$axios.get('colaboradores',{
+          headers:{
+            'Authorization': `Bearer ${this.$store.state.token}`
           }
         }).then((res)=>{
-          if (res.status === 200){
-            if (res.data.col.length > 0)
-              this.Colaboradores = res.data.col;
-
-            this.isLoadCol     = true
-          }
+          res.data.colaboradores.forEach( (i) => {
+            this.Colaboradores.push({
+              "id": i.col,
+              "nombre": i.nombres+' '+i.apellidos
+            })
+          })
         })
       },
       cargarInventario(){

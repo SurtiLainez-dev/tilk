@@ -21,7 +21,7 @@
           <template v-slot:default>
             <tbody>
             <tr><th>Saldo Inicial:</th><td>L. {{int.format(cuenta.total)}}</td></tr>
-            <tr><th>Mora:</th><td>L. {{int.format(cuenta.contrato_cliente.saldo_mora)}}</td></tr>
+            <tr><th>Mora:</th><td>L. {{int.format(cuenta.mora)}}</td></tr>
             <tr><th>Saldo Actual:</th><td>L. {{int.format(cuenta.saldo_actual)}}</td></tr>
             </tbody>
           </template>
@@ -39,11 +39,11 @@
             </tr>
             <tr>
               <th>Días en Mora:</th>
-              <td>{{cuenta.contrato_cliente.dias_mora}}</td>
+              <td>{{cuenta.dias_mora}}</td>
             </tr>
             <tr>
               <th>Fecha de Vencimiento:</th>
-              <td>{{cuenta.contrato_cliente.fecha_vencimiento}}</td>
+              <td>{{cuenta.fecha_vencimiento}}</td>
             </tr>
             </tbody>
           </template>
@@ -202,7 +202,7 @@ export default {
       });
       this.tasa = this.cuenta.tasa_mora;
       this.saldo_actual = this.cuenta.saldo_actual;
-      this.dias_mora    = this.cuenta.contrato_cliente.dias_mora
+      this.dias_mora    = this.cuenta.dias_mora
     },
     generarEdicion(){
       this.saldo_abonado = 0;

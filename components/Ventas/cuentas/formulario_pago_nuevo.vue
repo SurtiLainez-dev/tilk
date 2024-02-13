@@ -60,7 +60,7 @@ export default {
         descripcion: '',
         fecha_pago: null
       },
-      gastos:['Flete', 'Gastos Administrativos', 'Pago de Matrícula', 'Pago de Traspado', 'Otros']
+      gastos:['Flete', 'Gastos Administrativos', 'Pago de Matrícula', 'Pago de Traspaso', 'Placa' ,'Otros']
     }
   },
   watch:{

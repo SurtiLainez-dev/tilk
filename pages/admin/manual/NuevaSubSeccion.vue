@@ -8,8 +8,7 @@
       </v-card>
       <br>
       <v-row>
-        <v-col></v-col>
-        <v-col class="grey lighten-5" cols="10">
+        <v-col class="grey lighten-5">
           <v-row no-gutters>
             <v-col><v-card-title>Datos de la Sub Sección</v-card-title></v-col>
             <v-col class="d-flex justify-end" v-if="tipo === 2">
@@ -34,137 +33,30 @@
             </v-row>
             <v-textarea rows="2" dense label="Detalle" v-model="detalle"
                         :rules="[rule.required, rule.minDetalle, rule.maxDetalle]" counter class="ma-2"></v-textarea>
-            <v-row>
-              <v-col class="d-flex justify-end">
-                <v-btn small tile color="indigo" class="ma-2" dark @click="addPaso">Agregar Paso</v-btn>
-                <v-btn small tile color="indigo" class="ma-2" dark @click="addPasoLink">Agregar Paso con Link</v-btn>
-              </v-col>
-            </v-row>
-            <v-divider></v-divider>
-            <v-simple-table dense>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Detalle del Paso</th>
-                  <th>Id del Link</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(item, index) in pasos">
-                  <td>{{index + 1}}</td>
-                  <td>
-                    <v-text-field :rules="[rule.required]" dense v-model="item.detalle"></v-text-field>
-                  </td>
-                  <td>
-                    <v-text-field :disabled="item.tipo === 1" dense v-model="item.id"></v-text-field>
-                  </td>
-                </tr>
-              </tbody>
-            </v-simple-table>
 
-            <v-divider></v-divider>
-            <v-row>
-              <v-col class="d-flex justify-end">
-                <v-btn small tile color="indigo" class="ma-2" dark @click="addFoto">Agregar Foto</v-btn>
-              </v-col>
-            </v-row>
-            <v-simple-table dense>
-              <thead>
-              <tr>
-                <th>#</th>
-                <th>Detalle</th>
-                <th>Id</th>
-                <th>documentos</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr v-for="(item, index) in fotos">
-                <td>{{index + 1}}</td>
-                <td>
-                  <v-text-field :rules="[rule.required]" dense v-model="item.detalle"></v-text-field>
-                </td>
-                <td>
-                  <v-text-field :rules="[rule.required]" dense v-model="item.id"></v-text-field>
-                </td>
-                <td>
-                  <v-file-input dense v-model="item.file"></v-file-input>
-                </td>
-              </tr>
-              </tbody>
-            </v-simple-table>
-            <v-divider></v-divider>
-            <v-row>
-              <v-col class="d-flex justify-end">
-                <v-btn small tile color="indigo" class="ma-2" dark @click="addDraws">Agregar Draw</v-btn>
-              </v-col>
-            </v-row>
-            <v-simple-table dense>
-              <thead>
-              <tr>
-                <th>#</th>
-                <th>Detalle</th>
-                <th>Url</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr v-for="(item, index) in draws">
-                <td style="width: 4%">{{index + 1}}</td>
-                <td style="width: 16%">
-                  <v-text-field :rules="[rule.required]" dense v-model="item.detalle"></v-text-field>
-                </td>
-                <td style="width: 80%">
-                  <v-text-field :rules="[rule.required]" dense v-model="item.url"></v-text-field>
-                </td>
-              </tr>
-              </tbody>
-            </v-simple-table>
-            <v-divider></v-divider>
-            <v-row>
-              <v-col class="d-flex justify-end">
-                <v-btn small tile color="indigo" class="ma-2" dark @click="addFile">Agregar Archivo</v-btn>
-              </v-col>
-            </v-row>
-            <v-simple-table dense>
-              <thead>
-              <tr>
-                <th>#</th>
-                <th>Detalle</th>
-                <th>Archivo</th>
-                <th>Id</th>
-                <th>Tipo</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr v-for="(item, index) in files">
-                <td style="width: 4%">{{index + 1}}</td>
-                <td>
-                  <v-text-field :rules="[rule.required]" dense v-model="item.detalle"></v-text-field>
-                </td>
-                <td>
-                  <v-file-input dense v-model="item.file"></v-file-input>
-                </td>
-                <td>
-                  <v-text-field :rules="[rule.required]" dense v-model="item.id"></v-text-field>
-                </td>
-                <td>
-                  <v-autocomplete dense v-model="item.tipo" :rules="[rule.required]" :items="tipoFile"></v-autocomplete>
-                </td>
-              </tr>
-              </tbody>
-            </v-simple-table>
-            <v-divider></v-divider>
+            <client-only>
+              <v-card flat tile>
+                <VueEditor @change="containerManual" v-model="contenido" id="editorManual"
+                           useCustomImageHandler @image-added="cargarFoto"/>
+              </v-card>
+            </client-only>
+
             <v-card-actions class="d-flex justify-end">
               <v-btn color="success" small tile dark class="ma-2" @click="validarForm">Registrar</v-btn>
             </v-card-actions>
           </v-form>
         </v-col>
-        <v-col></v-col>
+
+<!--        <v-col cols="6" >-->
+<!--          <div id="vistaHtml" v-html="contenido"></div>-->
+<!--        </v-col>-->
       </v-row>
     </v-card>
   </v-card>
 </template>
 
 <script>
+import { VueEditor } from "vue2-editor";
 export default {
   name: "NuevaSubSeccion",
   data(){
@@ -193,7 +85,10 @@ export default {
         minDetalle:     v => v.length >= 10  || 'Debe ingresar mínimo 10 carácteres',
         maxTitulo:      v => v.length <= 100 || 'Maximo de carácteres es 100',
         maxDetalle:     v => v.length <= 250 || 'DMaximo de carácteres es 250',
-      }
+      },
+      contenido: '',
+      cargandoFoto: false,
+      vistaVivo: false
     }
   },
   computed:{
@@ -211,7 +106,9 @@ export default {
     if (this.SECCION){
       this.titulo = this.SECCION.titulo;
       this.detalle = this.SECCION.detalle;
-      this.pasos   = JSON.parse(this.SECCION.contenido);
+      let contenido = JSON.parse(this.SECCION.contenido);
+
+      this.contenido = contenido[0]
       this.estado  = this.SECCION.estado;
       if (this.SECCION.fotos)
         this.fotos = JSON.parse(this.SECCION.fotos)
@@ -220,11 +117,11 @@ export default {
       if (this.SECCION.videos)
         this.files = JSON.parse(this.SECCION.videos);
 
-      console.log(this.files)
 
       this.seccion = this.SECCION.manual_seccion.id;
 
       this.tipo = 2;
+      // this.containerManual();
     }
     this.$store.commit('guardarTitulo','Administrador > Manual > Nueva Sub Sección')
     this.$store.commit('manual/manual/cargarSECCIONES');
@@ -272,6 +169,42 @@ export default {
         id: ''
       })
     },
+    cargarFoto(file, Editor, cursorLocation, resetUploader){
+      this.cargandoFoto = true;
+      let formData = new FormData();
+      formData.append("foto", file);
+      this.$axios({
+        url: "cargar_imagen",
+        method: "POST",
+        data: formData
+      }).then(result => {
+        const url = result.data.url; // Get url from response
+        Editor.insertEmbed(cursorLocation, "image", url);
+        resetUploader();
+        this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
+        this.cargandoFoto = false;
+      }).catch(err => {
+        console.log(err);
+      });
+    },
+    containerManual(){
+      setTimeout(()=>{
+        let images = document.querySelector("#vistaHtml");
+        images.style.font = "bold 90% monospace";
+        let imagesChil = images.querySelectorAll(":scope > ol > li > img");
+        let olChil     = images.querySelectorAll(":scope > ol > li");
+        olChil.forEach(item=>{
+          item.style.fontSize = '11px';
+          item.style.font = "bold 90% monospace";
+          item.width = '50px';
+        })
+        imagesChil.forEach(item=>{
+          item.style.width = '100%';
+          item.style.margin = '5px';
+          item.style.padding = '5px';
+        });
+      },500)
+    },
     editarForm(){
       let data = new FormData();
       let fotos = [];
@@ -302,7 +235,7 @@ export default {
       data.append('titulo',  this.titulo);
       data.append('detalle', this.detalle);
       data.append('seccion', this.seccion);
-      data.append('pasos',   JSON.stringify(this.pasos));
+      data.append('pasos',   this.contenido);
       data.append('fotos',   JSON.stringify(fotos));
       data.append('filesD',   JSON.stringify(files));
       data.append('draws',   JSON.stringify(this.draws));
@@ -340,7 +273,7 @@ export default {
       data.append('titulo',  this.titulo);
       data.append('detalle', this.detalle);
       data.append('seccion', this.seccion);
-      data.append('pasos',   JSON.stringify(this.pasos));
+      data.append('pasos',   this.contenido);
       data.append('fotos',   JSON.stringify(this.fotos));
       this.$store.commit('activarOverlay', true);
       this.$axios({
@@ -386,5 +319,9 @@ export default {
 </script>
 
 <style scoped>
-
+#vistaHtml{
+  border-left: solid 3px #aaaaaa;
+  padding: 10px;
+  background-color: #fffbfb;
+}
 </style>

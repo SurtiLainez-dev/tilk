@@ -3,6 +3,7 @@
     <v-card flat v-if="VISTA === 1">
       <v-toolbar flat>
         <h6>Clientes Existentes en Surtidora Laínez</h6>
+        <v-btn tile small text icon color="indigo" class="ma-2 mb-4" @click="$store.commit('cliente/cargar_CLIENTES')"><v-icon small>fa fa-sync</v-icon></v-btn>
         <v-spacer></v-spacer>
         <v-text-field dense label="Buscar Cliente" v-model="search"></v-text-field>
       </v-toolbar>
@@ -26,6 +27,7 @@
         </template>
       </v-data-table>
     </v-card>
+
 
     <v-card flat v-else-if="VISTA === 2">
       <info_perfil/>
@@ -71,6 +73,10 @@ export default {
     // this.$store.commit('guardarTitulo', 'Clientes');
     this.$store.commit('cliente/cargar_CLIENTES');
     this.VISTA = 1;
+    this.$store.commit('direcciones/cargar_COLONIAS');
+    this.$store.commit('direcciones/cargar_DISTRITOS');
+    this.$store.commit('direcciones/cargar_MUNICIPIOS');
+    this.$store.commit('direcciones/cargar_DEPARTAMENTOS');
   },
   methods:{
     goCliente(cliente){

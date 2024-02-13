@@ -102,13 +102,13 @@
                         class="ma-2" label="Total de precio de contado" disabled></v-text-field>
         </v-col>
         <v-col>
-          <v-select dense label="Seleccionar mmpuesto" :items="Impuestos"
+          <v-select dense label="Seleccionar impuesto" :items="Impuestos"
                     @change="leerImpuesto" class="ma-2"
                     v-model="impuesto" :rules="[rules.req]"></v-select>
         </v-col>
         <v-col>
           <v-text-field :suffix="combo.margenUtilidadReal+'%'" dense class="ma-2" v-model="combo.margenUtilidad"
-                        :rules="[rules.req, rules.impuesto.menor]" @change="calcularPrecioContado"
+                        :rules="[rules.req, rules.impuesto.menor]" @change="calcularPrecioContado" @keyup.enter="calcularPrecioContado"
                         label="Margen de ganancia"></v-text-field>
         </v-col>
         <v-col>
@@ -145,10 +145,11 @@
       <table>
         <thead>
         <tr>
-          <th>Precio de Costo</th>
-          <th>Ganancia</th>
+          <th>Precio de Costo SIV</th>
+          <th>Ganancia sin SIV</th>
+          <th>Precio de Venta sin SIV</th>
           <th>Impuesto</th>
-          <th>Precio de Contado</th>
+          <th>Precio de Venta con SIV</th>
           <th>Prima Mínina</th>
           <th>Financiando</th>
           <th class="d-flex justify-center">
@@ -170,6 +171,7 @@
         <tr>
           <td>L {{int.format(combo.precio_costo)}}</td>
           <td>L {{int.format(combo.margen_ganancia)}}</td>
+          <td>L {{int.format(combo.precio_sin_impuesto)}}</td>
           <td>L {{int.format(combo.impuesto2)}}</td>
           <td>L {{int.format(combo.precio_contado)}}</td>
           <td>L {{int.format(combo.prima)}}</td>
@@ -322,6 +324,7 @@ export default {
         nombre: '',
         detalle: '',
         sin_prima: 0,
+        precio_sin_impuesto: 0
       },
       impuesto: '', //es el impuesto seleccionado por el cliente
       Impuestos: [], //son los impuestos registrados en tilk,
@@ -385,12 +388,13 @@ export default {
     },
     calcularPrecioContado(){
       this.combo.margenUtilidadReal = this.combo.margenUtilidad
-      if (this.$refs.FormNuevoCombo2.validate()){
+      if (this.combo.impuesto > 0){
         if (this.combo.margenUtilidadReal > 1)
           this.combo.margenUtilidadReal = (this.combo.margenUtilidadReal / 100).toFixed(4);
 
         this.combo.margen_ganancia = (parseFloat(this.combo.precio_costo * this.combo.margenUtilidadReal)).toFixed(2)
         let PRECIO_S_IMPUESTO = (parseFloat(this.combo.margen_ganancia) + parseFloat(this.combo.precio_costo)).toFixed(2);
+        this.combo.precio_sin_impuesto = PRECIO_S_IMPUESTO;
         this.combo.impuesto2 = (parseFloat(PRECIO_S_IMPUESTO * this.combo.impuesto)).toFixed(2)
         let PRECIO_C_IMPUESTO = (parseFloat(this.combo.impuesto2) + parseFloat(PRECIO_S_IMPUESTO));
         this.combo.precio_contado = PRECIO_C_IMPUESTO
@@ -484,8 +488,7 @@ export default {
     leerImpuesto(){
       this.combo.impuesto_id = this.impuesto.split('-')[0];
       this.combo.impuesto    = this.impuesto.split('-')[1];
-      if (this.$refs.FormNuevoCombo2.validate())
-        this.calcularPrecioContado()
+      this.calcularPrecioContado()
     },
     probarFinanciamiento(TASA_MENSUAL, T){
       let PAGOS = [];

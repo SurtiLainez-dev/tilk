@@ -85,6 +85,16 @@
                     </v-list-item-content>
                   </v-list-item>
 
+                  <v-list-item :disabled="LOAD_USER" @click="VISTA = 8">
+                    <v-list-item-icon>
+                      <v-icon >fa fa-signature</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                      <v-list-item-title v-text="'Crear Firma de Correo'"></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+
                 </v-list-item-group>
               </v-list>
             </v-navigation-drawer>
@@ -96,7 +106,8 @@
           <planillas          v-else-if="VISTA === 3" />
           <mis_notificaciones v-else-if="VISTA === 5"/>
           <contrasena         v-else-if="VISTA === 6" />
-            <ordenes          v-else-if="VISTA === 7"/>
+          <ordenes            v-else-if="VISTA === 7"/>
+          <firma_correo       v-else-if="VISTA === 8"/>
         </v-col>
       </v-row>
     </v-card>
@@ -111,6 +122,7 @@ import planillas from "../../../components/mi_perfil/planillas";
 import contrasena from "../../../components/mi_perfil/contrasena";
 import ordenes from "@/components/mi_perfil/ordenes";
 import mis_notificaciones from "@/components/mi_perfil/mis_notificaciones.vue";
+import firma_correo from "@/components/mi_perfil/firma_correo.vue";
 export default {
   name: "mi_perfil",
   components:{
@@ -119,7 +131,8 @@ export default {
     planillas,
     contrasena,
     ordenes,
-    mis_notificaciones
+    mis_notificaciones,
+    firma_correo
   },
   computed:{
     USER(){

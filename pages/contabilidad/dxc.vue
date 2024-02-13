@@ -110,6 +110,7 @@ export default {
     Vue.use(vsCheckbox);
     Vue.use(vsIcon);
     this.$store.commit('contabilidad/dxc/cargar_DXCS');
+    this.$store.commit('guardarTitulo','Contabilidad > Documentos por Cobrar')
   },
   computed:{
     filterDXC(){

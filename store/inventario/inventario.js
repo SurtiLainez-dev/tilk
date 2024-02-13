@@ -6,7 +6,9 @@ export const state = () => ({
     PEPS:            [],
     LOAD_PEPS:       false,
     LOAD_STOCK:      false,
-    STOCK:           []
+    STOCK:           [],
+    HISTORIAL:       [],
+    LOAD_HISTORIAL:  false
 });
 export const mutations = {
     asignar_ARTICULO(state, data){
@@ -24,6 +26,13 @@ export const mutations = {
     },
     cambiarEstado_LOADPEPS(state, val){
         state.LOAD_PEPS = val;
+    },
+    cargarHISTORAL(state){
+        state.LOAD_HISTORIAL = true;
+        this.$axios.get('articulo/historial/'+state.ARTICULO.id).then((res)=>{
+            state.HISTORIAL = res.data.historial;
+            state.LOAD_HISTORIAL = false;
+        })
     },
     cargar_PEPS(state){
         state.LOAD_PEPS = true;

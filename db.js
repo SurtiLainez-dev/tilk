@@ -385,12 +385,17 @@ module.exports.descargarActualizacion = (data) =>{
     Log.info(data);
     Log.info('dir');
     Log.info(dir);
+    let fileStream = fs.createWriteStream(dir);
     https.get(data.url, (res)=>{
-        let fileStream = fs.createWriteStream(dir);
         res.pipe(fileStream);
         fileStream.on('finish', () => {
             fileStream.close();
             win.webContents.send('descarga-version-terminada', dir)
         })
+    }).on('error', (e) => {
+        console.error(e);
+        fileStream.close();
+        fileStream.destroy();
     });
+
 }

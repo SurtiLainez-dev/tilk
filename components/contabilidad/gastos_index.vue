@@ -16,6 +16,10 @@
                 width="250px" height="250" @click="goConsulta(4,'Todos los Tipos de Gastos')">
           <h6>Todos los Tipos de Gastos</h6>
         </v-card>
+        <v-card class="ma-5 mt-10 hover d-flex justify-center align-center"
+                width="250px" height="250" @click="solicitarClave" >
+          <h6>Solicitar Token</h6>
+        </v-card>
       </v-container>
     </v-card>
 
@@ -29,18 +33,39 @@
       <gastos_sucursal v-if="VISTA === 2 || VISTA === 3 || VISTA === 5 || VISTA === 6"/>
       <tipos_gastos v-else-if="VISTA === 4"/>
     </v-card>
+
+    <v-dialog v-model="dialogo" width="40%">
+      <v-card>
+        <v-card-title>Token para Cargar Facturas</v-card-title>
+        <v-card-text>Este token tiene una duración de una hora, sino logras cargar las facturas en una hora, tendras que
+          solicitar un nuevo token,</v-card-text>
+        <v-card flat tile class="ma-4">
+          <v-text-field class="ma-2" v-model="token"></v-text-field>
+        </v-card>
+        <v-card-actions class="d-flex justify-end">
+          <v-btn color="success" small tile dark @click="dialogo = false">Cerrar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
 <script>
 import gastos_sucursal from "@/components/contabilidad/gastos/gastos_sucursal.vue";
 import tipos_gastos from "@/components/contabilidad/gastos/tipos_gastos.vue";
+
 export default {
   components:{gastos_sucursal, tipos_gastos},
   name: "gastos_index",
   created() {
     this.VISTA = 1;
     this.goBack();
+  },
+  data(){
+    return{
+      token: 'ueueueu',
+      dialogo: false
+    }
   },
   computed:{
     VISTA:{
@@ -72,7 +97,18 @@ export default {
       this.VISTA  = val;
       this.TITULO = titulo;
       this.$store.commit('guardarTitulo', 'Contabilidad > Gastos > '+this.TITULO);
-    }
+    },
+    solicitarClave(){
+      this.$store.commit('activarOverlay', true);
+      this.$axios.post('solicitar_clave').then((res)=>{
+        this.token   = this.$store.state.usuario+'['+res.data.clave;
+        this.dialogo = true;
+        this.$store.commit('activarOverlay', false);
+      }).catch((error)=>{
+        this.dialogoPartida = true;
+        this.$store.commit('activarOverlay', false);
+      });
+    },
   }
 }
 </script>

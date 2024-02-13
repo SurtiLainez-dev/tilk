@@ -105,6 +105,15 @@
         <v-divider></v-divider>
         <v-card-text>Descuento que se puede aplicar L. {{descuento.inicial}}</v-card-text>
 
+        <v-row v-if="Venta.filas.length > 0 && Venta.filas[0].precio_promo">
+          <v-col cols="9">
+            <v-card-text>El articulo que seleccionaste tiene un precio de promoción de L.{{int.format(Venta.filas[0].precio_promo)}}. La fecha maximo de uso de esta
+            promoción es el {{Venta.filas[0].final_promo.split('-')[2]}}/{{Venta.filas[0].final_promo.split('-')[1]}}/{{Venta.filas[0].final_promo.split('-')[0]}}.</v-card-text>
+          </v-col >
+          <v-col>
+            <v-btn x-small color="indigo" tile class="mt-3 text-white" @click="capturarPromo">Usar Precio de Promo</v-btn>
+          </v-col>
+        </v-row>
         <v-card tile v-if="isMoto">
           <v-card-text>
             El cobro de matricula se cobra automaticamente, al saldo final se le resta la matricula. Si le
@@ -276,6 +285,7 @@
           <v-tab :key="0">Todos los Artículos</v-tab>
           <v-tab :key="1">Motocicletas</v-tab>
           <v-tab :key="2">Artículos con Seríe</v-tab>
+          <v-tab :key="3">Combos</v-tab>
         </v-tabs>
 
         <v-tabs-items v-model="tab">
@@ -371,6 +381,52 @@
               </template>
             </v-data-table>
           </v-tab-item>
+          <v-tab-item :key="3">
+            <v-toolbar color="grey lighten-4">
+              <h6>Todos los Combos</h6>
+              <v-spacer></v-spacer>
+              <v-text-field dense label="Buscar Artículo" v-model="searchCombo"></v-text-field>
+            </v-toolbar>
+            <v-data-table :headers="headerCombo"
+                          :loading="loadArticulos"
+                          loading-text="Cargando combos ..."
+                          :items="Combos"
+                          class="rowsTable"
+                          :search="searchCombo"
+                          dense>
+              <template v-slot:item.id="{item}">
+                <v-tooltip top>
+                  <template v-slot:activator="{on, attrs}">
+                    <v-btn fab width="22px" v-on="on" v-bind="attrs"
+                           @click="addCombo(item)"
+                           height="22px" color="success" dark>
+                      <v-icon size="15">fa fa-arrow-right</v-icon></v-btn>
+                  </template>
+                  <span>Seleccionar</span>
+                </v-tooltip>
+              </template>
+              <template v-slot:item.precio_contado="{item}">
+                L {{new Intl.NumberFormat().format(item.precio_contado)}}
+              </template>
+              <template v-slot:item.detalle_combo="{item}">
+                <v-tooltip top>
+                  <template v-slot:activator="{on, attrs}">
+                    <v-btn color="black" v-on="on" v-bind="attrs" dark small fab icon><v-icon small>fa fa-table</v-icon></v-btn>
+                  </template>
+                  <v-card color="wihite" width="100%">
+                    <span>Articulos del combo</span>
+                    <v-list-item v-for="data in item.detalle_combo">
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          {{ data.articulo.nombre_articulo }} - {{data.articulo.codigo_sistema}}
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-card>
+                </v-tooltip>
+              </template>
+            </v-data-table>
+          </v-tab-item>
         </v-tabs-items>
 
         <v-card-actions class="d-flex justify-end">
@@ -440,6 +496,8 @@ export default {
   },
   data(){
     return{
+      isCombo: false,
+      comboId: null,
       int: Intl.NumberFormat(),
       tipoVenta: 0,
       descuento:{
@@ -454,6 +512,8 @@ export default {
       searchMoto: '',
       searchRemision: '',
       searchRegalia:  '',
+      searchCombo: '',
+      Combos: [],
       headerArticulos:[
           '#',
           {key: 'articulo',stickyColumn: true, isRowHeader: true, variant: 'light'},
@@ -494,6 +554,12 @@ export default {
         {text:'Serie de Fabricante',value:'serie_fabricante'},
         {text:'Acciones',value:'articulo_id'},
         {text:'Precio',value:'precio_actual'},
+      ],
+      headerCombo: [
+        {text:'Nombre',value:'nombre'},
+        {text:'Precio de Contado',value:'precio_contado'},
+        {text:'Articulos',value:'detalle_combo'},
+        {text:'Acciones',value:'id'},
       ],
       header:[
         {text:'Proveedor',value:'articulo.marca.proveedor.nombre'},
@@ -586,44 +652,95 @@ export default {
     },
   },
   methods:{
-    addLineaArticulo(data){
+    addCombo(data){
+      this.isCombo = true;
+      this.comboId = data.id;
       this.tipoVenta = 1;
       this.isMoto    = false;
-      if (data.articulo.precio_activo){
-        if (data.articulo.is_motocicleta !== 1){
-          this.Venta.filas.push({
-            key:         this.Venta.filas.length,
-            articulo:    data.articulo.nombre_articulo,
-            cantidad:    1,
-            cantidadMax: data.stock_actual,
-            precio:      data.articulo.precio_activo.precio_contado,
-            cod_sistema: data.articulo.codigo_sistema,
-            cod_provee:  data.articulo.codigo_proveedor,
-            is_serie:    true,
-            serie:       '',
-            color:       '',
-            is_remision: false,
-            is_moto:     this.esVehiculo(data.articulo),
-            remision_id: null,
-            articulo_id: data.articulo.id,
-            totalFila:   (1 * data.articulo.precio_activo.precio_contado).toFixed(2),
-            estado:      1,
-            vali_serie:  false,
-            vali_color:  false,
-            descuento:   data.articulo.precio_activo.descuento
-          });
+      this.Venta.filas = [];
+      let precio = data.precio_contado;
 
-          this.sumarTotalFactura(1);
-          this.descuento.inicial = this.Venta.filas.reduce((total, item) => total + item.descuento, 0);
-          this.dialogoBusqueda = false;
+      data.detalle_combo.forEach((item, index)=>{
+        if (index > 0)
+          precio = 0;
+
+        this.Venta.filas.push({
+          key: this.Venta.filas.length,
+          articulo: item.articulo.nombre_articulo,
+          cantidad: 1,
+          cantidadMax: 1,
+          precio,
+          cod_sistema: item.articulo.codigo_sistema,
+          cod_provee:  item.articulo.codigo_proveedor,
+          is_serie:    true,
+          serie:       '',
+          color:       '',
+          is_remision: false,
+          is_moto:     this.esVehiculo(item.articulo),
+          remision_id: null,
+          articulo_id: item.articulo.id,
+          totalFila:   precio,
+          estado:      1,
+          vali_serie: false,
+          vali_color: false,
+          descuento:  0,
+          precio_promo: 0,
+          final_promo: null
+        });
+
+        this.sumarTotalFactura(1);
+        this.descuento.inicial = this.Venta.filas.reduce((total, item) => total + item.descuento, 0);
+        this.dialogoBusqueda = false;
+      })
+    },
+    addLineaArticulo(data){
+      this.isCombo   = false;
+      this.comboId = null;
+      this.tipoVenta = 1;
+      this.isMoto    = false;
+      if (this.Venta.filas.length === 0){
+        if (data.articulo.precio_activo){
+          if (data.articulo.is_motocicleta !== 1){
+            this.Venta.filas.push({
+              key:         this.Venta.filas.length,
+              articulo:    data.articulo.nombre_articulo,
+              cantidad:    1,
+              cantidadMax: data.stock_actual,
+              precio:      data.articulo.precio_activo.precio_contado,
+              cod_sistema: data.articulo.codigo_sistema,
+              cod_provee:  data.articulo.codigo_proveedor,
+              is_serie:    true,
+              serie:       '',
+              color:       '',
+              is_remision: false,
+              is_moto:     this.esVehiculo(data.articulo),
+              remision_id: null,
+              articulo_id: data.articulo.id,
+              totalFila:   (1 * data.articulo.precio_activo.precio_contado).toFixed(2),
+              estado:      1,
+              vali_serie:  false,
+              vali_color:  false,
+              descuento:   data.articulo.precio_activo.descuento,
+              precio_promo: data.articulo.precio_activo.precio_codigo,
+              final_promo:  data.articulo.precio_activo.end_promocion
+            });
+
+            this.sumarTotalFactura(1);
+            this.descuento.inicial = this.Venta.filas.reduce((total, item) => total + item.descuento, 0);
+            this.dialogoBusqueda = false;
+          }else{
+            this.notificacion('El artículo que seleccionaste es una motocicleta','warning');
+          }
         }else{
-          this.notificacion('El artículo que seleccionaste es una motocicleta','warning');
+          this.notificacion('Este artículo no cuenta con un precio activo aún','warning');
         }
       }else{
-        this.notificacion('Este artículo no cuenta con un precio activo aún','warning');
+        this.notificacion('Ya tienes seleccionado un articulo','warning')
       }
     },
     addLineaMoto(data){
+      this.isCombo = false;
+      this.comboId = null;
       this.Venta.filas.push({
         key:         this.Venta.filas.length,
         articulo:    data.remision_articulo.articulo.nombre_articulo,
@@ -655,6 +772,8 @@ export default {
     },
     addLineaRemision(data){
       this.isMoto = false;
+      this.isCombo = false;
+      this.comboId = null;
       if (data.articulo.is_motocicleta !== 1){
         this.Venta.filas.push({
           key: this.Venta.filas.length,
@@ -712,6 +831,10 @@ export default {
         this.loadCliente = false;
       });
     },
+    capturarPromo(){
+      this.Venta.filas[0].precio = this.Venta.filas[0].precio_promo;
+      this.sumarTotalFactura(this.Venta.filas[0].estado);
+    },
     cargarColaboradores(){
       this.Colaboradores = [];
       this.loadColaborador = true;
@@ -729,6 +852,7 @@ export default {
       this.loadArticulos = true;
       this.$axios.get('/2.0/inventario_x_sucursal/disponible/'+this.SUCURSAL).then((res)=>{
         this.ArticulosI    = res.data.inventario;
+        this.Combos        = res.data.combos;
         this.loadArticulos = false;
       })
     },
@@ -809,7 +933,7 @@ export default {
         this.$store.commit('activarOverlay', false)
       }).catch((error)=>{
         if (error.response.status === 422)
-          this.notificacion('El cliente ya existe','error');
+          this.notificacion('El cliente ya existe','warning');
         else
           this.notificacion('Hubo un error inesperado en el servidor','error');
 
@@ -832,7 +956,9 @@ export default {
         isMoto:      this.isMoto,
         matricula:   this.matricula,
         editMatricula:  this.editMatricula,
-        cobroMatricula: this.cobroMatricula
+        cobroMatricula: this.cobroMatricula,
+        isCombo:        this.isCombo,
+        comboId:        this.comboId
       }).then((res)=>{
         this.$store.commit('activarOverlay', false);
         this.notificacion(res.data.msj,'success');

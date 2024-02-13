@@ -61,7 +61,7 @@
                                 label="Seleccionar Mes" :items="mes"></v-autocomplete>
               </v-col>
               <v-col>
-                <v-text-field class="ma-2" disabled label="Año" :value="new_deposito.anio"></v-text-field>
+                <v-text-field class="ma-2" label="Año" v-model="new_deposito.anio"></v-text-field>
               </v-col>
             </v-row>
             <v-card-actions class="d-flex justify-end">
@@ -108,33 +108,54 @@
               </template>
             </v-simple-table>
             <v-divider></v-divider>
+            <v-card flat tile v-if="new_deposito.Historial.length > 0">
+              <v-row no-gutters>
+                <v-col>
+                  <table class="ma-2" style="width: 100%">
+                    <thead>
+                      <tr>
+                        <td style="font-size: 20px">Total Circulado: L. <strong>{{int.format(DatosCierre.total)}}</strong></td>
+                      </tr>
+                      <tr>
+                        <td style="font-size: 20px">Total de Efectivo Ingresado: L. <strong>{{int.format(DatosCierre.ingreso)}}</strong></td>
+                      </tr>
+                      <tr>
+                        <td style="font-size: 20px">Total de Efectivo Egresado en el Día: L. <strong>{{int.format(DatosCierre.egreso)}}</strong></td>
+                      </tr>
+                      <tr>
+                        <td style="font-size: 20px">Efectivo al Final del Día: L. <strong>{{int.format(DatosCierre.efectivo)}}</strong></td>
+                      </tr>
+                    </thead>
+                  </table>
+                </v-col>
+                <v-col>
+                  <table class="ma-2" style="width: 100%">
+                    <thead>
+                    <tr>
+                      <td style="font-size: 20px">Efectivo Declarado: L. <strong>{{int.format(DatosCierre.efectivo_declarado)}}</strong></td>
+                    </tr>
+                    <tr>
+                      <td style="font-size: 20px">Descuadre: L. <strong>{{int.format(DatosCierre.descuadre)}}</strong></td>
+                    </tr>
+                    <tr>
+                      <td style="font-size: 20px">Total Acumulado Inicial: L. <strong>{{int.format(DatosCierre.total_acumulado_h)}}</strong></td>
+                    </tr>
+                    <tr>
+                      <td style="font-size: 20px">Total Acumulado: L. <strong>{{int.format(DatosCierre.total_acumulado)}}</strong></td>
+                    </tr>
+                    </thead>
+                  </table>
+                </v-col>
+              </v-row>
+            </v-card>
             <v-row v-if="new_deposito.Historial.length > 0">
-              <v-col>
-                <v-text-field dense label="Total de Egresos" prefix="L." v-model="new_deposito.egresos" class="ma-2" disabled></v-text-field>
-              </v-col>
-              <v-col>
-                <v-text-field dense label="Total de Ingresos" prefix="L." v-model="new_deposito.ingresos" class="ma-2" disabled></v-text-field>
-              </v-col>
-              <v-col>
-                <v-text-field dense label="Diferencia" prefix="L." v-model="new_deposito.total" class="ma-2" disabled></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row v-if="new_deposito.Historial.length > 0">
-              <v-col cols="7">
+              <v-col >
                 <v-text-field label="Referencia" class="ma-2" :rules="[rules.req.req]" dense v-model="egreso.referencia"></v-text-field>
               </v-col>
-              <v-col cols="5">
+              <v-col >
                 <v-autocomplete :items="ccCuentasB" :item-value="'id'" :item-text="'nombre'" class="ma-2"
                                 :loading="loadccBancos" label="Seleccionar al Banco en que se va a Depósitar"
                                 dense :rules="[rules.req.req]" v-model="egreso.ccBanco"></v-autocomplete>
-              </v-col>
-            </v-row>
-            <v-row v-if="new_deposito.Historial.length > 0">
-              <v-col cols="3">
-                <v-text-field label="Saldo Acumulado" :value="$store.state.caja.CAJA.saldo_acumulado"
-                              hint="Es el total de efectivo de esta caja que no se ha depositado"
-                              persistent-hint
-                              dense class="ma-2" prefix="L." disabled></v-text-field>
               </v-col>
               <v-col>
                 <v-text-field label="Total a Depositar" v-model="egreso.total" :rules="[rules.req.req]"
@@ -145,6 +166,7 @@
                               dense label="Comprobante" v-model="egreso.file"></v-file-input>
               </v-col>
             </v-row>
+            <v-divider></v-divider>
             <v-card-actions v-if="new_deposito.Historial.length > 0" class="d-flex justify-end">
               <v-btn color="red" small dark tile class="ma-2" @click="new_deposito.dialogo = false">Cerrar</v-btn>
               <v-btn color="success" small dark tile class="ma-2" @click="validarForm2">Registrar</v-btn>
@@ -189,11 +211,13 @@ export default {
       rules: {
         req: {
           req: v => !!v || 'Campo requerido',
+          mayor: v => v >= 0 || 'Tiene que ser mayor o igual a 0'
         },
         efectivo:{
           min: v => v <= this.TOTAL_CAJA || 'No puede ser mayor al total que hay en efectivo',
         },
       },
+      DatosCierre:{}
     }
   },
   computed:{
@@ -258,6 +282,12 @@ export default {
             this.new_deposito.egresos = parseFloat(this.new_deposito.egresos) + parseFloat(item.total);
         })
         this.new_deposito.total = parseFloat(this.new_deposito.ingresos) - parseFloat(this.new_deposito.egresos);
+      })
+      this.cargarDatosCierre(`${this.new_deposito.anio}-${this.new_deposito.mes}-${this.new_deposito.dia}`)
+    },
+    cargarDatosCierre(fecha){
+      this.$axios.get('cajas/historial_cierre_x_fecha/'+fecha+'/caja/'+this.CAJA).then((res)=>{
+        this.DatosCierre = res.data.cierre;
         this.new_deposito.loadinHistorial = false;
       })
     },
@@ -286,6 +316,7 @@ export default {
       data.append('cc_id',      this.egreso.ccBanco);
       data.append('file',       this.egreso.file);
       data.append('fecha', f.getFullYear()+'-'+this.new_deposito.mes+'-'+this.new_deposito.dia);
+      data.append('cierre_id',  this.DatosCierre.id);
       this.$axios({
         method: 'post',
         url:    'caja/subir/egreso',

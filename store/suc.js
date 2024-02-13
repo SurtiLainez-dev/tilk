@@ -5,6 +5,7 @@ export const state = () => ({
     COLABORADORES: [],
     VISTA_MULTIPLE: 1,
     TITULO_GENERICO: '',
+
 });
 
 export const mutations = {

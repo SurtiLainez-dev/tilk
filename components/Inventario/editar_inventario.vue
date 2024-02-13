@@ -56,6 +56,17 @@
           </v-col>
         </v-row>
         <v-divider></v-divider>
+        <v-row>
+          <v-col>
+            <v-card-subtitle>Colores Para el Articulo</v-card-subtitle>
+            <v-card flat tile class="d-flex grey lighten-3">
+              <v-btn fab dark text icon color="indigo" class="ma-2" @click="dialogoColor = true"><v-icon>fa fa-plus</v-icon></v-btn>
+              <div v-for="(item,index) in JSON.parse(data.colores)"
+                   class="ma-2" @dblclick="deleteColor(index)"
+                   :style="'cursor: pointer; height: 50px; width: 50px; border-radius: 100px; background-color: #'+item"></div>
+            </v-card>
+          </v-col>
+        </v-row>
         <v-card-subtitle>Fotos</v-card-subtitle>
         <v-card :loading="loadFotos" flat>
           <v-row>
@@ -202,6 +213,7 @@
                   <tbody>
                   <tr v-for="item in editarDetalles"
                       :class="{'green lighten-5': item.accion === 1 || item.accion === 2, 'red lighten-5':item.accion === 3}">
+                    <td>{{item.titulo}}</td>
                     <td>{{item.detalle}}</td>
                   </tr>
                   </tbody>
@@ -329,11 +341,14 @@
                 <th>#</th>
                 <th>Acciones</th>
                 <th>Principal</th>
+                <th>Color Seleccionado</th>
+                <th>Colores</th>
                 <th>Quitar</th>
               </tr>
               </thead>
               <tbody>
               <tr v-for="(item, i) in editarFotos"
+                  :style="'border-left: solid 20px #'+!item.color?'FFFFFF':item.color"
                   :class="{'green lighten-5': item.accion === 1 || item.accion === 3, 'red lighten-5': item.accion === 2}">
                 <td>{{i + 1}}</td>
                 <td v-if="item.url">
@@ -376,6 +391,20 @@
                     <span v-if="item.isPrincipal === 1">Foto principal</span>
                     <span v-else>Presiona para convertir a principal</span>
                   </v-tooltip>
+                </td>
+                <td style="background-color: #cccccc">
+                  <div class="d-flex justify-start">
+                    <div
+                         :style="'height: 25px; width: 25px; cursor: pointer; margin: 2px; background-color: #'+item.color">
+                    </div>
+                  </div>
+                </td>
+                <td style="background-color: #cccccc">
+                  <div class="d-flex justify-start">
+                    <div v-for="(index, y) in JSON.parse(data.colores)" @click="cambiarColorFoto(item, index)"
+                         :style="'height: 25px; width: 25px; cursor: pointer; margin: 2px; background-color: #'+index">
+                    </div>
+                  </div>
                 </td>
                 <td>
                   <v-btn fab dark x-small text color="red" @click="deleteImg(item)"><v-icon>fa fa-times</v-icon></v-btn>
@@ -472,6 +501,7 @@
               <thead>
               <tr>
                 <th>#</th>
+                <th>Titulo</th>
                 <th>Detalle</th>
                 <th>Quitar</th>
               </tr>
@@ -480,6 +510,9 @@
               <tr v-for="(item, i) in editarDetalles"
                   :class="{'green lighten-5': item.accion === 1 || item.accion === 2, 'red lighten-5':item.accion === 3}">
                 <td>{{i+1}}</td>
+                <td>
+                  <v-text-field @keyup="editandoDetalles(item, 2)" dense v-model="item.titulo"></v-text-field>
+                </td>
                 <td>
                   <v-text-field @keyup="editandoDetalles(item, 2)" dense v-model="item.detalle"></v-text-field>
                 </td>
@@ -498,6 +531,25 @@
         </v-container>
       </v-card>
     </v-dialog>
+
+    <v-dialog width="30%" v-model="dialogoColor">
+      <v-card>
+        <v-card-title>Seleccionar Color</v-card-title>
+        <div class="d-flex justify-center">
+          <v-color-picker
+              dot-size="25"
+              hide-inputs
+              hide-sliders
+              swatches-max-height="200"
+              v-model="color"
+          ></v-color-picker>
+        </div>
+        <v-card-actions class="d-flex justify-end">
+          <v-btn color="orange" text small tile dark @click="dialogoColor = false">Cerrar</v-btn>
+          <v-btn color="green" small tile dark @click="seleccionarColor">Seleccionar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card></template>
 
 <script>
@@ -505,6 +557,7 @@ export default {
 name: "editar_inventario",
   data(){
     return{
+      dialogoColor: false,
       rules: {
         art: {
           req: v => !!v || 'Campo requerido',
@@ -540,7 +593,8 @@ name: "editar_inventario",
       editarFotos: [],
       editarComponentes: [],
       editarDetalles:    [],
-      loadDetalles: false
+      loadDetalles: false,
+      color: ''
     }
   },
   computed:{
@@ -574,6 +628,10 @@ name: "editar_inventario",
         accion: 1,
         articulo_id: this.data.articulo
       })
+    },
+    cambiarColorFoto(i, color){
+      i.color = color;
+      i.accion = 3;
     },
     cambiarFotoPrincipal(i){
       this.editarFotos.forEach((i)=>{
@@ -612,7 +670,8 @@ name: "editar_inventario",
             key: i,
             accion: 0,
             detalle: item.detalle,
-            accionAnt: 0
+            accionAnt: 0,
+            titulo: item.titulo
           })
         })
         this.loadDetalles = false;
@@ -633,10 +692,20 @@ name: "editar_inventario",
             url: i.url,
             isPrincipal: i.isPrincipal,
             accion:      0,
-            accionAnt:   0
+            accionAnt:   0,
+            color: i.color
           })
         })
       })
+    },
+    deleteColor(index){
+      let data = JSON.parse(this.data.colores);
+      if (data.length > 1){
+        data.splice(index, 1);
+        this.data.colores = JSON.stringify(data);
+      }else{
+        this.$store.commit('notificacion',{color:'warning', texto:'No puedes eliminarlo, porque minimo tiene que tener un color'});
+      }
     },
     deleteImg(item){
       this.editarFotos.forEach((i)=>{
@@ -679,6 +748,9 @@ name: "editar_inventario",
     seleccionarArticulo(item){
       this.dialogoBuscar = false;
       this.data          = item;
+      if (!this.data.colores){
+        this.data.colores = JSON.stringify(['FFFFFF']);
+      }
       this.cargarDetalles();
       this.cargarFotos();
       this.load          = true;
@@ -688,6 +760,13 @@ name: "editar_inventario",
       this.editarFotos       = [];
       this.Fotos             = [];
       this.editarDetalles    = [];
+    },
+    seleccionarColor(){
+      let colores = JSON.parse(this.data.colores);
+      colores.push(this.color.substring(1,7));
+      this.data.colores = JSON.stringify(colores);
+      this.dialogoColor = false;
+      this.color        = '';
     },
     seleccionarImagen(url,key){
       this.urlFoto   = url;
@@ -711,6 +790,8 @@ name: "editar_inventario",
         if (this.editarFotos[i].accion !== 0)
           fotos.push(this.editarFotos[i])
 
+        if (!this.editarFotos[i].color)
+          this.editarFotos[i].color = 'FFFFFF';
       }
 
 
@@ -726,6 +807,8 @@ name: "editar_inventario",
       data.append('stock_maximo',this.data.stock_max);
       data.append('imgs', JSON.stringify(fotos));
       data.append('modelo', this.data.modelo);
+      data.append('modelo', this.data.modelo);
+      data.append('colores', this.data.colores);
       data.append('detalles', JSON.stringify(this.editarDetalles));
       this.$axios({
         url: 'articulos/edit',
@@ -739,7 +822,6 @@ name: "editar_inventario",
         this.load = false;
         this.$store.commit('activarOverlay', false);
         this.$store.commit('notificacion',{texto: res.data.msg,color:'success'});
-        this.$store.commit('quitarPestanaKey',7)
         this.$store.commit('inventario/cargarInventario');
       }).catch((error)=>{
         this.$store.commit('activarOverlay', false);

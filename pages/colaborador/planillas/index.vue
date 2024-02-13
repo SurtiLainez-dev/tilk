@@ -3,7 +3,7 @@
     <v-card flat>
       <v-card  :loading="LOADPLANILLAS" flat height="100" color="grey lighten-5">
         <v-toolbar color="grey lighten-5" flat dense>
-          <v-toolbar-title>Anticipos de Clientes</v-toolbar-title>
+          <v-toolbar-title>Planillas de Colaboradores</v-toolbar-title>
           <v-spacer></v-spacer>
         </v-toolbar>
         <v-row no-gutters >

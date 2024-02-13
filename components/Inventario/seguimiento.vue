@@ -32,6 +32,15 @@
                               label="Sexo" filled dense></v-select>
                 </v-col>
             </v-row>
+            <v-row no-gutters>
+              <v-col>
+                <v-text-field class="ma-2" v-model="comentario"
+                              :loading="Cliente.loading"
+                              hint="El comentario solo se coloca cuando el cliente es CLIENTE FINAL. Colocar el nombre real del cliente en este campo"
+                              persistent-hint
+                              label="Comentario" filled dense></v-text-field>
+              </v-col>
+            </v-row>
             <v-alert v-if="!Cliente.exists" dense border="left" prominent type="warning" text>
                 <v-row no-gutters align="center">
                     <v-col class="grow">
@@ -103,6 +112,7 @@
         name: "seguimiento",
         data(){
             return{
+                comentario: '',
                 fields:['num','detalle','fecha','forma_contacto', 'respuesta','se_contacto'],
                 Tareas: [],
                 formaContactar:[
@@ -304,10 +314,10 @@
                                 duration: 4000
                             });
                     }
-
-                    if (cont === bandera && this.Cliente.nombres.length > 0)
-                        this.registrarSeguimiento();
                 })
+
+                if (cont === bandera && this.Cliente.nombres.length > 0)
+                    this.registrarSeguimiento();
             },
             registrarSeguimiento(){
                 this.$store.commit('activarOverlay', true);
@@ -318,6 +328,7 @@
                     articulo_id: this.articulo.articulo,
                     detalles:    detalles,
                     tareas:      tareas,
+                    comentario:  this.comentario
                 },{
                     headers: {
                         'Authorization': 'Bearer ' + this.$store.state.token

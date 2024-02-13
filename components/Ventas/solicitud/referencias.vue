@@ -4,187 +4,220 @@
         <v-btn fab text width="20px" height="20px" x-small color="success" dark @click="addReferecias">
             <v-icon size="15">fa fa-plus</v-icon>
         </v-btn>
-        <v-row>
+        <v-card :disabled="validado" flat tile>
+          <v-row>
             <v-col>
-                <table class="rowsTable">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre completo</th>
-                        <th>Teléfono</th>
-                        <th>Parentesco</th>
-                        <th>Dirección</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="item in Solicitud.referencias">
-                        <th width="2%">
-                            {{parseInt(item.key) + parseInt(1)}}
-                        </th>
-                        <td width="25%">
-                            <input type="text" v-model="item.nombre">
-                        </td>
-                        <td width="10%">
-                            <input type="text" v-model="item.telefono">
-                        </td>
-                        <td width="15%">
-                            <input type="text" v-model="item.parentesco">
-                        </td>
-                        <td width="44%">
-                            <input type="text" v-model="item.direccion"/>
-                        </td>
-                        <td width="4%" class="text-center">
-                            <v-btn fab @click="removeReferencia(item.key)" x-small color="red" width="20px" height="20px" dark>
-                                <v-icon size="15">fa fa-times</v-icon>
-                            </v-btn>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+              <table class="rowsTable">
+                <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nombre completo</th>
+                  <th>Cod.</th>
+                  <th>Teléfono</th>
+                  <th>Parentesco</th>
+                  <th>Dirección</th>
+                  <th>Nuevo</th>
+                  <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in Solicitud.referencias">
+                  <th width="2%">
+                    {{parseInt(item.key) + parseInt(1)}}
+                  </th>
+                  <td width="25%">
+                    <input type="text" v-model="item.nombre">
+                  </td>
+                  <td width="5%">
+                    <input type="text" v-model="item.area">
+                  </td>
+                  <td width="10%">
+                    <input type="text" v-model="item.telefono">
+                  </td>
+                  <td width="15%">
+                    <input type="text" v-model="item.parentesco">
+                  </td>
+                  <td width="34%">
+                    <input type="text" v-model="item.direccion"/>
+                  </td>
+                  <td width="5%" class="text-center">
+                    <input type="checkbox" v-model="item.nuevo" disabled/>
+                  </td>
+                  <td width="4%" class="text-center">
+                    <v-btn fab @click="removeReferencia(item.key)" x-small color="red" width="20px" height="20px" dark>
+                      <v-icon size="15">fa fa-times</v-icon>
+                    </v-btn>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
             </v-col>
-        </v-row>
-        <hr>
-        <small>Avales</small>
-        <v-btn fab text width="20px" height="20px" x-small color="success" dark @click="addAvales">
+          </v-row>
+          <hr>
+          <small>Agenda del cliente</small>
+          <small>Puedes copiar cualquier informacion de esta agenda presionado las teclas (Ctrl + C).</small>
+          <small>Para pegar la información solo presion las teclas (Ctrl + V)</small>
+          <table>
+            <thead>
+            <tr>
+              <th>Detalle</th>
+              <th>Telefono</th>
+              <th>+ Info</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="item in Cliente.telefonos">
+              <td><input type="text" :value="item.detalle"></td>
+              <td><input type="text" :value="item.num"></td>
+              <td v-if="item.info">
+                <input v-if="item.info.dir" type="text" :value="item.info.dir">
+                <input v-else type="text" value="-----" disabled>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <small>Avales</small>
+          <v-btn fab text width="20px" height="20px" x-small color="success" dark @click="addAvales">
             <v-icon size="15">fa fa-plus</v-icon>
-        </v-btn>
-        <v-row>
+          </v-btn>
+          <v-row>
             <v-col>
-                <table class="rowsTable">
-                    <thead>
-                    <tr>
-                        <th>Identidad</th>
-                        <th>Nombres</th>
-                        <th>Apellidos</th>
-                        <th>Sexo</th>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="item in Solicitud.avales">
-                        <td width="20%">
-                            <v-row no-gutters>
-                                <v-col cols="10">
-                                    <input type="text"  v-model="item.identidad" @keyup.enter="buscarCliente(item)">
-                                </v-col>
-                                <v-col cols="2" class="d-flex align-center justify-center">
-                                    <b-spinner v-if="item.load"  variant="success" type="grow" small></b-spinner>
-                                </v-col>
-                            </v-row>
-                        </td>
-                        <td width="25%">
-                            <input type="text" :disabled="item.exist" v-model="item.nombres">
-                        </td>
-                        <td width="25%">
-                            <input type="text" :disabled="item.exist" v-model="item.apellidos">
-                        </td>
-                        <td width="20%">
-                            <select class="select-css" :disabled="item.exist" v-model="item.sexo">
-                                <option value="1">Masculino</option>
-                                <option value="2">Femenino</option>
-                            </select>
-                        </td>
-                        <td width="7%">
-                            <v-tooltip top>
-                                <template v-slot:activator="{on, attrs}">
-                                    <v-btn color="red" class="ma-1" height="22px" width="22px"
-                                           @click="dialogoFiles = true"
-                                           fab v-on="on" v-bind="attrs" x-small>
-                                        <v-icon size="15" color="white">fa fa-file-pdf</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Ver documentos del cliente</span>
-                            </v-tooltip>
+              <table class="rowsTable">
+                <thead>
+                <tr>
+                  <th>Identidad</th>
+                  <th>Nombres</th>
+                  <th>Apellidos</th>
+                  <th>Sexo</th>
+                  <td></td>
+                  <td></td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in Solicitud.avales">
+                  <td width="20%">
+                    <v-row no-gutters>
+                      <v-col cols="10">
+                        <input type="text"  v-model="item.identidad" @keyup.enter="buscarCliente(item)">
+                      </v-col>
+                      <v-col cols="2" class="d-flex align-center justify-center">
+                        <b-spinner v-if="item.load"  variant="success" type="grow" small></b-spinner>
+                      </v-col>
+                    </v-row>
+                  </td>
+                  <td width="25%">
+                    <input type="text" :disabled="item.exist" v-model="item.nombres">
+                  </td>
+                  <td width="25%">
+                    <input type="text" :disabled="item.exist" v-model="item.apellidos">
+                  </td>
+                  <td width="20%">
+                    <select class="select-css" :disabled="item.exist" v-model="item.sexo">
+                      <option value="1">Masculino</option>
+                      <option value="2">Femenino</option>
+                    </select>
+                  </td>
+                  <td width="7%">
+                    <v-tooltip top>
+                      <template v-slot:activator="{on, attrs}">
+                        <v-btn color="red" class="ma-1" height="22px" width="22px"
+                               @click="dialogoFiles = true"
+                               fab v-on="on" v-bind="attrs" x-small>
+                          <v-icon size="15" color="white">fa fa-file-pdf</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Ver documentos del cliente</span>
+                    </v-tooltip>
 
-                            <v-tooltip top>
-                                <template v-slot:activator="{on, attrs}">
-                                    <v-btn color="indigo" class="ma-1" height="22px" @click="guardarAval(item)"
-                                           width="22px" fab v-on="on" v-bind="attrs" x-small>
-                                        <v-icon size="15" color="white">fa fa-save</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Guardar cliente</span>
-                            </v-tooltip>
+                    <v-tooltip top>
+                      <template v-slot:activator="{on, attrs}">
+                        <v-btn color="indigo" class="ma-1" height="22px" @click="guardarAval(item)"
+                               width="22px" fab v-on="on" v-bind="attrs" x-small>
+                          <v-icon size="15" color="white">fa fa-save</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Guardar cliente</span>
+                    </v-tooltip>
 
-                        </td>
-                        <td width="3%">
-                            <v-btn fab @click="removeAval(item.key)" x-small color="red" width="22px" height="22px" dark>
+                  </td>
+                  <td width="3%">
+                    <v-btn fab @click="removeAval(item.key)" x-small color="red" width="22px" height="22px" dark>
+                      <v-icon size="15">fa fa-times</v-icon>
+                    </v-btn>
+                  </td>
+
+                  <v-dialog v-model="dialogoFiles" width="60%">
+                    <v-card>
+                      <v-card-title class="grey lighten-2">Documentos de {{item.nombres}} {{item.apellidos}}</v-card-title>
+                      <v-container class="d-flex justify-center grey lighten-5">
+                        <table class="rowsTable">
+                          <thead>
+                          <tr>
+                            <th>Nombre del archivo</th>
+                            <th class="d-flex justify-center">Estado</th>
+                            <th>Archivo</th>
+                            <th>*</th>
+                            <th></th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          <tr v-for="i in item.archivos">
+                            <td width="30%"><input type="text" v-model="i.detalle"></td>
+                            <td class="d-flex justify-center">
+                              <v-icon v-if="i.status" color="success">fa fa-check</v-icon>
+                              <v-icon v-else color="red">fa fa-times</v-icon>
+                            </td>
+                            <td v-if="i.status === 1 || i.status">
+                              <v-btn @click="verDocumento(i.dir)" fab height="25px" width="20px" text color="red">
+                                <v-icon size="15">fa fa-file-pdf</v-icon>
+                              </v-btn>
+                            </td>
+                            <td v-else-if="i.status === 0 || !i.status">
+                              <v-row no-gutters>
+                                <v-col cols="11">
+                                  <b-form-file browse-text="Buscar" v-model="i.file" @change="cambiarEstadoFile(i)"
+                                               :placeholder="'buscar '+i.detalle" accept="application/pdf" size="sm">
+                                  </b-form-file>
+                                </v-col>
+                                <v-col v-if="i.file" cols="1" class="d-flex justify-center">
+                                  <v-btn fab height="24px" width="24px" text @click="i.file = null">
+                                    <v-icon size="15px">fa fa-trash-alt</v-icon>
+                                  </v-btn>
+                                </v-col>
+                              </v-row>
+                            </td>
+                            <td>
+                              <span v-if="i.num === 1">Sí</span>
+                              <span v-if="i.num === 2">No</span>
+                            </td>
+                            <td>
+                              <v-btn width="20px" height="20px" @click="removeArchivos(i.key, item)"
+                                     text fab color="red">
                                 <v-icon size="15">fa fa-times</v-icon>
-                            </v-btn>
-                        </td>
-
-                        <v-dialog v-model="dialogoFiles" width="60%">
-                            <v-card>
-                                <v-card-title class="grey lighten-2">Documentos de {{item.nombres}} {{item.apellidos}}</v-card-title>
-                                <v-container class="d-flex justify-center grey lighten-5">
-                                    <table class="rowsTable">
-                                        <thead>
-                                        <tr>
-                                            <th>Nombre del archivo</th>
-                                            <th class="d-flex justify-center">Estado</th>
-                                            <th>Archivo</th>
-                                            <th>*</th>
-                                            <th></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr v-for="i in item.archivos">
-                                            <td width="30%"><input type="text" v-model="i.detalle"></td>
-                                            <td class="d-flex justify-center">
-                                                <v-icon v-if="i.status" color="success">fa fa-check</v-icon>
-                                                <v-icon v-else color="red">fa fa-times</v-icon>
-                                            </td>
-                                            <td v-if="i.status === 1 || i.status">
-                                                <v-btn @click="verDocumento(i.dir)" fab height="25px" width="20px" text color="red">
-                                                    <v-icon size="15">fa fa-file-pdf</v-icon>
-                                                </v-btn>
-                                            </td>
-                                            <td v-else-if="i.status === 0 || !i.status">
-                                                <v-row no-gutters>
-                                                    <v-col cols="11">
-                                                        <b-form-file browse-text="Buscar" v-model="i.file" @change="cambiarEstadoFile(i)"
-                                                                     :placeholder="'buscar '+i.detalle" accept="application/pdf" size="sm">
-                                                        </b-form-file>
-                                                    </v-col>
-                                                    <v-col v-if="i.file" cols="1" class="d-flex justify-center">
-                                                        <v-btn fab height="24px" width="24px" text @click="i.file = null">
-                                                            <v-icon size="15px">fa fa-trash-alt</v-icon>
-                                                        </v-btn>
-                                                    </v-col>
-                                                </v-row>
-                                            </td>
-                                            <td>
-                                                <span v-if="i.num === 1">Sí</span>
-                                                <span v-if="i.num === 2">No</span>
-                                            </td>
-                                            <td>
-                                                <v-btn width="20px" height="20px" @click="removeArchivos(i.key, item)"
-                                                       text fab color="red">
-                                                    <v-icon size="15">fa fa-times</v-icon>
-                                                </v-btn>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </v-container>
-                                <v-divider></v-divider>
-                                <v-card-actions class="d-flex justify-end">
-                                    <v-btn color="success" @click="addArchivos(item)" small dark>Agregar Fila</v-btn>
-                                    <v-btn color="warning" @click="dialogoFiles = false" small dark>Cerrar</v-btn>
-                                </v-card-actions>
-                            </v-card>
-                        </v-dialog>
-                    </tr>
-                    </tbody>
-                </table>
+                              </v-btn>
+                            </td>
+                          </tr>
+                          </tbody>
+                        </table>
+                      </v-container>
+                      <v-divider></v-divider>
+                      <v-card-actions class="d-flex justify-end">
+                        <v-btn color="success" @click="addArchivos(item)" small dark>Agregar Fila</v-btn>
+                        <v-btn color="warning" @click="dialogoFiles = false" small dark>Cerrar</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </tr>
+                </tbody>
+              </table>
             </v-col>
-        </v-row>
+          </v-row>
+        </v-card>
         <hr>
         <v-row no-gutters class="d-flex justify-end">
-            <v-btn color="warning" class="ma-2" small dark @click="vistaSolicitud = 2">Volver</v-btn>
-            <v-btn color="success" class="ma-2" small dark @click="validarDatos">Pasar a la revisión</v-btn>
+            <v-btn color="warning" class="ma-2" tile small dark @click="vistaSolicitud = 2">Volver</v-btn>
+            <v-btn color="indigo" class="ma-2" tile small dark @click="validarDatos">Validar</v-btn>
+            <v-btn color="success" class="ma-2 text--white" tile small @click="vistaSolicitud = 4" :disabled="!validado">Pasar a la revisión</v-btn>
         </v-row>
     </v-container>
 </template>
@@ -200,6 +233,9 @@
                     return this.$store.state.solicitud_credito.data;
                 }
             },
+            Cliente(){
+              return this.$store.state.solicitud_credito.Cliente;
+            },
             vistaSolicitud:{
                 get:function () {
                     return this.$store.state.solicitud_credito.SolicitudCredito_vista;
@@ -211,7 +247,8 @@
         },
         data(){
             return{
-                dialogoFiles: false
+                dialogoFiles: false,
+                validado: false
             }
         },
         methods:{
@@ -256,7 +293,7 @@
                     this.notificacion(
                         `Datos actualizados del aval ${parseInt(item.key) + parseInt(1)}`,
                         'success')
-                    this.$store.commit('activarOverlay', fa);
+                    this.$store.commit('activarOverlay', false);
                 }).catch((error)=>{
                     this.$store.commit('activarOverlay', false);
                 })
@@ -293,6 +330,7 @@
                     "telefono":   '',
                     "parantesco": '',
                     "direccion":  '',
+                    "area":       '504',
                     "estado":     false,
                     "key":        this.Solicitud.referencias.length,
                     "comentario": ''
@@ -511,13 +549,17 @@
             },
             validarDatos(){
                 if (this.validarReferencias() && this.validarAvales())
-                    this.vistaSolicitud = 4
+                    this.validado = true;
 
             },
             validarReferencias(){
                 let ref = this.Solicitud.referencias;
                 let bandera = ref.length, contador = 0, cont = 0;
+                let telefonos = [];
                 ref.forEach((i) => {
+                    telefonos = this.Cliente.telefonos.filter(item=>item.num == i.telefono);
+                    i.nuevo = telefonos.length === 0;
+
                     cont = 0;
                     if (i.nombre.length > 5)
                         cont++;
@@ -526,7 +568,7 @@
                             `Completa el nombre de la referencia ${parseInt(i.key) + parseInt(1)}`,
                             'warning')
 
-                    if (i.telefono.length === 8)
+                    if (i.telefono.length >= 8 || i.telefono.length <= 10)
                         cont++;
                     else
                         this.notificacion(

@@ -8,11 +8,11 @@
           <th>Nombre del Cliente</th>
           <td>{{GESTION.cliente.nombres}} {{GESTION.cliente.apellidos}}</td>
           <th>Días de Mora</th>
-          <td>{{VENTA.contrato_cliente.dias_mora}} días</td>
+          <td>{{VENTA.dias_mora}} días</td>
         </tr>
         <tr>
           <th>Descripción del Crédito</th>
-          <td colspan="3">{{VENTA.contrato_cliente.remision_articulo.articulo.descripcion_corta}} - {{VENTA.contrato_cliente.remision_articulo.articulo.marca.nombre}}</td>
+          <td></td>
         </tr>
         <tr>
           <th>Intereses</th>

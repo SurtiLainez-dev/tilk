@@ -12,6 +12,8 @@
         <th>Saldo actual</th>
         <th>Mora</th>
         <th>Total de mora</th>
+        <th>Saldo Capital</th>
+        <th>Saldo Capital Mora</th>
         <th>Inicio de mora</th>
         <th>Fecha de pago</th>
         <th>Estado</th>
@@ -29,6 +31,9 @@
           <v-badge v-else dot color="green"></v-badge>
         </td>
         <td>L {{int.format(item.mora,2)}}</td>
+        <td>L {{int.format(item.saldo_cap,2)}}</td>
+        <td v-if="item.mora > 0">L {{int.format(item.saldo_cap,2)}}</td>
+        <td v-else>-</td>
         <td v-if="item.inicio_mora">
           {{item.inicio_mora.split('-')[2]}}/{{item.inicio_mora.split('-')[1]}}/{{item.inicio_mora.split('-')[0]}}
         </td>
@@ -50,6 +55,8 @@
         <td style="border-top: 1px solid">L. {{int.format(total_saldo_actual,2)}}</td>
         <td></td>
         <td style="border-top: 1px solid">L. {{int.format(total_mora,2)}}</td>
+        <td style="border-top: 1px solid">L. {{int.format(total_capital,2)}}</td>
+        <td style="border-top: 1px solid">L. {{int.format(total_capital_mora,2)}}</td>
         <td></td>
         <td></td>
         <td></td>
@@ -82,6 +89,7 @@ export default {
         'saldo_actual',
         'is_mora',
         'mora',
+        'capital',
         'inicio_mora',
         'fecha_pago',
         'estado',
@@ -125,6 +133,17 @@ export default {
       if (this.PAGOS)
         return this.PAGOS.reduce((num1, num2)=> num1 + parseFloat(num2.total_abonado), 0);
       else return 0;
+    },
+    total_capital(){
+      if (this.PAGOS)
+        return this.PAGOS.reduce((num1, num2)=> num1 + parseFloat(num2.saldo_cap), 0);
+      else return 0;
+    },
+    total_capital_mora(){
+      if (this.PAGOS) {
+        let pagos = this.PAGOS.filter(item=>item.mora > 0)
+        return pagos.reduce((num1, num2) => num1 + parseFloat(num2.saldo_cap), 0);
+      }else return 0;
     }
   }
 }

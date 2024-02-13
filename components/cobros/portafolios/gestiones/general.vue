@@ -18,7 +18,7 @@
           <th>Saldo Atrasado</th>
           <td>L {{int.format(GESTION.pagando)}}</td>
           <th>Saldo Abonado</th>
-          <td>L {{int.format(VENTA.contrato_cliente.saldo_abonado)}}</td>
+          <td>L {{int.format(VENTA.total_abonado)}}</td>
           <th>Saldo Inicial de la Cuenta</th>
           <td>L {{int.format(VENTA.total)}}</td>
         </tr>

@@ -158,6 +158,7 @@ export default {
         {text:'Recibos de Clientes', value:1},
         {text:'Facturas de Contado', value:2},
         {text:'Facturas de Crédito', value:3},
+        {text:'Facturas de Articulos de Reingreso', value:4},
       ],
       rule: {
         contadorI: {

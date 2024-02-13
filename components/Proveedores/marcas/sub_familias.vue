@@ -35,10 +35,21 @@
                       :item-value="'id'" label="Familia" :rules="[rule.required]"></v-select>
             <v-text-field v-model="SubFamilia.nombre" :rules="[rule.required, rule.min, rule.max]"
                           label="Nombre de la Sub-familia" required :counter="60"></v-text-field>
+            <v-card v-if="SubFamilia.img" flat tile class="d-flex justify-center">
+              <v-img
+                  :lazy-src="SubFamilia.img"
+                  max-height="150"
+                  max-width="250"
+                  :src="SubFamilia.img"
+              ></v-img>
+            </v-card>
+            <v-file-input v-model="img" dense label="Foto de Presentación"></v-file-input>
+            <v-divider></v-divider>
             <v-row>
               <v-col class="d-flex justify-end">
-                <v-btn v-if="sideSubFamilia" color="orange"  @click="editandoSubFamilia" dark small>Registrar Cambios </v-btn>
-                <v-btn v-else @click="registrarSubFamilia" color="orange" dark small>Crear Sub-familia</v-btn>
+                <v-btn class="ma-2" color="orange"  @click="sideUso = false" dark small>Cerrar </v-btn>
+                <v-btn class="ma-2" v-if="sideSubFamilia" color="orange"  @click="editandoSubFamilia" dark small>Registrar Cambios </v-btn>
+                <v-btn class="ma-2" v-else @click="registrarSubFamilia" color="orange" dark small>Crear Sub-familia</v-btn>
               </v-col>
             </v-row>
           </v-form>
@@ -91,11 +102,13 @@
         SubFamilia:{
           nombre: '',
           familia: null,
-          sub: ''
+          sub: '',
+          img: null
         },
         Familias: null,
         isPeticionSave: false,
-        errorInput: false
+        errorInput: false,
+        img: null
       }
     },
     mounted() {
@@ -114,25 +127,28 @@
         if (this.$refs.FormSubFamilia.validate()){
           this.overlay = true
           this.sideUso = false
-          this.$axios.post('sub_familias',{
-            familia: this.SubFamilia.familia,
-            nombre: this.SubFamilia.nombre
-          },{
-            headers: {
-              'Authorization': 'Bearer ' + this.$store.state.token
+          let data = new FormData();
+          data.append('familia', this.SubFamilia.familia);
+          data.append('nombre', this.SubFamilia.nombre);
+          data.append('img', this.img);
+          this.$axios({
+            url: 'sub_familias',
+            method: 'post',
+            data: data,
+            headers:{
+              'Authorization': 'Bearer ' + this.$store.state.token,
+              'Content-Type': "multipart/form-data"
             }
           }).then((res)=>{
-            if (res.status === 200){
-              this.$fetch()
-              this.overlay = false
-              Swal.fire(
+            this.$fetch()
+            this.overlay = false
+            Swal.fire(
                 'Registro Exitoso',
-                `Se ha registrado exitosamente ${this.SubFamilia.nombre} exitosamente en la base de datos`,
+                `La familia ${this.SubFamilia.nombre} se guardado exitosamente en la base de datos`,
                 'success'
-              )
-              this.SubFamilia.nombre  = ''
-              this.SubFamilia.familia = ''
-            }
+            )
+            this.SubFamilia.nombre = ''
+            this.SubFamilia.codigo = ''
           })
         }else {
           this.errorInput = true
@@ -142,26 +158,31 @@
         if (this.$refs.FormSubFamilia.validate()){
           this.overlay = true;
           this.sideUso = false
-          this.$axios.put('sub_familias/'+this.SubFamilia.sub,{
-            familia: this.SubFamilia.familia,
-            nombre: this.SubFamilia.nombre
-          },{
-            headers: {
-              'Authorization': 'Bearer ' + this.$store.state.token
+          let data = new FormData();
+          data.append('familia', this.SubFamilia.familia);
+          data.append('nombre',  this.SubFamilia.nombre);
+          data.append('img',     this.img);
+          data.append('id',      this.SubFamilia.sub);
+          this.$axios({
+            url: 'sub_familias/edit',
+            method: 'post',
+            data: data,
+            headers:{
+              'Authorization': 'Bearer ' + this.$store.state.token,
+              'Content-Type': "multipart/form-data"
             }
           }).then((res)=>{
-            if (res.status === 200){
-              this.$fetch()
-              this.overlay = false
-              Swal.fire(
+            this.$fetch()
+            this.overlay = false
+            Swal.fire(
                 'Registro Exitoso',
-                `Se ha registrado el cambio exitosamente ${this.SubFamilia.nombre} exitosamente en la base de datos`,
+                `La familia ${this.SubFamilia.nombre} se guardado exitosamente en la base de datos`,
                 'success'
-              )
-              this.SubFamilia.nombre = ''
-              this.SubFamilia.familia = null
-            }
+            )
+            this.SubFamilia.nombre = ''
+            this.SubFamilia.codigo = ''
           })
+
         }else {
           this.errorInput = true
         }
@@ -172,6 +193,7 @@
         this.SubFamilia.nombre = item.nombre
         this.SubFamilia.sub = item.id
         this.sideSubFamilia = true
+        this.SubFamilia.img = item.img
         this.sideUso = true
       },
       cargarFamilias(){

@@ -680,6 +680,9 @@ export default {
     seleccionarArticulo(item){
       this.dialogoBuscar = false;
       this.data          = item;
+      if (!data.colores){
+        data.colores = JSON.stringify(['FFF']);
+      }
       this.cargarDetalles();
       this.cargarFotos();
       this.load          = true;

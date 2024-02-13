@@ -14,5 +14,8 @@ export const mutations = {
             state.DEPOSITOS     = res.data.depositos;
             state.LOADDEPOSITOS = false;
         })
+    },
+    cambiar_LOADDEPOSITO(state, val){
+        state.LOADDEPOSITOS = val;
     }
 }

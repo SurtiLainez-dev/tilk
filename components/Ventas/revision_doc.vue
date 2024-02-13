@@ -38,7 +38,7 @@ export default {
     this.$axios.get('cuentas/ventas/'+this.VENTA_O.id).then((res)=>{
       this.$store.commit('cuentas/agregar_CUENTA', res.data.venta);
     });
-    this.$route.params.cliente = this.VENTA_O.cliente_id;
+    this.$route.params.cliente = this.VENTA_O.cliente;
   },
   name: "revision_doc",
   data(){

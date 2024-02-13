@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-card flat tile class="pa-3">
         <v-stepper v-model="vistaSolicitud">
             <v-stepper-header>
                 <v-stepper-step :complete="vistaSolicitud > 1" step="1">Datos del cliente</v-stepper-step>
@@ -41,7 +41,7 @@
                 </v-stepper-content>
             </v-stepper-items>
         </v-stepper>
-    </v-container>
+    </v-card>
 </template>
 
 <script>

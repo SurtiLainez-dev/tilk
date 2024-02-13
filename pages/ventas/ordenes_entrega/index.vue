@@ -13,11 +13,11 @@
                   @click:row="goOrden"
                   loading-text="Cargando Ordenes de Entrega"
                   :loading="LOAD_ORDENES">
-      <template v-slot:item.venta.cliente.nombres="{item}">
-        {{item.venta.cliente.nombres}} {{item.venta.cliente.apellidos}}
+      <template v-slot:item.nombres="{item}">
+        {{item.nombres}} {{item.apellidos}}
       </template>
-      <template v-slot:item.venta.colaborador.nombres="{item}">
-        {{item.venta.colaborador.nombres}} {{item.venta.colaborador.nombres}}
+      <template v-slot:item.nC="{item}">
+        {{item.nC}} {{item.apC}}
       </template>
       <template v-slot:item.estado="{item}">
         <v-chip dark color="success" x-small v-if="item.estado ===1 ">Entregado</v-chip>
@@ -36,10 +36,10 @@ export default {
     return{
       header:[
         {text:'Codigo de la Orden',value:'cod'},
-        {text:'Venta',value:'venta.cod'},
-        {text:'Nombre del Cliente',value:'venta.cliente.nombres'},
-        {text:'Vendedor',value:'venta.colaborador.nombres'},
-        {text:'Sucursal',value:'venta.colaborador.sucursal.nombre'},
+        {text:'Venta',value:'codV'},
+        {text:'Nombre del Cliente',value:'nombres'},
+        {text:'Vendedor',value:'nC'},
+        {text:'Sucursal',value:'sucursal'},
         {text:'Estado',value:'estado'},
       ],
       search: ''

@@ -3,7 +3,7 @@
     <v-container style="color: #FFF">
       <strong>Caja</strong>
     </v-container>
-    <v-list-group v-if="PERMISOS.includes(152)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(152)">
 
 
       <template v-slot:activator value="true">
@@ -15,7 +15,7 @@
     </v-list-group>
 
 
-    <v-list-group v-if="PERMISOS.includes(153)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(153)">
       <template v-slot:activator value="true">
         <v-list-item-title>Facturas</v-list-item-title>
       </template>
@@ -27,7 +27,7 @@
       </v-list-item>
     </v-list-group>
 
-    <v-list-group v-if="PERMISOS.includes(154)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(154)">
       <template v-slot:activator value="true">
         <v-list-item-title>Calendario</v-list-item-title>
       </template>
@@ -42,11 +42,11 @@
       </v-list-item>
     </v-list-group>
 
-    <v-list-group v-if="PERMISOS.includes(155) || PERMISOS.includes(156) || PERMISOS.includes(157) || PERMISOS.includes(158)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(155) || PERMISOS.includes(156) || PERMISOS.includes(157) || PERMISOS.includes(158)">
       <template v-slot:activator value="true">
         <v-list-item-title>Administrador</v-list-item-title>
       </template>
-      <v-list-item v-if="PERMISOS.includes(155)" class="itemOpciones" @click="go('/caja/admin/historial')">
+      <v-list-item v-if="PERMISOS.includes(155)" class="itemOpciones" @click="anadirPestana(14,'Historial de Cajas')">
         Historial de Cierres
       </v-list-item>
       <v-list-item  class="itemOpciones" @click="go('/caja/admin/cajas')">
@@ -66,11 +66,25 @@
 export default {
   name: "sideCaja",
   methods:{
+    anadirPestana(key, titulo){
+      let bandera = 0;
+      this.Pes.forEach((item)=>{
+        if (item.key === key)
+          bandera++;
+      });
+      if (bandera === 0){
+        this.$store.commit('anadirCaja', {titulo:titulo, key: key});
+        this.$store.commit('cambiarTab', {val:key, tipo:false});
+      }
+    },
     go(url){
       this.$router.push(url)
-    }
+    },
   },
   computed:{
+    Pes(){
+      return this.$store.state.pestana
+    },
     PERMISOS(){
       let permisos = this.$store.state.permisosUser.split(',');
       let per = [];
@@ -82,7 +96,7 @@ export default {
       }else
         return [];
     },
-  }
+  },
 }
 </script>
 

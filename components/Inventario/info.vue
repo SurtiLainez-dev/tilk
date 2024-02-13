@@ -1,511 +1,522 @@
 <template>
-    <div class="pr-2">
-      <v-bottom-navigation color="deep-orange lighten-1" horizontal>
-        <v-btn @click="Solicitar.dialogo = true">
-          <span>Solicitar</span>
-          <v-icon>fa fa-exchange-alt</v-icon>
-        </v-btn>
-        <v-btn @click="sidePrecio = !sidePrecio">
-          <span>Precio</span>
-          <v-icon>fa fa-tag</v-icon>
-        </v-btn>
-        <v-btn>
-          <span>Fotos</span>
-          <v-icon>fa fa-images</v-icon>
-        </v-btn>
-        <v-btn @click="sideMotos = !sideMotos" v-if="data.is_motocicleta === 1">
-          <span>Motocicletas</span>
-          <v-icon>fa fa-motorcycle</v-icon>
-        </v-btn>
-        <v-btn @click="dialogoEtiqueta = true">
-          <span>Etiqueta</span>
-          <v-icon>fa fa-tag</v-icon>
-        </v-btn>
-      </v-bottom-navigation>
-      <v-row>
-        <v-col cols="5">
-          <v-hover v-slot:default="{ hover }" open-delay="0">
-            <v-card :elevation="hover ? 16 : 2" class="pl-2 pr-2">
-              <v-card-title>Sucursales Disponibles</v-card-title>
-              <hr>
-              <v-simple-table height="300px" fixed-header class="rowsTable">
-                <template v-slot:default>
-                  <thead>
-                  <tr>
-                    <th>Sucursal</th>
-                    <th class="text-center">Reingreso</th>
-                    <th class="text-center">Nuevo</th>
-                    <th class="text-center">Consignado</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr v-for="item in Stock">
-                    <td>
-                      <v-tooltip top>
-                        <template v-slot:activator="{on, attrs}">
-                          <span v-on="on" v-bind="attrs">{{item.sucursal.abreviatura}}</span>
-                        </template>
-                        <span>{{item.sucursal.nombre}}</span>
-                      </v-tooltip>
-                    </td>
-                    <td class="text-center">{{item.stock_reingreso}}</td>
-                    <td class="text-center">{{item.stock_actual}}</td>
-                    <td class="text-center">{{item.stock_consignado}}</td>
-                  </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
+    <div class="pt-1 pa-2">
+
+      <v-card>
+
+        <v-tabs  vertical>
+          <v-tab >Información</v-tab>
+          <v-tab><v-icon left>fa fa-tag</v-icon>Precio</v-tab>
+          <v-tab><v-icon left>fa fa-images</v-icon>Ver Imagenes</v-tab>
+          <v-tab><v-icon left>fa fa-boxes</v-icon>Disponibilidad</v-tab>
+          <v-tab><v-icon left>fa fa-tools</v-icon>Utilidades</v-tab>
+          <v-tab><v-icon left>fa fa-exchange-alt</v-icon>Transferencia</v-tab>
+
+          <v-tab-item>
+            <v-card tile class="pa-2" style="height: 89vh">
+              <div class="row no-gutters">
+                <div class="col">
+                  <div><span class="titleDatos" style="font-size: 20px !important;">Datos Generales del Articulo</span></div>
+                </div>
+              </div>
+              <v-divider></v-divider>
+              <div class="row no-gutters">
+                <div class="col">
+                  <div><span class="titleDatos">Nombre del Articulo</span></div>
+                  <div><span class="subtitleDatos">{{data.nombre_articulo}}</span></div>
+                </div>
+              </div>
+              <div class="row no-gutters">
+                <div class="col">
+                  <div><span class="titleDatos">Descripción del Articulo</span></div>
+                  <div><span class="subtitleDatos">{{data.descripcion_corta}}</span></div>
+                </div>
+              </div>
+              <div class="row no-gutters">
+                <div class="col">
+                  <div><span class="titleDatos">Marca</span></div>
+                  <div><span class="subtitleDatos">{{data.marca}}</span></div>
+                </div>
+                <div class="col">
+                  <div><span class="titleDatos">Modelo</span></div>
+                  <div><span class="subtitleDatos">{{data.modelo}}</span></div>
+                </div>
+                <div class="col">
+                  <div><span class="titleDatos">Codigo del Sistema</span></div>
+                  <div><span class="subtitleDatos">{{data.codigo_sistema}}</span></div>
+                </div>
+                <div class="col">
+                  <div><span class="titleDatos">Referencia</span></div>
+                  <div><span class="subtitleDatos">{{data.referencia_fabricante?data.referencia_fabricante:''}}</span></div>
+                </div>
+                <div class="col">
+                  <div><span class="titleDatos">Cod. Barras</span></div>
+                  <div><span class="subtitleDatos">{{data.codigo_barras?data.codigo_barras:''}}</span></div>
+                </div>
+              </div>
+              <div class="row no-gutters">
+                <div class="col">
+                  <div><span class="titleDatos">Sub-Familia</span></div>
+                  <div><span class="subtitleDatos">{{data.fam}}</span></div>
+                </div>
+                <div class="col">
+                  <div><span class="titleDatos">Familia</span></div>
+                  <div><span class="subtitleDatos">{{data.familia}}</span></div>
+                </div>
+                <div class="col">
+                  <div><span class="titleDatos">Codigo del Proveedor</span></div>
+                  <div><span class="subtitleDatos">{{data.codigo_proveedor}}</span></div>
+                </div>
+                <div class="col">
+                  <div><span class="titleDatos"></span></div>
+                </div>
+                <div class="col">
+                  <div><span class="titleDatos"></span></div>
+                </div>
+              </div>
+              <v-divider></v-divider>
+              <div class="row no-gutters">
+                <div class="col">
+                  <div><span class="titleDatos">Detalles Técnicos</span></div>
+                </div>
+              </div>
+              <table>
+                <thead>
+                <tr>
+                  <th>Titulo</th>
+                  <th>Detalle</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in Detalles">
+                  <td>{{item.titulo}}</td>
+                  <td>{{item.detalle}}</td>
+                </tr>
+                </tbody>
+              </table>
             </v-card>
-          </v-hover>
-        </v-col>
-        <v-col cols="7">
-          <v-hover v-slot:default="{ hover }" open-delay="0">
-            <v-card :elevation="hover ? 16 : 2" class="pl-2 pr-2">
-              <v-card-title>Artículo Desintegrado</v-card-title>
-              <hr>
-              <v-simple-table height="300px" fixed-header class="rowsTable">
-                <template v-slot:default>
-                  <thead>
-                  <tr>
-                    <th>Sucursal</th>
-                    <th>Cód. Sístema</th>
-                    <th>Serie</th>
-                    <th>Estado</th>
-                    <th>Precio</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr v-for="item in Remision">
-                    <td>{{item.sucursal.abreviatura}}</td>
-                    <td>{{item.serie_sistema}}</td>
-                    <td>{{item.serie_fabricante}}</td>
-                    <td>{{item.estado_articulo.nombre}}</td>
-                    <td>L. {{item.precio_actual}}</td>
-                  </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
-              <v-navigation-drawer v-if="data.is_motocicleta === 1" v-model="sideMotos" clipped right
-                                   absolute width="100%" class="side" >
-                <v-container>
+          </v-tab-item>
+          <v-tab-item>
+            <v-card tile class="pa-2" style="height: 89vh">
+              <div class="row no-gutters">
+                <div class="col">
+                  <div><span class="titleDatos" style="font-size: 20px !important;">Cotizador para Solicitúd de Credito</span></div>
+                </div>
+              </div>
+              <v-divider></v-divider>
+              <v-card flat tile>
+                <v-row no-gutters>
+                  <v-col>
+                    <v-card class="ma-2 pa-2" >
+                      <v-row no-gutters>
+                        <v-col cols="8">
+                          <v-alert v-if="Precios.S_contado" dense border="left" type="warning" text>
+                            Este artículo solo se puede vender al contado.
+                          </v-alert>
+                        </v-col>
+                        <v-col cols="4" class="d-flex justify-end align-center">
+                          <v-tooltip v-if="Precios.meses > 0" top>
+                            <template v-slot:activator="{on , attrs}">
+                              <v-btn class="ma-2" v-bind="attrs" v-on="on" x-small fab dark @click="registrarCotizacion">
+                                <v-icon>fa fa-print</v-icon>
+                              </v-btn>
+                            </template>
+                            <span>Imprimir Cotización</span>
+                          </v-tooltip>
+                          <v-tooltip top>
+                            <template v-slot:activator="{on , attrs}">
+                              <v-btn class="ma-2" v-bind="attrs" v-on="on" color="green" x-small fab dark>
+                                <v-icon>fa fa-cart-arrow-down</v-icon>
+                              </v-btn>
+                            </template>
+                            <span>Realizar Venta de Contado</span>
+                          </v-tooltip>
+                          <v-tooltip top>
+                            <template v-slot:activator="{on, attrs}">
+                              <v-btn fab x-small color="pink" v-bind="attrs" :disabled="!calcularP"
+                                     v-on="on" class="ma-2" @click="sideSolicitud = true">
+                                <v-icon color="white">fa fa-clipboard-list</v-icon></v-btn>
+                            </template>
+                            <span>Crear Solicitúd de Crédito</span>
+                          </v-tooltip>
+                          <v-tooltip top v-if="Precios.meses > 0">
+                            <template v-slot:activator="{on, attrs}">
+                              <v-btn fab x-small color="indigo" v-bind="attrs"
+                                     v-on="on" dark class="ma-2" @click="sideSeguimiento = true">
+                                <v-icon>fa fa-tasks</v-icon></v-btn>
+                            </template>
+                            <span>Crear Seguimiento</span>
+                          </v-tooltip>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col>
+                          <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.contado"
+                                        label="Precio de Contado"></v-text-field>
+                        </v-col>
+                        <v-col>
+                          <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.min_prima"
+                                        label="Mínimo de Prima"></v-text-field>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col >
+                          <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.saldo"
+                                        label="Saldo"></v-text-field>
+                        </v-col>
+                        <v-col>
+                          <v-text-field class="ma-2" suffix="lps" v-model="Precios.prima" :disabled="Precios.S_contado"
+                                        :rules="[rules.precios.prima]" @keyup="calcularSaldoNuevo"
+                                        label="*Prima propuesta por el cliente" dense></v-text-field>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col>
+                          <v-text-field class="ma-2" suffix="lps" disabled dense
+                                        label="Saldo a financiar" v-model="Precios.saldo_nuevo"></v-text-field>
+                        </v-col>
+                        <v-col>
+                          <v-select dense label="*Forma de pagos" v-model="Precios.forma_pago"
+                                    class="ma-2" :items="formaPagos" :disabled="Precios.S_contado"></v-select>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col>
+                          <v-text-field dense label="*Cantidad de meses" class="ma-2"
+                                        @keyup.enter="calcularPagos"
+                                        :disabled="Precios.S_contado"
+                                        v-model="Precios.meses" suffix="meses"></v-text-field>
+                        </v-col>
+                        <v-col>
+                          <v-text-field dense
+                                        class="ma-2"
+                                        disabled
+                                        suffix="meses"
+                                        v-model="Precios.maximo_financiamiento"
+                                        label="Maximo de meses a financiar"></v-text-field>
+                        </v-col>
+
+                      </v-row>
+                      <v-row>
+                        <v-col>
+                          <v-text-field dense
+                                        class="ma-2"
+                                        disabled
+                                        suffix="lps"
+                                        v-model="Precios.cuota"
+                                        label="Cuota por pago"></v-text-field>
+                        </v-col>
+                        <v-col>
+                          <v-text-field dense
+                                        class="ma-2"
+                                        disabled
+                                        suffix="lps"
+                                        v-model="Precios.total_credito"
+                                        label="Total del Crédito"></v-text-field>
+                        </v-col>
+                      </v-row>
+                      <v-divider></v-divider>
+                      <v-card-subtitle>Forma de calcular los pagos</v-card-subtitle>
+                      <v-card-actions class="d-flex justify-end">
+                        <v-btn class="ma-2" @click="calcularPagosContadoPagos" small tile dark :disabled="Precios.S_contado"
+                               color="blue" v-if="Precios.prom_cant_cuotas > 0">Contado para {{Precios.prom_cant_cuotas}} pagos</v-btn>
+                        <v-btn class="ma-2" @click="calcularPagosSinPrima" small tile dark :disabled="Precios.S_contado"
+                               color="green" v-if="Precios.venta_sin_prima">Sin Prima</v-btn>
+                        <v-btn class="ma-2" @click="calcularPagos" small tile dark :disabled="Precios.S_contado"
+                               color="indigo">Financiado</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-col>
+                  <v-col>
+                    <v-card class="ma-2 pa-2" flat>
+                      <b-table :current-page="currentPage"
+                               :per-page="perPage"
+                               bordered
+                               hover
+                               striped
+                               class="rowsTable"
+                               :fields="fieldsPagos"
+                               :items="Precios.pagos"
+                               caption-top
+                               small>
+                        <template v-slot:table-caption>Pagos del crédito</template>
+                        <template v-slot:head(num)>#</template>
+                        <template v-slot:head(fecha)>Fecha de Pago</template>
+                        <template v-slot:head(saldo)>Saldo</template>
+                        <template v-slot:head(cuota)>Cuota</template>
+                        <template v-slot:head(saldo_a)>Saldo Restante</template>
+                        <template v-slot:cell(saldo)="scope">
+                          L {{scope.item.saldo}}
+                        </template>
+                        <template v-slot:cell(cuota)="scope">
+                          L {{scope.item.cuota}}
+                        </template>
+                        <template v-slot:cell(saldo_a)="scope">
+                          L {{scope.item.saldo_a}}
+                        </template>
+                      </b-table>
+                      <v-row>
+                        <v-col class="d-flex justify-center">
+                          <b-pagination :disabled="Precios.S_contado"
+                                        v-model="currentPage"
+                                        :total-rows="totalRows"
+                                        :per-page="perPage"
+                                        align="fill"
+                                        size="sm"
+                                        class="my-0"
+                          ></b-pagination>
+                        </v-col>
+                      </v-row>
+                    </v-card>
+                  </v-col>
+                </v-row>
+
+              </v-card>
+
+              <v-navigation-drawer v-model="sideSolicitud" clipped right absolute width="100%" class="side">
+                <v-card flat tile class="pa-4">
                   <v-row no-gutters>
                     <v-col cols="1" class="d-flex align-center">
-                      <v-btn class="ma-2" dark fab x-small text color="red" @click="sideMotos = false">
+                      <v-btn class="ma-2" dark fab x-small text color="red" @click="sideSolicitud = false">
                         <v-icon>fa fa-times</v-icon>
                       </v-btn>
                     </v-col>
-                    <v-col cols="11" class="d-flex justify-center align-center"><h4>Motocicletas en Existencia</h4></v-col>
+                    <v-col cols="11" class="d-flex justify-center align-center"><h4>Solicitud de Crédito</h4></v-col>
                   </v-row>
                   <hr>
-                  <v-simple-table class="rowsTable" dense>
-                    <template v-slot:default>
-                      <thead>
-                      <tr>
-                        <th>Chasis</th>
-                        <th>Motor</th>
-                        <th>Color</th>
-                        <th>Seríe</th>
-                        <th>Precio</th>
-                        <th></th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      <tr v-for="item in Remision">
-                        <td>{{item.motocicleta.chasis}}</td>
-                        <td>{{item.motocicleta.motor}}</td>
-                        <td>{{item.motocicleta.color}}</td>
-                        <td>{{item.serie_sistema}}</td>
-                        <td>L {{item.precio_actual}}</td>
-                        <td><v-checkbox dense></v-checkbox></td>
-                      </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
+                  <solicitud v-if="sideSolicitud" :precio="Precios" :combo="false" :articulo="data" :forma_pago="forma_de_pago"/>
+                </v-card>
+              </v-navigation-drawer>
+              <v-navigation-drawer v-model="sideSeguimiento" clipped right absolute width="100%" class="side">
+                <v-container>
+                  <v-row no-gutters>
+                    <v-col cols="1" class="d-flex align-center">
+                      <v-btn class="ma-2" dark fab x-small text color="red" @click="sideSeguimiento = false">
+                        <v-icon>fa fa-times</v-icon>
+                      </v-btn>
+                    </v-col>
+                    <v-col cols="11" class="d-flex justify-center align-center"><h4>Creando Seguimiento de Prospecto de {{data.nombre_articulo}}</h4></v-col>
+                  </v-row>
+                  <hr>
+                  <seguimiento v-if="sideSeguimiento" :articulo="data" :forma_pago="forma_de_pago"
+                               :cuota="parseInt(Math.round(Precios.cuota))"
+                               :prima="parseInt(Math.round(Precios.prima))"
+                               :contado="parseInt(Math.round(Precios.contado))"
+                               :precio="precio_enviar" :pagos="parseInt(Precios.meses)"/>
                 </v-container>
               </v-navigation-drawer>
             </v-card>
-          </v-hover>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="4">
-          <v-hover v-slot:default="{ hover }" open-delay="0">
-            <v-card :elevation="hover ? 16 : 2" class="pl-2 pr-2">
-              <v-card-title>Detalles Técnicos</v-card-title>
-              <hr>
-              <v-simple-table height="345px" class="rowsTable">
-                <template v-slot:default>
-                  <tbody>
-                  <tr v-for="item in Detalles">
-                    <td>{{item.detalle}}</td>
-                  </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
-            </v-card>
-          </v-hover>
-        </v-col>
-        <v-col cols="5">
-          <v-hover v-slot:default="{ hover }" open-delay="0">
-            <v-card  :elevation="hover ? 16 : 2" class="pl-2 pr-2">
-              <v-card-title>Inventario Compuesto</v-card-title>
-              <hr>
-              <v-simple-table class="rowsTable" fixed-header height="344px">
-                <template v-slot:default>
-                  <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Sucursal</th>
-                    <th class="text-center">Nuevo</th>
-                    <th class="text-center">Reingreso</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr v-for="item in Compuestos">
-                    <td>{{item.nombre}}</td>
-                    <td>{{item.sucursal}}</td>
-                    <td class="text-center">{{item.stock}}</td>
-                    <td class="text-center">{{item.reingreso}}</td>
-                  </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
-            </v-card>
-          </v-hover>
-        </v-col>
-        <v-col cols="3">
-          <v-hover v-slot:default="{ hover }" open-delay="0">
-            <v-card :elevation="hover ? 16 : 2" class="pl-2 pr-2">
-              <v-card-title>Detalles del Artículo</v-card-title>
-              <hr>
-              <v-list>
-                <v-list-item-group>
-                  <v-list-item>
-                    <v-list-item-content>
-                      <v-list-item-title v-text="'Código del Sístema'"></v-list-item-title>
-                      <v-list-item-subtitle v-text="data.codigo_sistema"></v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-content>
-                      <v-list-item-title v-text="'Módelo'"></v-list-item-title>
-                      <v-list-item-subtitle v-text="data.modelo"></v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-content>
-                      <v-list-item-title v-text="'Familía'"></v-list-item-title>
-                      <v-list-item-subtitle v-text="data.familia"></v-list-item-subtitle>
-                      <v-list-item-subtitle v-text="'Sub-familia: '+data.fam"></v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-content>
-                      <v-list-item-title v-text="'Código del Proveedor'"></v-list-item-title>
-                      <v-list-item-subtitle v-text="data.codigo_proveedor"></v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-content>
-                      <v-list-item-title v-text="'Código de Barras'"></v-list-item-title>
-                      <v-list-item-subtitle v-text="data.codigo_barras"></v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-list-item-group>
-              </v-list>
-            </v-card>
-          </v-hover>
-        </v-col>
-      </v-row>
+          </v-tab-item>
+          <v-tab-item>
+            <v-card tile class="pa-2" style="height: 89vh">
+              <div class="row no-gutters">
+                <div class="col">
+                  <div><span class="titleDatos" style="font-size: 20px !important;">Datos Generales del Articulo</span></div>
+                </div>
+              </div>
+              <v-divider></v-divider>
 
-      <v-dialog v-model="Solicitar.dialogo" width="30%">
-        <v-card class="pl-5 pr-5">
-          <v-card-title>Solicitud de {{data.nombre_articulo}} [{{data.codigo_sistema}}]</v-card-title>
-          <hr>
-          <v-form ref="FormSolicitudTransferencia">
-            <v-row>
-              <v-col cols="5">
-                <v-text-field v-model="Solicitar.cantidad"
-                              label="Cantidad a Solicitar"
-                              :rules="[rules.envio.req, rules.envio.mayor]"
+              <v-row>
+                <v-col
+                    @click="abrirDialogoFoto(item.url)"
+                    v-for="(item, index) in fotos"
+                    :key="index"
+                    class="d-flex child-flex"
+                    cols="2"
+                >
+                  <v-img
+                      :src="item.url"
+                      aspect-ratio="1"
+                      class="grey lighten-2"
+                      :lazy-src="item.url"
+                  >
+
+                  </v-img>
+                </v-col>
+              </v-row>
+
+              <v-navigation-drawer v-model="dialogoFoto" clipped right absolute width="100%" class="side">
+                <v-card flat tile class="pa-4">
+                  <v-row no-gutters>
+                    <v-col cols="1" class="d-flex align-center">
+                      <v-btn class="ma-2" dark fab x-small text color="red" @click="dialogoFoto = false">
+                        <v-icon>fa fa-times</v-icon>
+                      </v-btn>
+                    </v-col>
+                    <v-col cols="11" class="d-flex justify-center align-center"><h4>Foto del Artículo</h4></v-col>
+                  </v-row>
+                  <v-divider></v-divider>
+                  <div class="pa-5">
+                    <v-img :src="urlFoto"></v-img>
+                  </div>
+                </v-card>
+              </v-navigation-drawer>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item>
+            <v-card tile class="pa-2" style="height: 89vh">
+              <div class="row no-gutters">
+                <div class="col">
+                  <div><span class="titleDatos" style="font-size: 20px !important;">Disponibilidad Actual</span></div>
+                </div>
+              </div>
+              <v-divider></v-divider>
+              <v-row>
+                <v-col>
+                  <div class="row no-gutters">
+                    <div class="col">
+                      <div><span class="titleDatos">Inventario en Sucursales</span></div>
+                    </div>
+                  </div>
+                  <table>
+                    <thead>
+                    <tr>
+                      <th>Sucursal</th>
+                      <th class="text-center">Reingreso</th>
+                      <th class="text-center">Nuevo</th>
+                      <th class="text-center">Consignado</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in Stock">
+                      <td>{{item.sucursal.abreviatura}} - {{item.sucursal.nombre}}</td>
+                      <td class="text-center">{{item.stock_reingreso}}</td>
+                      <td class="text-center">{{item.stock_actual}}</td>
+                      <td class="text-center">{{item.stock_consignado}}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </v-col>
+                <v-divider vertical></v-divider>
+                <v-col>
+                  <div class="row no-gutters">
+                    <div class="col">
+                      <div><span class="titleDatos">Inventario Compuesto</span></div>
+                    </div>
+                  </div>
+                  <table>
+                    <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Sucursal</th>
+                      <th class="text-center">Nuevo</th>
+                      <th class="text-center">Reingreso</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in Compuestos">
+                      <td>{{item.nombre}}</td>
+                      <td>{{item.sucursal}}</td>
+                      <td class="text-center">{{item.stock}}</td>
+                      <td class="text-center">{{item.reingreso}}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item>
+            <v-card tile class="pa-2" style="height: 89vh">
+              <div class="row no-gutters">
+                <div class="col">
+                  <div><span class="titleDatos" style="font-size: 20px !important;">Utilidades</span></div>
+                </div>
+              </div>
+              <v-divider></v-divider>
+
+              <v-row>
+                <v-col>
+                  <v-card height="80" class="rowsTable" @click="imprimirEtiqueta">
+                    <v-row>
+                      <v-col cols="1" class="mt-2">
+                        <div class="white d-flex justify-center ml-3" style="border-radius: 100px; height: 40px; width: 60px">
+                          <v-icon color="cyan" size="25">fa fa-tag</v-icon>
+                        </div>
+                      </v-col>
+                      <v-col class="mt-2" style="margin-left: 40px">
+                        <v-card-text class="pt-0">
+                          <div class="text-h6 font-weight-light mb-2">
+                            Imprimir Etiqueta
+                          </div>
+                        </v-card-text>
+                      </v-col>
+                    </v-row>
+                  </v-card>
+                </v-col>
+                <v-col></v-col>
+                <v-col></v-col>
+                <v-col></v-col>
+              </v-row>
+
+            </v-card>
+          </v-tab-item>
+          <v-tab-item>
+            <v-card tile class="pa-2" style="height: 89vh">
+              <div class="row no-gutters">
+                <div class="col">
+                  <div><span class="titleDatos" style="font-size: 20px !important;">Solicitúd de Transferencia</span></div>
+                </div>
+              </div>
+              <v-divider></v-divider>
+              <v-card flat tile class="d-flex justify-center">
+                <v-card tile width="50%" class="pa-5">
+                  <v-form ref="FormSolicitudTransferencia">
+                    <v-row>
+                      <v-col cols="5">
+                        <v-text-field v-model="Solicitar.cantidad"
+                                      label="Cantidad a Solicitar"
+                                      :rules="[rules.envio.req, rules.envio.mayor]"
+                                      type="number">
+                        </v-text-field>
+                      </v-col>
+                      <v-col cols="7">
+                        <v-select v-model="Solicitar.estado"
+                                  :items="Solicitar.itemEstado"
+                                  :rules="[rules.envio.req]"
+                                  label="Estado del Artículo"
+                                  @change="validarStock"
+                                  type="number">
+                        </v-select>
+                      </v-col>
+                    </v-row>
+                    <v-select v-model="Solicitar.stock"
+                              :rules="[rules.envio.req]"
+                              @change="validarStock"
+                              :items="Solicitar.Sucursales"
+                              label="Sucursal de Origen"
                               type="number">
-                </v-text-field>
-              </v-col>
-              <v-col cols="7">
-                <v-select v-model="Solicitar.estado"
-                          :items="Solicitar.itemEstado"
-                          :rules="[rules.envio.req]"
-                          label="Estado del Artículo"
-                          @change="validarStock"
-                          type="number">
-                </v-select>
-              </v-col>
-            </v-row>
-            <v-select v-model="Solicitar.stock"
-                      :rules="[rules.envio.req]"
-                      @change="validarStock"
-                      :items="Solicitar.Sucursales"
-                      label="Sucursal de Origen"
-                      type="number">
-            </v-select>
-            <v-text-field v-model="suc"
-                          label="Sucursal Solicitante"
-                          disabled>
-            </v-text-field>
-            <v-text-field v-model="user"
-                          label="Usuario Solicitante"
-                          disabled>
-            </v-text-field>
-            <v-select :items="Motivos"
-                      :item-text="'motivo'"
-                      :rules="[rules.envio.req]"
-                      v-model="Solicitar.motivo"
-                      label="Motivo de Solicitud"
-                      :item-value="'id'"></v-select>
-            <v-textarea v-model="Solicitar.observacion"
-                        rows="3"
-                        :rules="[rules.envio.req, rules.envio.min, rules.envio.max]"
-                        label="Observación"
-                        :counter="244">
-            </v-textarea>
-          </v-form>
-
-          <v-card-actions class="d-flex justify-end">
-            <v-btn color="orange" small dark @click="Solicitar.dialogo = false">Cancelar</v-btn>
-            <v-btn color="success" small dark @click="validarSolicitudEnvio">Solicitar Artículo</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <v-navigation-drawer v-model="sidePrecio" clipped right
-                           absolute width="100%" class="side" >
-        <v-container>
-          <v-row no-gutters>
-            <v-col cols="1" class="d-flex align-center">
-              <v-btn class="ma-2" dark fab x-small text color="red" @click="sidePrecio = false">
-                <v-icon>fa fa-times</v-icon>
-              </v-btn>
-            </v-col>
-            <v-col cols="11" class="d-flex justify-center align-center"><h4>Cotizador de {{data.nombre_articulo}} [{{data.descripcion_corta}}]</h4></v-col>
-          </v-row>
-
-          <v-row no-gutters>
-            <v-col>
-              <v-card class="ma-2 pa-2" >
-                <v-row no-gutters>
-                  <v-col cols="8">
-                    <v-alert v-if="Precios.S_contado" dense border="left" type="warning" text>
-                      Este artículo solo se puede vender al contado.
-                    </v-alert>
-                  </v-col>
-                  <v-col cols="4" class="d-flex justify-end align-center">
-                    <v-tooltip v-if="Precios.meses > 0" top>
-                      <template v-slot:activator="{on , attrs}">
-                        <v-btn class="ma-2" v-bind="attrs" v-on="on" x-small fab dark @click="registrarCotizacion">
-                          <v-icon>fa fa-print</v-icon>
-                        </v-btn>
-                      </template>
-                      <span>Imprimir Cotización</span>
-                    </v-tooltip>
-                    <v-tooltip top>
-                      <template v-slot:activator="{on , attrs}">
-                        <v-btn class="ma-2" v-bind="attrs" v-on="on" color="green" x-small fab dark>
-                          <v-icon>fa fa-cart-arrow-down</v-icon>
-                        </v-btn>
-                      </template>
-                      <span>Realizar Venta de Contado</span>
-                    </v-tooltip>
-                    <v-tooltip top>
-                      <template v-slot:activator="{on, attrs}">
-                        <v-btn fab x-small color="pink" v-bind="attrs" :disabled="!calcularP"
-                               v-on="on" class="ma-2" @click="sideSolicitud = true">
-                          <v-icon color="white">fa fa-clipboard-list</v-icon></v-btn>
-                      </template>
-                      <span>Crear Solicitúd de Crédito</span>
-                    </v-tooltip>
-                    <v-tooltip top v-if="Precios.meses > 0">
-                      <template v-slot:activator="{on, attrs}">
-                        <v-btn fab x-small color="indigo" v-bind="attrs"
-                               v-on="on" dark class="ma-2" @click="sideSeguimiento = true">
-                          <v-icon>fa fa-tasks</v-icon></v-btn>
-                      </template>
-                      <span>Crear Seguimiento</span>
-                    </v-tooltip>
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col>
-                    <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.contado"
-                                  label="Precio de Contado"></v-text-field>
-                  </v-col>
-                  <v-col>
-                    <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.min_prima"
-                                  label="Mínimo de Prima"></v-text-field>
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col >
-                    <v-text-field class="ma-2" dense suffix="lps" disabled v-model="Precios.saldo"
-                                  label="Saldo"></v-text-field>
-                  </v-col>
-                  <v-col>
-                    <v-text-field class="ma-2" suffix="lps" v-model="Precios.prima" :disabled="Precios.S_contado"
-                                  :rules="[rules.precios.prima]" @keyup="calcularSaldoNuevo"
-                                  label="*Prima propuesta por el cliente" dense></v-text-field>
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col>
-                    <v-text-field class="ma-2" suffix="lps" disabled dense
-                                  label="Saldo a financiar" v-model="Precios.saldo_nuevo"></v-text-field>
-                  </v-col>
-                  <v-col>
-                    <v-select dense label="*Forma de pagos" v-model="Precios.forma_pago"
-                              class="ma-2" :items="formaPagos" :disabled="Precios.S_contado"></v-select>
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col>
-                    <v-text-field dense label="*Cantidad de meses" class="ma-2"
-                                  @keyup.enter="calcularPagos"
-                                  :disabled="Precios.S_contado"
-                                  v-model="Precios.meses" suffix="meses"></v-text-field>
-                  </v-col>
-                  <v-col>
-                    <v-text-field dense
-                                  class="ma-2"
-                                  disabled
-                                  suffix="meses"
-                                  v-model="Precios.maximo_financiamiento"
-                                  label="Maximo de meses a financiar"></v-text-field>
-                  </v-col>
-
-                </v-row>
-                <v-row>
-                  <v-col>
-                    <v-text-field dense
-                                  class="ma-2"
-                                  disabled
-                                  suffix="lps"
-                                  v-model="Precios.cuota"
-                                  label="Cuota por pago"></v-text-field>
-                  </v-col>
-                  <v-col>
-                    <v-text-field dense
-                                  class="ma-2"
-                                  disabled
-                                  suffix="lps"
-                                  v-model="Precios.total_credito"
-                                  label="Total del Crédito"></v-text-field>
-                  </v-col>
-                </v-row>
-                <v-divider></v-divider>
-                <v-card-subtitle>Forma de calcular los pagos</v-card-subtitle>
-                <v-card-actions class="d-flex justify-end">
-                  <v-btn class="ma-2" @click="calcularPagosContadoPagos" small tile dark :disabled="Precios.S_contado"
-                         color="blue" v-if="Precios.prom_cant_cuotas > 0">Contado para {{Precios.prom_cant_cuotas}} pagos</v-btn>
-                  <v-btn class="ma-2" @click="calcularPagosSinPrima" small tile dark :disabled="Precios.S_contado"
-                         color="green" v-if="Precios.venta_sin_prima">Sin Prima</v-btn>
-                  <v-btn class="ma-2" @click="calcularPagos" small tile dark :disabled="Precios.S_contado"
-                         color="indigo">Financiado</v-btn>
-                </v-card-actions>
+                    </v-select>
+                    <v-text-field v-model="suc"
+                                  label="Sucursal Solicitante"
+                                  disabled>
+                    </v-text-field>
+                    <v-text-field v-model="user"
+                                  label="Usuario Solicitante"
+                                  disabled>
+                    </v-text-field>
+                    <v-select :items="Motivos"
+                              :item-text="'motivo'"
+                              :rules="[rules.envio.req]"
+                              v-model="Solicitar.motivo"
+                              label="Motivo de Solicitud"
+                              :item-value="'id'"></v-select>
+                    <v-textarea v-model="Solicitar.observacion"
+                                rows="3"
+                                :rules="[rules.envio.req, rules.envio.min, rules.envio.max]"
+                                label="Observación"
+                                :counter="244">
+                    </v-textarea>
+                  </v-form>
+                  <v-card-actions class="d-flex justify-end">
+                    <v-btn color="success" tile small dark @click="validarSolicitudEnvio">Solicitar Artículo</v-btn>
+                  </v-card-actions>
+                </v-card>
               </v-card>
-            </v-col>
-            <v-col>
-              <v-card class="ma-2 pa-2" flat>
-                <b-table :current-page="currentPage"
-                         :per-page="perPage"
-                         bordered
-                         hover
-                         striped
-                         class="rowsTable"
-                         :fields="fieldsPagos"
-                         :items="Precios.pagos"
-                         caption-top
-                         small>
-                  <template v-slot:table-caption>Pagos del crédito</template>
-                  <template v-slot:head(num)>#</template>
-                  <template v-slot:head(fecha)>Fecha de Pago</template>
-                  <template v-slot:head(saldo)>Saldo</template>
-                  <template v-slot:head(cuota)>Cuota</template>
-                  <template v-slot:head(saldo_a)>Saldo Restante</template>
-                  <template v-slot:cell(saldo)="scope">
-                    L {{scope.item.saldo}}
-                  </template>
-                  <template v-slot:cell(cuota)="scope">
-                    L {{scope.item.cuota}}
-                  </template>
-                  <template v-slot:cell(saldo_a)="scope">
-                    L {{scope.item.saldo_a}}
-                  </template>
-                </b-table>
-                <v-row>
-                  <v-col class="d-flex justify-center">
-                    <b-pagination :disabled="Precios.S_contado"
-                                  v-model="currentPage"
-                                  :total-rows="totalRows"
-                                  :per-page="perPage"
-                                  align="fill"
-                                  size="sm"
-                                  class="my-0"
-                    ></b-pagination>
-                  </v-col>
-                </v-row>
-              </v-card>
-            </v-col>
-          </v-row>
+            </v-card>
+          </v-tab-item>
+        </v-tabs>
 
-        </v-container>
-      </v-navigation-drawer>
-
-      <v-navigation-drawer v-model="sideSeguimiento" clipped right absolute width="100%" class="side">
-        <v-container>
-          <v-row no-gutters>
-            <v-col cols="1" class="d-flex align-center">
-              <v-btn class="ma-2" dark fab x-small text color="red" @click="sideSeguimiento = false">
-                <v-icon>fa fa-times</v-icon>
-              </v-btn>
-            </v-col>
-            <v-col cols="11" class="d-flex justify-center align-center"><h4>Creando Seguimiento de Prospecto de {{data.nombre_articulo}}</h4></v-col>
-          </v-row>
-          <hr>
-          <seguimiento v-if="sideSeguimiento" :articulo="data" :forma_pago="forma_de_pago"
-                       :cuota="parseInt(Math.round(Precios.cuota))"
-                       :prima="parseInt(Math.round(Precios.prima))"
-                       :contado="parseInt(Math.round(Precios.contado))"
-                       :precio="precio_enviar" :pagos="parseInt(Precios.meses)"/>
-        </v-container>
-      </v-navigation-drawer>
-
-      <v-navigation-drawer v-model="sideSolicitud" clipped right absolute width="100%" class="side">
-        <v-container>
-          <v-row no-gutters>
-            <v-col cols="1" class="d-flex align-center">
-              <v-btn class="ma-2" dark fab x-small text color="red" @click="sideSolicitud = false">
-                <v-icon>fa fa-times</v-icon>
-              </v-btn>
-            </v-col>
-            <v-col cols="11" class="d-flex justify-center align-center"><h4>Solicitud de Crédito</h4></v-col>
-          </v-row>
-          <hr>
-          <solicitud v-if="sideSolicitud" :precio="Precios" :combo="false" :articulo="data" :forma_pago="forma_de_pago"/>
-        </v-container>
-      </v-navigation-drawer>
-
-      <v-dialog v-model="dialogoEtiqueta" width="25%">
-        <v-card>
-          <v-toolbar color="grey lighten-3" dense flat>
-            <v-card-title>Creando Etiqueta</v-card-title>
-          </v-toolbar>
-          <v-container>
-            <v-btn color="success" small tile dark block @click="imprimirEtiqueta">Crear Etiqueta</v-btn>
-          </v-container>
-          <v-divider></v-divider>
-          <v-card-actions class="d-flex justify-end">
-            <v-btn color="orange" small tile dark @click="dialogoEtiqueta = false">Cerrar</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      </v-card>
     </div>
 </template>
 
@@ -560,7 +571,10 @@
     props:{data: Object},
     data(){
       return{
+        urlFoto: '',
+        dialogoFoto: false,
         dialogoEtiqueta: false,
+        fotos: [],
         observacion: '',
         currentPage: 1,
         totalRows: 1,
@@ -574,6 +588,7 @@
           'num','fecha','saldo','cuota','saldo_a'
         ],
         Precios:{
+          observacion: '',
           S_contado: false,
           contado:0,
           min_prima: 0,
@@ -640,11 +655,15 @@
       this.cargarMotivosTraslados()
     },
     methods:{
+      abrirDialogoFoto(url){
+        this.urlFoto     = url;
+        this.dialogoFoto = true;
+      },
       calcularPagos(){
         this.observacion = 'VENTA FINANCIADA'
         this.calcularP = true;
+        //Meses son los meses que el usuario ingreso
         let MESES = this.Precios.meses, FIN = this.Precios.financiamiento;
-        console.log(MESES)
         let SALDO_F = this.Precios.saldo_nuevo;
         this.calcularSaldoNuevo();
         if (MESES <= this.Precios.maximo_financiamiento){
@@ -652,7 +671,7 @@
             this.Precios.cuota = 0
             this.Precios.pagos = [];
             let TASA_M = (FIN / 12).toFixed(4);
-            console.log(TASA_M)
+            console.log('tasa interes mensual: '+TASA_M)
             let TASA = Math.pow(parseInt(1) + parseFloat(TASA_M), -MESES);
             console.log(TASA)
             TASA = TASA - 1;
@@ -676,7 +695,8 @@
             this.Precios.total_credito = (this.Precios.cuota * pagos).toFixed(2);
             console.log("saldo a financiar "+SALDO_F);
             console.log("Tasa "+TASA_M);
-            this.crearPagos(pagos, this.Precios.forma_pago, TASA_M)
+            //financiamiento
+            this.crearPagos(pagos, this.Precios.forma_pago, 1)
           }
         }else
           this.$store.commit('notificacion',{texto:'No es valida la cantidad de meses', color:'warning'})
@@ -711,7 +731,8 @@
             }
             this.Precios.total_credito = 0;
             this.Precios.total_credito = (this.Precios.cuota * pagos).toFixed(2);
-            this.crearPagos(pagos, this.Precios.forma_pago, TASA_M)
+            //sin prima
+            this.crearPagos(pagos, this.Precios.forma_pago, 2)
           }
         }else
           this.$store.commit('notificacion',{texto:'No es valida la cantidad de meses', color:'warning'})
@@ -722,32 +743,43 @@
         this.Precios.meses = this.Precios.prom_cant_cuotas;
         this.Precios.saldo_nuevo =this.Precios.contado;
         this.Precios.total_credito = this.Precios.contado;
-        this.Precios.prima = 0;
         this.Precios.cuota = 0
         this.Precios.pagos = [];
         this.Precios.cuota = (this.Precios.contado / this.Precios.prom_cant_cuotas).toFixed(3);
-        this.crearPagos(this.Precios.prom_cant_cuotas,this.Precios.forma_pago);
+        this.Precios.prima = 0
+        this.crearPagos(this.Precios.prom_cant_cuotas - 1,this.Precios.forma_pago, 3);
 
       },
-      crearPagos(pagos, tipo){
+      // tipo 1 -> financiado, 2->sin prima, 3 -> contado para pagos
+      crearPagos(pagos, tipoPago, tipo){
         this.totalRows = 1;
         let dias= 0, saldo = this.Precios.total_credito;
         let ANTES = new Date(), cuota = this.Precios.cuota;
 
-        if(this.Precios.prima > 0){
+        if(this.Precios.prima > 0 || (tipo === 1 || tipo === 3)){
+          let pago = 0;
+          let saldoA = 0;
+          if (tipo === 1) {
+            pago = this.Precios.prima;
+            saldoA = (parseFloat(saldo) + parseFloat(this.Precios.prima)).toFixed(2);
+          }else if (tipo === 3) {
+            pago = this.Precios.cuota;
+            saldoA = saldo
+            saldo  = (saldo - pago).toFixed(2)
+          }
           this.Precios.pagos.push({
             "num": 'prima',
             "fecha": ANTES.getDate()+'/'+(ANTES.getMonth() + 1)+'/'+ANTES.getFullYear(),
-            "saldo": (parseFloat(saldo) + parseFloat(this.Precios.prima)).toFixed(2),
-            "cuota": this.Precios.prima,
+            "saldo": saldoA,
+            "cuota": pago,
             "saldo_a": saldo
           });
         }
         this.totalRows++;
-        if (tipo === 1 || tipo === 2){
-          if (tipo === 1){
+        if (tipoPago === 1 || tipoPago === 2){
+          if (tipoPago === 1){
             dias = 7
-          }else if (tipo === 2){
+          }else if (tipoPago === 2){
             dias = 15
           }
           for (let i = 0;  i < pagos; i++){
@@ -800,6 +832,7 @@
         }).then((res)=>{
           this.Detalles   = res.data.detalles;
           this.Stock      = res.data.stock;
+          this.fotos      = res.data.fotos;
           res.data.compuestos.forEach( (i) => {
             i.inventario_compuestos.forEach( (a) => {
               this.Compuestos.push({
@@ -825,7 +858,8 @@
           }
         }).then((res)=>{
           if (res.status === 200){
-            this.PrecioArticulo = res.data.precio[0];
+            let precio = res.data.precio.filter(item=>item.estado === 1)
+            this.PrecioArticulo = precio[0];
             this.Precios.contado = this.PrecioArticulo.precio_contado;
             this.Precios.min_prima = this.PrecioArticulo.minimo_prima;
             this.Precios.saldo = (parseFloat(this.Precios.contado) - parseFloat(this.Precios.min_prima)).toFixed(2)
@@ -963,5 +997,62 @@
   }
   .side{
     opacity: 0.99;
+  }
+  .titleDatos{
+    font-family: 'Rubik', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: #272727;
+  }
+  .subtitleDatos{
+    font-family: 'Rubik', sans-serif;
+    font-size: 11px;
+    color: #3a3a3a;
+  }
+  .titleInput{
+    font-size: 12px;
+    font-family: 'Rubik', sans-serif;
+    color: #7F828B;
+  }
+  table{
+    width: 100%;
+    border-collapse: collapse;
+  }
+  table thead tr th{
+    font-size: 12px;
+    font-family: 'Rubik', sans-serif;
+    font-weight: bold;
+    color: #7F828B;
+    text-align: start;
+  }
+  table tbody tr td{
+    font-size: 11px;
+    font-family: 'Rubik', sans-serif;
+    color: #7F828B;
+    height: 22px;
+    border-bottom: solid 1px #DADADA;
+  }
+  table tbody tr:hover{
+    cursor: pointer;
+    background-color: #f6f6f6;
+  }
+  .containerInput{
+    border: solid 1px #DADADA;
+    padding: 2px;
+    height: 30px;
+  }
+  select{
+    font-size: 14px;
+  }
+  .bodyTrTitle{
+    padding: 8px;
+    font-family: 'Rubik', sans-serif;
+  }
+  .bodyTrSubTitle{
+    color: #47494e;
+    font-family: 'Rubik', sans-serif;
+  }
+  .bodyTr{
+    border: solid 1px #b2b0b0;
   }
 </style>

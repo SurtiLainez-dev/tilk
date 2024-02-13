@@ -4,11 +4,12 @@ import Swal from "sweetalert2";
     <v-card class="pl-2 pr-2">
 <!--  Encabezado de la pagina    -->
       <v-row>
-        <v-col cols="4" class="d-flex justify-center align-center">
+        <v-col cols="8" class="d-flex justify-start align-center">
           <v-btn dark color="orange" tile small class="ma-2" @click="popupPlanilla = true">Crear Planilla</v-btn>
           <v-btn dark color="primary" tile small class="ma-2" @click="popupAcciones = true">Crear Acciones</v-btn>
+          <v-btn dark color="pink" tile small class="ma-2" @click="popupLote = true">Crear Lote de Planillas</v-btn>
         </v-col>
-        <v-col cols="8" class="d-flex justify-center">
+        <v-col cols="4" class="d-flex justify-center">
           <v-card-title>
             Área de Trábajo
           </v-card-title>
@@ -50,6 +51,16 @@ import Swal from "sweetalert2";
               </v-col>
             </v-row>
           </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-autocomplete label="Lotes Abiertos" dense
+                            v-model="lote_id"
+                            :item-value="'id'"
+                            :item-text="'nombre'"
+                            :items="Lotes"></v-autocomplete>
+          </v-col>
+          <v-col></v-col>
         </v-row>
 <!--    fin enzabezado de fechas    -->
         <v-divider></v-divider>
@@ -161,6 +172,21 @@ import Swal from "sweetalert2";
           <v-col class="d-flex justify-end">
             <v-btn dark color="orange" @click="planillaCol" small tile
                    v-if="selectedColaboradores.length > 0">Registrar Empleados</v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="popupLote" width="800px">
+      <v-card class="pl-5 pr-5">
+        <v-progress-linear indeterminate color="green" v-if="isPeticionSucursal"></v-progress-linear>
+        <v-card-title>Creando un Lote de Planillas</v-card-title>
+        <v-divider></v-divider>
+        <v-form ref="FormLotePlanillas">
+          <v-text-field dense label="Nombre del Lote" v-model="nombreLoto"></v-text-field>
+        </v-form>
+        <v-row>
+          <v-col class="d-flex justify-end">
+            <v-btn dark color="orange" @click="registrarLote"  small tile>Registrar Lote</v-btn>
           </v-col>
         </v-row>
       </v-card>
@@ -306,6 +332,9 @@ import Swal from "sweetalert2";
     },
     data(){
       return{
+        lote_id: 0,
+        Lotes: [],
+        nombreLoto: '',
         num:{
           rule:{
             tel: v => (v.length === 0 || /^[+]?([0-9]+(?:[\.][0-9]*)?|\.[0-9]+)$/.test(v)) || 'Telefono no válido, tienes datos diferentes a números'
@@ -349,6 +378,7 @@ import Swal from "sweetalert2";
         },
         popupAcciones:          false,
         popupPlanilla:          false,
+        popupLote:              false,
         sucursal_id:            '',
         selected:               [],
         sucursal:               {
@@ -387,7 +417,10 @@ import Swal from "sweetalert2";
       this.cargarRangos();
       this.anios();
       this.cargarTipoAccionesPlanillas();
-      this.$store.commit('guardarTitulo', 'Planilla > Nueva')
+      this.$store.commit('guardarTitulo', 'Planilla > Nueva');
+      this.$axios.get('lotes_planillas').then((res)=>{
+        this.Lotes = res.data.lotes;
+      })
     },
     methods:{
       addAccion: function(){
@@ -466,11 +499,12 @@ import Swal from "sweetalert2";
         })
       },
       crearPlanilla(){
-        if (this.$refs.FormRegistroPlanilla.validate()){
+        if (this.$refs.FormRegistroPlanilla.validate() && this.lote_id > 0){
           this.dialogoVerificar = false
           this.overlay = true
           return this.$axios.post("/planillas", {
-            sucursalId: this.sucursal.id,
+            lote_id:     this.lote_id,
+            sucursalId:  this.sucursal.id,
             observacion: this.sucursal.observacion,
             mesAsignado: this.sucursal.nombreMes,
             anoAsignado: this.sucursal.ano,
@@ -569,6 +603,25 @@ import Swal from "sweetalert2";
       },
       print: function(){
         this.$router.replace({path:'/colaborador/planillas/pdf/'+this.codPlanillasGo})
+      },
+      registrarLote(){
+        if (this.nombreLoto.length > 10){
+          this.$store.commit('activarOverlay', true);
+          this.popupLote = false;
+          this.$axios.post('lote_nuevo',{
+            nombre: this.nombreLoto
+          }).then((res)=>{
+            this.Lotes = res.data.lotes;
+            this.$store.commit('notificacion',{texto:res.data.msj, color:'success'});
+            this.$store.commit('activarOverlay', false);
+          }).catch((error)=>{
+            this.$store.commit('notificacion',{texto:'Hubo un error en el servidor', color:'error'});
+            this.popupLote = true;
+            this.$store.commit('activarOverlay', false);
+          })
+        }else{
+          this.$store.commit('notificacion',{texto:'El nombre tiene que tener mas de 10 caracteres', color:'warning'})
+        }
       },
       selectTipoAccion: function(item){
         if (this.dataPlanilla[this.index].tipoAccion[item] && this.dataPlanilla[this.index].totalAccion[item]){

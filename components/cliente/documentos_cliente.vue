@@ -93,8 +93,7 @@ export default {
 
       data.append('id', this.CLIENTE.id);
       data.append('archivos', JSON.stringify(this.Archivos));
-      this.$store.commit('activarOverlay', true);
-
+      this.$store.commit('activarOverlay', true)
       this.$axios({
         method:'post',
         url:'clientes/edit/files',

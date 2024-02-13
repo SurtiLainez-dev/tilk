@@ -28,28 +28,28 @@ export const mutations = {
         })
     },
     carlular_RGBA(state){
-        let num  = Math.floor(Math.random()*19);
+        let num  = Math.floor(Math.random()*18);
         let color1  = [
-            '#F300FF',
-            '#FF00BD',
-            '#FF0000',
-            '#001BFF',
-            '#900C3F',
-            '#fdf2e9',
-            '#DAF7A6',
-            '#ED92DF',
-            '#7FB3D5',
-            '#FF6400',
-            '#C8F521',
-            '#FF5733',
-            '#FFF700',
-            '#8FFF00',
-            '#00FF23',
+            '#CD6155',
+            '#EC7063',
+            '#AF7AC5',
+            '#A569BD',
+            '#5499C7',
+            '#5DADE2',
+            '#48C9B0',
+            '#45B39D',
+            '#52BE80',
+            '#58D68D',
+            '#F4D03F',
+            '#F5B041',
+            '#EB984E',
+            '#DC7633',
+            '#CACFD2',
             '#AAB7B8',
-            '#00FFD4',
-            '#009EFF',
-            '#FFC300',
-            '#7000FF'];
+            '#99A3A4',
+            '#5D6D7E',
+            '#566573',
+        ];
 
         state.RGBA =  color1[num];
     }

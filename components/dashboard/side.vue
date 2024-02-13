@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer v-if="$store.state.MENU" app dark permanent>
+    <v-navigation-drawer color="grey darken-3" v-if="$store.state.MENU" app dark permanent>
         <v-list>
           <v-list-item >
             <v-list-item-content>
@@ -7,7 +7,7 @@
                 TILK
               </v-list-item-title>
               <v-list-item-subtitle>
-                Surtidora Laínez
+                <span v-if="tipoUser < 5">Surtidora Laínez</span> <span v-else>Surti Créditos - {{$store.state.sucursal_id}}</span>
               </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
@@ -15,8 +15,8 @@
 
         <v-divider></v-divider>
 
-        <v-row>
-            <v-col class="subMenu rounded-lg px-2" cols="3">
+        <v-row v-if="tipoUser < 5">
+            <v-col class="subMenu rounded-lg px-2 grey darken-2" cols="3">
                 <v-row v-for="item in opciones">
                   <v-col v-if="item.id === 1" class="d-flex justify-center" @click="go(item.url, item.id, item.accion)">
                       <v-tooltip right>
@@ -63,28 +63,6 @@
                           <v-icon>{{item.icono}}</v-icon>
                         </v-btn>
                         <v-btn v-else @click="go(item.url, item.id, item.accion)" v-on="on" v-bind="attrs" :color="item.color" fab x-small dark>
-                          <v-icon>{{item.icono}}</v-icon>
-                        </v-btn>
-                      </template>
-                      <span>{{item.titulo}}</span>
-                    </v-tooltip>
-                  </v-col>
-                  <v-col v-else-if="item.id === 11" class="d-flex justify-center">
-                    <v-tooltip right>
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-btn @click="go(item.url, item.id, item.accion)" v-on="on" v-bind="attrs"
-                               :color="item.color" fab x-small dark>
-                          <v-icon>{{item.icono}}</v-icon>
-                        </v-btn>
-                      </template>
-                      <span>{{item.titulo}}</span>
-                    </v-tooltip>
-                  </v-col>
-                  <v-col v-else-if="item.id === 12" class="d-flex justify-center">
-                    <v-tooltip right>
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-btn @click="$store.commit('cambiar_MENU')" v-on="on" v-bind="attrs"
-                               :color="item.color" fab x-small dark>
                           <v-icon>{{item.icono}}</v-icon>
                         </v-btn>
                       </template>
@@ -165,6 +143,35 @@
             </v-list>
           </v-col>
         </v-row>
+
+      <div v-else-if="tipoUser == 5">
+        <v-list-item class="itemOpciones" @click="goFinanciera('/inicio/')">
+          Inicio
+        </v-list-item>
+        <v-list-group color="green">
+          <template v-slot:activator value="true">
+            <v-tooltip top>
+              <span>Opciones de la financiera</span>
+              <template v-slot:activator="{on, attrs}"><v-list-item-title v-on="on" v-bind="attrs">Opciones</v-list-item-title></template>
+            </v-tooltip>
+          </template>
+          <v-list-item class="itemOpciones" @click="goFinanciera('/financiera/solicitud_nueva')">
+            Crear Solicitúd
+          </v-list-item>
+          <v-list-item class="itemOpciones" @click="goFinanciera('/financiera/solicitudes')">
+            Ver Solicitudes
+          </v-list-item>
+          <v-list-item class="itemOpciones" @click="goFinanciera('/financiera/ventas')">
+            Ver Ventas
+          </v-list-item>
+          <v-list-item class="itemOpciones" @click="goFinanciera('/financiera/cuadro_ventas')">
+            Cuadro de Ventas
+          </v-list-item>
+          <v-list-item class="itemOpciones" @click="goFinanciera('/financiera/clientes')">
+            Mis Clientes
+          </v-list-item>
+        </v-list-group>
+      </div>
     </v-navigation-drawer>
 </template>
 
@@ -237,10 +244,6 @@
             'url': '/caja/', 'id': 9, 'modulo': 0, 'accion': true},
           {'color':'green darken-4', 'titulo':'Reportes', 'icono':'fa fa-file-contract',
             'url': '', 'id': 10, 'modulo': 0, 'accion': false},
-          {'color':'light-blue darken-4', 'titulo':'Cerrar Sesión', 'icono':'fa fa-sign-in-alt',
-            'url': '', 'id': 11, 'modulo': 0, 'accion': false},
-          {'color':'light-blue darken-4', 'titulo':'Esconder Menú', 'icono':'mdi-eye-off',
-            'url': '', 'id': 12, 'modulo': 0, 'accion': false}
         ]
     }
     },
@@ -280,6 +283,9 @@
         if (accion)
           this.$router.push(url)
       },
+      goFinanciera(url){
+        this.$router.push(url)
+      }
     },
     computed:{
       tipoUser: function () {
@@ -303,7 +309,7 @@
         set: function (val){
           this.$store.commit('cambiar_MENU');
         }
-      }
+      },
     }
   }
 </script>
@@ -313,5 +319,14 @@
         margin-top: 10px;
         background-color: #47494e;
     }
-
+    .itemOpciones{
+      font-size: 10px !important;
+      margin-left: 6px;
+      cursor: pointer;
+    }
+    .itemOpciones:hover{
+      background-color: #47494e;
+      margin-left: 8px;
+      font-size: 14px !important;
+    }
 </style>

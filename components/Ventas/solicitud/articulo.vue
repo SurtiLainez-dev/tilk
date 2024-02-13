@@ -10,7 +10,7 @@
                         </tr>
                         <tr>
                             <th>Marca: </th>
-                            <td><input type="text" disabled v-model="articulo.marca"></td>
+                            <td><input type="text" disabled v-model="articulo.marca.nombre"></td>
                         </tr>
                         <tr>
                             <th>Código del sistema: </th>
@@ -150,7 +150,7 @@
         <small>Observación del precio</small>
         <br>
         <br>
-        <v-textarea outlined label="Observación" dense rows="4">
+        <v-textarea outlined label="Observación" v-model="precio.observacion" dense rows="4">
 
         </v-textarea>
         <hr>

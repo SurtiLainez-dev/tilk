@@ -48,10 +48,18 @@ export const state = () =>({
   DIRUTILIDADES: null,
   IMPUESTO: {},
   ACTUALIZACION: false,
-  VERSION: ''
+  VERSION: '',
+  URL_VERSION: null,
+  DESCARGA_FINALIZADA: false
 });
 
 export const mutations = {
+  cambiarEstado_DESCARGAFINALIZADA(state, estado){
+    state.DESCARGA_FINALIZADA = estado
+  },
+  agregar_URLVERSION(state, url){
+    state.URL_VERSION = url;
+  },
   agregarACTUALIZACION(state, version){
     state.ACTUALIZACION = version;
   },

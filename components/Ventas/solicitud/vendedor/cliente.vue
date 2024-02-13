@@ -539,7 +539,7 @@
                         'Content-Type': "multipart/form-data"
                     }
                 }).then((res)=>{
-                    this.$store.commit('solicitud_credito/cargarSolicitudes');
+                    this.$store.commit('solicitud_credito/cargarSolicitudes', {tipo: 1, search: null, fecha: null});
                     th.Archivos = [];
                     archivos = [];
                     archivos = res.data.files;

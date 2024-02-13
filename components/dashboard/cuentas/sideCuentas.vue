@@ -1,7 +1,7 @@
 <template>
   <div>
 
-    <v-list-group v-if="PERMISOS.includes(141)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(141)">
       <template v-slot:activator value="true">
         <v-list-item-title>Clientes</v-list-item-title>
       </template>
@@ -11,7 +11,7 @@
     </v-list-group>
 
 
-    <v-list-group v-if="PERMISOS.includes(144) || PERMISOS.includes(145) || PERMISOS.includes(146)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(144) || PERMISOS.includes(145) || PERMISOS.includes(146)">
       <template v-slot:activator value="true">
         <v-list-item-title>Ventas</v-list-item-title>
       </template>
@@ -21,16 +21,16 @@
       <v-list-item v-if="PERMISOS.includes(145)" dense class="itemOpciones" @click="go('/ventas/agregar_pagos')">
         Agregar Pagos a Cuentas
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(146)" dense class="itemOpciones" @click="go('/ventas/nueva_venta_manual')">
+      <v-list-item v-if="PERMISOS.includes(146)" dense class="itemOpciones" @click="anadirPestana(15,'Nueva Cuenta Manual')">
         Agregar Venta Manual
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(149)" dense class="itemOpciones" @click="go('/ventas/canceladas')">
+      <v-list-item v-if="PERMISOS.includes(149)" dense class="itemOpciones" @click="anadirPestana(13,'Cuentas Canceladas')">
         Ventas Canceladas
       </v-list-item>
       <v-list-item v-if="PERMISOS.includes(64)" class="itemOpciones" @click="go('/admin/cuentas')">
         Editar Cuenta
       </v-list-item>
-      <v-list-item class="itemOpciones" @click="go('/ventas/prospectos')">
+      <v-list-item class="itemOpciones" @click="anadirPestana(30,'Prospectos')">
         Prospectos
       </v-list-item>
       <v-list-item class="itemOpciones" @click="go('/ventas/ventas_x_col')">
@@ -38,7 +38,7 @@
       </v-list-item>
     </v-list-group>
 
-    <v-list-group v-if="PERMISOS.includes(147)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(147)">
       <template v-slot:activator value="true">
         <v-tooltip top>
           <template v-slot:activator="{on, attrs}">
@@ -55,7 +55,7 @@
       </v-list-item>
     </v-list-group>
 
-    <v-list-group v-if="PERMISOS.includes(7)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(7)">
       <template v-slot:activator value="true">
         <v-list-item-title>Cobros</v-list-item-title>
       </template>

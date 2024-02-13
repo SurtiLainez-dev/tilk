@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-list-group v-if="PERMISOS.includes(41) || PERMISOS.includes(42) || PERMISOS.includes(43) || PERMISOS.includes(48) ||
-               PERMISOS.includes(44) || PERMISOS.includes(46) || PERMISOS.includes(47)">
+               PERMISOS.includes(44) || PERMISOS.includes(46) || PERMISOS.includes(47)" color="green" >
       <template v-slot:activator value="true">
         <v-list-item-title>Contabilidad</v-list-item-title>
       </template>
@@ -32,8 +32,11 @@
       <v-list-item v-if="PERMISOS.includes(421)" dense class="itemOpciones" @click="go('/contabilidad/dxc')">
         Documentos por Cobrar
       </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/acreedores')">
+        Acreedores
+      </v-list-item>
     </v-list-group>
-    <v-list-group v-if="PERMISOS.includes(49) || PERMISOS.includes(410) || PERMISOS.includes(411) || PERMISOS.includes(412)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(49) || PERMISOS.includes(410) || PERMISOS.includes(411) || PERMISOS.includes(412)">
       <template v-slot:activator value="true">
         <v-list-item-title>Facturas</v-list-item-title>
       </template>
@@ -60,6 +63,12 @@
       </v-list-item>
       <v-list-item dense v-if="PERMISOS.includes(412)" class="itemOpciones" @click="go('/contabilidad/facturas/proveedor/ingreso_manual')">
         Ingreso Manual a CC
+      </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/formato_pagos/contratos/nuevo_contrato_servicios')">
+        Crear Contrato de Servicios
+      </v-list-item>
+      <v-list-item dense class="itemOpciones" @click="go('/contabilidad/formato_pagos/contratos/')">
+        Contratos de Servicios
       </v-list-item>
     </v-list-group>
   </div>

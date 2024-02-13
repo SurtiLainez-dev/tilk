@@ -10,7 +10,7 @@
       </v-tooltip>
     </v-card-actions>
     <v-data-table :headers="header" dense :items-per-page="20"
-                  :items="JSON.parse(CUENTA.estado_cuenta)">
+                  :items="EstadoCuenta">
       <template v-slot:item.debito="{item}">{{int.format(item.debito)}}</template>
       <template v-slot:item.credito="{item}">{{int.format(item.credito)}}</template>
       <template v-slot:item.saldo="{item}">{{int.format(item.saldo)}}</template>
@@ -31,6 +31,9 @@ export default {
       return this.$store.state.usuario;
     }
   },
+  created() {
+    this.cargarEstado();
+  },
   data(){
     return{
       header:[
@@ -41,7 +44,10 @@ export default {
         {text: 'Crédito', value:'credito'},
         {text: 'Saldo', value:'saldo'},
       ],
-      int: Intl.NumberFormat()
+      int: Intl.NumberFormat(),
+      EstadoCuenta: [],
+      idEstadoCuenta: 0,
+      load: true
     }
   },
   methods:{
@@ -51,6 +57,17 @@ export default {
 
       ipcRenderer.send('pint_navegador', url);
       this.$store.commit('activarOverlay', false);
+    },
+    cargarEstado(){
+      if (this.EstadoCuenta.length === 0){
+        this.$axios.get('venta/estado_cuenta/'+this.CUENTA.id).then((res)=>{
+          this.idEstadoCuenta = res.data.estado.id;
+          if (res.data.estado.estado_cuenta){
+            this.EstadoCuenta = JSON.parse(res.data.estado.estado_cuenta);
+          }
+          this.load = false;
+        })
+      }
     },
     solicitarClave(){
       this.$store.commit('activarOverlay', true);

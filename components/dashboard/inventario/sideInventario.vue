@@ -1,18 +1,21 @@
 <template>
   <div>
-    <v-list-group v-if="PERMISOS.includes(34) || PERMISOS.includes(310) || PERMISOS.includes(38)
+    <v-list-group color="green"  v-if="PERMISOS.includes(34) || PERMISOS.includes(310) || PERMISOS.includes(38)
     || PERMISOS.includes(312) || PERMISOS.includes(33) || PERMISOS.includes(39) || PERMISOS.includes(315)">
-      <template v-slot:activator value="true">
+      <template v-slot:activator value="true" >
         <v-list-item-title>Inventario</v-list-item-title>
       </template>
       <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="anadirPestana(6, 'Inventario')">
         Inventario
       </v-list-item>
+      <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="go('/inventario/articulos/articulos_reingreso')">
+        Inventario de Reingreso
+      </v-list-item>
       <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="anadirPestana(9, 'Inventario de Motocicletas')">
         Motocicletas
       </v-list-item>
-      <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="anadirPestana(9, 'Inventario de Combos')">
-        Motocicletas
+      <v-list-item v-if="PERMISOS.includes(34)" dense class="itemOpciones" @click="anadirPestana(19, 'Inventario Imprimible')">
+        Imprimir Inventario
       </v-list-item>
       <v-list-item v-if="PERMISOS.includes(310)"  dense class="itemOpciones" @click="anadirPestana(8, 'Crear Artículo')">
         Crear Artículo
@@ -50,7 +53,7 @@
         Inventario x Sucursal
       </v-list-item>
     </v-list-group>
-    <v-list-group v-if="PERMISOS.includes(311) || PERMISOS.includes(32) || PERMISOS.includes(37) || PERMISOS.includes(31)">
+    <v-list-group color="green"  v-if="PERMISOS.includes(311) || PERMISOS.includes(32) || PERMISOS.includes(37) || PERMISOS.includes(31)">
       <template v-slot:activator value="true">
         <v-list-item-title>Ordenes</v-list-item-title>
       </template>

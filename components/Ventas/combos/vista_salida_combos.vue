@@ -525,7 +525,7 @@ export default {
         articulos:   this.DATA_VENTA.facturas_contados
       }).then((res)=>{
         this.$store.commit('ventas/cargar_DATA_VENTA');
-        this.$store.commit('ventas/cargar_MIS_VENTAS');
+        this.$store.commit('ventas/cargar_MIS_VENTAS', null);
 
         this.$store.commit('notificacion',{texto:'Se ha actualizado la información de la venta', color:'success'})
         if (decision === 1) {

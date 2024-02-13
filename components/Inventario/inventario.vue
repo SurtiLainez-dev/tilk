@@ -125,7 +125,6 @@ export default {
     }
   },
   created() {
-    this.$store.commit('guardarTitulo', 'Inventario');
     this.cargarProveedor();
     this.cargarFamilias();
   },

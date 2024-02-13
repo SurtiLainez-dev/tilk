@@ -1,10 +1,10 @@
 <template>
     <div>
-      <v-list-group>
+      <v-list-group color="green" >
         <template v-slot:activator value="true">
           <v-list-item-title>Inventario</v-list-item-title>
         </template>
-        <v-list-item v-if="PERMISOS.includes(413)" dense class="itemOpciones" @click="go('/contabilidad/articulos/precio')">
+        <v-list-item v-if="PERMISOS.includes(413)" dense class="itemOpciones" @click="anadirPestana(24, 'Asignación de Precio')">
           Asignación de Precios
         </v-list-item>
         <v-list-item v-if="PERMISOS.includes(413)" dense class="itemOpciones" @click="go('/contabilidad/articulos/combos')">
@@ -31,9 +31,23 @@
     methods:{
       go(url){
         this.$router.push(url)
-      }
+      },
+      anadirPestana(key, titulo){
+        let bandera = 0;
+        this.Pes.forEach((item)=>{
+          if (item.key === key)
+            bandera++;
+        });
+        if (bandera === 0){
+          this.$store.commit('anadirCaja', {titulo:titulo, key: key});
+          this.$store.commit('cambiarTab', {val:key, tipo:false});
+        }
+      },
     },
     computed:{
+      Pes(){
+        return this.$store.state.pestana
+      },
       PERMISOS(){
         let permisos = this.$store.state.permisosUser.split(',');
         let per = [];

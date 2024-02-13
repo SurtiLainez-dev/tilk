@@ -600,7 +600,7 @@ export default {
           correo:      this.Colaborador,
           direccion:   this.Direccion
         }).then((res)=>{
-          this.$store.commit('ventas/cargar_MIS_VENTAS');
+          this.$store.commit('ventas/cargar_MIS_VENTAS', null);
           setTimeout(()=>{
             this.$store.commit('activarOverlay', false);
           },4500);

@@ -3,7 +3,7 @@ module.exports = {
 	components: true,
 	head: {
 		script:[
-			{ src: 'https://cdn.jsdelivr.net/npm/chart.js@2.8.0'},
+			{ src: 'https://cdn.jsdelivr.net/npm/chart.js'},
 		],
 		meta: [
 			{ charset: 'utf-8' },
@@ -18,11 +18,14 @@ module.exports = {
 			{rel:'stylesheet', href:'https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=Roboto+Slab&display=swap'},
 			{rel:'stylesheet', href:'https://fonts.googleapis.com/css2?family=Open+Sans:wght@500&display=swap'},
 			{rel:'stylesheet', href:'https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,500;1,400&family=Roboto&family=Roboto+Mono&display=swap'},
+			{rel:'stylesheet', href:"https://fonts.googleapis.com/css2?family=Montserrat&family=Rubik&display=swap"},
+
 		],
 		title: 'TILK',
 	}, // Headers of the page
 	build: {
 		vendor: ['vue-pdf'],
+		transpile: [/^vue2-google-maps($|\/)/],
 		extend (config, { isDev, isClient }) {
 			if (isDev && isClient) {
 				// Run ESLint on save

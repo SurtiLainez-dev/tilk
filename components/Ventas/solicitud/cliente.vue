@@ -132,6 +132,7 @@
                             <thead>
                             <tr>
                                 <th>Detalle</th>
+                                <th>Cod.</th>
                                 <th>Número</th>
                                 <th></th>
                             </tr>
@@ -139,6 +140,7 @@
                             <tbody>
                                 <tr v-for="item in Cliente.telefonos">
                                     <td><input type="text" v-model="item.detalle"></td>
+                                    <td><input type="text" v-model="item.area"></td>
                                     <td><input type="text" v-model="item.num"></td>
                                     <td>
                                         <v-btn color="red" width="20px" height="20px"
@@ -412,10 +414,10 @@
             this.Solicitud.avales = [];
             this.Solicitud.referencias=
                 [
-                    {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 0, comentario: ''},
-                    {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 1, comentario: ''},
-                    {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 2, comentario: ''},
-                    {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 3, comentario: ''},
+                    {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 0, comentario: '', area:'504', nuevo: false},
+                    {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 1, comentario: '', area:'504', nuevo: false},
+                    {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 2, comentario: '', area:'504', nuevo: false},
+                    {nombre: '', telefono: '', parentesco: '', direccion: '', estado:false, key: 3, comentario: '', area:'504', nuevo: false},
                 ]
         },
         computed:{
@@ -506,6 +508,7 @@
                 this.Cliente.telefonos.push({
                     'detalle':       'Telefono '+(parseInt(1) + parseInt(this.Cliente.telefonos.length)),
                     'num':           '',
+                    'area':          '504',
                     'key':           this.Cliente.telefonos.length
                 })
             },
@@ -528,9 +531,24 @@
                                 this.Fechas.mes = cl.fecha_nacimiento.split('-')[1];
                                 this.Fechas.ano = cl.fecha_nacimiento.split('-')[0];
                             }
-                            if (cl.telefonos)
-                                th.telefonos = JSON.parse(cl.telefonos);
-                            else
+                            let telefono = [];
+                            let area = '';
+                            if (cl.telefonos) {
+                              JSON.parse(cl.telefonos).forEach(item=>{
+                                if (!item.area){
+                                  if(item.num.length === 8)
+                                    area = '504';
+                                  else area = '';
+                                  telefono.push({
+                                    key: item.key,
+                                    num: item.num,
+                                    detalle: item.detalle,
+                                    area: area
+                                  })
+                                }else telefono.push(item)
+                              });
+                              th.telefonos = telefono;
+                            }else
                                 th.telefonos = [];
                             th.fecha_nacimiento = cl.fecha_nacimiento;
                             th.is_trabaja       = cl.is_trabaja;
@@ -615,12 +633,13 @@
                             th.telefonos        = [];
                             th.direcciones      = [];
                         }
-
                         this.loadIdentidad = false;
-                        this.vista = 2;
-                        this.height = '100%';
-                        this.width  = '100%';
-                        this.btncliente = true;
+
+                      this.vista = 2;
+                      this.height = '100%';
+                      this.width  = '100%';
+                      this.btncliente = true;
+                      console.log(this.Solicitud)
                     }).catch((error)=>{
                         this.notificacion('Hubo error al cargar los datos. Presiona ENTER nuevamente','error');
                         this.loadIdentidad = false;
@@ -924,7 +943,8 @@
                 let contador = 0, long = this.Cliente.telefonos.length;
                 if (long > 0){
                     this.Cliente.telefonos.forEach( (i)=>{
-                        if (i.detalle.length > 0 && i.num.length === 8)
+
+                        if (i.detalle.length > 0 && (i.num.length === 8 || i.num.length === 10 || i.num.length === 9) && i.area.length === 3)
                             contador++
                     });
                     if (contador === long)
