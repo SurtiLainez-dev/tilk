@@ -2,7 +2,7 @@
 <v-card flat tile>
     <v-row>
       <v-col cols="2">
-        <v-card  :loading="!loadData" height="460" width="256" class="mx-auto">
+        <v-card  :loading="!loadData" height="510" width="256" class="mx-auto">
           <v-navigation-drawer permanent>
             <v-list dense nav>
               <v-list-item v-for="item in items" :key="item.title" link @click="cambiarDatosMenu(item)">
@@ -17,24 +17,26 @@
       </v-col>
 
       <v-col cols="10">
-        <v-card height="100%" v-if="loadData">
-          <v-toolbar flat>
-            <v-card-title class="grey--text">{{tituloMenu}}</v-card-title>
-            <v-spacer></v-spacer>
-          </v-toolbar>
-          <v-divider></v-divider>
-          <datos_cuenta           v-if="VISTA === 1"/>
-          <cliente_cuenta         v-else-if="VISTA === 2"/>
-          <articulo_cuenta        v-else-if="VISTA === 3 && CUENTA.tipo_venta === 2"/>
-          <articulos_contado      v-else-if="VISTA === 3 && CUENTA.tipo_venta === 1"/>
-          <pago_nuevo             v-else-if="VISTA === 4"/>
-          <pagos_agregados_cuenta v-else-if="VISTA === 5"/>
-          <pagos_cuenta           v-else-if="VISTA === 6"/>
-          <estado_cuenta          v-else-if="VISTA === 7 && CUENTA.tipo_venta === 2"/>
-          <orden_entrega          v-else-if="VISTA === 8"/>
-          <recibos                v-else-if="VISTA === 9"/>
-          <deducción_mora         v-else-if="VISTA === 10 && PERMISOS.includes(148)"/>
-        </v-card>
+          <v-card height="100%" v-if="loadData">
+              <v-toolbar flat>
+                  <v-card-title class="grey--text">{{tituloMenu}}</v-card-title>
+                  <v-spacer></v-spacer>
+              </v-toolbar>
+              <v-divider></v-divider>
+              <datos_cuenta v-if="VISTA === 1" />
+              <cliente_cuenta v-else-if="VISTA === 2" />
+              <articulo_cuenta v-else-if="VISTA === 3 && CUENTA.tipo_venta === 2" />
+              <articulos_contado v-else-if="VISTA === 3 && CUENTA.tipo_venta === 1" />
+              <pago_nuevo v-else-if="VISTA === 4" />
+              <pagos_agregados_cuenta v-else-if="VISTA === 5" />
+              <pagos_cuenta v-else-if="VISTA === 6" />
+              <estado_cuenta v-else-if="VISTA === 7 && CUENTA.tipo_venta === 2" />
+              <orden_entrega v-else-if="VISTA === 8" />
+              <recibos v-else-if="VISTA === 9" />
+              <deducción_mora v-else-if="VISTA === 10 && PERMISOS.includes(148)" />
+              <editar_cuenta v-else-if="VISTA === 11" />
+              
+          </v-card>
       </v-col>
     </v-row>
 
@@ -53,6 +55,8 @@ import orden_entrega from "./cuentas/orden_entrega";
 import estado_cuenta from "./cuentas/estado_cuenta";
 import recibos from "./cuentas/recibos";
 import deducción_mora from "@/components/Ventas/cuentas/deducción_mora";
+import editar_cuenta from "@/components/Ventas/cuentas/editar_cuenta";
+    
 export default {
   components:{
     datos_cuenta,
@@ -64,7 +68,10 @@ export default {
     orden_entrega,
     estado_cuenta,
     recibos,
-    deducción_mora
+    deducción_mora,
+        editar_cuenta,
+       
+
   },
   name: "cuenta",
   data(){
@@ -81,6 +88,8 @@ export default {
         { title: 'Orden de Entrega',      val:8 },
         { title: 'Documentos',            val:9 },
         { title: 'Deducir Mora',          val:10},
+        { title: 'Edicion Venta',         val:11 },
+         
       ],
       vistaMenu: 1,
       loadData: false,
